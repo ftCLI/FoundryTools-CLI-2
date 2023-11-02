@@ -17,8 +17,8 @@ FVAR_TABLE = "fvar"
 
 class Font(TTFont):
     """
-    The Font class is a subclass of TTFont and provides additional properties to check the type and flavor of a font
-    file.
+    The Font class is a subclass of TTFont and provides additional properties to check the type and
+    flavor of a font file.
 
     Example Usage:
     >>>font = Font("font.ttf")
