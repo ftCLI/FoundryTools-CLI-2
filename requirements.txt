@@ -1,0 +1,1 @@
+fonttools[woff,pathops,unicode] == 4.43.1
