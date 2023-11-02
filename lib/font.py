@@ -51,6 +51,8 @@ class Font(TTFont):
 
         :return: True if the font is a PostScript font, False otherwise.
         """
+
+    def is_postscript(self):
         return self.sfntVersion == SFNT_POSTSCRIPT
 
     @property
@@ -86,10 +88,14 @@ class Font(TTFont):
 
         :return: True if the font is a SFNT font, False otherwise.
         """
+        return self.flavor == FLAVOR_WOFF2
+
+    def is_sfnt(self):
         return self.flavor is None
 
     @property
     def is_static(self):
+
         """
         Check if the font is a static font.
 
@@ -99,7 +105,6 @@ class Font(TTFont):
 
     @property
     def is_variable(self):
-        """
         Check if the font is a variable font.
 
         :return: True if the font is a variable font, False otherwise.
