@@ -58,6 +58,9 @@ class Font(TTFont):
     def is_woff2(self):
         return self.flavor == FLAVOR_WOFF2
 
+    def is_sfnt(self):
+        return self.flavor is None
+
     @property
     def is_static(self):
         return self.get(FVAR_TABLE) is None
