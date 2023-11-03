@@ -1,3 +1,4 @@
+import copy
 from fontTools.pens.cu2quPen import Cu2QuPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTLibError, newTable
@@ -7,7 +8,7 @@ from foundrytools_cli_2.lib.font import Font
 
 def otf_to_ttf(
         font: Font, max_err: float = 1.0, reverse_direction: bool = True, post_format=2.0
-) -> None:
+) -> Font:
     """
     Convert a OpenType font to a TrueType font.
 
@@ -22,21 +23,23 @@ def otf_to_ttf(
     if font.sfntVersion != "OTTO":
         raise TTLibError("Not a OpenType font (bad sfntVersion)")
 
-    glyph_order = font.getGlyphOrder()
+    font_copy = copy.deepcopy(font)
 
-    font["loca"] = newTable("loca")
-    font["glyf"] = glyf = newTable("glyf")
+    glyph_order = font_copy.getGlyphOrder()
+
+    font_copy["loca"] = newTable("loca")
+    font_copy["glyf"] = glyf = newTable("glyf")
     glyf.glyphOrder = glyph_order
     glyf.glyphs = glyphs_to_quadratic(
-        glyphs=font.getGlyphSet(), max_err=max_err, reverse_direction=reverse_direction
+        glyphs=font_copy.getGlyphSet(), max_err=max_err, reverse_direction=reverse_direction
     )
-    del font["CFF "]
-    if "VORG" in font:
-        del font["VORG"]
-    glyf.compile(font)
-    update_hmtx(font=font, glyf=glyf)
+    del font_copy["CFF "]
+    if "VORG" in font_copy:
+        del font_copy["VORG"]
+    glyf.compile(font_copy)
+    update_hmtx(font=font_copy, glyf=glyf)
 
-    font["maxp"] = maxp = newTable("maxp")
+    font_copy["maxp"] = maxp = newTable("maxp")
     maxp.tableVersion = 0x00010000
     maxp.maxZones = 1
     maxp.maxTwilightPoints = 0
@@ -48,19 +51,20 @@ def otf_to_ttf(
     maxp.maxComponentElements = max(
         len(g.components if hasattr(g, "components") else []) for g in glyf.glyphs.values()
     )
-    maxp.compile(font)
+    maxp.compile(font_copy)
 
-    post = font["post"]
+    post = font_copy["post"]
     post.formatType = post_format
     post.extraNames = []
     post.mapping = {}
     post.glyphOrder = glyph_order
     try:
-        post.compile(font)
+        post.compile(font_copy)
     except OverflowError:
         post.formatType = 3
 
-    font.sfntVersion = "\000\001\000\000"
+    font_copy.sfntVersion = "\000\001\000\000"
+    return font_copy
 
 
 def update_hmtx(font: Font, glyf):
