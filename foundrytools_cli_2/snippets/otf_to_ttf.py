@@ -1,9 +1,20 @@
-import copy
+from copy import deepcopy
+from typing import Dict
+
 from fontTools.pens.cu2quPen import Cu2QuPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
-from fontTools.ttLib import TTLibError, newTable
+from fontTools.ttLib import newTable
+from fontTools.ttLib.tables._g_l_y_f import Glyph  # type: ignore
 
 from foundrytools_cli_2.lib.font import Font
+
+T_CFF = "CFF "
+T_LOCA = "loca"
+T_GLYF = "glyf"
+T_MAXP = "maxp"
+T_POST = "post"
+T_HMTX = "hmtx"
+T_VORG = "VORG"
 
 
 def otf_to_ttf(
@@ -20,27 +31,29 @@ def otf_to_ttf(
             Defaults to True.
         post_format (float, optional): The 'post' table format. Defaults to 2.0.
     """
-    if font.sfntVersion != "OTTO":
-        raise TTLibError("Not a OpenType font (bad sfntVersion)")
+    if font.is_tt:
+        raise ValueError("The font is not an OpenType-PS font.")
+    if font.is_variable:
+        raise NotImplementedError("Variable fonts are not supported.")
 
-    font_copy = copy.deepcopy(font)
+    font_copy = deepcopy(font)
 
     glyph_order = font_copy.getGlyphOrder()
 
-    font_copy["loca"] = newTable("loca")
-    font_copy["glyf"] = glyf = newTable("glyf")
+    font_copy[T_LOCA] = newTable(T_LOCA)
+    font_copy[T_GLYF] = glyf = newTable(T_GLYF)
     glyf.glyphOrder = glyph_order
     glyf.glyphs = glyphs_to_quadratic(
         glyphs=font_copy.getGlyphSet(), max_err=max_err, reverse_direction=reverse_direction
     )
-    del font_copy["CFF "]
-    if "VORG" in font_copy:
-        del font_copy["VORG"]
+    del font_copy[T_CFF]
+    if T_VORG in font_copy:
+        del font_copy[T_VORG]
     glyf.compile(font_copy)
     update_hmtx(font=font_copy, glyf=glyf)
 
     MAXP_TABLE_VERSION = 0x00010000
-    font_copy["maxp"] = maxp = newTable("maxp")
+    font_copy[T_MAXP] = maxp = newTable(T_MAXP)
     maxp.tableVersion = MAXP_TABLE_VERSION
     maxp.maxZones = 1
     maxp.maxTwilightPoints = 0
@@ -54,7 +67,7 @@ def otf_to_ttf(
     )
     maxp.compile(font_copy)
 
-    post = font_copy["post"]
+    post = font_copy[T_POST]
     post.formatType = post_format
     post.extraNames = []
     post.mapping = {}
@@ -78,13 +91,13 @@ def update_hmtx(font: Font, glyf):
         glyf: The 'glyf' table.
     """
 
-    hmtx = font["hmtx"]
+    hmtx = font[T_HMTX]
     for glyph_name, glyph in glyf.glyphs.items():
         if hasattr(glyph, "xMin"):
             hmtx[glyph_name] = (hmtx[glyph_name][0], glyph.xMin)
 
 
-def glyphs_to_quadratic(glyphs, max_err=1.0, reverse_direction=False) -> dict:
+def glyphs_to_quadratic(glyphs, max_err=1.0, reverse_direction=False) -> Dict[str, Glyph]:
     """
     Convert the glyphs of a font to quadratic.
 
