@@ -15,6 +15,7 @@ T_MAXP = "maxp"
 T_POST = "post"
 T_HMTX = "hmtx"
 T_VORG = "VORG"
+MAXP_TABLE_VERSION = 0x00010000
 
 
 def otf_to_ttf(
@@ -52,7 +53,6 @@ def otf_to_ttf(
     glyf.compile(font_copy)
     update_hmtx(font=font_copy, glyf=glyf)
 
-    MAXP_TABLE_VERSION = 0x00010000
     font_copy[T_MAXP] = maxp = newTable(T_MAXP)
     maxp.tableVersion = MAXP_TABLE_VERSION
     maxp.maxZones = 1
