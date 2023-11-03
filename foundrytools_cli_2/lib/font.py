@@ -1,11 +1,7 @@
-"""
-A subclass of fontTools.ttLib.TTFont
-"""
-
-
 from pathlib import Path
 import typing as t
 
+from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.ttLib.ttFont import TTFont
 
 SFNT_POSTSCRIPT = "OTTO"
@@ -95,3 +91,63 @@ class Font(TTFont):
         :return: True if the font is a variable font, False otherwise.
         """
         return self.get(FVAR_TABLE) is not None
+
+    def get_output_file(
+        self,
+        output_dir: t.Optional[Path] = None,
+        overwrite: bool = True,
+        suffix: str = "",
+    ) -> Path:
+        """
+        Get output file for a Font object. If ``output_dir`` is not specified, the output file will
+        be saved in the same directory as the input file. It the output file already exists and
+        ``overwrite`` is False, file name will be incremented by adding a number preceded by '#'
+        before the extension until a non-existing file name is found.
+
+        Args:
+            output_dir: Path to the output directory.
+            overwrite: A boolean indicating whether to overwrite existing files.
+            suffix: An optional suffix to append to the file name.
+
+        Returns:
+            A Path object pointing to the output file.
+        """
+
+        # In some cases we may need to add a suffix to the file name. If the suffix is already
+        # present, we remove it before adding it again.
+        file = Path(self.reader.file.name)
+        out_dir = output_dir or file.parent
+        file_name = file.stem
+        extension = self.get_real_extension()
+        if suffix != "":
+            file_name = file_name.replace(suffix, "")
+
+        out_file = Path(
+            makeOutputFileName(
+                file_name,
+                extension=extension,
+                suffix=suffix,
+                outputDir=out_dir,
+                overWrite=overwrite,
+            )
+        )
+        return out_file
+
+    def get_real_extension(self) -> str:
+        """
+        Get the real extension of the font. If the font is a web font, the extension will be
+        determined by the font flavor. If the font is a SFNT font, the extension will be determined
+        by the sfntVersion attribute.
+
+        Returns:
+            The extension of the font.
+        """
+
+        if self.flavor is not None:
+            return f".{self.flavor}"
+        elif self.sfntVersion == SFNT_POSTSCRIPT:
+            return ".otf"
+        elif self.sfntVersion == SFNT_TRUETYPE:
+            return ".ttf"
+        else:
+            return ".unknown"
