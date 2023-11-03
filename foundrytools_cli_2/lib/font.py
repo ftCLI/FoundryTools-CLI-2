@@ -143,10 +143,11 @@ class Font(TTFont):
             The extension of the font.
         """
 
+        extension = ""
         if self.flavor is not None:
-            return f".{self.flavor}"
+            extension = f".{self.flavor}"
         elif self.sfntVersion == SFNT_POSTSCRIPT:
-            return ".otf"
+            extension = ".otf"
         elif self.sfntVersion == SFNT_TRUETYPE:
-            return ".ttf"
-        return ".unknown"
+            extension = ".ttf"
+        return extension
