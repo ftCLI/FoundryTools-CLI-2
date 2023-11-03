@@ -1,13 +1,9 @@
-"""
-A helper class to find fonts in a given path.
-"""
-
 import logging
 import typing as t
 from dataclasses import dataclass
 from pathlib import Path
 
-from fontTools.ttLib.ttFont import TTFont, TTLibError
+from fontTools.ttLib.ttFont import TTLibError
 
 from foundrytools_cli_2.lib.font import Font
 
@@ -208,12 +204,12 @@ class FontFinder:
                 yield from (x for x in self.input_path.glob("*") if x.is_file())
 
 
-def _is_woff(font: TTFont) -> bool:
+def _is_woff(font: Font) -> bool:
     """
     Returns a boolean indicating whether the given font is a WOFF font.
 
     Args:
-        font (TTFont): A TTFont object.
+        font (Font): A Font object.
 
     Returns:
         bool: A boolean indicating whether the given font is a WOFF font.
@@ -221,12 +217,12 @@ def _is_woff(font: TTFont) -> bool:
     return font.flavor == WOFF_FLAVOR
 
 
-def _is_woff2(font: TTFont) -> bool:
+def _is_woff2(font: Font) -> bool:
     """
     Returns a boolean indicating whether the given font is a WOFF2 font.
 
     Args:
-        font (TTFont): A TTFont object.
+        font (Font): A Font object.
 
     Returns:
         bool: A boolean indicating whether the given font is a WOFF2 font.
