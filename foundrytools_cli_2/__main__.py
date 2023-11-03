@@ -21,7 +21,20 @@ cli = click.Group()
 @input_path_argument()
 @recursive_flag()
 @recalc_timestamp_flag()
-def print_font_name(input_path: Path, recursive: bool = False, recalc_timestamp: bool = False):
+def print_font_name(
+        input_path: Path, recursive: bool = False, recalc_timestamp: bool = False
+) -> None:
+    """
+    Print the name of the font file.
+
+    \f
+    :param input_path: A path to a font file or a directory containing font files.
+    :param recursive: A boolean indicating whether to search for fonts recursively in
+        subdirectories.
+    :param recalc_timestamp: A boolean indicating whether to recalculate the font's
+        modified timestamp on save.
+    :return: None
+    """
     filters = FontFinderFilters(filter_out_tt=True)
     options = FontLoadOptions(recalc_timestamp=recalc_timestamp)
     try:
