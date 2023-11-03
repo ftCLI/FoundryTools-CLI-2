@@ -12,7 +12,7 @@ def tt_remove_hints(font: Font) -> None:
     if not font.is_tt:
         raise NotImplementedError("Only TrueType fonts are supported.")
 
-    font_copy = font.deepcopy()
+    font_copy = deepcopy(font)
     dehint(font_copy)
 
     return font_copy
