@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from dehinter import dehint
+from dehinter.font import dehint
 
 from foundrytools_cli_2.lib.font import Font
 
