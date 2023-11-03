@@ -8,7 +8,7 @@ from pathlib import Path
 
 from fontTools.ttLib.ttFont import TTFont, TTLibError
 
-from foundryToolsCLI_2.lib.font import Font
+from foundrytools_cli_2.lib.font import Font
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
