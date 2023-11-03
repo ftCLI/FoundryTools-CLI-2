@@ -8,7 +8,7 @@ from foundrytools_cli_2.lib.font import Font
 
 def decomponentize(font: Font) -> Font:
     """
-    Decomponentize the font.
+    Decomponentize a TrueType font.
     """
 
     font_copy = deepcopy(font)
