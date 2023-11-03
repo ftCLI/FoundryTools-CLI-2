@@ -22,11 +22,11 @@ def otf_to_ttf(
     if font.sfntVersion != "OTTO":
         raise TTLibError("Not a OpenType font (bad sfntVersion)")
 
-    glyphOrder = font.getGlyphOrder()
+    glyph_order = font.getGlyphOrder()
 
     font["loca"] = newTable("loca")
     font["glyf"] = glyf = newTable("glyf")
-    glyf.glyphOrder = glyphOrder
+    glyf.glyphOrder = glyph_order
     glyf.glyphs = glyphs_to_quadratic(
         glyphs=font.getGlyphSet(), max_err=max_err, reverse_direction=reverse_direction
     )
@@ -54,7 +54,7 @@ def otf_to_ttf(
     post.formatType = post_format
     post.extraNames = []
     post.mapping = {}
-    post.glyphOrder = glyphOrder
+    post.glyphOrder = glyph_order
     try:
         post.compile(font)
     except OverflowError:
@@ -74,9 +74,9 @@ def update_hmtx(font: Font, glyf):
     """
 
     hmtx = font["hmtx"]
-    for glyphName, glyph in glyf.glyphs.items():
+    for glyph_name, glyph in glyf.glyphs.items():
         if hasattr(glyph, "xMin"):
-            hmtx[glyphName] = (hmtx[glyphName][0], glyph.xMin)
+            hmtx[glyph_name] = (hmtx[glyph_name][0], glyph.xMin)
 
 
 def glyphs_to_quadratic(glyphs, max_err=1.0, reverse_direction=False) -> dict:
@@ -94,11 +94,11 @@ def glyphs_to_quadratic(glyphs, max_err=1.0, reverse_direction=False) -> dict:
         The converted glyphs.
     """
 
-    quadGlyphs = {}
+    quad_glyphs = {}
     for gname in glyphs.keys():
         glyph = glyphs[gname]
-        ttPen = TTGlyphPen(glyphs)
-        cu2quPen = Cu2QuPen(ttPen, max_err=max_err, reverse_direction=reverse_direction)
-        glyph.draw(cu2quPen)
-        quadGlyphs[gname] = ttPen.glyph()
-    return quadGlyphs
+        tt_pen = TTGlyphPen(glyphs)
+        cu2qu_pen = Cu2QuPen(tt_pen, max_err=max_err, reverse_direction=reverse_direction)
+        glyph.draw(cu2qu_pen)
+        quad_glyphs[gname] = tt_pen.glyph()
+    return quad_glyphs
