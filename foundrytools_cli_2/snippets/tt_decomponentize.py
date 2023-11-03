@@ -1,5 +1,3 @@
-from copy import deepcopy
-
 from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 
