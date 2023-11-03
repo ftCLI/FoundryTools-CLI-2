@@ -149,5 +149,4 @@ class Font(TTFont):
             return ".otf"
         elif self.sfntVersion == SFNT_TRUETYPE:
             return ".ttf"
-        else:
-            return ".unknown"
+        return ".unknown"
