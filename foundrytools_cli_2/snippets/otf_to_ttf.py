@@ -1,13 +1,26 @@
+from copy import deepcopy
+from typing import Dict
+
 from fontTools.pens.cu2quPen import Cu2QuPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
-from fontTools.ttLib import TTLibError, newTable
+from fontTools.ttLib import newTable
+from fontTools.ttLib.tables._g_l_y_f import Glyph  # type: ignore
 
 from foundrytools_cli_2.lib.font import Font
+
+T_CFF = "CFF "
+T_LOCA = "loca"
+T_GLYF = "glyf"
+T_MAXP = "maxp"
+T_POST = "post"
+T_HMTX = "hmtx"
+T_VORG = "VORG"
+MAXP_TABLE_VERSION = 0x00010000
 
 
 def otf_to_ttf(
         font: Font, max_err: float = 1.0, reverse_direction: bool = True, post_format=2.0
-) -> None:
+) -> Font:
     """
     Convert a OpenType font to a TrueType font.
 
@@ -19,25 +32,29 @@ def otf_to_ttf(
             Defaults to True.
         post_format (float, optional): The 'post' table format. Defaults to 2.0.
     """
-    if font.sfntVersion != "OTTO":
-        raise TTLibError("Not a OpenType font (bad sfntVersion)")
+    if font.is_tt:
+        raise ValueError("The font is not an OpenType-PS font.")
+    if font.is_variable:
+        raise NotImplementedError("Variable fonts are not supported.")
 
-    glyph_order = font.getGlyphOrder()
+    font_copy = deepcopy(font)
 
-    font["loca"] = newTable("loca")
-    font["glyf"] = glyf = newTable("glyf")
+    glyph_order = font_copy.getGlyphOrder()
+
+    font_copy[T_LOCA] = newTable(T_LOCA)
+    font_copy[T_GLYF] = glyf = newTable(T_GLYF)
     glyf.glyphOrder = glyph_order
     glyf.glyphs = glyphs_to_quadratic(
-        glyphs=font.getGlyphSet(), max_err=max_err, reverse_direction=reverse_direction
+        glyphs=font_copy.getGlyphSet(), max_err=max_err, reverse_direction=reverse_direction
     )
-    del font["CFF "]
-    if "VORG" in font:
-        del font["VORG"]
-    glyf.compile(font)
-    update_hmtx(font=font, glyf=glyf)
+    del font_copy[T_CFF]
+    if T_VORG in font_copy:
+        del font_copy[T_VORG]
+    glyf.compile(font_copy)
+    update_hmtx(font=font_copy, glyf=glyf)
 
-    font["maxp"] = maxp = newTable("maxp")
-    maxp.tableVersion = 0x00010000
+    font_copy[T_MAXP] = maxp = newTable(T_MAXP)
+    maxp.tableVersion = MAXP_TABLE_VERSION
     maxp.maxZones = 1
     maxp.maxTwilightPoints = 0
     maxp.maxStorage = 0
@@ -48,19 +65,20 @@ def otf_to_ttf(
     maxp.maxComponentElements = max(
         len(g.components if hasattr(g, "components") else []) for g in glyf.glyphs.values()
     )
-    maxp.compile(font)
+    maxp.compile(font_copy)
 
-    post = font["post"]
+    post = font_copy[T_POST]
     post.formatType = post_format
     post.extraNames = []
     post.mapping = {}
     post.glyphOrder = glyph_order
     try:
-        post.compile(font)
+        post.compile(font_copy)
     except OverflowError:
         post.formatType = 3
 
-    font.sfntVersion = "\000\001\000\000"
+    font_copy.sfntVersion = "\000\001\000\000"
+    return font_copy
 
 
 def update_hmtx(font: Font, glyf):
@@ -73,13 +91,13 @@ def update_hmtx(font: Font, glyf):
         glyf: The 'glyf' table.
     """
 
-    hmtx = font["hmtx"]
+    hmtx = font[T_HMTX]
     for glyph_name, glyph in glyf.glyphs.items():
         if hasattr(glyph, "xMin"):
             hmtx[glyph_name] = (hmtx[glyph_name][0], glyph.xMin)
 
 
-def glyphs_to_quadratic(glyphs, max_err=1.0, reverse_direction=False) -> dict:
+def glyphs_to_quadratic(glyphs, max_err=1.0, reverse_direction=False) -> Dict[str, Glyph]:
     """
     Convert the glyphs of a font to quadratic.
 
