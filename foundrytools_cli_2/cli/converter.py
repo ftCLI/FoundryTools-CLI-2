@@ -56,5 +56,5 @@ def ttf2otf(
                 tt = otf_to_ttf(font=font)
                 out_file = tt.get_output_file(output_dir=output_dir, overwrite=overwrite)
                 font.save(out_file)
-            except (PermissionError, Exception) as e:
+            except Exception as e:  # pylint: disable=broad-except
                 print(e)
