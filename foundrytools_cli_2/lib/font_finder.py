@@ -26,10 +26,22 @@ FVAR_TABLE = "fvar"
 
 
 @dataclass
+class FontLoadOptions:
+    """
+    A class that specifies how to load the font.
+    """
+
+    lazy: t.Optional[bool] = None
+    recalc_timestamp: bool = False
+    recalc_bboxes: bool = True
+
+
+@dataclass
 class FontFinderFilters:
     """
     A class that specifies which fonts to filter out when searching for fonts.
     """
+
     filter_out_tt: bool = False
     filter_out_ps: bool = False
     filter_out_woff: bool = False
@@ -62,13 +74,7 @@ class FontFinder:
         input_path: A Path object pointing to the input path. The input path can be a directory or a
             file.
         recursive: A boolean indicating whether to search recursively.
-        recalc_timestamp: A boolean indicating whether to recalculate the modified timestamp on
-            save.
-        recalc_bboxes: A boolean indicating whether to recalculate the bounding boxes on save.
-        lazy: A boolean indicating whether to load the font lazily. If lazy is set to True, many
-            data structures are loaded lazily, upon access only. If it is set to False, many data
-            structures are loaded immediately. The default is ``lazy=None`` which is somewhere in
-            between.
+        options: A FontLoadOptions object that specifies how to load the fonts.
         filters: A FontFinderFilters object that specifies which fonts to filter out.
     """
 
@@ -76,9 +82,7 @@ class FontFinder:
         self,
         input_path: t.Union[str, Path],
         recursive: bool = False,
-        recalc_timestamp: bool = True,
-        recalc_bboxes: bool = True,
-        lazy: t.Optional[bool] = None,
+        options=FontLoadOptions(),
         filters=FontFinderFilters(),
     ) -> None:
         """
@@ -88,13 +92,7 @@ class FontFinder:
             input_path: A Path object pointing to the input path. The input path can be a directory
                 or a file.
             recursive: A boolean indicating whether to search recursively.
-            recalc_timestamp: A boolean indicating whether to recalculate the modified timestamp on
-                save.
-            recalc_bboxes: A boolean indicating whether to recalculate the bounding boxes on save.
-            lazy: A boolean indicating whether to load the font lazily. If lazy is set to True, many
-                data structures are loaded lazily, upon access only. If it is set to False, many
-                data structures are loaded immediately. The default is ``lazy=None`` which is
-                somewhere in between.
+            options: A FontLoadOptions object that specifies how to load the fonts.
             filters: A FontFinderFilters object that specifies which fonts to filter out.
 
         Returns:
@@ -106,9 +104,7 @@ class FontFinder:
         except Exception as e:
             raise FontFinderError(f"Invalid input path: {input_path}") from e
         self.recursive = recursive
-        self.recalc_timestamp = recalc_timestamp
-        self.recalc_bboxes = recalc_bboxes
-        self.lazy = lazy
+        self.options = options
         self.filters = filters
 
         self._validate_filters()
@@ -183,9 +179,9 @@ class FontFinder:
             try:
                 font = Font(
                     file,
-                    lazy=self.lazy,
-                    recalc_timestamp=self.recalc_timestamp,
-                    recalc_bboxes=self.recalc_bboxes,
+                    lazy=self.options.lazy,
+                    recalc_timestamp=self.options.recalc_timestamp,
+                    recalc_bboxes=self.options.recalc_bboxes,
                 )
                 if not any(condition and func(font) for condition, func in self._filter_conditions):
                     logger.debug("Found font: %s", file)
