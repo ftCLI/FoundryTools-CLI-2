@@ -9,7 +9,7 @@ import typing as t
 from fontTools.ttLib.ttFont import TTFont
 
 SFNT_POSTSCRIPT = "OTTO"
-SFNT_TRUETYPE = "0/1/0/0"
+SFNT_TRUETYPE = "\0\1\0\0"
 FLAVOR_WOFF = "woff"
 FLAVOR_WOFF2 = "woff2"
 FVAR_TABLE = "fvar"
@@ -17,17 +17,7 @@ FVAR_TABLE = "fvar"
 
 class Font(TTFont):
     """
-    The Font class is a subclass of TTFont and provides additional properties to check the type and
-    flavor of a font file.
-
-    Example Usage:
-    >>>font = Font("font.ttf")
-    >>>print(font.is_postscript)  # False
-    >>>print(font.is_truetype)  # True
-    >>>print(font.is_woff)  # False
-    >>>print(font.is_woff2)  # False
-    >>>print(font.is_static)  # True
-    >>>print(font.is_variable)  # False
+    The Font class is a subclass of TTFont and provides additional properties and methods.
     """
 
     def __init__(
@@ -45,7 +35,7 @@ class Font(TTFont):
         )
 
     @property
-    def is_postscript(self) -> bool:
+    def is_ps(self) -> bool:
         """
         Check if the font has PostScript outlines font.
 
@@ -54,7 +44,7 @@ class Font(TTFont):
         return self.sfntVersion == SFNT_POSTSCRIPT
 
     @property
-    def is_truetype(self):
+    def is_tt(self):
         """
         Check if the font has TrueType outlines.
 
