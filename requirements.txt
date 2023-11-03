@@ -1,2 +1,3 @@
-fonttools[woff,pathops,unicode] ==4.44.0
+fonttools[woff,pathops,unicode] == 4.44.0
 afdko == 4.0.0
+click == 8.1.7
