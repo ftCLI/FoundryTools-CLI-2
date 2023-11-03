@@ -21,6 +21,12 @@ from foundrytools_cli_2.snippets.otf_to_ttf import otf_to_ttf
 cli = click.Group()
 
 
+class ConverterError(Exception):
+    """
+    An exception raised by the Converter commands.
+    """
+
+
 @cli.command("ttf2otf")
 @input_path_argument()
 @recursive_flag()
@@ -45,14 +51,17 @@ def ttf2otf(
             input_path=input_path, recursive=recursive, options=options, filters=filters
         )
         fonts = finder.generate_fonts()
-        for font in fonts:
-            with font:
-                try:
-                    print(font.reader.file.name)
-                    otf_to_ttf(font=font)
-                    out_file = font.get_output_file(output_dir=output_dir, overwrite=overwrite)
-                    font.save(out_file)
-                except Exception as e:
-                    print(e)
+
     except FontFinderError as e:
         print(e)
+        return
+
+    for font in fonts:
+        with font:
+            try:
+                print(font.reader.file.name)
+                otf_to_ttf(font=font)
+                out_file = font.get_output_file(output_dir=output_dir, overwrite=overwrite)
+                font.save(out_file)
+            except Exception as e:
+                raise ConverterError from e
