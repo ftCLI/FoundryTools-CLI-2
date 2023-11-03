@@ -4,6 +4,7 @@ A helper class to find fonts in a given path.
 
 import logging
 import typing as t
+from dataclasses import dataclass
 from pathlib import Path
 
 from fontTools.ttLib.ttFont import TTFont, TTLibError
@@ -22,6 +23,17 @@ WOFF2_FLAVOR = "woff2"
 OTF_SFNT_VERSION = "OTTO"
 TTF_SFNT_VERSION = "\x00\x01\x00\x00"
 FVAR_TABLE = "fvar"
+
+
+@dataclass
+class FontFinderFilters:
+    filter_out_tt: bool = False
+    filter_out_ps: bool = False
+    filter_out_woff: bool = False
+    filter_out_woff2: bool = False
+    filter_out_sfnt: bool = False
+    filter_out_static: bool = False
+    filter_out_variable: bool = False
 
 
 class FontFinderError(Exception):
@@ -54,13 +66,7 @@ class FontFinder:
             data structures are loaded lazily, upon access only. If it is set to False, many data
             structures are loaded immediately. The default is ``lazy=None`` which is somewhere in
             between.
-        filter_out_tt: A boolean indicating whether to filter out TrueType fonts.
-        filter_out_ps: A boolean indicating whether to filter out PostScript fonts.
-        filter_out_woff: A boolean indicating whether to filter out WOFF fonts.
-        filter_out_woff2: A boolean indicating whether to filter out WOFF2 fonts.
-        filter_out_sfnt: A boolean indicating whether to filter out sfnt fonts.
-        filter_out_static: A boolean indicating whether to filter out static fonts.
-        filter_out_variable: A boolean indicating whether to filter out variable fonts.
+        filters: A FontFinderFilters object that specifies which fonts to filter out.
     """
 
     def __init__(
@@ -70,13 +76,7 @@ class FontFinder:
         recalc_timestamp: bool = True,
         recalc_bboxes: bool = True,
         lazy: t.Optional[bool] = None,
-        filter_out_tt: bool = False,
-        filter_out_ps: bool = False,
-        filter_out_woff: bool = False,
-        filter_out_woff2: bool = False,
-        filter_out_sfnt: bool = False,
-        filter_out_static: bool = False,
-        filter_out_variable: bool = False,
+        filters=FontFinderFilters(),
     ) -> None:
         """
         Initialize the FontFinder class.
@@ -92,13 +92,7 @@ class FontFinder:
                 data structures are loaded lazily, upon access only. If it is set to False, many
                 data structures are loaded immediately. The default is ``lazy=None`` which is
                 somewhere in between.
-            filter_out_tt: A boolean indicating whether to filter out TrueType fonts.
-            filter_out_ps: A boolean indicating whether to filter out PostScript fonts.
-            filter_out_woff: A boolean indicating whether to filter out WOFF fonts.
-            filter_out_woff2: A boolean indicating whether to filter out WOFF2 fonts.
-            filter_out_sfnt: A boolean indicating whether to filter out sfnt fonts.
-            filter_out_static: A boolean indicating whether to filter out static fonts.
-            filter_out_variable: A boolean indicating whether to filter out variable fonts.
+            filters: A FontFinderFilters object that specifies which fonts to filter out.
 
         Returns:
             None
@@ -112,24 +106,18 @@ class FontFinder:
         self.recalc_timestamp = recalc_timestamp
         self.recalc_bboxes = recalc_bboxes
         self.lazy = lazy
-        self.filter_out_tt = filter_out_tt
-        self.filter_out_ps = filter_out_ps
-        self.filter_out_woff = filter_out_woff
-        self.filter_out_woff2 = filter_out_woff2
-        self.filter_out_sfnt = filter_out_sfnt
-        self.filter_out_static = filter_out_static
-        self.filter_out_variable = filter_out_variable
+        self.filters = filters
 
         self._validate_filters()
 
         self._filter_conditions = [
-            (self.filter_out_tt, _is_tt),
-            (self.filter_out_ps, _is_ps),
-            (self.filter_out_woff, _is_woff),
-            (self.filter_out_woff2, _is_woff2),
-            (self.filter_out_sfnt, _is_sfnt),
-            (self.filter_out_static, _is_static),
-            (self.filter_out_variable, _is_variable),
+            (self.filters.filter_out_tt, _is_tt),
+            (self.filters.filter_out_ps, _is_ps),
+            (self.filters.filter_out_woff, _is_woff),
+            (self.filters.filter_out_woff2, _is_woff2),
+            (self.filters.filter_out_sfnt, _is_sfnt),
+            (self.filters.filter_out_static, _is_static),
+            (self.filters.filter_out_variable, _is_variable),
         ]
 
     def find_fonts(self) -> t.List[Font]:
@@ -169,11 +157,15 @@ class FontFinder:
             ) from e
 
     def _validate_filters(self) -> None:
-        if self.filter_out_tt and self.filter_out_ps:
+        if self.filters.filter_out_tt and self.filters.filter_out_ps:
             raise FontFinderError("Cannot filter out both TrueType and PostScript fonts.")
-        if self.filter_out_woff and self.filter_out_woff2 and self.filter_out_sfnt:
+        if (
+            self.filters.filter_out_woff
+            and self.filters.filter_out_woff2
+            and self.filters.filter_out_sfnt
+        ):
             raise FontFinderError("Cannot filter out both web fonts and SFNT fonts.")
-        if self.filter_out_static and self.filter_out_variable:
+        if self.filters.filter_out_static and self.filters.filter_out_variable:
             raise FontFinderError("Cannot filter out both static and variable fonts.")
 
     def _generate_fonts(self) -> t.Generator[Font, None, None]:
@@ -187,7 +179,8 @@ class FontFinder:
         for file in files:
             try:
                 font = Font(
-                    file, lazy=self.lazy,
+                    file,
+                    lazy=self.lazy,
                     recalc_timestamp=self.recalc_timestamp,
                     recalc_bboxes=self.recalc_bboxes,
                 )
