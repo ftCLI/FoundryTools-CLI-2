@@ -6,7 +6,7 @@ import logging
 import typing as t
 from pathlib import Path
 
-from fontTools.ttLib.ttFont import TTFont
+from fontTools.ttLib.ttFont import TTFont, TTLibError
 
 F = t.TypeVar("F", bound="TTFont")
 
@@ -26,6 +26,9 @@ FVAR_TABLE = "fvar"
 
 
 class FontFinderError(Exception):
+    """
+    An exception raised by the FontFinder class.
+    """
     pass
 
 
@@ -167,8 +170,10 @@ class FontFinder:
         """
         try:
             next(self._generate_fonts())
-        except StopIteration:
-            raise FontFinderError(f"No fonts matching the criteria found in {self.input_path}")
+        except StopIteration as e:
+            raise FontFinderError(
+                f"No fonts matching the criteria found in {self.input_path}"
+            ) from e
 
     def _validate_cls(self) -> None:
         if not issubclass(self.return_cls, TTFont):
@@ -200,7 +205,7 @@ class FontFinder:
                 if not any(condition and func(font) for condition, func in self._filter_conditions):
                     logger.debug(f"Found font: {file}")
                     yield font
-            except Exception as e:
+            except TTLibError as e:
                 logger.debug(f"{file}: {e}")
 
     def _generate_files(self) -> t.Generator[Path, None, None]:
