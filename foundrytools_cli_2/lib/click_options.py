@@ -238,3 +238,22 @@ def common_options() -> t.Callable:
         ),
     ]
     return add_options(_common_options)
+
+
+def tolerance_option() -> t.Callable:
+    """
+    Add the tolerance option to a click command.
+
+    :return: a decorator that adds the tolerance option to a click command
+    """
+    _tolerance_option = [
+        click.option(
+            "-t",
+            "--tolerance",
+            type=click.IntRange(min=16, max=16384),
+            help="""
+            The tolerance value used to convert quadratic curves to cubic curves. The default is 0.
+            """,
+        )
+    ]
+    return add_options(_tolerance_option)
