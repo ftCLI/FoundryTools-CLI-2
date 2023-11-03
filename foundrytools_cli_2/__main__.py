@@ -13,6 +13,7 @@ from foundrytools_cli_2.lib.font_finder import (
     FontFinderFilters,
     FontLoadOptions,
 )
+from foundrytools_cli_2.lib.timer import Timer
 
 cli = click.Group()
 
@@ -21,6 +22,7 @@ cli = click.Group()
 @input_path_argument()
 @recursive_flag()
 @recalc_timestamp_flag()
+@Timer()
 def print_font_name(
         input_path: Path, recursive: bool = False, recalc_timestamp: bool = False
 ) -> None:
