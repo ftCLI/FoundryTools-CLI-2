@@ -192,10 +192,10 @@ class FontFinder:
                     recalc_bboxes=self.recalc_bboxes,
                 )
                 if not any(condition and func(font) for condition, func in self._filter_conditions):
-                    logger.debug(f"Found font: {file}")
+                    logger.debug("Found font: %s" % file)
                     yield font
             except TTLibError as e:
-                logger.debug(f"{file}: {e}")
+                logger.debug("%s: %s" % (file, e))
 
     def _generate_files(self) -> t.Generator[Path, None, None]:
         """
