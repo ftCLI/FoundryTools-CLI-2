@@ -50,8 +50,8 @@ def choice_to_int_callback(
     :return: an integer or a tuple of integers
     """
 
-    # we do not check if the values can be converted to integers here because the click.Choice should be correctly
-    # built.
+    # we do not check if the values can be converted to integers here because the click.Choice
+    # should be correctly built.
     if not value or ctx.resilient_parsing:
         return None
     if param.multiple:
@@ -63,10 +63,11 @@ def str_to_tuple_callback(
     ctx: click.Context, _, value: t.Optional[str]
 ) -> t.Optional[t.Tuple[str]]:
     """
-    Callback for click options that accept a tuple of strings. Converts a string to a tuple of strings.
-
-    If the value is None or the click context is resilient, returns None. Otherwise, converts a string to a tuple of
+    Callback for click options that accept a tuple of strings. Converts a string to a tuple of
     strings.
+
+    If the value is None or the click context is resilient, returns None. Otherwise, converts a
+    string to a tuple of strings.
 
     :param ctx: click Context
     :param _: click Parameter. Not used
