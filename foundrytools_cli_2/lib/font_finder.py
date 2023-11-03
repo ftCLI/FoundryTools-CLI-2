@@ -27,6 +27,9 @@ FVAR_TABLE = "fvar"
 
 @dataclass
 class FontFinderFilters:
+    """
+    A class that specifies which fonts to filter out when searching for fonts.
+    """
     filter_out_tt: bool = False
     filter_out_ps: bool = False
     filter_out_woff: bool = False
