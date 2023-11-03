@@ -46,8 +46,7 @@ def ttf2otf(
         fonts = finder.generate_fonts()
 
     except FontFinderError as e:
-        print(e)
-        return
+        raise click.Abort(e)
 
     for font in fonts:
         with font:
