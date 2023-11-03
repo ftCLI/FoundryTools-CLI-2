@@ -78,8 +78,8 @@ class FontFinder:
         self,
         input_path: t.Union[str, Path],
         recursive: bool = False,
-        options=FontLoadOptions(),
-        filters=FontFinderFilters(),
+        options=t.Optional[FontLoadOptions],
+        filters=t.Optional[FontFinderFilters],
     ) -> None:
         """
         Initialize the FontFinder class.
@@ -100,8 +100,8 @@ class FontFinder:
         except Exception as e:
             raise FontFinderError(f"Invalid input path: {input_path}") from e
         self.recursive = recursive
-        self.options = options
-        self.filters = filters
+        self.options = options or FontLoadOptions()
+        self.filters = filters or FontFinderFilters()
 
         self._validate_filters()
 
@@ -295,4 +295,4 @@ def _is_variable(font: Font) -> bool:
     return font.get(FVAR_TABLE) is not None
 
 
-__all__ = ["FontFinder", "FontFinderError"]
+__all__ = ["FontFinder", "FontFinderError", "FontFinderFilters", "FontLoadOptions"]

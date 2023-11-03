@@ -25,7 +25,7 @@ setuptools.setup(
     url="https://github.com/ftCLI/FoundryTools-CLI-2",
     packages=setuptools.find_packages(),
     include_package_data=True,
-    entry_points={"console_scripts": ["ft-cli = foundrytools_cli_2.__main__:main"]},
+    entry_points={"console_scripts": ["ft-cli = foundrytools_cli_2.__main__:cli"]},
     install_requires=_get_requirements(),
     classifiers=[
         "Programming Language :: Python :: 3",
