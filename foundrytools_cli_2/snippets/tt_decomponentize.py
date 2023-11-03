@@ -1,0 +1,31 @@
+from copy import deepcopy
+
+from fontTools.pens.recordingPen import DecomposingRecordingPen
+from fontTools.pens.ttGlyphPen import TTGlyphPen
+
+from foundrytools_cli_2.lib.font import Font
+
+
+def decomponentize(font: Font) -> Font:
+    """
+    Decomponentize the font.
+    """
+
+    font_copy = deepcopy(font)
+
+    glyph_set = font_copy.getGlyphSet()
+    glyf_table = font_copy["glyf"]
+    dr_pen = DecomposingRecordingPen(glyph_set)
+    tt_pen = TTGlyphPen(None)
+
+    for glyph_name in font_copy.glyphOrder:
+        glyph = glyf_table[glyph_name]
+        if not glyph.isComposite():
+            continue
+        dr_pen.value = []
+        tt_pen.init()
+        glyph.draw(dr_pen, glyf_table)
+        dr_pen.replay(tt_pen)
+        glyf_table[glyph_name] = tt_pen.glyph()
+
+    return font_copy
