@@ -1,1 +1,2 @@
 fonttools[woff,pathops,unicode] == 4.43.1
+afdko == 4.0.0
