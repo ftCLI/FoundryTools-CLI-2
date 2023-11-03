@@ -39,8 +39,9 @@ def otf_to_ttf(
     glyf.compile(font_copy)
     update_hmtx(font=font_copy, glyf=glyf)
 
+    MAXP_TABLE_VERSION = 0x00010000
     font_copy["maxp"] = maxp = newTable("maxp")
-    maxp.tableVersion = 0x00010000
+    maxp.tableVersion = MAXP_TABLE_VERSION
     maxp.maxZones = 1
     maxp.maxTwilightPoints = 0
     maxp.maxStorage = 0
