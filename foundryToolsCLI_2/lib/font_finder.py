@@ -8,7 +8,7 @@ from pathlib import Path
 
 from fontTools.ttLib.ttFont import TTFont, TTLibError
 
-F = t.TypeVar("F", bound="TTFont")
+from foundryToolsCLI_2.lib.font import Font
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -19,7 +19,6 @@ logger.addHandler(handler)
 
 WOFF_FLAVOR = "woff"
 WOFF2_FLAVOR = "woff2"
-SFNT_FLAVOR: t.Optional[str] = None
 OTF_SFNT_VERSION = "OTTO"
 TTF_SFNT_VERSION = "\x00\x01\x00\x00"
 FVAR_TABLE = "fvar"
@@ -29,7 +28,6 @@ class FontFinderError(Exception):
     """
     An exception raised by the FontFinder class.
     """
-    pass
 
 
 class FontFinder:
@@ -49,7 +47,6 @@ class FontFinder:
         input_path: A Path object pointing to the input path. The input path can be a directory or a
             file.
         recursive: A boolean indicating whether to search recursively.
-        return_cls: The return type of the find_fonts() method. The default is ``TTFont``.
         recalc_timestamp: A boolean indicating whether to recalculate the modified timestamp on
             save.
         recalc_bboxes: A boolean indicating whether to recalculate the bounding boxes on save.
@@ -70,7 +67,6 @@ class FontFinder:
         self,
         input_path: t.Union[str, Path],
         recursive: bool = False,
-        return_cls: t.Type[F] = TTFont,
         recalc_timestamp: bool = True,
         recalc_bboxes: bool = True,
         lazy: t.Optional[bool] = None,
@@ -89,7 +85,6 @@ class FontFinder:
             input_path: A Path object pointing to the input path. The input path can be a directory
                 or a file.
             recursive: A boolean indicating whether to search recursively.
-            return_cls: The return type of the find_fonts() method. The default is ``TTFont``.
             recalc_timestamp: A boolean indicating whether to recalculate the modified timestamp on
                 save.
             recalc_bboxes: A boolean indicating whether to recalculate the bounding boxes on save.
@@ -114,7 +109,6 @@ class FontFinder:
         except Exception as e:
             raise FontFinderError(f"Invalid input path: {input_path}") from e
         self.recursive = recursive
-        self.return_cls = return_cls
         self.recalc_timestamp = recalc_timestamp
         self.recalc_bboxes = recalc_bboxes
         self.lazy = lazy
@@ -126,7 +120,6 @@ class FontFinder:
         self.filter_out_static = filter_out_static
         self.filter_out_variable = filter_out_variable
 
-        self._validate_cls()
         self._validate_filters()
 
         self._filter_conditions = [
@@ -139,7 +132,7 @@ class FontFinder:
             (self.filter_out_variable, _is_variable),
         ]
 
-    def find_fonts(self) -> t.List[F]:
+    def find_fonts(self) -> t.List[Font]:
         """
         Returns a list of TTFont objects found in the input path.
 
@@ -150,7 +143,7 @@ class FontFinder:
         self._validate_fonts()
         return list(fonts)
 
-    def generate_fonts(self) -> t.Generator[F, None, None]:
+    def generate_fonts(self) -> t.Generator[Font, None, None]:
         """
         Returns a generator that yields TTFont objects found in the input path.
 
@@ -175,10 +168,6 @@ class FontFinder:
                 f"No fonts matching the criteria found in {self.input_path}"
             ) from e
 
-    def _validate_cls(self) -> None:
-        if not issubclass(self.return_cls, TTFont):
-            raise FontFinderError("The cls argument must be a subclass of TTFont.")
-
     def _validate_filters(self) -> None:
         if self.filter_out_tt and self.filter_out_ps:
             raise FontFinderError("Cannot filter out both TrueType and PostScript fonts.")
@@ -187,7 +176,7 @@ class FontFinder:
         if self.filter_out_static and self.filter_out_variable:
             raise FontFinderError("Cannot filter out both static and variable fonts.")
 
-    def _generate_fonts(self) -> t.Generator[F, None, None]:
+    def _generate_fonts(self) -> t.Generator[Font, None, None]:
         """
         A generator that yields TTFont or TTFont subclass objects found in the input path.
 
@@ -197,10 +186,10 @@ class FontFinder:
         files = self._generate_files()
         for file in files:
             try:
-                font = self.return_cls(
+                font = Font(
                     file, lazy=self.lazy,
-                    recalcTimestamp=self.recalc_timestamp,
-                    recalcBBoxes=self.recalc_bboxes,
+                    recalc_timestamp=self.recalc_timestamp,
+                    recalc_bboxes=self.recalc_bboxes,
                 )
                 if not any(condition and func(font) for condition, func in self._filter_conditions):
                     logger.debug(f"Found font: {file}")
@@ -253,25 +242,25 @@ def _is_woff2(font: TTFont) -> bool:
     return font.flavor == WOFF2_FLAVOR
 
 
-def _is_sfnt(font: TTFont) -> bool:
+def _is_sfnt(font: Font) -> bool:
     """
     Returns a boolean indicating whether the given font is a sfnt font.
 
     Args:
-        font (TTFont): A TTFont object.
+        font (Font): A TTFont object.
 
     Returns:
         bool: A boolean indicating whether the given font is a sfnt font.
     """
-    return font.flavor == SFNT_FLAVOR
+    return font.flavor is None
 
 
-def _is_ps(font: TTFont) -> bool:
+def _is_ps(font: Font) -> bool:
     """
     Returns a boolean indicating whether the given font is an OpenType font.
 
     Args:
-        font (TTFont): A TTFont object.
+        font (Font): A Font object.
 
     Returns:
         bool: A boolean indicating whether the given font is an OpenType font.
@@ -279,12 +268,12 @@ def _is_ps(font: TTFont) -> bool:
     return font.sfntVersion == OTF_SFNT_VERSION
 
 
-def _is_tt(font: TTFont) -> bool:
+def _is_tt(font: Font) -> bool:
     """
     Returns a boolean indicating whether the given font is a TrueType font.
 
     Args:
-        font (TTFont): A TTFont object.
+        font (Font): A Font object.
 
     Returns:
         bool: A boolean indicating whether the given font is a TrueType font.
@@ -292,12 +281,12 @@ def _is_tt(font: TTFont) -> bool:
     return font.sfntVersion == TTF_SFNT_VERSION
 
 
-def _is_static(font: TTFont) -> bool:
+def _is_static(font: Font) -> bool:
     """
     Returns a boolean indicating whether the given font is a static font.
 
     Args:
-        font (TTFont): A TTFont object.
+        font (Font): A Font object.
 
     Returns:
         bool: A boolean indicating whether the given font is a static font.
@@ -305,12 +294,12 @@ def _is_static(font: TTFont) -> bool:
     return font.get(FVAR_TABLE) is None
 
 
-def _is_variable(font: TTFont) -> bool:
+def _is_variable(font: Font) -> bool:
     """
     Returns a boolean indicating whether the given font is a variable font.
 
     Args:
-        font (TTFont): A TTFont object.
+        font (Font): A Font object.
 
     Returns:
         bool: A boolean indicating whether the given font is a variable font.
