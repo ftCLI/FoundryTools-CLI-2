@@ -1,5 +1,6 @@
 import itertools
-from collections.abc import Mapping, Callable
+# from collections.abc import Mapping, Callable
+from typing import Mapping , Callable
 
 import pathops
 from fontTools.misc.roundTools import otRound
