@@ -1,3 +1,6 @@
 [MASTER]
 disable =
     C0114, # Missing module docstring
+    R0913, # Too many arguments
+    R0914, # Too many local variables
+    W1203, # Use % formatting in logging functions and pass the % parameters as arguments
