@@ -9,7 +9,7 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import ttFont
 from fontTools.ttLib.tables import _g_l_y_f
 
-_TTGlyphMapping = Mapping[str, ttFont._TTGlyph]  # pylint: disable=protected-access
+_TTGlyphMapping = Mapping[str, ttFont._TTGlyph]
 
 
 def remove_tiny_paths(path: pathops.Path, glyph_name, min_area: int = 25, verbose: bool = True):
