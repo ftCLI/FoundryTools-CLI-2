@@ -1,4 +1,3 @@
-from copy import deepcopy
 from typing import Dict
 
 from fontTools.pens.cu2quPen import Cu2QuPen
@@ -37,23 +36,21 @@ def otf_to_ttf(
     if font.is_variable:
         raise NotImplementedError("Variable fonts are not supported.")
 
-    font_copy = deepcopy(font)
+    glyph_order = font.getGlyphOrder()
 
-    glyph_order = font_copy.getGlyphOrder()
-
-    font_copy[T_LOCA] = newTable(T_LOCA)
-    font_copy[T_GLYF] = glyf = newTable(T_GLYF)
+    font[T_LOCA] = newTable(T_LOCA)
+    font[T_GLYF] = glyf = newTable(T_GLYF)
     glyf.glyphOrder = glyph_order
     glyf.glyphs = glyphs_to_quadratic(
-        glyphs=font_copy.getGlyphSet(), max_err=max_err, reverse_direction=reverse_direction
+        glyphs=font.getGlyphSet(), max_err=max_err, reverse_direction=reverse_direction
     )
-    del font_copy[T_CFF]
-    if T_VORG in font_copy:
-        del font_copy[T_VORG]
-    glyf.compile(font_copy)
-    update_hmtx(font=font_copy, glyf=glyf)
+    del font[T_CFF]
+    if T_VORG in font:
+        del font[T_VORG]
+    glyf.compile(font)
+    update_hmtx(font=font, glyf=glyf)
 
-    font_copy[T_MAXP] = maxp = newTable(T_MAXP)
+    font[T_MAXP] = maxp = newTable(T_MAXP)
     maxp.tableVersion = MAXP_TABLE_VERSION
     maxp.maxZones = 1
     maxp.maxTwilightPoints = 0
@@ -65,20 +62,20 @@ def otf_to_ttf(
     maxp.maxComponentElements = max(
         len(g.components if hasattr(g, "components") else []) for g in glyf.glyphs.values()
     )
-    maxp.compile(font_copy)
+    maxp.compile(font)
 
-    post = font_copy[T_POST]
+    post = font[T_POST]
     post.formatType = post_format
     post.extraNames = []
     post.mapping = {}
     post.glyphOrder = glyph_order
     try:
-        post.compile(font_copy)
+        post.compile(font)
     except OverflowError:
         post.formatType = 3
 
-    font_copy.sfntVersion = "\000\001\000\000"
-    return font_copy
+    font.sfntVersion = "\000\001\000\000"
+    return font
 
 
 def update_hmtx(font: Font, glyf):

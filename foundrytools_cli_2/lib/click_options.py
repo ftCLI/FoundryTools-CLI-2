@@ -250,10 +250,33 @@ def tolerance_option() -> t.Callable:
         click.option(
             "-t",
             "--tolerance",
-            type=click.IntRange(min=16, max=16384),
+            type=click.FloatRange(min=0.0, max=3.0),
+            default=1.0,
             help="""
-            The tolerance value used to convert quadratic curves to cubic curves. The default is 0.
+            Conversion tolerance (0.0-3.0, default 1.0). Low tolerance adds more points but keeps
+            shapes. High tolerance adds  few points but may change shape.
             """,
         )
     ]
     return add_options(_tolerance_option)
+
+
+def target_upm_option(required: bool = False) -> t.Callable:
+    """
+    Add the scale_upm option to a click command.
+
+    :return: a decorator that adds the scale_upm option to a click command
+    """
+    _target_upm_option = [
+        click.option(
+            "-upm",
+            "--target-upm",
+            type=click.IntRange(min=16, max=16384),
+            default=None,
+            required=required,
+            help="""
+            Scale the font to the specified UPM.
+            """,
+        )
+    ]
+    return add_options(_target_upm_option)
