@@ -63,6 +63,9 @@ def get_cff_font_info(font: Font) -> dict:
 
 
 def get_post_values(font: Font) -> dict:
+    """
+    Setup CFF post table values
+    """
     post_info = dict(
         italicAngle=round(font["post"].italicAngle),
         underlinePosition=font["post"].underlinePosition,
