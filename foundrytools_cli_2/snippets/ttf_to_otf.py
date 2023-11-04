@@ -49,15 +49,15 @@ def get_cff_font_info(font: Font) -> dict:
     major_version = str(font_revision[0])
     minor_version = str(font_revision[1]).ljust(3, "0")
 
-    cff_font_info = dict(
-        version=".".join([major_version, str(int(minor_version))]),
-        FullName=font["name"].getBestFullName(),
-        FamilyName=font["name"].getBestFamilyName(),
-        ItalicAngle=font["post"].italicAngle,
-        UnderlinePosition=font["post"].underlinePosition,
-        UnderlineThickness=font["post"].underlineThickness,
-        isFixedPitch=bool(font["post"].isFixedPitch),
-    )
+    cff_font_info = {
+        "version": ".".join([major_version, str(int(minor_version))]),
+        "FullName": font["name"].getBestFullName(),
+        "FamilyName": font["name"].getBestFamilyName(),
+        "ItalicAngle": font["post"].italicAngle,
+        "UnderlinePosition": font["post"].underlinePosition,
+        "UnderlineThickness": font["post"].underlineThickness,
+        "isFixedPitch": bool(font["post"].isFixedPitch),
+    }
 
     return cff_font_info
 
@@ -66,16 +66,16 @@ def get_post_values(font: Font) -> dict:
     """
     Setup CFF post table values
     """
-    post_info = dict(
-        italicAngle=round(font["post"].italicAngle),
-        underlinePosition=font["post"].underlinePosition,
-        underlineThickness=font["post"].underlineThickness,
-        isFixedPitch=font["post"].isFixedPitch,
-        minMemType42=font["post"].minMemType42,
-        maxMemType42=font["post"].maxMemType42,
-        minMemType1=font["post"].minMemType1,
-        maxMemType1=font["post"].maxMemType1,
-    )
+    post_info = {
+        "italicAngle": round(font["post"].italicAngle),
+        "underlinePosition": font["post"].underlinePosition,
+        "underlineThickness": font["post"].underlineThickness,
+        "isFixedPitch": font["post"].isFixedPitch,
+        "minMemType42": font["post"].minMemType42,
+        "maxMemType42": font["post"].maxMemType42,
+        "minMemType1": font["post"].minMemType1,
+        "maxMemType1": font["post"].maxMemType1,
+    }
     return post_info
 
 
