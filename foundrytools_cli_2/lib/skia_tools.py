@@ -8,7 +8,7 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import ttFont
 from fontTools.ttLib.tables import _g_l_y_f
 
-_TTGlyphMapping = Mapping[str, ttFont._TTGlyph]
+_TTGlyphMapping = Mapping[str, ttFont._TTGlyph]  # pylint: disable=protected-access
 
 
 def remove_tiny_paths(path: pathops.Path, glyph_name, min_area: int = 25, verbose: bool = True):
@@ -149,8 +149,7 @@ def same_path(path_1: pathops.Path, path_2: pathops.Path) -> bool:
     """
     if {tuple(c) for c in path_1.contours} != {tuple(c) for c in path_2.contours}:
         return False
-    else:
-        return True
+    return True
 
 
 def ttf_components_overlap(glyph: _g_l_y_f.Glyph, glyph_set: _TTGlyphMapping) -> bool:
