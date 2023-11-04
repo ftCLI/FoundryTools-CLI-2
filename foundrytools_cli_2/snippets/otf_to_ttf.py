@@ -18,7 +18,7 @@ MAXP_TABLE_VERSION = 0x00010000
 
 
 def otf_to_ttf(
-        font: Font, max_err: float = 1.0, reverse_direction: bool = True, post_format=2.0
+    font: Font, max_err: float = 1.0, reverse_direction: bool = True, post_format=2.0
 ) -> Font:
     """
     Convert a OpenType font to a TrueType font.

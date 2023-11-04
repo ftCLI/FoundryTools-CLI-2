@@ -58,7 +58,8 @@ def ps2tt(
     options = FontLoadOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(
-            input_path=input_path, recursive=recursive, options=options, filters=filters)
+            input_path=input_path, recursive=recursive, options=options, filters=filters
+        )
         fonts = finder.generate_fonts()
 
     except FontFinderError as e:
@@ -85,13 +86,13 @@ def ps2tt(
 @recalc_timestamp_flag()
 @Timer()
 def tt2ps(
-        input_path: Path,
-        recursive: bool = False,
-        tolerance: float = 1.0,
-        output_dir: Path = None,
-        overwrite: bool = True,
-        target_upm: Optional[int] = None,
-        recalc_timestamp: bool = False,
+    input_path: Path,
+    recursive: bool = False,
+    tolerance: float = 1.0,
+    output_dir: Path = None,
+    overwrite: bool = True,
+    target_upm: Optional[int] = None,
+    recalc_timestamp: bool = False,
 ):
     """
     Convert TrueType flavored fonts to PostScript flavored fonts.
@@ -101,7 +102,8 @@ def tt2ps(
     options = FontLoadOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(
-            input_path=input_path, recursive=recursive, options=options, filters=filters)
+            input_path=input_path, recursive=recursive, options=options, filters=filters
+        )
         fonts = finder.find_fonts()
 
     except FontFinderError as e:
