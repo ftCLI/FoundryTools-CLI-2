@@ -269,8 +269,8 @@ def target_upm_option(required: bool = False) -> t.Callable:
     """
     _target_upm_option = [
         click.option(
-            "-s",
-            "--scale-upm",
+            "-upm",
+            "--target-upm",
             type=click.IntRange(min=16, max=16384),
             default=None,
             required=required,
