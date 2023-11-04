@@ -4,7 +4,7 @@ from typing import Dict
 from fontTools.pens.cu2quPen import Cu2QuPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import newTable
-from fontTools.ttLib.tables._g_l_y_f import Glyph  # type: ignore
+from fontTools.ttLib.tables._g_l_y_f import Glyph  # pylint: disable=protected-access
 
 from foundrytools_cli_2.lib.font import Font
 
