@@ -46,7 +46,7 @@ def ps2tt(
     input_path: Path,
     recursive: bool = False,
     tolerance: float = 1.0,
-    output_dir: Path = None,
+    output_dir: Optional[Path] = None,
     overwrite: bool = True,
     recalc_timestamp: bool = False,
 ):
@@ -89,7 +89,7 @@ def tt2ps(
     input_path: Path,
     recursive: bool = False,
     tolerance: float = 1.0,
-    output_dir: Path = None,
+    output_dir: Optional[Path] = None,
     overwrite: bool = True,
     target_upm: Optional[int] = None,
     recalc_timestamp: bool = False,
