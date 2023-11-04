@@ -9,6 +9,13 @@ from foundrytools_cli_2.snippets.otf_to_ttf import otf_to_ttf
 
 
 def ttf_to_otf(font: Font, charstrings: dict) -> Font:
+    """
+    Convert a TrueType font to a OpenType-PS font.
+
+    Args:
+        font (Font): The TrueType font to convert.
+        charstrings (dict): The CFF charstrings.
+    """
     cff_font_info = get_cff_font_info(font)
     post_values = get_post_values(font)
 
