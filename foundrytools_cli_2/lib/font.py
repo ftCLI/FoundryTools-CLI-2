@@ -1,7 +1,11 @@
 from pathlib import Path
 import typing as t
 
+from dehinter.font import dehint
 from fontTools.misc.cliTools import makeOutputFileName
+from fontTools.pens.recordingPen import DecomposingRecordingPen
+from fontTools.pens.ttGlyphPen import TTGlyphPen
+from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.ttFont import TTFont
 
 SFNT_POSTSCRIPT = "OTTO"
@@ -91,6 +95,60 @@ class Font(TTFont):
         :return: True if the font is a variable font, False otherwise.
         """
         return self.get(FVAR_TABLE) is not None
+
+    def tt_decomponentize(self) -> None:
+        """
+        Decomponentize a TrueType font.
+        """
+
+        if not self.is_tt:
+            raise NotImplementedError("Decomponentization is only supported for TrueType fonts.")
+
+        glyph_set = self.getGlyphSet()
+        glyf_table = self["glyf"]
+        dr_pen = DecomposingRecordingPen(glyph_set)
+        tt_pen = TTGlyphPen(None)
+
+        for glyph_name in self.glyphOrder:
+            glyph = glyf_table[glyph_name]
+            if not glyph.isComposite():
+                continue
+            dr_pen.value = []
+            tt_pen.init()
+            glyph.draw(dr_pen, glyf_table)
+            dr_pen.replay(tt_pen)
+            glyf_table[glyph_name] = tt_pen.glyph()
+
+    def tt_remove_hints(self) -> None:
+        """
+        Remove hints from a TrueType font.
+        """
+
+        if not self.is_tt:
+            raise NotImplementedError("Only TrueType fonts are supported.")
+
+        dehint(self)
+
+    def tt_scale_upm(self, units_per_em: int) -> None:
+        """
+        Scale the font's unitsPerEm value to the given value.
+
+        Args:
+            units_per_em (int): The new unitsPerEm value.
+        """
+
+        if not self.is_tt:
+            raise NotImplementedError("Scaling upem is only supported for TrueType fonts.")
+
+        if units_per_em not in range(16, 16385):
+            raise ValueError("units_per_em must be in the range 16 to 16384.")
+
+        if self["head"].unitsPerEm == units_per_em:
+            raise ValueError(
+                f"Font already has {units_per_em} units per em. No need to scale upem."
+            )
+
+        scale_upem(self, new_upem=units_per_em)
 
     def get_output_file(
         self,
