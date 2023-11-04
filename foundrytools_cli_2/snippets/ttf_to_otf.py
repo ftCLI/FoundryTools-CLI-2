@@ -49,7 +49,7 @@ def get_cff_font_info(font: Font) -> dict:
         ItalicAngle=font["post"].italicAngle,
         UnderlinePosition=font["post"].underlinePosition,
         UnderlineThickness=font["post"].underlineThickness,
-        isFixedPitch=False if font["post"].isFixedPitch == 0 else True,
+        isFixedPitch=bool(font["post"].isFixedPitch),
     )
 
     return cff_font_info
@@ -89,16 +89,21 @@ def get_charstrings(font: Font, tolerance: float = 1.0) -> Dict:
                 try:
                     charstrings[c] = fallback_charstrings[c]
                     print(f"Successfully got charstring for {c}")
-                except Exception as e:
+                except Exception as e:  # pylint: disable=broad-except
                     print(f"Failed to get charstring for {c}: {e}")
 
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         print(f"Failed to convert {font.reader.file.name}: {e}")
 
     return charstrings
 
 
 def get_qu2cu_charstrings(font: Font, tolerance: float = 1.0, verbose: bool = True):
+    """
+    Get CFF charstrings using Qu2CuPen
+
+    :return: CFF charstrings.
+    """
     qu2cu_charstrings = {}
     failed = []
     glyph_set = font.getGlyphSet()
@@ -136,6 +141,9 @@ def get_t2_charstrings(font: Font) -> dict:
 
 
 def get_fallback_charstrings(font: Font, tolerance: float = 1.0, verbose: bool = True) -> dict:
+    """
+    Get the charstrings from a fallback OTF font.
+    """
     t2_charstrings = get_t2_charstrings(font=font)
     ps = ttf_to_otf(font=font, charstrings=t2_charstrings)
     tt = otf_to_ttf(font=ps, max_err=tolerance, reverse_direction=True)
