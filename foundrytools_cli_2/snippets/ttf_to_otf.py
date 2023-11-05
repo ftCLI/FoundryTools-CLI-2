@@ -5,6 +5,7 @@ from fontTools.pens.qu2cuPen import Qu2CuPen
 from fontTools.pens.t2CharStringPen import T2CharStringPen
 
 from foundrytools_cli_2.lib.font import Font
+from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.snippets.otf_to_ttf import otf_to_ttf
 
 
@@ -92,18 +93,18 @@ def get_charstrings(font: Font, tolerance: float = 1.0) -> Dict:
         failed, charstrings = get_qu2cu_charstrings(font, tolerance=tolerance)
 
         if len(failed) > 0:
-            print(f"Retrying to get {len(failed)} charstrings...")
+            logger.info(f"Retrying to get {len(failed)} charstrings...")
             fallback_charstrings = get_fallback_charstrings(font, tolerance=tolerance)
 
             for c in failed:
                 try:
                     charstrings[c] = fallback_charstrings[c]
-                    print(f"Successfully got charstring for {c}")
+                    logger.info(f"Successfully got charstring for {c}")
                 except Exception as e:  # pylint: disable=broad-except
-                    print(f"Failed to get charstring for {c}: {e}")
+                    logger.error(f"Failed to get charstring for {c}: {e}")
 
     except Exception as e:  # pylint: disable=broad-except
-        print(f"Failed to convert {font.reader.file.name}: {e}")
+        logger.error(f"Failed to convert {font.reader.file.name}: {e}")
 
     return charstrings
 
@@ -126,7 +127,7 @@ def get_qu2cu_charstrings(font: Font, tolerance: float = 1.0, verbose: bool = Tr
             qu2cu_charstrings[k] = t2_pen.getCharString()
         except NotImplementedError as e:
             if verbose:
-                print(f"Failed to get charstring for {k}: {e}")
+                logger.warning(f"Failed to get charstring for {k}: {e}")
             failed.append(k)
 
     return failed, qu2cu_charstrings
