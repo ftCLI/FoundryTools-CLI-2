@@ -108,35 +108,38 @@ def tt2ps(
 
     for font in fonts:
         with font:
-            try:
-                logger.info(f"Converting {font.reader.file.name}")
+            # try:
+            logger.info(f"Converting {font.reader.file.name}")
 
-                logger.info("Decomponentizing source font...")
-                font.tt_decomponentize()
-                if target_upm:
-                    logger.info(f"Scaling UPM to {target_upm}")
-                    font.tt_scale_upm(units_per_em=target_upm)
+            logger.info("Decomponentizing source font...")
+            font.tt_decomponentize()
 
-                logger.info("Getting charstrings...")
-                charstrings = get_charstrings(font=font, tolerance=tolerance)
+            if target_upm:
+                logger.info(f"Scaling UPM to {target_upm}")
+                font.tt_scale_upm(units_per_em=target_upm)
 
-                logger.info("Converting to OTF...")
-                ps = ttf_to_otf(font=font, charstrings=charstrings)
+            logger.info("Getting charstrings...")
+            charstrings = get_charstrings(font=font, tolerance=tolerance)
 
-                buffer = BytesIO()
-                ps.save(buffer)
-                buffer.seek(0)
-                ps = Font(buffer, recalc_timestamp=False)
-                logger.error(ps.reader.file)
+            logger.info("Converting to OTF...")
+            otf = ttf_to_otf(font=font, charstrings=charstrings)
 
-                logger.info("Correcting contours...")
-                correct_otf_contours(ps)
+            out_file = otf.get_output_file(output_dir=output_dir, overwrite=overwrite)
+            otf.save(out_file)
+            otf = Font(out_file)
 
-                logger.info("Subroutinizing...")
-                subroutinize(ps)
+            buf = BytesIO()
+            otf.save(buf)
+            buf.seek(0)
+            otf = Font(buf)
 
-                out_file = font.get_output_file(output_dir=output_dir, overwrite=overwrite)
-                ps.save(out_file)
-                logger.success(f"Saved {out_file}")
-            except Exception as e:  # pylint: disable=broad-except
-                print(e)
+            logger.info("Correcting contours...")
+            correct_otf_contours(otf)
+
+            logger.info("Subroutinizing...")
+            subroutinize(otf)
+
+            otf.save(out_file)
+            logger.success(f"Saved {out_file}")
+            # except Exception as e:  # pylint: disable=broad-except
+            #     print(e)

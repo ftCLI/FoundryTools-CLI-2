@@ -109,12 +109,13 @@ def get_charstrings(font: Font, tolerance: float = 1.0) -> Dict:
     return charstrings
 
 
-def get_qu2cu_charstrings(font: Font, tolerance: float = 1.0, verbose: bool = True):
+def get_qu2cu_charstrings(font: Font, tolerance: float = 1.0):
     """
     Get CFF charstrings using Qu2CuPen
 
     :return: CFF charstrings.
     """
+
     qu2cu_charstrings = {}
     failed = []
     glyph_set = font.getGlyphSet()
@@ -126,8 +127,7 @@ def get_qu2cu_charstrings(font: Font, tolerance: float = 1.0, verbose: bool = Tr
             glyph_set[k].draw(qu2cu_pen)
             qu2cu_charstrings[k] = t2_pen.getCharString()
         except NotImplementedError as e:
-            if verbose:
-                logger.warning(f"Failed to get charstring for {k}: {e}")
+            logger.warning(f"Failed to get charstring for {k}: {e}")
             failed.append(k)
 
     return failed, qu2cu_charstrings
@@ -158,5 +158,5 @@ def get_fallback_charstrings(font: Font, tolerance: float = 1.0, verbose: bool =
     t2_charstrings = get_t2_charstrings(font=font)
     ps = ttf_to_otf(font=font, charstrings=t2_charstrings)
     tt = otf_to_ttf(font=ps, max_err=tolerance, reverse_direction=True)
-    _, fallback_charstrings = get_qu2cu_charstrings(tt, tolerance=tolerance, verbose=verbose)
+    _, fallback_charstrings = get_qu2cu_charstrings(tt, tolerance=tolerance)
     return fallback_charstrings
