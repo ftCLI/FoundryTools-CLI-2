@@ -156,7 +156,7 @@ def get_fallback_charstrings(font: Font, tolerance: float = 1.0) -> dict:
     Get the charstrings from a fallback OTF font.
     """
     t2_charstrings = get_t2_charstrings(font=font)
-    ps = ttf_to_otf(font=font, charstrings=t2_charstrings)
-    tt = otf_to_ttf(font=ps, max_err=tolerance, reverse_direction=True)
-    _, fallback_charstrings = get_qu2cu_charstrings(tt, tolerance=tolerance)
+    otf = ttf_to_otf(font=font, charstrings=t2_charstrings)
+    ttf = otf_to_ttf(font=otf, max_err=tolerance, reverse_direction=True)
+    _, fallback_charstrings = get_qu2cu_charstrings(ttf, tolerance=tolerance)
     return fallback_charstrings
