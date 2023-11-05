@@ -193,6 +193,14 @@ def remove_tiny_paths(path: pathops.Path, glyph_name, min_area: int = 25, verbos
 
 
 def correct_otf_contours(font: Font, min_area: int = 25, verbose: bool = False) -> None:
+    """
+    Corrects the contours of an OTF font.
+
+    :param font: the font
+    :param min_area: the minimum area of a path
+    :param verbose: if True, logs the modified glyphs
+    :return: None
+    """
 
     if not font.is_ps:
         raise NotImplementedError("Not an OTF font")
@@ -222,5 +230,5 @@ def correct_otf_contours(font: Font, min_area: int = 25, verbose: bool = False) 
             cs = t2_charstring_from_skia_path(path=path_2, width=v.width)
             logger.debug(f"Corrected contours for glyph '{k}'")
 
-            cff_table.cff[0].CharStrings[k] = cs.compile()
+            cff_table.cff[0].CharStrings[k] = cs
             modified.append(k)
