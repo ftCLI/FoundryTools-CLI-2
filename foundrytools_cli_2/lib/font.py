@@ -1,3 +1,4 @@
+from io import BytesIO
 from pathlib import Path
 import typing as t
 
@@ -22,7 +23,7 @@ class Font(TTFont):
 
     def __init__(
         self,
-        file: t.Optional[t.Union[str, Path]] = None,
+        file: t.Optional[t.Union[str, Path, BytesIO]] = None,
         recalc_bboxes: bool = True,
         recalc_timestamp: bool = False,
         lazy: t.Optional[bool] = None,
