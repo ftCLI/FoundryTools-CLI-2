@@ -151,7 +151,7 @@ def get_t2_charstrings(font: Font) -> dict:
     return t2_charstrings
 
 
-def get_fallback_charstrings(font: Font, tolerance: float = 1.0, verbose: bool = True) -> dict:
+def get_fallback_charstrings(font: Font, tolerance: float = 1.0) -> dict:
     """
     Get the charstrings from a fallback OTF font.
     """
