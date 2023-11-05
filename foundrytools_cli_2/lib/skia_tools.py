@@ -1,6 +1,5 @@
 import itertools
-# from collections.abc import Mapping, Callable
-from typing import Mapping , Callable
+from typing import Mapping, Callable
 
 import pathops
 from fontTools.misc.roundTools import otRound
@@ -9,27 +8,10 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import ttFont
 from fontTools.ttLib.tables import _g_l_y_f
 
+from foundrytools_cli_2.lib.font import Font
+from foundrytools_cli_2.lib.logger import logger
+
 _TTGlyphMapping = Mapping[str, ttFont._TTGlyph]
-
-
-def remove_tiny_paths(path: pathops.Path, glyph_name, min_area: int = 25, verbose: bool = True):
-    """
-    Removes tiny paths from a pathops.Path.
-
-    :param path: the path from which to remove the tiny paths
-    :param glyph_name: the glyph name
-    :param min_area: the minimum are of a path
-    :param verbose: if True, logs the removed tiny paths
-    :return: the cleaned path
-    """
-    cleaned_path = pathops.Path()
-    for contour in path.contours:
-        if contour.area >= min_area:
-            cleaned_path.addPath(contour)
-        else:
-            if verbose:
-                print(f"Tiny path removed from glyph '{glyph_name}'")
-    return cleaned_path
 
 
 def skia_path_from_glyph(glyph_name: str, glyph_set: _TTGlyphMapping) -> pathops.Path:
@@ -46,7 +28,9 @@ def skia_path_from_glyph(glyph_name: str, glyph_set: _TTGlyphMapping) -> pathops
     return path
 
 
-def skia_path_from_component(component: _g_l_y_f.GlyphComponent, glyph_set: _TTGlyphMapping):
+def skia_path_from_glyph_component(
+    component: _g_l_y_f.GlyphComponent, glyph_set: _TTGlyphMapping
+) -> pathops.Path:
     """
     Returns a pathops.Path from a glyph component
 
@@ -57,6 +41,41 @@ def skia_path_from_component(component: _g_l_y_f.GlyphComponent, glyph_set: _TTG
     base_glyph_name, transformation = component.getComponentInfo()
     path = skia_path_from_glyph(glyph_name=base_glyph_name, glyph_set=glyph_set)
     return path.transform(*transformation)
+
+
+def ttf_components_overlap(glyph: _g_l_y_f.Glyph, glyph_set: _TTGlyphMapping) -> bool:
+    """
+    Checks if a TrueType composite glyph has overlapping components.
+
+    :param glyph: the glyph
+    :param glyph_set: the glyphSet to which the glyph belongs
+    :return: True if the glyph has overlapping components, False otherwise
+    """
+    if not glyph.isComposite():
+        raise ValueError("This method only works with TrueType composite glyphs")
+    if len(glyph.components) < 2:
+        return False
+
+    component_paths = {}
+
+    def _get_nth_component_path(index: int) -> pathops.Path:
+        if index not in component_paths:
+            component_paths[index] = skia_path_from_glyph_component(
+                glyph.components[index], glyph_set
+            )
+        return component_paths[index]
+
+    return any(
+        pathops.op(
+            _get_nth_component_path(i),
+            _get_nth_component_path(j),
+            pathops.PathOp.INTERSECTION,
+            clockwise=True,
+            fix_winding=True,
+            keep_starting_points=False,
+        )
+        for i, j in itertools.combinations(range(len(glyph.components)), 2)
+    )
 
 
 def ttf_glyph_from_skia_path(path: pathops.Path) -> _g_l_y_f.Glyph:
@@ -129,13 +148,13 @@ def simplify_path(path: pathops.Path, glyph_name: str, clockwise: bool) -> patho
     path = round_path(path)
     try:
         path = pathops.simplify(path, fix_winding=True, clockwise=clockwise)
-        print(
+        logger.info(
             f"skia-pathops failed to simplify glyph '{glyph_name}' with float coordinates, but "
             f"succeeded using rounded integer coordinates"
         )
         return path
     except pathops.PathOpsError as e:
-        print(f"skia-pathops failed to simplify glyph '{glyph_name}': {e}")
+        logger.error(f"skia-pathops failed to simplify glyph '{glyph_name}': {e}")
 
     raise AssertionError("Unreachable")
 
@@ -153,48 +172,55 @@ def same_path(path_1: pathops.Path, path_2: pathops.Path) -> bool:
     return True
 
 
-def ttf_components_overlap(glyph: _g_l_y_f.Glyph, glyph_set: _TTGlyphMapping) -> bool:
+def remove_tiny_paths(path: pathops.Path, glyph_name, min_area: int = 25, verbose: bool = True):
     """
-    Checks if a TrueType composite glyph has overlapping components.
+    Removes tiny paths from a pathops.Path.
 
-    :param glyph: the glyph
-    :param glyph_set: the glyphSet to which the glyph belongs
-    :return: True if the glyph has overlapping components, False otherwise
+    :param path: the path from which to remove the tiny paths
+    :param glyph_name: the glyph name
+    :param min_area: the minimum are of a path
+    :param verbose: if True, logs the removed tiny paths
+    :return: the cleaned path
     """
-    if not glyph.isComposite():
-        raise ValueError("This method only works with TrueType composite glyphs")
-    if len(glyph.components) < 2:
-        return False
+    cleaned_path = pathops.Path()
+    for contour in path.contours:
+        if contour.area >= min_area:
+            cleaned_path.addPath(contour)
+        else:
+            if verbose:
+                logger.info(f"Tiny path removed from glyph '{glyph_name}'")
+    return cleaned_path
 
-    component_paths = {}
 
-    def _get_nth_component_path(index: int) -> pathops.Path:
-        if index not in component_paths:
-            component_paths[index] = skia_path_from_component(
-                glyph.components[index], glyph_set
+def correct_otf_contours(font: Font, min_area: int = 25, verbose: bool = False) -> None:
+
+    if not font.is_ps:
+        raise NotImplementedError("Not an OTF font")
+
+    cff_table = font["CFF "]
+
+    glyph_set = font.getGlyphSet()
+
+    modified = []
+    charstrings = {}
+
+    for k, v in glyph_set.items():
+        t2_pen = T2CharStringPen(width=v.width, glyphSet=glyph_set)
+        glyph_set[k].draw(t2_pen)
+        charstrings[k] = t2_pen.getCharString()
+
+        path_1 = skia_path_from_glyph(glyph_name=k, glyph_set=glyph_set)
+        path_2 = skia_path_from_glyph(glyph_name=k, glyph_set=glyph_set)
+        path_2 = simplify_path(path=path_2, glyph_name=k, clockwise=False)
+
+        if min_area > 0:
+            path_2 = remove_tiny_paths(
+                path=path_2, glyph_name=k, min_area=min_area, verbose=verbose
             )
-        return component_paths[index]
 
-    return any(
-        pathops.op(
-            _get_nth_component_path(i),
-            _get_nth_component_path(j),
-            pathops.PathOp.INTERSECTION,
-            fix_winding=True,
-            keep_starting_points=False,
-            clockwise=True,
-        )
-        for i, j in itertools.combinations(range(len(glyph.components)), 2)
-    )
+        if not same_path(path_1=path_1, path_2=path_2):
+            cs = t2_charstring_from_skia_path(path=path_2, width=v.width)
+            logger.debug(f"Corrected contours for glyph '{k}'")
 
-
-def skia_path_from_glyph_component(component: _g_l_y_f.GlyphComponent, glyph_set: _TTGlyphMapping):
-    """
-    Returns a pathops.Path from a glyph component
-    :param component:
-    :param glyph_set:
-    :return:
-    """
-    base_glyph_name, transformation = component.getComponentInfo()
-    path = skia_path_from_glyph(base_glyph_name, glyph_set)
-    return path.transform(*transformation)
+            cff_table.cff[0].CharStrings[k] = cs.compile()
+            modified.append(k)
