@@ -60,7 +60,7 @@ def choice_to_int_callback(
 
 
 def str_to_tuple_callback(
-    ctx: click.Context, _, value: t.Optional[str]
+    ctx: click.Context, _: click.Parameter, value: t.Optional[str]
 ) -> t.Optional[t.Tuple[str]]:
     """
     Callback for click options that accept a tuple of strings. Converts a string to a tuple of

@@ -72,8 +72,8 @@ class FontFinder:
         self,
         input_path: t.Union[str, Path],
         recursive: bool = False,
-        options=t.Optional[FontLoadOptions],
-        filters=t.Optional[FontFinderFilters],
+        options: t.Optional[FontLoadOptions] = None,
+        filters: t.Optional[FontFinderFilters] = None,
     ) -> None:
         """
         Initialize the FontFinder class.

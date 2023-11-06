@@ -14,7 +14,7 @@ def add_options(options: t.List[t.Callable]) -> t.Callable:
     :return: a decorator that adds the options to a click command
     """
 
-    def _add_options(func: t.Callable):
+    def _add_options(func: t.Callable) -> t.Callable:
         for option in reversed(options):
             func = option(func)
         return func
@@ -22,7 +22,7 @@ def add_options(options: t.List[t.Callable]) -> t.Callable:
     return _add_options
 
 
-def input_path_argument(dir_okay=True, file_okay=True) -> t.Callable:
+def input_path_argument(dir_okay: bool = True, file_okay: bool = True) -> t.Callable:
     """
     Add the ``input_path`` argument to a click command.
 

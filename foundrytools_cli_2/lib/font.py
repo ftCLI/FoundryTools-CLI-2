@@ -45,7 +45,7 @@ class Font(TTFont):
         return self.sfntVersion == SFNT_POSTSCRIPT
 
     @property
-    def is_tt(self):
+    def is_tt(self) -> bool:
         """
         Check if the font has TrueType outlines.
 
@@ -54,7 +54,7 @@ class Font(TTFont):
         return self.sfntVersion == SFNT_TRUETYPE
 
     @property
-    def is_woff(self):
+    def is_woff(self) -> bool:
         """
         Check if the font is a WOFF font.
 
@@ -63,7 +63,7 @@ class Font(TTFont):
         return self.flavor == FLAVOR_WOFF
 
     @property
-    def is_woff2(self):
+    def is_woff2(self) -> bool:
         """
         Check if the font is a WOFF2 font.
 
@@ -72,7 +72,7 @@ class Font(TTFont):
         return self.flavor == FLAVOR_WOFF2
 
     @property
-    def is_sfnt(self):
+    def is_sfnt(self) -> bool:
         """
         Check if the font is a SFNT font.
 
@@ -81,7 +81,7 @@ class Font(TTFont):
         return self.flavor is None
 
     @property
-    def is_static(self):
+    def is_static(self) -> bool:
         """
         Check if the font is a static font.
 
@@ -90,7 +90,7 @@ class Font(TTFont):
         return self.get(FVAR_TABLE) is None
 
     @property
-    def is_variable(self):
+    def is_variable(self) -> bool:
         """
         Check if the font is a variable font.
 

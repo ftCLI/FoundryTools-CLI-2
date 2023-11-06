@@ -10,10 +10,10 @@ class LoggerFilter:  # pylint: disable=too-few-public-methods
     A custom logger filter that filters out log records below the given level.
     """
 
-    def __init__(self, level):
+    def __init__(self, level: str) -> None:
         self.level = level
 
-    def __call__(self, record):
+    def __call__(self, record) -> bool:  # type: ignore
         level_no = logger.level(self.level).no
         return record["level"].no >= level_no
 
@@ -34,7 +34,7 @@ logger.add(
 
 # Add a custom level to the logger
 logger.level("SKIP", no=27, color="<light-black><bold>", icon="⏭️")
-logger.__class__.skip = partialmethod(logger.__class__.log, "SKIP")
+logger.__class__.skip = partialmethod(logger.__class__.log, "SKIP")  # type: ignore
 
 
 __all__ = ["logger", "logger_filter"]
