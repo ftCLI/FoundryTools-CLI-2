@@ -3,7 +3,8 @@ from typing import Mapping, Callable
 
 from fontTools.fontBuilder import FontBuilder
 from fontTools.misc.roundTools import otRound
-from fontTools.pens.t2CharStringPen import T2CharStringPen, T2CharString
+from fontTools.misc.psCharStrings import T2CharString
+from fontTools.pens.t2CharStringPen import T2CharStringPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import ttFont
 from fontTools.ttLib.tables import _g_l_y_f, C_F_F_
