@@ -13,6 +13,7 @@ from foundrytools_cli_2.lib.click_options import (
     target_upm_option,
     tolerance_option,
     subroutinize_flag,
+    debug_flag,
 )
 from foundrytools_cli_2.lib.font_finder import (
     FontFinder,
@@ -20,11 +21,10 @@ from foundrytools_cli_2.lib.font_finder import (
     FontFinderFilters,
     FontLoadOptions,
 )
-from foundrytools_cli_2.lib.logger import logger
+from foundrytools_cli_2.lib.logger import logger, logger_filter
 from foundrytools_cli_2.lib.timer import Timer
 from foundrytools_cli_2.snippets.otf_to_ttf import otf_to_ttf
 from foundrytools_cli_2.snippets.ttf_to_otf import ttf_to_otf, get_charstrings
-
 
 cli = click.Group()
 
@@ -44,7 +44,7 @@ def ps2tt(
     output_dir: Optional[Path] = None,
     overwrite: bool = True,
     recalc_timestamp: bool = False,
-):
+) -> None:
     """
     Convert PostScript flavored fonts to TrueType flavored fonts.
     """
@@ -81,6 +81,7 @@ def ps2tt(
 @output_dir_option()
 @overwrite_flag()
 @recalc_timestamp_flag()
+@debug_flag()
 @Timer(logger=logger.info)
 def tt2ps(
     input_path: Path,
@@ -91,10 +92,14 @@ def tt2ps(
     overwrite: bool = True,
     target_upm: Optional[int] = None,
     recalc_timestamp: bool = False,
-):
+    debug: bool = False,
+) -> None:
     """
     Convert TrueType flavored fonts to PostScript flavored fonts.
     """
+
+    if debug:
+        logger_filter.level = "DEBUG"
 
     filters = FontFinderFilters(filter_out_ps=True, filter_out_variable=True)
     options = FontLoadOptions(recalc_timestamp=recalc_timestamp)
@@ -109,7 +114,7 @@ def tt2ps(
         raise click.Abort()
 
     for font in fonts:
-        with font:
+        with font, Timer(logger=logger.success, text="Font converted in {:0.3f} seconds"):
             try:
                 logger.info(f"Converting {font.reader.file.name}")
 
@@ -129,7 +134,13 @@ def tt2ps(
 
                 if subr:
                     logger.info("Subroutinizing...")
+                    # Save the flavor and set it to None to avoid cffsubr to fail
+                    if otf.flavor is not None:
+                        flavor = otf.flavor
+                    otf.flavor = None
                     subroutinize(otf)
+                    if locals().get("flavor"):
+                        otf.flavor = flavor
 
                     # Using compreffor requires to save the font to a buffer first
                     # from io import BytesIO

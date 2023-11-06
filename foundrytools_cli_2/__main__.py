@@ -9,5 +9,5 @@ from foundrytools_cli_2.cli.converter import cli as converter_cli
     }
 )
 @click.version_option()
-def cli():  # pylint: disable=missing-function-docstring
+def cli() -> None:  # pylint: disable=missing-function-docstring
     pass

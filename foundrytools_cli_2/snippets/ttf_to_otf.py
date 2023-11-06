@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List, Tuple
 
 from fontTools.fontBuilder import FontBuilder
 from fontTools.pens.qu2cuPen import Qu2CuPen
@@ -98,7 +98,7 @@ def get_charstrings(font: Font, tolerance: float = 1.0) -> Dict:
     :return: CFF charstrings.
     """
 
-    charstrings = {}
+    charstrings: Dict = {}
     try:
         tolerance = tolerance / 1000 * font["head"].unitsPerEm
         failed, charstrings = get_qu2cu_charstrings(font, tolerance=tolerance)
@@ -120,7 +120,7 @@ def get_charstrings(font: Font, tolerance: float = 1.0) -> Dict:
     return charstrings
 
 
-def get_qu2cu_charstrings(font: Font, tolerance: float = 1.0):
+def get_qu2cu_charstrings(font: Font, tolerance: float = 1.0) -> Tuple[List, Dict]:
     """
     Get CFF charstrings using Qu2CuPen
 

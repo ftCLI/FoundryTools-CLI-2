@@ -174,7 +174,7 @@ def same_path(path_1: pathops.Path, path_2: pathops.Path) -> bool:
     return True
 
 
-def remove_tiny_paths(path: pathops.Path, glyph_name, min_area: int = 25):
+def remove_tiny_paths(path: pathops.Path, glyph_name: str, min_area: int = 25) -> pathops.Path:
     """
     Removes tiny paths from a pathops.Path.
 
