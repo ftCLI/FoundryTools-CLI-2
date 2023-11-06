@@ -174,7 +174,6 @@ class FontFinder:
                     recalc_bboxes=self.options.recalc_bboxes,
                 )
                 if not any(condition and func(font) for condition, func in self._filter_conditions):
-                    logger.debug(f"Found font: {file}")
                     yield font
             except TTLibError as e:
                 logger.debug(f"{file}: {e}")
