@@ -1,5 +1,6 @@
 from typing import Dict
 
+from fontTools.cffLib.width import optimizeWidths
 from fontTools.fontBuilder import FontBuilder
 from fontTools.pens.qu2cuPen import Qu2CuPen
 from fontTools.pens.t2CharStringPen import T2CharStringPen
@@ -19,6 +20,13 @@ def ttf_to_otf(font: Font, charstrings: dict) -> Font:
     """
     cff_font_info = get_cff_font_info(font)
     post_values = get_post_values(font)
+    advance_widths = get_advance_widths(font)
+    # h_metrics = get_horizontal_metrics(charstrings, advance_widths)
+    default_width_x, nominal_width_x = optimizeWidths(advance_widths.values())
+    private_dict = {
+        "defaultWidthX": default_width_x,
+        "nominalWidthX": nominal_width_x,
+    }
 
     fb = FontBuilder(font=font)
     fb.isTTF = False
@@ -30,8 +38,17 @@ def ttf_to_otf(font: Font, charstrings: dict) -> Font:
         psName=font["name"].getDebugName(6),
         charStringsDict=charstrings,
         fontInfo=cff_font_info,
-        privateDict={},
+        privateDict=private_dict,
     )
+
+    lsb = {}
+    for gn, cs in charstrings.items():
+        lsb[gn] = cs.calcBounds(None)[0] if cs.calcBounds(None) is not None else 0
+    metrics = {}
+    for gn, advance_width in advance_widths.items():
+        metrics[gn] = (advance_width, lsb[gn])
+
+    fb.setupHorizontalMetrics(metrics)
     fb.setupDummyDSIG()
     fb.setupMaxp()
     fb.setupPost(**post_values)
@@ -80,6 +97,21 @@ def get_post_values(font: Font) -> dict:
     return post_info
 
 
+def get_advance_widths(font: Font) -> Dict[str, int]:
+    """
+    Get advance widths from a font.
+
+    :return: Advance widths.
+    """
+    advance_widths = {}
+    glyph_set = font.getGlyphSet()
+
+    for k, v in glyph_set.items():
+        advance_widths[k] = v.width
+
+    return advance_widths
+
+
 def get_charstrings(font: Font, tolerance: float = 1.0) -> Dict:
     """
     Get CFF charstrings using Qu2CuPen, falling back to T2CharStringPen if Qu2CuPen fails.
@@ -105,6 +137,8 @@ def get_charstrings(font: Font, tolerance: float = 1.0) -> Dict:
 
     except Exception as e:  # pylint: disable=broad-except
         logger.error(f"Failed to convert {font.reader.file.name}: {e}")
+
+    print(charstrings["A"].__dict__)
 
     return charstrings
 
@@ -157,6 +191,8 @@ def get_fallback_charstrings(font: Font, tolerance: float = 1.0) -> dict:
     """
     t2_charstrings = get_t2_charstrings(font=font)
     otf = ttf_to_otf(font=font, charstrings=t2_charstrings)
-    ttf = otf_to_ttf(font=otf, max_err=tolerance, reverse_direction=True)
+    # We have a fallback OTF font with incorrect contours direction here, so we need to set
+    # reverse_direction to False. Later Qu2CuPen will reverse the direction of the contours.
+    ttf = otf_to_ttf(font=otf, max_err=tolerance, reverse_direction=False)
     _, fallback_charstrings = get_qu2cu_charstrings(ttf, tolerance=tolerance)
     return fallback_charstrings
