@@ -1,7 +1,7 @@
 import io
 from pathlib import Path
-import setuptools
 from typing import List
+import setuptools
 
 this_directory = Path(__file__).parent
 long_description = this_directory.joinpath("README.md").read_text(encoding="utf-8")
