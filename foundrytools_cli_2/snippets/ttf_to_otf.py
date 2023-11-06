@@ -1,6 +1,5 @@
 from typing import Dict
 
-from fontTools.cffLib.width import optimizeWidths
 from fontTools.fontBuilder import FontBuilder
 from fontTools.pens.qu2cuPen import Qu2CuPen
 from fontTools.pens.t2CharStringPen import T2CharStringPen
@@ -20,13 +19,6 @@ def ttf_to_otf(font: Font, charstrings: dict) -> Font:
     """
     cff_font_info = get_cff_font_info(font)
     post_values = get_post_values(font)
-    advance_widths = get_advance_widths(font)
-    # h_metrics = get_horizontal_metrics(charstrings, advance_widths)
-    default_width_x, nominal_width_x = optimizeWidths(advance_widths.values())
-    private_dict = {
-        "defaultWidthX": default_width_x,
-        "nominalWidthX": nominal_width_x,
-    }
 
     fb = FontBuilder(font=font)
     fb.isTTF = False
@@ -38,8 +30,10 @@ def ttf_to_otf(font: Font, charstrings: dict) -> Font:
         psName=font["name"].getDebugName(6),
         charStringsDict=charstrings,
         fontInfo=cff_font_info,
-        privateDict=private_dict,
+        privateDict={},
     )
+
+    advance_widths = fb.font.get_advance_widths()
 
     lsb = {}
     for gn, cs in charstrings.items():
@@ -95,21 +89,6 @@ def get_post_values(font: Font) -> dict:
         "maxMemType1": font["post"].maxMemType1,
     }
     return post_info
-
-
-def get_advance_widths(font: Font) -> Dict[str, int]:
-    """
-    Get advance widths from a font.
-
-    :return: Advance widths.
-    """
-    advance_widths = {}
-    glyph_set = font.getGlyphSet()
-
-    for k, v in glyph_set.items():
-        advance_widths[k] = v.width
-
-    return advance_widths
 
 
 def get_charstrings(font: Font, tolerance: float = 1.0) -> Dict:
