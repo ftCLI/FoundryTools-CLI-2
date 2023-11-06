@@ -1,4 +1,3 @@
-import logging
 import typing as t
 from dataclasses import dataclass
 from pathlib import Path
@@ -6,13 +5,8 @@ from pathlib import Path
 from fontTools.ttLib.ttFont import TTLibError
 
 from foundrytools_cli_2.lib.font import Font
+from foundrytools_cli_2.lib.logger import logger
 
-logger = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-handler.setLevel(logging.DEBUG)
-handler.setFormatter(formatter)
-logger.addHandler(handler)
 
 WOFF_FLAVOR = "woff"
 WOFF2_FLAVOR = "woff2"
@@ -180,10 +174,10 @@ class FontFinder:
                     recalc_bboxes=self.options.recalc_bboxes,
                 )
                 if not any(condition and func(font) for condition, func in self._filter_conditions):
-                    logger.debug("Found font: %s", file)
+                    logger.debug(f"Found font: {file}")
                     yield font
             except TTLibError as e:
-                logger.debug("%s: %s", file, e)
+                logger.debug(f"{file}: {e}")
 
     def _generate_files(self) -> t.Generator[Path, None, None]:
         """

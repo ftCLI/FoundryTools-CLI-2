@@ -5,6 +5,7 @@ from fontTools.pens.qu2cuPen import Qu2CuPen
 from fontTools.pens.t2CharStringPen import T2CharStringPen
 
 from foundrytools_cli_2.lib.font import Font
+from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.snippets.otf_to_ttf import otf_to_ttf
 
 
@@ -31,6 +32,17 @@ def ttf_to_otf(font: Font, charstrings: dict) -> Font:
         fontInfo=cff_font_info,
         privateDict={},
     )
+
+    advance_widths = fb.font.get_advance_widths()
+
+    lsb = {}
+    for gn, cs in charstrings.items():
+        lsb[gn] = cs.calcBounds(None)[0] if cs.calcBounds(None) is not None else 0
+    metrics = {}
+    for gn, advance_width in advance_widths.items():
+        metrics[gn] = (advance_width, lsb[gn])
+
+    fb.setupHorizontalMetrics(metrics)
     fb.setupDummyDSIG()
     fb.setupMaxp()
     fb.setupPost(**post_values)
@@ -92,28 +104,29 @@ def get_charstrings(font: Font, tolerance: float = 1.0) -> Dict:
         failed, charstrings = get_qu2cu_charstrings(font, tolerance=tolerance)
 
         if len(failed) > 0:
-            print(f"Retrying to get {len(failed)} charstrings...")
+            logger.info(f"Retrying to get {len(failed)} charstrings...")
             fallback_charstrings = get_fallback_charstrings(font, tolerance=tolerance)
 
             for c in failed:
                 try:
                     charstrings[c] = fallback_charstrings[c]
-                    print(f"Successfully got charstring for {c}")
+                    logger.info(f"Successfully got charstring for {c}")
                 except Exception as e:  # pylint: disable=broad-except
-                    print(f"Failed to get charstring for {c}: {e}")
+                    logger.error(f"Failed to get charstring for {c}: {e}")
 
     except Exception as e:  # pylint: disable=broad-except
-        print(f"Failed to convert {font.reader.file.name}: {e}")
+        logger.error(f"Failed to convert {font.reader.file.name}: {e}")
 
     return charstrings
 
 
-def get_qu2cu_charstrings(font: Font, tolerance: float = 1.0, verbose: bool = True):
+def get_qu2cu_charstrings(font: Font, tolerance: float = 1.0):
     """
     Get CFF charstrings using Qu2CuPen
 
     :return: CFF charstrings.
     """
+
     qu2cu_charstrings = {}
     failed = []
     glyph_set = font.getGlyphSet()
@@ -125,8 +138,7 @@ def get_qu2cu_charstrings(font: Font, tolerance: float = 1.0, verbose: bool = Tr
             glyph_set[k].draw(qu2cu_pen)
             qu2cu_charstrings[k] = t2_pen.getCharString()
         except NotImplementedError as e:
-            if verbose:
-                print(f"Failed to get charstring for {k}: {e}")
+            logger.warning(f"Failed to get charstring for {k}: {e}")
             failed.append(k)
 
     return failed, qu2cu_charstrings
@@ -150,12 +162,14 @@ def get_t2_charstrings(font: Font) -> dict:
     return t2_charstrings
 
 
-def get_fallback_charstrings(font: Font, tolerance: float = 1.0, verbose: bool = True) -> dict:
+def get_fallback_charstrings(font: Font, tolerance: float = 1.0) -> dict:
     """
     Get the charstrings from a fallback OTF font.
     """
     t2_charstrings = get_t2_charstrings(font=font)
-    ps = ttf_to_otf(font=font, charstrings=t2_charstrings)
-    tt = otf_to_ttf(font=ps, max_err=tolerance, reverse_direction=True)
-    _, fallback_charstrings = get_qu2cu_charstrings(tt, tolerance=tolerance, verbose=verbose)
+    otf = ttf_to_otf(font=font, charstrings=t2_charstrings)
+    # We have a fallback OTF font with incorrect contours direction here, so we need to set
+    # reverse_direction to False. Later Qu2CuPen will reverse the direction of the contours.
+    ttf = otf_to_ttf(font=otf, max_err=tolerance, reverse_direction=False)
+    _, fallback_charstrings = get_qu2cu_charstrings(ttf, tolerance=tolerance)
     return fallback_charstrings

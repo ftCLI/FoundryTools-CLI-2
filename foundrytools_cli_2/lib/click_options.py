@@ -280,3 +280,20 @@ def target_upm_option(required: bool = False) -> t.Callable:
         )
     ]
     return add_options(_target_upm_option)
+
+
+def subroutinize_flag() -> t.Callable:
+    """
+    Add the subroutinize option to a click command.
+
+    :return: a decorator that adds the subroutinize option to a click command
+    """
+    _subroutinize_flag = [
+        click.option(
+            "--subroutinize/--no-subroutinize",
+            "subr",
+            default=True,
+            help="Subroutinize the font.",
+        )
+    ]
+    return add_options(_subroutinize_flag)
