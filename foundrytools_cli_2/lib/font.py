@@ -71,6 +71,7 @@ class Font(TTFont):
         """
         return self.flavor == FLAVOR_WOFF2
 
+    @property
     def is_sfnt(self):
         """
         Check if the font is a SFNT font.
@@ -96,6 +97,20 @@ class Font(TTFont):
         :return: True if the font is a variable font, False otherwise.
         """
         return self.get(FVAR_TABLE) is not None
+
+    def get_advance_widths(self) -> t.Dict[str, int]:
+        """
+        Get advance widths from a font.
+
+        :return: Advance widths.
+        """
+        advance_widths = {}
+        glyph_set = self.getGlyphSet()
+
+        for k, v in glyph_set.items():
+            advance_widths[k] = v.width
+
+        return advance_widths
 
     def tt_decomponentize(self) -> None:
         """
