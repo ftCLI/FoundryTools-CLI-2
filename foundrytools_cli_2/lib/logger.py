@@ -5,7 +5,10 @@ from functools import partialmethod
 from loguru import logger
 
 
-class LoggerFilter:
+class LoggerFilter:  # pylint: disable=too-few-public-methods
+    """
+    A custom logger filter that filters out log records below the given level.
+    """
 
     def __init__(self, level):
         self.level = level
