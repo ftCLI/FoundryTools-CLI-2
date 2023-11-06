@@ -138,8 +138,6 @@ def get_charstrings(font: Font, tolerance: float = 1.0) -> Dict:
     except Exception as e:  # pylint: disable=broad-except
         logger.error(f"Failed to convert {font.reader.file.name}: {e}")
 
-    print(charstrings["A"].__dict__)
-
     return charstrings
 
 
