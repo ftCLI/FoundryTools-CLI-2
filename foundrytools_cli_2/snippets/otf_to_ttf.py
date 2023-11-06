@@ -4,7 +4,8 @@ from fontTools.pens.cu2quPen import Cu2QuPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import newTable
 from fontTools.ttLib.tables._g_l_y_f import (
-    table__g_l_y_f, Glyph
+    table__g_l_y_f,
+    Glyph,
 )  # pylint: disable=protected-access
 
 from foundrytools_cli_2.lib.font import Font
@@ -97,7 +98,7 @@ def update_hmtx(font: Font, glyf: table__g_l_y_f) -> None:
 
 
 def glyphs_to_quadratic(
-        glyphs: Dict, max_err: float = 1.0, reverse_direction: bool = False
+    glyphs: Dict, max_err: float = 1.0, reverse_direction: bool = False
 ) -> Dict[str, Glyph]:
     """
     Convert the glyphs of a font to quadratic.

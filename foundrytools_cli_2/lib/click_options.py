@@ -22,7 +22,7 @@ def add_options(options: t.List[t.Callable]) -> t.Callable:
     return _add_options
 
 
-def input_path_argument(dir_okay: bool=True, file_okay:bool=True) -> t.Callable:
+def input_path_argument(dir_okay: bool = True, file_okay: bool = True) -> t.Callable:
     """
     Add the ``input_path`` argument to a click command.
 
