@@ -1,4 +1,3 @@
-from io import BytesIO
 from pathlib import Path
 from typing import Optional
 
@@ -13,8 +12,8 @@ from foundrytools_cli_2.lib.click_options import (
     output_dir_option,
     target_upm_option,
     tolerance_option,
+    subroutinize_flag,
 )
-from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font_finder import (
     FontFinder,
     FontFinderError,
@@ -23,7 +22,6 @@ from foundrytools_cli_2.lib.font_finder import (
 )
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.timer import Timer
-from foundrytools_cli_2.lib.skia_tools import correct_otf_contours
 from foundrytools_cli_2.snippets.otf_to_ttf import otf_to_ttf
 from foundrytools_cli_2.snippets.ttf_to_otf import ttf_to_otf, get_charstrings
 
@@ -60,6 +58,7 @@ def ps2tt(
         fonts = finder.generate_fonts()
 
     except FontFinderError as e:
+        logger.error(e)
         raise click.Abort(e)
 
     for font in fonts:
@@ -78,6 +77,7 @@ def ps2tt(
 @recursive_flag()
 @tolerance_option()
 @target_upm_option()
+@subroutinize_flag()
 @output_dir_option()
 @overwrite_flag()
 @recalc_timestamp_flag()
@@ -86,6 +86,7 @@ def tt2ps(
     input_path: Path,
     recursive: bool = False,
     tolerance: float = 1.0,
+    subr: bool = True,
     output_dir: Optional[Path] = None,
     overwrite: bool = True,
     target_upm: Optional[int] = None,
@@ -104,42 +105,43 @@ def tt2ps(
         fonts = finder.find_fonts()
 
     except FontFinderError as e:
-        raise click.Abort(e)
+        logger.error(e)
+        raise click.Abort()
 
     for font in fonts:
         with font:
-            # try:
-            logger.info(f"Converting {font.reader.file.name}")
+            try:
+                logger.info(f"Converting {font.reader.file.name}")
 
-            logger.info("Decomponentizing source font...")
-            font.tt_decomponentize()
+                logger.info("Decomponentizing source font...")
+                font.tt_decomponentize()
 
-            if target_upm:
-                logger.info(f"Scaling UPM to {target_upm}")
-                font.tt_scale_upm(units_per_em=target_upm)
+                if target_upm:
+                    logger.info(f"Scaling UPM to {target_upm}")
+                    font.tt_scale_upm(units_per_em=target_upm)
 
-            logger.info("Getting charstrings...")
-            charstrings = get_charstrings(font=font, tolerance=tolerance)
+                logger.info("Getting charstrings...")
+                charstrings = get_charstrings(font=font, tolerance=tolerance)
 
-            logger.info("Converting to OTF...")
-            otf = ttf_to_otf(font=font, charstrings=charstrings)
+                logger.info("Converting to OTF...")
+                otf = ttf_to_otf(font=font, charstrings=charstrings)
+                out_file = otf.get_output_file(output_dir=output_dir, overwrite=overwrite)
 
-            out_file = otf.get_output_file(output_dir=output_dir, overwrite=overwrite)
-            otf.save(out_file)
-            otf = Font(out_file)
+                if subr:
+                    logger.info("Subroutinizing...")
+                    subroutinize(otf)
 
-            buf = BytesIO()
-            otf.save(buf)
-            buf.seek(0)
-            otf = Font(buf)
+                    # Using compreffor requires to save the font to a buffer first
+                    # from io import BytesIO
+                    # with BytesIO() as buf:
+                    #     buf = BytesIO()
+                    #     otf.save(buf)
+                    #     buf.seek(0)
+                    #     otf = Font(buf)
+                    #     compress(otf)
 
-            logger.info("Correcting contours...")
-            correct_otf_contours(otf)
+                otf.save(out_file)
 
-            logger.info("Subroutinizing...")
-            subroutinize(otf)
-
-            otf.save(out_file)
-            logger.success(f"Saved {out_file}")
-            # except Exception as e:  # pylint: disable=broad-except
-            #     print(e)
+                logger.success(f"Saved {out_file}")
+            except Exception as e:  # pylint: disable=broad-except
+                logger.error(e)
