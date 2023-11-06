@@ -196,6 +196,24 @@ def reorder_tables_flag() -> t.Callable:
     return add_options(_reorder_tables_flag)
 
 
+def debug_flag() -> t.Callable:
+    """
+    Add the debug option to a click command.
+
+    :return: a decorator that adds the debug option to a click command
+    """
+    _debug_flag = [
+        click.option(
+            "--debug/--no-debug",
+            default=False,
+            help="""
+            Use this flag to enable debug mode. By default, debug mode is disabled.
+            """,
+        )
+    ]
+    return add_options(_debug_flag)
+
+
 def common_options() -> t.Callable:
     """
     Add the common options to a click command.

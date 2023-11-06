@@ -104,13 +104,13 @@ def get_charstrings(font: Font, tolerance: float = 1.0) -> Dict:
         failed, charstrings = get_qu2cu_charstrings(font, tolerance=tolerance)
 
         if len(failed) > 0:
-            logger.info(f"Retrying to get {len(failed)} charstrings...")
+            logger.debug(f"Retrying to get {len(failed)} charstrings...")
             fallback_charstrings = get_fallback_charstrings(font, tolerance=tolerance)
 
             for c in failed:
                 try:
                     charstrings[c] = fallback_charstrings[c]
-                    logger.info(f"Successfully got charstring for {c}")
+                    logger.debug(f"Successfully got charstring for {c}")
                 except Exception as e:  # pylint: disable=broad-except
                     logger.error(f"Failed to get charstring for {c}: {e}")
 
@@ -138,7 +138,7 @@ def get_qu2cu_charstrings(font: Font, tolerance: float = 1.0):
             glyph_set[k].draw(qu2cu_pen)
             qu2cu_charstrings[k] = t2_pen.getCharString()
         except NotImplementedError as e:
-            logger.warning(f"Failed to get charstring for {k}: {e}")
+            logger.debug(f"Failed to get charstring for {k}: {e}")
             failed.append(k)
 
     return failed, qu2cu_charstrings
