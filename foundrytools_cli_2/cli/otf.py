@@ -11,6 +11,7 @@ from foundrytools_cli_2.lib.click_options import (
     output_dir_option,
     debug_flag,
     subroutinize_flag,
+    min_area_option,
 )
 from foundrytools_cli_2.lib.font_finder import (
     FontFinder,
@@ -37,6 +38,7 @@ cli = click.Group()
 def fix_contours(
     input_path: Path,
     recursive: bool = False,
+    min_area: int = 25,
     subroutinize: bool = True,
     debug: bool = False,
     output_dir: Optional[Path] = None,
@@ -66,7 +68,7 @@ def fix_contours(
         with font:
             try:
                 logger.info(f"Checking file {font.file.name}")
-                correct_otf_contours(font)
+                correct_otf_contours(font, min_area=min_area)
                 if subroutinize:
                     logger.info("Subroutinizing...")
                     font.ps_subroutinize()

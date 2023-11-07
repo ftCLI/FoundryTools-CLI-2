@@ -315,3 +315,21 @@ def subroutinize_flag() -> t.Callable:
         )
     ]
     return add_options(_subroutinize_flag)
+
+
+def min_area_option() -> t.Callable:
+    """
+    Add the min_area option to a click command.
+
+    :return: a decorator that adds the min_area option to a click command
+    """
+    _min_area_option = [
+        click.option(
+            "-ma",
+            "--min-area",
+            type=click.IntRange(min=0),
+            default=25,
+            help="Remove tiny paths with area less than the specified value.",
+        )
+    ]
+    return add_options(_min_area_option)
