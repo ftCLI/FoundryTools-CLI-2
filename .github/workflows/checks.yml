@@ -26,3 +26,4 @@ jobs:
         black --check --diff -l 100 .
         pylint $(git ls-files '*.py')
         mypy $(git ls-files '*.py')
+        ft-cli --help
