@@ -22,6 +22,6 @@ jobs:
         python -m pip install -r requirements-dev.txt
     - name: Analysing the code with pylint
       run: |
-        black --check --diff -l 120 .
+        black --check --diff -l 100 .
         pylint $(git ls-files '*.py')
         mypy $(git ls-files '*.py')
