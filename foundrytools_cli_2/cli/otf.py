@@ -69,7 +69,7 @@ def fix_contours(
     for font in fonts:
         with font:
             try:
-                logger.info(f"Checking file {font.file.name}")
+                logger.info(f"Checking file {font.reader.file.name}")
                 correct_otf_contours(font, min_area=min_area)
                 if subroutinize:
                     logger.info("Subroutinizing...")
