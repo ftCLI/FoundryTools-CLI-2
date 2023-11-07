@@ -37,7 +37,6 @@ class Font(TTFont):
             recalcTimestamp=recalc_timestamp,
             lazy=lazy,
         )
-        self.file = file
 
     @property
     def is_ps(self) -> bool:
