@@ -10,4 +10,4 @@
         - uses: psf/black@stable
           with:
             args: --check .
-            black_args: -l 100
+            options: -l 100
