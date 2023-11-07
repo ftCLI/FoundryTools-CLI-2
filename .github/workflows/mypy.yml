@@ -1,4 +1,4 @@
-name: Pylint
+name: Mypy
 
 on: [push]
 
@@ -22,4 +22,4 @@ jobs:
         python -m pip install -r requirements-dev.txt
     - name: Analysing the code with mypy
       run: |
-        mypy .
+        mypy --strict .
