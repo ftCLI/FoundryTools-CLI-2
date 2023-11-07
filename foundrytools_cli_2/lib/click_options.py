@@ -310,7 +310,6 @@ def subroutinize_flag() -> t.Callable:
     _subroutinize_flag = [
         click.option(
             "--subroutinize/--no-subroutinize",
-            "subr",
             default=True,
             help="Subroutinize the font.",
         )

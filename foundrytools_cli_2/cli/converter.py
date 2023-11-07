@@ -92,7 +92,7 @@ def tt2ps(
     input_path: Path,
     recursive: bool = False,
     tolerance: float = 1.0,
-    subr: bool = True,
+    subroutinize: bool = True,
     output_dir: Optional[Path] = None,
     overwrite: bool = True,
     target_upm: Optional[int] = None,
@@ -137,7 +137,7 @@ def tt2ps(
                 otf = ttf_to_otf(font=font, charstrings=charstrings)
                 out_file = otf.get_output_file(output_dir=output_dir, overwrite=overwrite)
 
-                if subr:
+                if subroutinize:
                     logger.info("Subroutinizing...")
                     otf.ps_subroutinize()
 

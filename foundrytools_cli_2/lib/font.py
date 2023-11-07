@@ -38,7 +38,6 @@ class Font(TTFont):
             lazy=lazy,
         )
         self.file = file
-        self.flavor: t.Optional[str] = super().flavor  # to avoid mypy error
 
     @property
     def is_ps(self) -> bool:
@@ -225,9 +224,7 @@ class Font(TTFont):
             raise ValueError("units_per_em must be in the range 16 to 16384.")
 
         if self["head"].unitsPerEm == units_per_em:
-            logger.warning(
-                f"Font already has {units_per_em} units per em. No need to scale upem."
-            )
+            logger.warning(f"Font already has {units_per_em} units per em. No need to scale upem.")
             return
 
         scale_upem(self, new_upem=units_per_em)
