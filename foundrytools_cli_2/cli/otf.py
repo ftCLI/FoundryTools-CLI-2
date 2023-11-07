@@ -47,8 +47,8 @@ def fix_contours(
     recalc_timestamp: bool = False,
 ) -> None:
     """
-    Fix the contours of an OTF font by removing overlaps, correcting contours direction, and removing
-    tiny paths.
+    Fix the contours of an OTF font by removing overlaps, correcting contours direction, and
+    removing tiny paths.
     """
 
     if debug:
