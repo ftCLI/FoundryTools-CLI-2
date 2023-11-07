@@ -9,4 +9,5 @@
         - uses: actions/checkout@v4
         - uses: psf/black@stable
           with:
-            args: --check -l 100 .
+            args: --check .
+            black_args: -l 100
