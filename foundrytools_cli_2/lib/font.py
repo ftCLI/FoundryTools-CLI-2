@@ -37,6 +37,8 @@ class Font(TTFont):
             recalcTimestamp=recalc_timestamp,
             lazy=lazy,
         )
+        self.file = file
+        self.flavor: t.Optional[str] = super().flavor  # to avoid mypy error
 
     @property
     def is_ps(self) -> bool:
