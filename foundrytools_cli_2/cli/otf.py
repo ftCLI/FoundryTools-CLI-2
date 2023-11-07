@@ -11,6 +11,7 @@ from foundrytools_cli_2.lib.click_options import (
     output_dir_option,
     debug_flag,
     subroutinize_flag,
+    min_area_option,
 )
 from foundrytools_cli_2.lib.font_finder import (
     FontFinder,
@@ -19,8 +20,8 @@ from foundrytools_cli_2.lib.font_finder import (
     FontLoadOptions,
 )
 from foundrytools_cli_2.lib.logger import logger, logger_filter
-from foundrytools_cli_2.lib.skia_tools import correct_otf_contours
 from foundrytools_cli_2.lib.timer import Timer
+from foundrytools_cli_2.snippets.ps_correct_contours import correct_otf_contours
 
 cli = click.Group()
 
@@ -28,6 +29,7 @@ cli = click.Group()
 @cli.command("fix-contours")
 @input_path_argument()
 @recursive_flag()
+@min_area_option()
 @subroutinize_flag()
 @output_dir_option()
 @overwrite_flag()
@@ -37,6 +39,7 @@ cli = click.Group()
 def fix_contours(
     input_path: Path,
     recursive: bool = False,
+    min_area: int = 25,
     subroutinize: bool = True,
     debug: bool = False,
     output_dir: Optional[Path] = None,
@@ -44,7 +47,8 @@ def fix_contours(
     recalc_timestamp: bool = False,
 ) -> None:
     """
-    Fix the contours of an OTF font.
+    Fix the contours of an OTF font by removing overlaps, correcting contours direction, and
+    removing tiny paths.
     """
 
     if debug:
@@ -65,8 +69,10 @@ def fix_contours(
     for font in fonts:
         with font:
             try:
-                logger.info(f"Checking file {font.file.name}")
-                correct_otf_contours(font)
+                print()
+                logger.info(f"Checking file {font.reader.file.name}")
+                logger.info("Correcting contours...")
+                correct_otf_contours(font, min_area=min_area)
                 if subroutinize:
                     logger.info("Subroutinizing...")
                     font.ps_subroutinize()

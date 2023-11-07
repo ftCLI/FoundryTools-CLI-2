@@ -37,7 +37,6 @@ class Font(TTFont):
             recalcTimestamp=recalc_timestamp,
             lazy=lazy,
         )
-        self.file = file
 
     @property
     def is_ps(self) -> bool:
@@ -64,7 +63,7 @@ class Font(TTFont):
 
         :return: True if the font is a WOFF font, False otherwise.
         """
-        return self.flavor == FLAVOR_WOFF
+        return self.flavor == FLAVOR_WOFF  # type: ignore
 
     @property
     def is_woff2(self) -> bool:
@@ -73,7 +72,7 @@ class Font(TTFont):
 
         :return: True if the font is a WOFF2 font, False otherwise.
         """
-        return self.flavor == FLAVOR_WOFF2
+        return self.flavor == FLAVOR_WOFF2  # type: ignore
 
     @property
     def is_sfnt(self) -> bool:
@@ -82,7 +81,7 @@ class Font(TTFont):
 
         :return: True if the font is a SFNT font, False otherwise.
         """
-        return self.flavor is None
+        return self.flavor is None  # type: ignore
 
     @property
     def is_static(self) -> bool:
@@ -168,8 +167,8 @@ class Font(TTFont):
         """
 
         extension = ""
-        if self.flavor is not None:
-            extension = f".{self.flavor}"
+        if self.flavor is not None:  # type: ignore
+            extension = f".{self.flavor}"  # type: ignore
         elif self.sfntVersion == SFNT_POSTSCRIPT:
             extension = ".otf"
         elif self.sfntVersion == SFNT_TRUETYPE:
@@ -237,7 +236,7 @@ class Font(TTFont):
         if not self.is_ps:
             raise NotImplementedError("Subroutinization is only supported for PostScript fonts.")
 
-        flavor = self.flavor
+        flavor = self.flavor  # type: ignore
         self.flavor = None
         subroutinize(otf=self)
         self.flavor = flavor
