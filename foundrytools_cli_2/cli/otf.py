@@ -68,7 +68,7 @@ def fix_contours(
                 logger.info(f"Checking file {font.file.name}")
                 correct_otf_contours(font)
                 if subroutinize:
-                    logger.info(f"Subroutinizing...")
+                    logger.info("Subroutinizing...")
                     font.ps_subroutinize()
                 output_file = font.get_output_file(output_dir=output_dir, overwrite=overwrite)
                 font.save(output_file)
