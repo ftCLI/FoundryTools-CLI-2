@@ -32,6 +32,7 @@ cli = click.Group()
 @input_path_argument()
 @recursive_flag()
 @tolerance_option()
+@target_upm_option(help_msg="Scale the converted fonts to the specified UPM.")
 @output_dir_option()
 @overwrite_flag()
 @recalc_timestamp_flag()
@@ -40,6 +41,7 @@ def ps2tt(
     input_path: Path,
     recursive: bool = False,
     tolerance: float = 1.0,
+    target_upm: Optional[int] = None,
     output_dir: Optional[Path] = None,
     overwrite: bool = True,
     recalc_timestamp: bool = False,
@@ -63,10 +65,14 @@ def ps2tt(
     for font in fonts:
         with font:
             try:
-                logger.info(f"Converting {font.reader.file.name}")
+                logger.info(f"Converting {font.file.name}")
                 tt = otf_to_ttf(font=font, max_err=tolerance, reverse_direction=True)
+                if target_upm:
+                    logger.info(f"Scaling UPM to {target_upm}")
+                    tt.tt_scale_upm(units_per_em=target_upm)
                 out_file = tt.get_output_file(output_dir=output_dir, overwrite=overwrite)
                 font.save(out_file)
+                logger.success(f"Saved {out_file}")
             except Exception as e:  # pylint: disable=broad-except
                 logger.error(e)
 
@@ -75,7 +81,7 @@ def ps2tt(
 @input_path_argument()
 @recursive_flag()
 @tolerance_option()
-@target_upm_option()
+@target_upm_option(help_msg="Scale the converted fonts to the specified UPM.")
 @subroutinize_flag()
 @output_dir_option()
 @overwrite_flag()
@@ -86,7 +92,7 @@ def tt2ps(
     input_path: Path,
     recursive: bool = False,
     tolerance: float = 1.0,
-    subr: bool = True,
+    subroutinize: bool = True,
     output_dir: Optional[Path] = None,
     overwrite: bool = True,
     target_upm: Optional[int] = None,
@@ -115,7 +121,7 @@ def tt2ps(
     for font in fonts:
         with font, Timer(logger=logger.success, text="Font converted in {:0.3f} seconds"):
             try:
-                logger.info(f"Converting {font.reader.file.name}")
+                logger.info(f"Converting {font.file.name}")
 
                 logger.info("Decomponentizing source font...")
                 font.tt_decomponentize()
@@ -131,7 +137,7 @@ def tt2ps(
                 otf = ttf_to_otf(font=font, charstrings=charstrings)
                 out_file = otf.get_output_file(output_dir=output_dir, overwrite=overwrite)
 
-                if subr:
+                if subroutinize:
                     logger.info("Subroutinizing...")
                     otf.ps_subroutinize()
 
