@@ -279,7 +279,10 @@ def tolerance_option() -> t.Callable:
     return add_options(_tolerance_option)
 
 
-def target_upm_option(required: bool = False) -> t.Callable:
+def target_upm_option(
+    required: bool = False,
+    help_msg: str = "Scale the font to the specified UPM.",
+) -> t.Callable:
     """
     Add the scale_upm option to a click command.
 
@@ -292,9 +295,7 @@ def target_upm_option(required: bool = False) -> t.Callable:
             type=click.IntRange(min=16, max=16384),
             default=None,
             required=required,
-            help="""
-            Scale the font to the specified UPM.
-            """,
+            help=help_msg,
         )
     ]
     return add_options(_target_upm_option)

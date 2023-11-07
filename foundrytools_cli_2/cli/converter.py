@@ -32,6 +32,7 @@ cli = click.Group()
 @input_path_argument()
 @recursive_flag()
 @tolerance_option()
+@target_upm_option(help_msg="Scale the converted fonts to the specified UPM.")
 @output_dir_option()
 @overwrite_flag()
 @recalc_timestamp_flag()
@@ -40,6 +41,7 @@ def ps2tt(
     input_path: Path,
     recursive: bool = False,
     tolerance: float = 1.0,
+    target_upm: Optional[int] = None,
     output_dir: Optional[Path] = None,
     overwrite: bool = True,
     recalc_timestamp: bool = False,
@@ -65,6 +67,9 @@ def ps2tt(
             try:
                 logger.info(f"Converting {font.reader.file.name}")
                 tt = otf_to_ttf(font=font, max_err=tolerance, reverse_direction=True)
+                if target_upm:
+                    logger.info(f"Scaling UPM to {target_upm}")
+                    tt.tt_scale_upm(units_per_em=target_upm)
                 out_file = tt.get_output_file(output_dir=output_dir, overwrite=overwrite)
                 font.save(out_file)
             except Exception as e:  # pylint: disable=broad-except
@@ -75,7 +80,7 @@ def ps2tt(
 @input_path_argument()
 @recursive_flag()
 @tolerance_option()
-@target_upm_option()
+@target_upm_option(help_msg="Scale the converted fonts to the specified UPM.")
 @subroutinize_flag()
 @output_dir_option()
 @overwrite_flag()
