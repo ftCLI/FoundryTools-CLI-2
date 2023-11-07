@@ -10,6 +10,8 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.ttFont import TTFont
 
+from foundrytools_cli_2.lib.logger import logger
+
 SFNT_POSTSCRIPT = "OTTO"
 SFNT_TRUETYPE = "\0\1\0\0"
 FLAVOR_WOFF = "woff"
@@ -221,9 +223,10 @@ class Font(TTFont):
             raise ValueError("units_per_em must be in the range 16 to 16384.")
 
         if self["head"].unitsPerEm == units_per_em:
-            raise ValueError(
+            logger.warning(
                 f"Font already has {units_per_em} units per em. No need to scale upem."
             )
+            return
 
         scale_upem(self, new_upem=units_per_em)
 
