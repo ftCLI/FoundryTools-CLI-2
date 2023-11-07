@@ -19,8 +19,8 @@ from foundrytools_cli_2.lib.font_finder import (
     FontLoadOptions,
 )
 from foundrytools_cli_2.lib.logger import logger, logger_filter
-from foundrytools_cli_2.lib.skia_tools import correct_otf_contours
 from foundrytools_cli_2.lib.timer import Timer
+from foundrytools_cli_2.snippets.ps_correct_contours import correct_otf_contours
 
 cli = click.Group()
 
