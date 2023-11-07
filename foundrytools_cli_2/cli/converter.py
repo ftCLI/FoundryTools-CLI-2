@@ -63,6 +63,7 @@ def ps2tt(
         raise click.Abort(e)
 
     for font in fonts:
+        print()
         with font:
             try:
                 logger.info(f"Converting {font.reader.file.name}")
@@ -119,6 +120,7 @@ def tt2ps(
         raise click.Abort()
 
     for font in fonts:
+        print()
         with font, Timer(logger=logger.success, text="Font converted in {:0.3f} seconds"):
             try:
                 logger.info(f"Converting {font.reader.file.name}")
