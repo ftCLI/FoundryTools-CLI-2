@@ -65,13 +65,14 @@ def ps2tt(
     for font in fonts:
         with font:
             try:
-                logger.info(f"Converting {font.reader.file.name}")
+                logger.info(f"Converting {font.file.name}")
                 tt = otf_to_ttf(font=font, max_err=tolerance, reverse_direction=True)
                 if target_upm:
                     logger.info(f"Scaling UPM to {target_upm}")
                     tt.tt_scale_upm(units_per_em=target_upm)
                 out_file = tt.get_output_file(output_dir=output_dir, overwrite=overwrite)
                 font.save(out_file)
+                logger.success(f"Saved {out_file}")
             except Exception as e:  # pylint: disable=broad-except
                 logger.error(e)
 
@@ -120,7 +121,7 @@ def tt2ps(
     for font in fonts:
         with font, Timer(logger=logger.success, text="Font converted in {:0.3f} seconds"):
             try:
-                logger.info(f"Converting {font.reader.file.name}")
+                logger.info(f"Converting {font.file.name}")
 
                 logger.info("Decomponentizing source font...")
                 font.tt_decomponentize()
