@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Optional
 
-from cffsubr import subroutinize
 import click
 
 from foundrytools_cli_2.lib.click_options import (
@@ -134,15 +133,9 @@ def tt2ps(
 
                 if subr:
                     logger.info("Subroutinizing...")
-                    # Save the flavor and set it to None to avoid cffsubr to fail
-                    if otf.flavor is not None:
-                        flavor = otf.flavor
-                    otf.flavor = None
-                    subroutinize(otf)
-                    if locals().get("flavor"):
-                        otf.flavor = flavor
+                    otf.ps_subroutinize()
 
-                    # Using compreffor requires to save the font to a buffer first
+                    # Using compreffor here requires to save the font to a buffer first
                     # from io import BytesIO
                     # with BytesIO() as buf:
                     #     buf = BytesIO()
