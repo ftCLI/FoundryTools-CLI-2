@@ -22,8 +22,8 @@ from foundrytools_cli_2.lib.font_finder import (
 )
 from foundrytools_cli_2.lib.logger import logger, logger_filter
 from foundrytools_cli_2.lib.timer import Timer
-from foundrytools_cli_2.snippets.otf_to_ttf import otf_to_ttf
-from foundrytools_cli_2.snippets.ttf_to_otf import ttf_to_otf, get_charstrings
+from foundrytools_cli_2.snippets.ps2tt import otf_to_ttf
+from foundrytools_cli_2.snippets.tt2ps import ttf_to_otf, get_charstrings
 
 cli = click.Group()
 
