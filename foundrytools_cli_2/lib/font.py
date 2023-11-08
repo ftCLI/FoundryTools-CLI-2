@@ -216,17 +216,6 @@ class Font:
         return out_file
 
     @property
-    def file_name(self) -> t.Optional[str]:
-        """
-        Get the file name of the font. If the font is a BytesIO object, return None.
-
-        :return: The file name of the font.
-        """
-        if self.file_path is None:
-            return None
-        return self.file_path.name
-
-    @property
     def real_extension(self) -> str:
         """
         Get the real extension of the font. If the font is a web font, the extension will be
