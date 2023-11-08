@@ -69,7 +69,7 @@ class Font:
         elif isinstance(input_obj, BytesIO):
             self._initialize_file_from_bytesio(input_obj, lazy)
         elif isinstance(input_obj, TTFont):
-            self._initialize_file_from_ttfont(input_obj, lazy)
+            self._initialize_file_from_ttfont(input_obj)
         else:
             self._initialize_empty_file()
 
@@ -78,13 +78,12 @@ class Font:
         self._tt_font = TTFont(path, lazy=lazy)
 
     def _initialize_file_from_bytesio(self, bytesio: BytesIO, lazy: t.Optional[bool]) -> None:
-        self._file_object = BytesIO()
+        self._file_object = bytesio
         self._tt_font = TTFont(bytesio, lazy=lazy)
 
-    def _initialize_file_from_ttfont(self, ttfont: TTFont, lazy: t.Optional[bool]) -> None:
+    def _initialize_file_from_ttfont(self, ttfont: TTFont) -> None:
         self._file_object = BytesIO()
-        ttfont.save(self._file_object)
-        self._tt_font = TTFont(self._file_object, lazy=lazy)
+        self._tt_font = ttfont
 
     def _initialize_empty_file(self) -> None:
         self._tt_font = TTFont()
