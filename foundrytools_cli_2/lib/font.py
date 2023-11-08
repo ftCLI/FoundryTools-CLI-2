@@ -10,13 +10,21 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.ttFont import TTFont
 
+from foundrytools_cli_2.lib.constants import (
+    WOFF_FLAVOR,
+    WOFF2_FLAVOR,
+    WOFF_EXTENSION,
+    WOFF2_EXTENSION,
+    OTF_EXTENSION,
+    TTF_EXTENSION,
+    PS_SFNT_VERSION,
+    TT_SFNT_VERSION,
+    FVAR_TABLE_TAG,
+    GLYF_TABLE_TAG,
+    MIN_UPM,
+    MAX_UPM,
+)
 from foundrytools_cli_2.lib.logger import logger
-
-SFNT_POSTSCRIPT = "OTTO"
-SFNT_TRUETYPE = "\0\1\0\0"
-FLAVOR_WOFF = "woff"
-FLAVOR_WOFF2 = "woff2"
-FVAR_TABLE = "fvar"
 
 
 class Font(TTFont):
@@ -45,7 +53,7 @@ class Font(TTFont):
 
         :return: True if the font is a PostScript font, False otherwise.
         """
-        return self.sfntVersion == SFNT_POSTSCRIPT
+        return self.sfntVersion == PS_SFNT_VERSION
 
     @property
     def is_tt(self) -> bool:
@@ -54,7 +62,7 @@ class Font(TTFont):
 
         :return: True if the font is a TrueType font, False otherwise.
         """
-        return self.sfntVersion == SFNT_TRUETYPE
+        return self.sfntVersion == TT_SFNT_VERSION
 
     @property
     def is_woff(self) -> bool:
@@ -63,7 +71,7 @@ class Font(TTFont):
 
         :return: True if the font is a WOFF font, False otherwise.
         """
-        return self.flavor == FLAVOR_WOFF  # type: ignore
+        return self.flavor == WOFF_FLAVOR  # type: ignore
 
     @property
     def is_woff2(self) -> bool:
@@ -72,7 +80,7 @@ class Font(TTFont):
 
         :return: True if the font is a WOFF2 font, False otherwise.
         """
-        return self.flavor == FLAVOR_WOFF2  # type: ignore
+        return self.flavor == WOFF2_FLAVOR  # type: ignore
 
     @property
     def is_sfnt(self) -> bool:
@@ -90,7 +98,7 @@ class Font(TTFont):
 
         :return: True if the font is a static font, False otherwise.
         """
-        return self.get(FVAR_TABLE) is None
+        return self.get(FVAR_TABLE_TAG) is None
 
     @property
     def is_variable(self) -> bool:
@@ -99,7 +107,7 @@ class Font(TTFont):
 
         :return: True if the font is a variable font, False otherwise.
         """
-        return self.get(FVAR_TABLE) is not None
+        return self.get(FVAR_TABLE_TAG) is not None
 
     def get_advance_widths(self) -> t.Dict[str, int]:
         """
@@ -141,7 +149,7 @@ class Font(TTFont):
         file = Path(self.reader.file.name)
         out_dir = output_dir or file.parent
         file_name = file.stem
-        extension = self.get_real_extension()
+        extension = self.real_extension
         if suffix != "":
             file_name = file_name.replace(suffix, "")
 
@@ -156,7 +164,30 @@ class Font(TTFont):
         )
         return out_file
 
-    def get_real_extension(self) -> str:
+    @property
+    def file_path(self) -> t.Optional[Path]:
+        """
+        Get the file path of the font. If the font is a BytesIO object, return None.
+
+        :return: The file path of the font.
+        """
+        if isinstance(self.reader.file, BytesIO):
+            return None
+        return Path(self.reader.file.name)
+
+    @property
+    def file_name(self) -> t.Optional[str]:
+        """
+        Get the file name of the font. If the font is a BytesIO object, return None.
+
+        :return: The file name of the font.
+        """
+        if self.file_path is None:
+            return None
+        return Path(self.reader.file.name).name
+
+    @property
+    def real_extension(self) -> str:
         """
         Get the real extension of the font. If the font is a web font, the extension will be
         determined by the font flavor. If the font is a SFNT font, the extension will be determined
@@ -166,14 +197,15 @@ class Font(TTFont):
             The extension of the font.
         """
 
-        extension = ""
-        if self.flavor is not None:  # type: ignore
-            extension = f".{self.flavor}"  # type: ignore
-        elif self.sfntVersion == SFNT_POSTSCRIPT:
-            extension = ".otf"
-        elif self.sfntVersion == SFNT_TRUETYPE:
-            extension = ".ttf"
-        return extension
+        if self.flavor == WOFF_FLAVOR:  # type: ignore
+            return WOFF_EXTENSION
+        if self.flavor == WOFF2_FLAVOR:  # type: ignore
+            return WOFF2_EXTENSION
+        if self.sfntVersion == PS_SFNT_VERSION:
+            return OTF_EXTENSION
+        if self.sfntVersion == TT_SFNT_VERSION:
+            return TTF_EXTENSION
+        return ".unknown"
 
     def tt_decomponentize(self) -> None:
         """
@@ -184,7 +216,7 @@ class Font(TTFont):
             raise NotImplementedError("Decomponentization is only supported for TrueType fonts.")
 
         glyph_set = self.getGlyphSet()
-        glyf_table = self["glyf"]
+        glyf_table = self[GLYF_TABLE_TAG]
         dr_pen = DecomposingRecordingPen(glyph_set)
         tt_pen = TTGlyphPen(None)
 
@@ -208,7 +240,7 @@ class Font(TTFont):
 
         dehint(self)
 
-    def tt_scale_upm(self, units_per_em: int) -> None:
+    def tt_scale_upem(self, units_per_em: int) -> None:
         """
         Scale the font's unitsPerEm value to the given value.
 
@@ -219,8 +251,8 @@ class Font(TTFont):
         if not self.is_tt:
             raise NotImplementedError("Scaling upem is only supported for TrueType fonts.")
 
-        if units_per_em not in range(16, 16385):
-            raise ValueError("units_per_em must be in the range 16 to 16384.")
+        if units_per_em not in range(MIN_UPM, MAX_UPM + 1):
+            raise ValueError(f"units_per_em must be in the range {MAX_UPM} to {MAX_UPM}.")
 
         if self["head"].unitsPerEm == units_per_em:
             logger.warning(f"Font already has {units_per_em} units per em. No need to scale upem.")
