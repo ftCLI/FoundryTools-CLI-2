@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from io import BytesIO
 from pathlib import Path
 import typing as t
@@ -63,9 +64,8 @@ class Font:
             self._tt_font = TTFont(input_obj, lazy=lazy)
 
         elif isinstance(input_obj, TTFont):
-            self._tt_font = TTFont(input_obj, lazy=lazy)
             self._file_obj = BytesIO()
-            self._tt_font.save(self._file_path)
+            input_obj.save(self._file_obj)
             self._tt_font = TTFont(self._file_path, lazy=lazy)
 
         else:
@@ -78,9 +78,7 @@ class Font:
     @property
     def tt_font(self) -> TTFont:
         """
-        Get the TTFont object.
-
-        :return: The TTFont object.
+        Get the underlying TTFont object.
         """
         return self._tt_font
 
@@ -156,6 +154,26 @@ class Font:
         """
         return self.tt_font.get(FVAR_TABLE_TAG) is not None
 
+    @property
+    def real_extension(self) -> str:
+        """
+        Get the real extension of the font. If the font is a web font, the extension will be
+        determined by the font flavor. If the font is a SFNT font, the extension will be determined
+        by the sfntVersion attribute.
+
+        Returns:
+            The extension of the font.
+        """
+        if self.tt_font.flavor == WOFF_FLAVOR:
+            return WOFF_EXTENSION
+        if self.tt_font.flavor == WOFF2_FLAVOR:
+            return WOFF2_EXTENSION
+        if self.tt_font.sfntVersion == PS_SFNT_VERSION:
+            return OTF_EXTENSION
+        if self.tt_font.sfntVersion == TT_SFNT_VERSION:
+            return TTF_EXTENSION
+        return ".unknown"
+
     def get_advance_widths(self) -> t.Dict[str, int]:
         """
         Get advance widths from a font.
@@ -214,37 +232,6 @@ class Font:
         )
         return out_file
 
-    @property
-    def file_name(self) -> t.Optional[str]:
-        """
-        Get the file name of the font. If the font is a BytesIO object, return None.
-
-        :return: The file name of the font.
-        """
-        if self.file_path is None:
-            return None
-        return self.file_path.name
-
-    @property
-    def real_extension(self) -> str:
-        """
-        Get the real extension of the font. If the font is a web font, the extension will be
-        determined by the font flavor. If the font is a SFNT font, the extension will be determined
-        by the sfntVersion attribute.
-
-        Returns:
-            The extension of the font.
-        """
-        if self.tt_font.flavor == WOFF_FLAVOR:  # type: ignore
-            return WOFF_EXTENSION
-        if self.tt_font.flavor == WOFF2_FLAVOR:  # type: ignore
-            return WOFF2_EXTENSION
-        if self.tt_font.sfntVersion == PS_SFNT_VERSION:
-            return OTF_EXTENSION
-        if self.tt_font.sfntVersion == TT_SFNT_VERSION:
-            return TTF_EXTENSION
-        return ".unknown"
-
     def tt_decomponentize(self) -> None:
         """
         Decomponentize a TrueType font.
@@ -298,6 +285,15 @@ class Font:
 
         scale_upem(self.tt_font, new_upem=units_per_em)
 
+    @contextmanager
+    def _restore_flavor(self) -> t.Iterator[None]:
+        original_flavor = self.tt_font.flavor
+        self.tt_font.flavor = None
+        try:
+            yield
+        finally:
+            self.tt_font.flavor = original_flavor
+
     def ps_subroutinize(self) -> None:
         """
         Subroutinize a PostScript font.
@@ -306,14 +302,8 @@ class Font:
         if not self.is_ps:
             raise NotImplementedError("Subroutinization is only supported for PostScript fonts.")
 
-        # Workaround to subroutinize WOFF and WOFF2 fonts
-        flavor = self.tt_font.flavor
-        self.tt_font.flavor = None
-
-        subroutinize(otf=self.tt_font)
-
-        # Restore the original flavor
-        self.tt_font.flavor = flavor
+        with self._restore_flavor():
+            subroutinize(otf=self.tt_font)
 
     def ps_desubroutinize(self) -> None:
         """
@@ -323,11 +313,5 @@ class Font:
         if not self.is_ps:
             raise NotImplementedError("Desubroutinization is only supported for PostScript fonts.")
 
-        # Workaround to desubroutinize WOFF and WOFF2 fonts
-        flavor = self.tt_font.flavor
-        self.tt_font.flavor = None
-
-        desubroutinize(otf=self.tt_font)
-
-        # Restore the original flavor
-        self.tt_font.flavor = flavor
+        with self._restore_flavor():
+            desubroutinize(otf=self.tt_font)

@@ -66,7 +66,7 @@ def otf2ttf(
         print()
         with font.tt_font:
             try:
-                logger.info(f"Converting {font.file_name}")
+                logger.info(f"Converting {font.file_path}")
                 tt = otf_to_ttf(font=font, max_err=tolerance, reverse_direction=True)
                 if target_upm:
                     logger.info(f"Scaling UPM to {target_upm}")
@@ -123,7 +123,7 @@ def ttf2otf(
         print()
         with font.tt_font, Timer(logger=logger.success, text="Font converted in {:0.3f} seconds"):
             try:
-                logger.info(f"Converting {font.file_name}")
+                logger.info(f"Converting {font.file_path}")
 
                 logger.info("Decomponentizing source font...")
                 font.tt_decomponentize()
