@@ -300,7 +300,7 @@ class Font:
         scale_upem(self.tt_font, new_upem=units_per_em)
 
     @contextmanager
-    def _restore_flavor(self):
+    def _restore_flavor(self) -> t.Iterator[None]:
         original_flavor = self.tt_font.flavor
         self.tt_font.flavor = None
         try:
