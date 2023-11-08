@@ -3,16 +3,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from fontTools.ttLib.ttFont import TTLibError
-
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.logger import logger
-
-
-WOFF_FLAVOR = "woff"
-WOFF2_FLAVOR = "woff2"
-OTF_SFNT_VERSION = "OTTO"
-TTF_SFNT_VERSION = "\x00\x01\x00\x00"
-FVAR_TABLE = "fvar"
 
 
 @dataclass
@@ -207,7 +199,7 @@ def _is_woff(font: Font) -> bool:
     Returns:
         bool: A boolean indicating whether the given font is a WOFF font.
     """
-    return font.tt_font.flavor == WOFF_FLAVOR
+    return font.is_woff
 
 
 def _is_woff2(font: Font) -> bool:
@@ -220,7 +212,7 @@ def _is_woff2(font: Font) -> bool:
     Returns:
         bool: A boolean indicating whether the given font is a WOFF2 font.
     """
-    return font.tt_font.flavor == WOFF2_FLAVOR
+    return font.is_woff2
 
 
 def _is_sfnt(font: Font) -> bool:
@@ -233,7 +225,7 @@ def _is_sfnt(font: Font) -> bool:
     Returns:
         bool: A boolean indicating whether the given font is a sfnt font.
     """
-    return font.tt_font.flavor is None
+    return font.is_sfnt
 
 
 def _is_ps(font: Font) -> bool:
@@ -246,7 +238,7 @@ def _is_ps(font: Font) -> bool:
     Returns:
         bool: A boolean indicating whether the given font is an OpenType font.
     """
-    return font.tt_font.sfntVersion == OTF_SFNT_VERSION
+    return font.is_ps
 
 
 def _is_tt(font: Font) -> bool:
@@ -259,7 +251,7 @@ def _is_tt(font: Font) -> bool:
     Returns:
         bool: A boolean indicating whether the given font is a TrueType font.
     """
-    return font.tt_font.sfntVersion == TTF_SFNT_VERSION
+    return font.is_tt
 
 
 def _is_static(font: Font) -> bool:
@@ -272,7 +264,7 @@ def _is_static(font: Font) -> bool:
     Returns:
         bool: A boolean indicating whether the given font is a static font.
     """
-    return font.tt_font.get(FVAR_TABLE) is None
+    return font.is_static
 
 
 def _is_variable(font: Font) -> bool:
@@ -285,7 +277,7 @@ def _is_variable(font: Font) -> bool:
     Returns:
         bool: A boolean indicating whether the given font is a variable font.
     """
-    return font.tt_font.get(FVAR_TABLE) is not None
+    return font.is_variable
 
 
 __all__ = ["FontFinder", "FontFinderError", "FontFinderFilters", "FontLoadOptions"]
