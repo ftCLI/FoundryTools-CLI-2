@@ -25,8 +25,8 @@ def correct_otf_contours(font: Font, min_area: int = 25) -> None:
     if not font.is_ps:
         raise NotImplementedError("Not an OTF font")
 
-    cff_table: C_F_F_.table_C_F_F_ = font["CFF "]
-    glyph_set = font.getGlyphSet()
+    cff_table: C_F_F_.table_C_F_F_ = font.tt_font["CFF "]
+    glyph_set = font.tt_font.getGlyphSet()
     charstrings = {}
     modified = []
 
@@ -63,7 +63,7 @@ def correct_otf_contours(font: Font, min_area: int = 25) -> None:
         for key, value in cff_table.cff.topDictIndex[0].Private.rawDict.items()
         if key not in ("Subrs", "defaultWidthX", "nominalWidthX")
     }
-    fb = FontBuilder(font=font)
+    fb = FontBuilder(font=font.tt_font)
     fb.setupCFF(
         psName=ps_name, fontInfo=font_info, privateDict=private_dict, charStringsDict=charstrings
     )

@@ -37,7 +37,7 @@ cli = click.Group()
 @overwrite_flag()
 @recalc_timestamp_flag()
 @Timer(logger=logger.info)
-def ps2tt(
+def otf2ttf(
     input_path: Path,
     recursive: bool = False,
     tolerance: float = 1.0,
@@ -64,15 +64,15 @@ def ps2tt(
 
     for font in fonts:
         print()
-        with font:
+        with font.tt_font:
             try:
-                logger.info(f"Converting {font.reader.file.name}")
+                logger.info(f"Converting {font.file_name}")
                 tt = otf_to_ttf(font=font, max_err=tolerance, reverse_direction=True)
                 if target_upm:
                     logger.info(f"Scaling UPM to {target_upm}")
-                    tt.tt_scale_upm(units_per_em=target_upm)
+                    tt.tt_scale_upem(units_per_em=target_upm)
                 out_file = tt.get_output_file(output_dir=output_dir, overwrite=overwrite)
-                font.save(out_file)
+                font.tt_font.save(out_file)
                 logger.success(f"Saved {out_file}")
             except Exception as e:  # pylint: disable=broad-except
                 logger.error(e)
@@ -89,7 +89,7 @@ def ps2tt(
 @recalc_timestamp_flag()
 @debug_flag()
 @Timer(logger=logger.info)
-def tt2ps(
+def ttf2otf(
     input_path: Path,
     recursive: bool = False,
     tolerance: float = 1.0,
@@ -121,16 +121,16 @@ def tt2ps(
 
     for font in fonts:
         print()
-        with font, Timer(logger=logger.success, text="Font converted in {:0.3f} seconds"):
+        with font.tt_font, Timer(logger=logger.success, text="Font converted in {:0.3f} seconds"):
             try:
-                logger.info(f"Converting {font.reader.file.name}")
+                logger.info(f"Converting {font.file_name}")
 
                 logger.info("Decomponentizing source font...")
                 font.tt_decomponentize()
 
                 if target_upm:
                     logger.info(f"Scaling UPM to {target_upm}")
-                    font.tt_scale_upm(units_per_em=target_upm)
+                    font.tt_scale_upem(units_per_em=target_upm)
 
                 logger.info("Getting charstrings...")
                 charstrings = get_charstrings(font=font, tolerance=tolerance)
@@ -152,8 +152,8 @@ def tt2ps(
                     #     otf = Font(buf)
                     #     compress(otf)
 
-                otf.save(out_file)
+                    otf.tt_font.save(out_file)
 
-                logger.success(f"Saved {out_file}")
+                    logger.success(f"Saved {out_file}")
             except Exception as e:  # pylint: disable=broad-except
                 logger.error(e)

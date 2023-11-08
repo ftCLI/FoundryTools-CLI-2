@@ -67,17 +67,17 @@ def fix_contours(
         raise click.Abort(e)
 
     for font in fonts:
-        with font:
+        with font.tt_font:
             try:
                 print()
-                logger.info(f"Checking file {font.reader.file.name}")
+                logger.info(f"Checking file {font.file_name}")
                 logger.info("Correcting contours...")
                 correct_otf_contours(font, min_area=min_area)
                 if subroutinize:
                     logger.info("Subroutinizing...")
                     font.ps_subroutinize()
                 output_file = font.get_output_file(output_dir=output_dir, overwrite=overwrite)
-                font.save(output_file)
+                font.tt_font.save(output_file)
                 logger.success(f"File saved to {output_file}")
             except Exception as e:  # pylint: disable=broad-except
                 logger.error(e)

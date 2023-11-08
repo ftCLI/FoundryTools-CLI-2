@@ -27,24 +27,61 @@ from foundrytools_cli_2.lib.constants import (
 from foundrytools_cli_2.lib.logger import logger
 
 
-class Font(TTFont):
+class Font:
     """
     The Font class is a subclass of TTFont and provides additional properties and methods.
     """
 
     def __init__(
         self,
-        file: t.Optional[t.Union[str, Path, BytesIO]] = None,
+        input_obj: t.Optional[t.Union[str, Path, BytesIO, TTFont]] = None,
         recalc_bboxes: bool = True,
         recalc_timestamp: bool = False,
         lazy: t.Optional[bool] = None,
     ) -> None:
-        super().__init__(
-            file=file,
-            recalcBBoxes=recalc_bboxes,
-            recalcTimestamp=recalc_timestamp,
-            lazy=lazy,
-        )
+        """
+        Initialize a Font object.
+
+        Args:
+            input_obj: A path to a font file or a BytesIO object.
+            recalc_bboxes: A boolean indicating whether to recalculate bounding boxes on save.
+            recalc_timestamp: A boolean indicating whether to recalculate the modified timestamp
+                on save.
+            lazy: A boolean indicating whether to load the font lazily.
+        """
+
+        self._file_path = None
+        self._file_obj = None
+        self._tt_font = None
+
+        if isinstance(input_obj, (str, Path)):
+            self._file_path = Path(input_obj)
+            self._tt_font = TTFont(input_obj, lazy=lazy)
+
+        elif isinstance(input_obj, BytesIO):
+            self._file_obj = BytesIO()
+            self._tt_font = TTFont(input_obj, lazy=lazy)
+
+        elif isinstance(input_obj, TTFont):
+            self._tt_font = TTFont(input_obj, lazy=lazy)
+            self._file_obj = BytesIO()
+            self._tt_font.save(self._file_path)
+            self._tt_font = TTFont(self._file_path, lazy=lazy)
+
+        else:
+            self._tt_font = TTFont()
+            self._file_obj = BytesIO()
+
+        self._tt_font.recalcBBoxes = recalc_bboxes
+        self._tt_font.recalcTimestamp = recalc_timestamp
+
+    @property
+    def tt_font(self) -> TTFont:
+        return self._tt_font
+
+    @property
+    def file_path(self) -> t.Optional[Path]:
+        return self._file_path
 
     @property
     def is_ps(self) -> bool:
@@ -53,7 +90,7 @@ class Font(TTFont):
 
         :return: True if the font is a PostScript font, False otherwise.
         """
-        return self.sfntVersion == PS_SFNT_VERSION
+        return self.tt_font.sfntVersion == PS_SFNT_VERSION
 
     @property
     def is_tt(self) -> bool:
@@ -62,7 +99,7 @@ class Font(TTFont):
 
         :return: True if the font is a TrueType font, False otherwise.
         """
-        return self.sfntVersion == TT_SFNT_VERSION
+        return self.tt_font.sfntVersion == TT_SFNT_VERSION
 
     @property
     def is_woff(self) -> bool:
@@ -71,7 +108,7 @@ class Font(TTFont):
 
         :return: True if the font is a WOFF font, False otherwise.
         """
-        return self.flavor == WOFF_FLAVOR  # type: ignore
+        return self.tt_font.flavor == WOFF_FLAVOR
 
     @property
     def is_woff2(self) -> bool:
@@ -80,7 +117,7 @@ class Font(TTFont):
 
         :return: True if the font is a WOFF2 font, False otherwise.
         """
-        return self.flavor == WOFF2_FLAVOR  # type: ignore
+        return self.tt_font.flavor == WOFF2_FLAVOR
 
     @property
     def is_sfnt(self) -> bool:
@@ -89,7 +126,7 @@ class Font(TTFont):
 
         :return: True if the font is a SFNT font, False otherwise.
         """
-        return self.flavor is None  # type: ignore
+        return self.tt_font.flavor is None
 
     @property
     def is_static(self) -> bool:
@@ -98,7 +135,7 @@ class Font(TTFont):
 
         :return: True if the font is a static font, False otherwise.
         """
-        return self.get(FVAR_TABLE_TAG) is None
+        return self.tt_font.get(FVAR_TABLE_TAG) is None
 
     @property
     def is_variable(self) -> bool:
@@ -107,7 +144,7 @@ class Font(TTFont):
 
         :return: True if the font is a variable font, False otherwise.
         """
-        return self.get(FVAR_TABLE_TAG) is not None
+        return self.tt_font.get(FVAR_TABLE_TAG) is not None
 
     def get_advance_widths(self) -> t.Dict[str, int]:
         """
@@ -116,7 +153,7 @@ class Font(TTFont):
         :return: Advance widths.
         """
         advance_widths = {}
-        glyph_set = self.getGlyphSet()
+        glyph_set = self.tt_font.getGlyphSet()
 
         for k, v in glyph_set.items():
             advance_widths[k] = v.width
@@ -146,9 +183,12 @@ class Font(TTFont):
 
         # In some cases we may need to add a suffix to the file name. If the suffix is already
         # present, we remove it before adding it again.
-        file = Path(self.reader.file.name)
-        out_dir = output_dir or file.parent
-        file_name = file.stem
+
+        if self.file_path is None:
+            raise ValueError("Cannot get output file for a BytesIO object.")
+
+        out_dir = output_dir or self.file_path.parent
+        file_name = self.file_path.stem
         extension = self.real_extension
         if suffix != "":
             file_name = file_name.replace(suffix, "")
@@ -165,17 +205,6 @@ class Font(TTFont):
         return out_file
 
     @property
-    def file_path(self) -> t.Optional[Path]:
-        """
-        Get the file path of the font. If the font is a BytesIO object, return None.
-
-        :return: The file path of the font.
-        """
-        if isinstance(self.reader.file, BytesIO):
-            return None
-        return Path(self.reader.file.name)
-
-    @property
     def file_name(self) -> t.Optional[str]:
         """
         Get the file name of the font. If the font is a BytesIO object, return None.
@@ -184,7 +213,7 @@ class Font(TTFont):
         """
         if self.file_path is None:
             return None
-        return Path(self.reader.file.name).name
+        return self.file_path.name
 
     @property
     def real_extension(self) -> str:
@@ -196,14 +225,13 @@ class Font(TTFont):
         Returns:
             The extension of the font.
         """
-
-        if self.flavor == WOFF_FLAVOR:  # type: ignore
+        if self.tt_font.flavor == WOFF_FLAVOR:  # type: ignore
             return WOFF_EXTENSION
-        if self.flavor == WOFF2_FLAVOR:  # type: ignore
+        if self.tt_font.flavor == WOFF2_FLAVOR:  # type: ignore
             return WOFF2_EXTENSION
-        if self.sfntVersion == PS_SFNT_VERSION:
+        if self.tt_font.sfntVersion == PS_SFNT_VERSION:
             return OTF_EXTENSION
-        if self.sfntVersion == TT_SFNT_VERSION:
+        if self.tt_font.sfntVersion == TT_SFNT_VERSION:
             return TTF_EXTENSION
         return ".unknown"
 
@@ -215,12 +243,12 @@ class Font(TTFont):
         if not self.is_tt:
             raise NotImplementedError("Decomponentization is only supported for TrueType fonts.")
 
-        glyph_set = self.getGlyphSet()
-        glyf_table = self[GLYF_TABLE_TAG]
+        glyph_set = self.tt_font.getGlyphSet()
+        glyf_table = self.tt_font[GLYF_TABLE_TAG]
         dr_pen = DecomposingRecordingPen(glyph_set)
         tt_pen = TTGlyphPen(None)
 
-        for glyph_name in self.glyphOrder:
+        for glyph_name in self.tt_font.glyphOrder:
             glyph = glyf_table[glyph_name]
             if not glyph.isComposite():
                 continue
@@ -254,11 +282,11 @@ class Font(TTFont):
         if units_per_em not in range(MIN_UPM, MAX_UPM + 1):
             raise ValueError(f"units_per_em must be in the range {MAX_UPM} to {MAX_UPM}.")
 
-        if self["head"].unitsPerEm == units_per_em:
+        if self.tt_font["head"].unitsPerEm == units_per_em:
             logger.warning(f"Font already has {units_per_em} units per em. No need to scale upem.")
             return
 
-        scale_upem(self, new_upem=units_per_em)
+        scale_upem(self.tt_font, new_upem=units_per_em)
 
     def ps_subroutinize(self) -> None:
         """
@@ -268,10 +296,14 @@ class Font(TTFont):
         if not self.is_ps:
             raise NotImplementedError("Subroutinization is only supported for PostScript fonts.")
 
-        flavor = self.flavor  # type: ignore
-        self.flavor = None
-        subroutinize(otf=self)
-        self.flavor = flavor
+        # Workaround to subroutinize WOFF and WOFF2 fonts
+        flavor = self.tt_font.flavor
+        self.tt_font.flavor = None
+
+        subroutinize(otf=self.tt_font)
+
+        # Restore the original flavor
+        self.tt_font.flavor = flavor
 
     def ps_desubroutinize(self) -> None:
         """
@@ -281,7 +313,11 @@ class Font(TTFont):
         if not self.is_ps:
             raise NotImplementedError("Desubroutinization is only supported for PostScript fonts.")
 
-        flavor = self.flavor
-        self.flavor = None
-        desubroutinize(otf=self)
-        self.flavor = flavor
+        # Workaround to desubroutinize WOFF and WOFF2 fonts
+        flavor = self.tt_font.flavor
+        self.tt_font.flavor = None
+
+        desubroutinize(otf=self.tt_font)
+
+        # Restore the original flavor
+        self.tt_font.flavor = flavor
