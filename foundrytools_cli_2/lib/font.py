@@ -35,43 +35,61 @@ class Font:
 
     def __init__(
         self,
-        input_obj: t.Optional[t.Union[str, Path, BytesIO, TTFont]] = None,
+        font_source: t.Optional[t.Union[str, Path, BytesIO, TTFont]] = None,
+        lazy: t.Optional[bool] = None,
         recalc_bboxes: bool = True,
         recalc_timestamp: bool = False,
-        lazy: t.Optional[bool] = None,
     ) -> None:
         """
         Initialize a Font object.
 
         Args:
-            input_obj: A path to a font file or a BytesIO object.
-            recalc_bboxes: A boolean indicating whether to recalculate bounding boxes on save.
-            recalc_timestamp: A boolean indicating whether to recalculate the modified timestamp
-                on save.
+            font_source: A path to a font file or a BytesIO object.
             lazy: A boolean indicating whether to load the font lazily.
+            recalc_bboxes: A boolean indicating whether to recalculate font's bounding boxes on
+                save.
+            recalc_timestamp: A boolean indicating whether to recalculate the font's modified
+            timestamp on save.
         """
 
-        self._file_path = None
-        self._file_obj = None
-        self._tt_font = None
+        self._file_path: t.Optional[Path]
+        self._file_object = t.Optional[BytesIO]
+        self._tt_font = None or TTFont()
 
+        self._initialize_file(font_source, lazy)
+        self._initialize_tt_font(recalc_bboxes, recalc_timestamp)
+
+    def _initialize_file(
+        self,
+        input_obj: t.Optional[t.Union[str, Path, BytesIO, TTFont]] = None,
+        lazy: t.Optional[bool] = None,
+    ) -> None:
         if isinstance(input_obj, (str, Path)):
-            self._file_path = Path(input_obj)
-            self._tt_font = TTFont(input_obj, lazy=lazy)
-
+            self._initialize_file_from_path(input_obj, lazy)
         elif isinstance(input_obj, BytesIO):
-            self._file_obj = BytesIO()
-            self._tt_font = TTFont(input_obj, lazy=lazy)
-
+            self._initialize_file_from_bytesio(input_obj, lazy)
         elif isinstance(input_obj, TTFont):
-            self._file_obj = BytesIO()
-            input_obj.save(self._file_obj)
-            self._tt_font = TTFont(self._file_path, lazy=lazy)
-
+            self._initialize_file_from_ttfont(input_obj)
         else:
-            self._tt_font = TTFont()
-            self._file_obj = BytesIO()
+            self._initialize_empty_file()
 
+    def _initialize_file_from_path(self, path: t.Union[str, Path], lazy: t.Optional[bool]) -> None:
+        self._file_path = Path(path)
+        self._tt_font = TTFont(path, lazy=lazy)
+
+    def _initialize_file_from_bytesio(self, bytesio: BytesIO, lazy: t.Optional[bool]) -> None:
+        self._file_object = bytesio
+        self._tt_font = TTFont(bytesio, lazy=lazy)
+
+    def _initialize_file_from_ttfont(self, ttfont: TTFont) -> None:
+        self._file_object = BytesIO()
+        self._tt_font = ttfont
+
+    def _initialize_empty_file(self) -> None:
+        self._tt_font = TTFont()
+        self._file_object = BytesIO()
+
+    def _initialize_tt_font(self, recalc_bboxes: bool, recalc_timestamp: bool) -> None:
         self._tt_font.recalcBBoxes = recalc_bboxes
         self._tt_font.recalcTimestamp = recalc_timestamp
 
@@ -277,7 +295,8 @@ class Font:
             raise NotImplementedError("Scaling upem is only supported for TrueType fonts.")
 
         if units_per_em not in range(MIN_UPM, MAX_UPM + 1):
-            raise ValueError(f"units_per_em must be in the range {MAX_UPM} to {MAX_UPM}.")
+            logger.error(f"units_per_em must be in the range {MAX_UPM} to {MAX_UPM}.")
+            return
 
         if self.tt_font["head"].unitsPerEm == units_per_em:
             logger.warning(f"Font already has {units_per_em} units per em. No need to scale upem.")
