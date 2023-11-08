@@ -10,7 +10,20 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.ttFont import TTFont
 
-from foundrytools_cli_2.lib.constants import *
+from foundrytools_cli_2.lib.constants import (
+    WOFF_FLAVOR,
+    WOFF2_FLAVOR,
+    WOFF_EXTENSION,
+    WOFF2_EXTENSION,
+    OTF_EXTENSION,
+    TTF_EXTENSION,
+    PS_SFNT_VERSION,
+    TT_SFNT_VERSION,
+    FVAR_TABLE_TAG,
+    GLYF_TABLE_TAG,
+    MIN_UPM,
+    MAX_UPM,
+)
 from foundrytools_cli_2.lib.logger import logger
 
 
@@ -58,7 +71,7 @@ class Font(TTFont):
 
         :return: True if the font is a WOFF font, False otherwise.
         """
-        return self.flavor == FLAVOR_WOFF  # type: ignore
+        return self.flavor == WOFF_FLAVOR  # type: ignore
 
     @property
     def is_woff2(self) -> bool:
@@ -192,7 +205,8 @@ class Font(TTFont):
             return OTF_EXTENSION
         elif self.sfntVersion == TT_SFNT_VERSION:
             return TTF_EXTENSION
-        return ".unknown"
+        else:
+            return ".unknown"
 
     def tt_decomponentize(self) -> None:
         """
