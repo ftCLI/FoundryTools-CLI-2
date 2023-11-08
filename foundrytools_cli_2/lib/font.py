@@ -199,14 +199,13 @@ class Font(TTFont):
 
         if self.flavor == WOFF_FLAVOR:  # type: ignore
             return WOFF_EXTENSION
-        elif self.flavor == WOFF2_FLAVOR:  # type: ignore
+        if self.flavor == WOFF2_FLAVOR:  # type: ignore
             return WOFF2_EXTENSION
-        elif self.sfntVersion == PS_SFNT_VERSION:
+        if self.sfntVersion == PS_SFNT_VERSION:
             return OTF_EXTENSION
-        elif self.sfntVersion == TT_SFNT_VERSION:
+        if self.sfntVersion == TT_SFNT_VERSION:
             return TTF_EXTENSION
-        else:
-            return ".unknown"
+        return ".unknown"
 
     def tt_decomponentize(self) -> None:
         """
