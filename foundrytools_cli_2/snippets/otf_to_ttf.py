@@ -39,21 +39,21 @@ def otf_to_ttf(
     if font.is_variable:
         raise NotImplementedError("Variable fonts are not supported.")
 
-    glyph_order = font.getGlyphOrder()
+    glyph_order = font.tt_font.getGlyphOrder()
 
-    font[T_LOCA] = newTable(T_LOCA)
-    font[T_GLYF] = glyf = newTable(T_GLYF)
+    font.tt_font[T_LOCA] = newTable(T_LOCA)
+    font.tt_font[T_GLYF] = glyf = newTable(T_GLYF)
     glyf.glyphOrder = glyph_order
     glyf.glyphs = glyphs_to_quadratic(
-        glyphs=font.getGlyphSet(), max_err=max_err, reverse_direction=reverse_direction
+        glyphs=font.tt_font.getGlyphSet(), max_err=max_err, reverse_direction=reverse_direction
     )
-    del font[T_CFF]
-    if T_VORG in font:
-        del font[T_VORG]
-    glyf.compile(font)
+    del font.tt_font[T_CFF]
+    if T_VORG in font.tt_font:
+        del font.tt_font[T_VORG]
+    glyf.compile(font.tt_font)
     update_hmtx(font=font, glyf=glyf)
 
-    font[T_MAXP] = maxp = newTable(T_MAXP)
+    font.tt_font[T_MAXP] = maxp = newTable(T_MAXP)
     maxp.tableVersion = MAXP_TABLE_VERSION
     maxp.maxZones = 1
     maxp.maxTwilightPoints = 0
@@ -65,19 +65,19 @@ def otf_to_ttf(
     maxp.maxComponentElements = max(
         len(g.components if hasattr(g, "components") else []) for g in glyf.glyphs.values()
     )
-    maxp.compile(font)
+    maxp.compile(font.tt_font)
 
-    post = font[T_POST]
+    post = font.tt_font[T_POST]
     post.formatType = post_format
     post.extraNames = []
     post.mapping = {}
     post.glyphOrder = glyph_order
     try:
-        post.compile(font)
+        post.compile(font.tt_font)
     except OverflowError:
         post.formatType = 3
 
-    font.sfntVersion = "\000\001\000\000"
+    font.tt_font.sfntVersion = "\000\001\000\000"
     return font
 
 
@@ -91,7 +91,7 @@ def update_hmtx(font: Font, glyf: table__g_l_y_f) -> None:
         glyf: The 'glyf' table.
     """
 
-    hmtx = font[T_HMTX]
+    hmtx = font.tt_font[T_HMTX]
     for glyph_name, glyph in glyf.glyphs.items():
         if hasattr(glyph, "xMin"):
             hmtx[glyph_name] = (hmtx[glyph_name][0], glyph.xMin)

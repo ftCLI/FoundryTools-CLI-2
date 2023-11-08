@@ -20,20 +20,20 @@ def ttf_to_otf(font: Font, charstrings: dict) -> Font:
     cff_font_info = get_cff_font_info(font)
     post_values = get_post_values(font)
 
-    fb = FontBuilder(font=font)
+    fb = FontBuilder(font=font.tt_font)
     fb.isTTF = False
     for table in ["glyf", "cvt ", "loca", "fpgm", "prep", "gasp", "LTSH", "hdmx"]:
         if table in fb.font:
             del fb.font[table]
 
     fb.setupCFF(
-        psName=font["name"].getDebugName(6),
+        psName=font.tt_font["name"].getDebugName(6),
         charStringsDict=charstrings,
         fontInfo=cff_font_info,
         privateDict={},
     )
 
-    advance_widths = fb.font.get_advance_widths()
+    advance_widths = font.get_advance_widths()
 
     lsb = {}
     for gn, cs in charstrings.items():
@@ -47,7 +47,7 @@ def ttf_to_otf(font: Font, charstrings: dict) -> Font:
     fb.setupMaxp()
     fb.setupPost(**post_values)
 
-    return fb.font
+    return font
 
 
 def get_cff_font_info(font: Font) -> dict:
@@ -57,18 +57,18 @@ def get_cff_font_info(font: Font) -> dict:
     :return: A dictionary of the font info.
     """
 
-    font_revision = str(round(font["head"].fontRevision, 3)).split(".")
+    font_revision = str(round(font.tt_font["head"].fontRevision, 3)).split(".")
     major_version = str(font_revision[0])
     minor_version = str(font_revision[1]).ljust(3, "0")
 
     cff_font_info = {
         "version": ".".join([major_version, str(int(minor_version))]),
-        "FullName": font["name"].getBestFullName(),
-        "FamilyName": font["name"].getBestFamilyName(),
-        "ItalicAngle": font["post"].italicAngle,
-        "UnderlinePosition": font["post"].underlinePosition,
-        "UnderlineThickness": font["post"].underlineThickness,
-        "isFixedPitch": bool(font["post"].isFixedPitch),
+        "FullName": font.tt_font["name"].getBestFullName(),
+        "FamilyName": font.tt_font["name"].getBestFamilyName(),
+        "ItalicAngle": font.tt_font["post"].italicAngle,
+        "UnderlinePosition": font.tt_font["post"].underlinePosition,
+        "UnderlineThickness": font.tt_font["post"].underlineThickness,
+        "isFixedPitch": bool(font.tt_font["post"].isFixedPitch),
     }
 
     return cff_font_info
@@ -79,14 +79,14 @@ def get_post_values(font: Font) -> dict:
     Setup CFF post table values
     """
     post_info = {
-        "italicAngle": round(font["post"].italicAngle),
-        "underlinePosition": font["post"].underlinePosition,
-        "underlineThickness": font["post"].underlineThickness,
-        "isFixedPitch": font["post"].isFixedPitch,
-        "minMemType42": font["post"].minMemType42,
-        "maxMemType42": font["post"].maxMemType42,
-        "minMemType1": font["post"].minMemType1,
-        "maxMemType1": font["post"].maxMemType1,
+        "italicAngle": round(font.tt_font["post"].italicAngle),
+        "underlinePosition": font.tt_font["post"].underlinePosition,
+        "underlineThickness": font.tt_font["post"].underlineThickness,
+        "isFixedPitch": font.tt_font["post"].isFixedPitch,
+        "minMemType42": font.tt_font["post"].minMemType42,
+        "maxMemType42": font.tt_font["post"].maxMemType42,
+        "minMemType1": font.tt_font["post"].minMemType1,
+        "maxMemType1": font.tt_font["post"].maxMemType1,
     }
     return post_info
 
@@ -100,7 +100,7 @@ def get_charstrings(font: Font, tolerance: float = 1.0) -> Dict:
 
     charstrings: Dict = {}
     try:
-        tolerance = tolerance / 1000 * font["head"].unitsPerEm
+        tolerance = tolerance / 1000 * font.tt_font["head"].unitsPerEm
         failed, charstrings = get_qu2cu_charstrings(font, tolerance=tolerance)
 
         if len(failed) > 0:
@@ -115,7 +115,7 @@ def get_charstrings(font: Font, tolerance: float = 1.0) -> Dict:
                     logger.error(f"Failed to get charstring for {c}: {e}")
 
     except Exception as e:  # pylint: disable=broad-except
-        logger.error(f"Failed to convert {font.reader.file.name}: {e}")
+        logger.error(f"Failed to convert {font.file_path}: {e}")
 
     return charstrings
 
@@ -129,7 +129,7 @@ def get_qu2cu_charstrings(font: Font, tolerance: float = 1.0) -> Tuple[List, Dic
 
     qu2cu_charstrings = {}
     failed = []
-    glyph_set = font.getGlyphSet()
+    glyph_set = font.tt_font.getGlyphSet()
 
     for k, v in glyph_set.items():
         t2_pen = T2CharStringPen(v.width, glyphSet=glyph_set)
@@ -151,7 +151,7 @@ def get_t2_charstrings(font: Font) -> dict:
     :return: CFF charstrings.
     """
     t2_charstrings = {}
-    glyph_set = font.getGlyphSet()
+    glyph_set = font.tt_font.getGlyphSet()
 
     for k, v in glyph_set.items():
         t2_pen = T2CharStringPen(v.width, glyphSet=glyph_set)

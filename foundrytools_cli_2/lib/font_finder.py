@@ -207,7 +207,7 @@ def _is_woff(font: Font) -> bool:
     Returns:
         bool: A boolean indicating whether the given font is a WOFF font.
     """
-    return font.flavor == WOFF_FLAVOR
+    return font.tt_font.flavor == WOFF_FLAVOR
 
 
 def _is_woff2(font: Font) -> bool:
@@ -220,7 +220,7 @@ def _is_woff2(font: Font) -> bool:
     Returns:
         bool: A boolean indicating whether the given font is a WOFF2 font.
     """
-    return font.flavor == WOFF2_FLAVOR
+    return font.tt_font.flavor == WOFF2_FLAVOR
 
 
 def _is_sfnt(font: Font) -> bool:
@@ -233,7 +233,7 @@ def _is_sfnt(font: Font) -> bool:
     Returns:
         bool: A boolean indicating whether the given font is a sfnt font.
     """
-    return font.flavor is None
+    return font.tt_font.flavor is None
 
 
 def _is_ps(font: Font) -> bool:
@@ -246,7 +246,7 @@ def _is_ps(font: Font) -> bool:
     Returns:
         bool: A boolean indicating whether the given font is an OpenType font.
     """
-    return font.sfntVersion == OTF_SFNT_VERSION
+    return font.tt_font.sfntVersion == OTF_SFNT_VERSION
 
 
 def _is_tt(font: Font) -> bool:
@@ -259,7 +259,7 @@ def _is_tt(font: Font) -> bool:
     Returns:
         bool: A boolean indicating whether the given font is a TrueType font.
     """
-    return font.sfntVersion == TTF_SFNT_VERSION
+    return font.tt_font.sfntVersion == TTF_SFNT_VERSION
 
 
 def _is_static(font: Font) -> bool:
@@ -272,7 +272,7 @@ def _is_static(font: Font) -> bool:
     Returns:
         bool: A boolean indicating whether the given font is a static font.
     """
-    return font.get(FVAR_TABLE) is None
+    return font.tt_font.get(FVAR_TABLE) is None
 
 
 def _is_variable(font: Font) -> bool:
@@ -285,7 +285,7 @@ def _is_variable(font: Font) -> bool:
     Returns:
         bool: A boolean indicating whether the given font is a variable font.
     """
-    return font.get(FVAR_TABLE) is not None
+    return font.tt_font.get(FVAR_TABLE) is not None
 
 
 __all__ = ["FontFinder", "FontFinderError", "FontFinderFilters", "FontLoadOptions"]
