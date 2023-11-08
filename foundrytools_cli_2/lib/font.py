@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from io import BytesIO
 from pathlib import Path
 import typing as t
@@ -298,6 +299,15 @@ class Font:
 
         scale_upem(self.tt_font, new_upem=units_per_em)
 
+    @contextmanager
+    def _restore_flavor(self):
+        original_flavor = self.tt_font.flavor
+        self.tt_font.flavor = None
+        try:
+            yield
+        finally:
+            self.tt_font.flavor = original_flavor
+
     def ps_subroutinize(self) -> None:
         """
         Subroutinize a PostScript font.
@@ -306,14 +316,8 @@ class Font:
         if not self.is_ps:
             raise NotImplementedError("Subroutinization is only supported for PostScript fonts.")
 
-        # Workaround to subroutinize WOFF and WOFF2 fonts
-        flavor = self.tt_font.flavor
-        self.tt_font.flavor = None
-
-        subroutinize(otf=self.tt_font)
-
-        # Restore the original flavor
-        self.tt_font.flavor = flavor
+        with self._restore_flavor():
+            subroutinize(otf=self.tt_font)
 
     def ps_desubroutinize(self) -> None:
         """
@@ -323,11 +327,5 @@ class Font:
         if not self.is_ps:
             raise NotImplementedError("Desubroutinization is only supported for PostScript fonts.")
 
-        # Workaround to desubroutinize WOFF and WOFF2 fonts
-        flavor = self.tt_font.flavor
-        self.tt_font.flavor = None
-
-        desubroutinize(otf=self.tt_font)
-
-        # Restore the original flavor
-        self.tt_font.flavor = flavor
+        with self._restore_flavor():
+            desubroutinize(otf=self.tt_font)
