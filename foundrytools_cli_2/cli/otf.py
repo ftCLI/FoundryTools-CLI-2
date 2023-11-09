@@ -81,3 +81,101 @@ def fix_contours(
                 logger.success(f"File saved to {output_file}")
             except Exception as e:  # pylint: disable=broad-except
                 logger.error(e)
+
+
+@cli.command("subr")
+@input_path_argument()
+@recursive_flag()
+@output_dir_option()
+@overwrite_flag()
+@recalc_timestamp_flag()
+@debug_flag()
+@Timer(logger=logger.info)
+def subr(
+    input_path: Path,
+    recursive: bool = False,
+    debug: bool = False,
+    output_dir: Optional[Path] = None,
+    overwrite: bool = True,
+    recalc_timestamp: bool = False,
+) -> None:
+    """
+    Subroutinize a font.
+    """
+
+    if debug:
+        logger_filter.level = "DEBUG"
+
+    filters = FontFinderFilters(filter_out_tt=True, filter_out_variable=True)
+    options = FontLoadOptions(recalc_timestamp=recalc_timestamp)
+    try:
+        finder = FontFinder(
+            input_path=input_path, recursive=recursive, options=options, filters=filters
+        )
+        fonts = finder.find_fonts()
+
+    except FontFinderError as e:
+        logger.error(e)
+        raise click.Abort(e)
+
+    for font in fonts:
+        with font.tt_font:
+            try:
+                print()
+                logger.info(f"Checking file {font.file_path}")
+                logger.info("Subroutinizing...")
+                font.ps_subroutinize()
+                output_file = font.get_output_file(output_dir=output_dir, overwrite=overwrite)
+                font.tt_font.save(output_file)
+                logger.success(f"File saved to {output_file}")
+            except Exception as e:
+                logger.error(e)
+
+
+@cli.command("desubr")
+@input_path_argument()
+@recursive_flag()
+@output_dir_option()
+@overwrite_flag()
+@recalc_timestamp_flag()
+@debug_flag()
+@Timer(logger=logger.info)
+def desubr(
+    input_path: Path,
+    recursive: bool = False,
+    debug: bool = False,
+    output_dir: Optional[Path] = None,
+    overwrite: bool = True,
+    recalc_timestamp: bool = False,
+) -> None:
+    """
+    Desubroutinize a font.
+    """
+
+    if debug:
+        logger_filter.level = "DEBUG"
+
+    filters = FontFinderFilters(filter_out_tt=True, filter_out_variable=True)
+    options = FontLoadOptions(recalc_timestamp=recalc_timestamp)
+    try:
+        finder = FontFinder(
+            input_path=input_path, recursive=recursive, options=options, filters=filters
+        )
+        fonts = finder.generate_fonts()
+
+    except FontFinderError as e:
+        logger.error(e)
+        raise click.Abort(e)
+
+    for font in fonts:
+        with font.tt_font:
+            try:
+                print()
+                logger.info(f"Checking file {font.file_path}")
+                logger.info("Desubroutinizing...")
+                font.ps_desubroutinize()
+                output_file = font.get_output_file(output_dir=output_dir, overwrite=overwrite)
+                font.tt_font.save(output_file)
+                logger.success(f"File saved to {output_file}")
+            except Exception as e:
+                logger.error(e)
