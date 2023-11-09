@@ -93,6 +93,12 @@ class Font:
         self._tt_font.recalcBBoxes = recalc_bboxes
         self._tt_font.recalcTimestamp = recalc_timestamp
 
+    def __enter__(self) -> "Font":
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback) -> None:  # type: ignore
+        self._tt_font.close()
+
     @property
     def tt_font(self) -> TTFont:
         """
@@ -192,21 +198,46 @@ class Font:
             return TTF_EXTENSION
         return self.tt_font.sfntVersion
 
-    def get_advance_widths(self) -> t.Dict[str, int]:
+    def save_to_file(
+        self,
+        output_path: t.Optional[Path] = None,
+        out_dir: t.Optional[Path] = None,
+        overwrite: bool = True,
+        suffix: str = "",
+    ) -> None:
         """
-        Get advance widths from a font.
+        Save the font to a file.
 
-        :return: Advance widths.
+        Args:
+            output_path: The output path. If not specified, the font will be saved to the same
+                location as the input file.
+            out_dir: The output directory. If not specified, the font will be saved to the same
+                directory as the input file.
+            overwrite: A boolean indicating whether to overwrite existing files.
+            suffix: An optional suffix to append to the file name.
         """
-        advance_widths = {}
-        glyph_set = self.tt_font.getGlyphSet()
+        if self.file_path is None:
+            self.tt_font.save(self._file_object)
+            return
 
-        for k, v in glyph_set.items():
-            advance_widths[k] = v.width
+        output_path = output_path or self.get_output_path(
+            output_dir=out_dir, overwrite=overwrite, suffix=suffix
+        )
+        self.tt_font.save(output_path)
 
-        return advance_widths
+    def save_to_bytesio(self) -> BytesIO:
+        """
+        Save the font to a BytesIO object.
 
-    def get_output_file(
+        Returns:
+            A BytesIO object.
+        """
+        buf = BytesIO()
+        self.tt_font.save(buf)
+        buf.seek(0)
+        return buf
+
+    def get_output_path(
         self,
         output_dir: t.Optional[Path] = None,
         overwrite: bool = True,
@@ -227,15 +258,20 @@ class Font:
             A Path object pointing to the output file.
         """
 
-        # In some cases we may need to add a suffix to the file name. If the suffix is already
-        # present, we remove it before adding it again.
-
         if self.file_path is None:
             raise ValueError("Cannot get output file for a BytesIO object.")
 
         out_dir = output_dir or self.file_path.parent
+        if not out_dir.exists():
+            try:
+                out_dir.mkdir(parents=True)
+            except OSError:
+                raise Exception(f"Failed to create output directory {out_dir}")
         file_name = self.file_path.stem
         extension = self.real_extension
+
+        # In some cases we may need to add a suffix to the file name. If the suffix is already
+        # present, we remove it before adding it again.
         if suffix != "":
             file_name = file_name.replace(suffix, "")
 
@@ -249,6 +285,20 @@ class Font:
             )
         )
         return out_file
+
+    def get_advance_widths(self) -> t.Dict[str, int]:
+        """
+        Get advance widths from a font.
+
+        :return: Advance widths.
+        """
+        advance_widths = {}
+        glyph_set = self.tt_font.getGlyphSet()
+
+        for k, v in glyph_set.items():
+            advance_widths[k] = v.width
+
+        return advance_widths
 
     def tt_decomponentize(self) -> None:
         """
@@ -327,6 +377,14 @@ class Font:
         if not self.is_ps:
             raise NotImplementedError("Subroutinization is only supported for PostScript fonts.")
 
+        # Using compreffor here requires to save the font to a buffer first
+        # from io import BytesIO
+        # with BytesIO() as buf:
+        #     buf = BytesIO()
+        #     otf.save(buf)
+        #     buf.seek(0)
+        #     otf = Font(buf)
+        #     compress(otf)
         with self._restore_flavor():
             subroutinize(otf=self.tt_font)
 
