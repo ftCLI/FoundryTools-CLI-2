@@ -182,15 +182,15 @@ class Font:
         Returns:
             The extension of the font.
         """
-        if self.tt_font.flavor == WOFF_FLAVOR:
+        if self.is_woff:
             return WOFF_EXTENSION
-        if self.tt_font.flavor == WOFF2_FLAVOR:
+        if self.is_woff2:
             return WOFF2_EXTENSION
-        if self.tt_font.sfntVersion == PS_SFNT_VERSION:
+        if self.is_ps:
             return OTF_EXTENSION
-        if self.tt_font.sfntVersion == TT_SFNT_VERSION:
+        if self.is_tt:
             return TTF_EXTENSION
-        return ".unknown"
+        return self.tt_font.sfntVersion
 
     def get_advance_widths(self) -> t.Dict[str, int]:
         """
@@ -306,6 +306,12 @@ class Font:
 
     @contextmanager
     def _restore_flavor(self) -> t.Iterator[None]:
+        """
+        This is a workaround to support subroutinization and desubroutinization for WOFF and WOFF2
+        fonts. cffsubr requires the font flavor to be set to None. This context manager is used to
+        temporarily set the font flavor to None and restore it after subroutinization or
+        desubroutinization.
+        """
         original_flavor = self.tt_font.flavor
         self.tt_font.flavor = None
         try:
