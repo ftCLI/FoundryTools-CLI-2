@@ -261,12 +261,8 @@ class Font:
         if self.file_path is None:
             raise ValueError("Cannot get output file for a BytesIO object.")
 
+        # We check elsewhere if the output directory is writable, no need to check it here.
         out_dir = output_dir or self.file_path.parent
-        if not out_dir.exists():
-            try:
-                out_dir.mkdir(parents=True)
-            except OSError:
-                raise Exception(f"Failed to create output directory {out_dir}")
         file_name = self.file_path.stem
         extension = self.real_extension
 
