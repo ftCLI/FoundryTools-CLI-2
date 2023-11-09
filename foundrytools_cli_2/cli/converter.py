@@ -22,8 +22,8 @@ from foundrytools_cli_2.lib.font_finder import (
 )
 from foundrytools_cli_2.lib.logger import logger, logger_filter
 from foundrytools_cli_2.lib.timer import Timer
-from foundrytools_cli_2.snippets.otf_to_ttf import otf_to_ttf
-from foundrytools_cli_2.snippets.ttf_to_otf import ttf_to_otf, get_charstrings
+from foundrytools_cli_2.snippets.ps2tt import otf_to_ttf
+from foundrytools_cli_2.snippets.tt2ps import ttf_to_otf, get_charstrings
 
 cli = click.Group()
 
@@ -64,15 +64,15 @@ def otf2ttf(
 
     for font in fonts:
         print()
-        with font.tt_font:
+        with font:
             try:
                 logger.info(f"Converting {font.file_path}")
                 tt = otf_to_ttf(font=font, max_err=tolerance, reverse_direction=True)
                 if target_upm:
                     logger.info(f"Scaling UPM to {target_upm}")
                     tt.tt_scale_upem(units_per_em=target_upm)
-                out_file = tt.get_output_file(output_dir=output_dir, overwrite=overwrite)
-                font.tt_font.save(out_file)
+                out_file = tt.get_output_path(output_dir=output_dir, overwrite=overwrite)
+                font.save_to_file(out_file)
                 logger.success(f"Saved {out_file}")
             except Exception as e:  # pylint: disable=broad-except
                 logger.error(e)
@@ -137,23 +137,13 @@ def ttf2otf(
 
                 logger.info("Converting to OTF...")
                 otf = ttf_to_otf(font=font, charstrings=charstrings)
-                out_file = otf.get_output_file(output_dir=output_dir, overwrite=overwrite)
 
                 if subroutinize:
                     logger.info("Subroutinizing...")
                     otf.ps_subroutinize()
 
-                    # Using compreffor here requires to save the font to a buffer first
-                    # from io import BytesIO
-                    # with BytesIO() as buf:
-                    #     buf = BytesIO()
-                    #     otf.save(buf)
-                    #     buf.seek(0)
-                    #     otf = Font(buf)
-                    #     compress(otf)
-
-                    otf.tt_font.save(out_file)
-
-                    logger.success(f"Saved {out_file}")
+                out_file = otf.get_output_path(output_dir=output_dir, overwrite=overwrite)
+                otf.save_to_file(out_file)
+                logger.success(f"Saved {out_file}")
             except Exception as e:  # pylint: disable=broad-except
                 logger.error(e)
