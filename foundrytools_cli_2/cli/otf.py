@@ -47,7 +47,7 @@ def fix_contours(
     recalc_timestamp: bool = False,
 ) -> None:
     """
-    Fix the contours of an OTF font by removing overlaps, correcting contours direction, and
+    Fix the contours of OpenType-PS fonts by removing overlaps, correcting contours direction, and
     removing tiny paths.
     """
 
@@ -100,7 +100,7 @@ def subr(
     recalc_timestamp: bool = False,
 ) -> None:
     """
-    Subroutinize a font.
+    Subroutinize OpenType-PS fonts with ``cffsubr``.
     """
 
     if debug:
@@ -149,7 +149,7 @@ def desubr(
     recalc_timestamp: bool = False,
 ) -> None:
     """
-    Desubroutinize a font.
+    Desubroutinize OpenType-PS fonts with ``cffsubr``.
     """
 
     if debug:
