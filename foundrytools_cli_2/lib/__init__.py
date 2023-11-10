@@ -1,4 +1,4 @@
-import constants
+from . import constants
 from .font import Font
 from .font_finder import FontFinder, FontFinderError
 from .logger import logger, logger_filter
