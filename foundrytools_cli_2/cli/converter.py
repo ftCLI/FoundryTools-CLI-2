@@ -70,7 +70,7 @@ def otf2ttf(
                 tt = otf_to_ttf(font=font, max_err=tolerance, reverse_direction=True)
                 if target_upm:
                     logger.info(f"Scaling UPM to {target_upm}")
-                    tt.tt_scale_upem(units_per_em=target_upm)
+                    tt.tt_scale_upem(new_upem=target_upm)
                 out_file = tt.get_output_file(output_dir=output_dir, overwrite=overwrite)
                 font.save_to_file(out_file)
                 logger.success(f"Saved {out_file}")
@@ -130,7 +130,7 @@ def ttf2otf(
 
                 if target_upm:
                     logger.info(f"Scaling UPM to {target_upm}")
-                    font.tt_scale_upem(units_per_em=target_upm)
+                    font.tt_scale_upem(new_upem=target_upm)
 
                 logger.info("Getting charstrings...")
                 charstrings = get_charstrings(font=font, tolerance=tolerance)
