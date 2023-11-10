@@ -13,7 +13,7 @@ class LoggerFilter:  # pylint: disable=too-few-public-methods
     def __init__(self, level: str) -> None:
         self.level = level
 
-    def __call__(self, record) -> bool:  # type: ignore
+    def __call__(self, record: dict) -> bool:
         level_no = logger.level(self.level).no
         return record["level"].no >= level_no
 
