@@ -1,6 +1,11 @@
 name: Checks
 
-on: [push]
+on:
+  push:
+    paths-ignore:
+      - "docs/**"
+      - "tests/**"
+
 
 jobs:
   build:
