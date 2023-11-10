@@ -62,30 +62,29 @@ class Font:
         self._ttfont: t.Optional[TTFont] = None
 
         if isinstance(source, (str, Path)):
-            self._initialize_from_file(source, lazy, recalc_bboxes, recalc_timestamp)
+            self._init_from_file(source, lazy, recalc_bboxes, recalc_timestamp)
         elif isinstance(source, BytesIO):
-            self._initialize_from_bytesio(source, lazy, recalc_bboxes, recalc_timestamp)
+            self._init_from_bytesio(source, lazy, recalc_bboxes, recalc_timestamp)
         elif isinstance(source, TTFont):
-            self._initialize_from_tt_font(source, lazy, recalc_bboxes, recalc_timestamp)
+            self._init_from_tt_font(source, lazy, recalc_bboxes, recalc_timestamp)
         else:
             raise ValueError(
-                f"Invalid source type {type(source)}. "
-                f"Expected str, Path, bytes, BytesIO, or TTFont."
+                f"Invalid source type {type(source)}. Expected str, Path, BytesIO, or TTFont."
             )
 
-    def _initialize_from_file(
+    def _init_from_file(
         self,
         path: t.Union[str, Path],
         lazy: t.Optional[bool],
         recalc_bboxes: bool,
         recalc_timestamp: bool,
     ) -> None:
-        self._file = Path(path)
+        self._file = Path(path).resolve()
         self._ttfont = TTFont(
             path, lazy=lazy, recalcBBoxes=recalc_bboxes, recalcTimestamp=recalc_timestamp
         )
 
-    def _initialize_from_bytesio(
+    def _init_from_bytesio(
         self,
         bytesio: BytesIO,
         lazy: t.Optional[bool],
@@ -96,8 +95,9 @@ class Font:
         self._ttfont = TTFont(
             bytesio, lazy=lazy, recalcBBoxes=recalc_bboxes, recalcTimestamp=recalc_timestamp
         )
+        bytesio.close()
 
-    def _initialize_from_tt_font(
+    def _init_from_tt_font(
         self, ttfont: TTFont, lazy: t.Optional[bool], recalc_bboxes: bool, recalc_timestamp: bool
     ) -> None:
         self._bytesio = BytesIO()
@@ -111,12 +111,7 @@ class Font:
         return self
 
     def __exit__(self, exc_type, exc_value, traceback) -> None:  # type: ignore
-        if isinstance(self._file, Path):
-            self._file.unlink()
-        if isinstance(self._bytesio, BytesIO):
-            self._bytesio.close()
-        if self._ttfont is not None:
-            self._ttfont.close()
+        self.close()
 
     def __repr__(self) -> str:
         return f"<Font file={self.file}, bytesio={self.bytesio}, ttfont={self.ttfont}>"
@@ -229,9 +224,9 @@ class Font:
             return TTF_EXTENSION
         return self.ttfont.sfntVersion
 
-    def save_to_file(
+    def save(
         self,
-        file: t.Union[str, Path],
+        file: t.Union[str, Path, BytesIO],
         reorder_tables: t.Optional[bool] = True,
     ) -> None:
         """
@@ -245,27 +240,11 @@ class Font:
         """
         self.ttfont.save(file, reorderTables=reorder_tables)
 
-    def save_to_bytesio(
-        self,
-        bytesio: t.Optional[BytesIO] = None,
-        reorder_tables: t.Optional[bool] = None,
-    ) -> BytesIO:
+    def close(self) -> None:
         """
-        Save the font to a BytesIO object.
-
-        Args:
-            bytesio: A BytesIO object. If not specified, a new BytesIO object will be created.
-            reorder_tables: If true, reorder the tables, sorting them by tag (recommended by the
-                OpenType specification). If false, retain the original font order. If None
-                (the default), reorder by table dependency (fastest).
-
-        Returns:
-            A BytesIO object.
+        Close the underlying TTFont object.
         """
-        buf = bytesio or BytesIO()
-        self.ttfont.save(buf, reorderTables=reorder_tables)
-        buf.seek(0)
-        return buf
+        self.ttfont.close()
 
     def get_output_file(
         self,

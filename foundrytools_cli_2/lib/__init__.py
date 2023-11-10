@@ -1,7 +1,6 @@
-from . import constants
 from .font import Font
 from .font_finder import FontFinder, FontFinderError
-from .logger import logger, logger_filter
+from .logger import logger, LoggerFilter
 from .timer import Timer, TimerError
 
 __all__ = [
@@ -9,8 +8,7 @@ __all__ = [
     "FontFinder",
     "FontFinderError",
     "logger",
-    "logger_filter",
+    "LoggerFilter",
     "Timer",
     "TimerError",
-    "constants",
 ]

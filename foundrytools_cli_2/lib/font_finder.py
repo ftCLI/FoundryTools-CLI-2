@@ -3,19 +3,10 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from fontTools.ttLib.ttFont import TTLibError
+
+from foundrytools_cli_2.lib.constants import TTFontOptions
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.logger import logger
-
-
-@dataclass
-class FontLoadOptions:
-    """
-    A class that specifies how to load the font.
-    """
-
-    lazy: t.Optional[bool] = None
-    recalc_timestamp: bool = False
-    recalc_bboxes: bool = True
 
 
 @dataclass
@@ -64,7 +55,7 @@ class FontFinder:
         self,
         input_path: t.Union[str, Path],
         recursive: bool = False,
-        options: t.Optional[FontLoadOptions] = None,
+        options: t.Optional[TTFontOptions] = None,
         filters: t.Optional[FontFinderFilters] = None,
     ) -> None:
         """
@@ -86,7 +77,7 @@ class FontFinder:
         except Exception as e:
             raise FontFinderError(f"Invalid input path: {input_path}") from e
         self.recursive = recursive
-        self.options = options or FontLoadOptions()
+        self.options = options or TTFontOptions()
         self.filters = filters or FontFinderFilters()
 
         self._validate_filters()
@@ -280,4 +271,4 @@ def _is_variable(font: Font) -> bool:
     return font.is_variable
 
 
-__all__ = ["FontFinder", "FontFinderError", "FontFinderFilters", "FontLoadOptions"]
+__all__ = ["FontFinder", "FontFinderError", "FontFinderFilters"]

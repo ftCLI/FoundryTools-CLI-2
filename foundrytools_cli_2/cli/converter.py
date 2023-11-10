@@ -3,6 +3,8 @@ from typing import Optional
 
 import click
 
+from foundrytools_cli_2.lib.constants import TTFontOptions
+
 from foundrytools_cli_2.lib.click.click_options import (
     input_path_argument,
     recursive_flag,
@@ -18,7 +20,6 @@ from foundrytools_cli_2.lib.font_finder import (
     FontFinder,
     FontFinderError,
     FontFinderFilters,
-    FontLoadOptions,
 )
 from foundrytools_cli_2.lib.logger import logger, logger_filter
 from foundrytools_cli_2.lib.timer import Timer
@@ -51,7 +52,7 @@ def otf2ttf(
     """
 
     filters = FontFinderFilters(filter_out_tt=True, filter_out_variable=True)
-    options = FontLoadOptions(recalc_timestamp=recalc_timestamp)
+    options = TTFontOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(
             input_path=input_path, recursive=recursive, options=options, filters=filters
@@ -72,7 +73,7 @@ def otf2ttf(
                     logger.info(f"Scaling UPM to {target_upm}")
                     tt.tt_scale_upem(new_upem=target_upm)
                 out_file = tt.get_output_file(output_dir=output_dir, overwrite=overwrite)
-                font.save_to_file(out_file)
+                font.save(out_file)
                 logger.success(f"Saved {out_file}")
             except Exception as e:  # pylint: disable=broad-except
                 logger.error(e)
@@ -108,7 +109,7 @@ def ttf2otf(
         logger_filter.level = "DEBUG"
 
     filters = FontFinderFilters(filter_out_ps=True, filter_out_variable=True)
-    options = FontLoadOptions(recalc_timestamp=recalc_timestamp)
+    options = TTFontOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(
             input_path=input_path, recursive=recursive, options=options, filters=filters
@@ -143,7 +144,8 @@ def ttf2otf(
                     otf.ps_subroutinize()
 
                 out_file = otf.get_output_file(output_dir=output_dir, overwrite=overwrite)
-                otf.save_to_file(out_file)
+                otf.save(out_file)
                 logger.success(f"Saved {out_file}")
+
             except Exception as e:  # pylint: disable=broad-except
                 logger.error(e)

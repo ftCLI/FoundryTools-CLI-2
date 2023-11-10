@@ -13,12 +13,8 @@ from foundrytools_cli_2.lib.click.click_options import (
     subroutinize_flag,
     min_area_option,
 )
-from foundrytools_cli_2.lib.font_finder import (
-    FontFinder,
-    FontFinderError,
-    FontFinderFilters,
-    FontLoadOptions,
-)
+from foundrytools_cli_2.lib.constants import TTFontOptions
+from foundrytools_cli_2.lib.font_finder import (FontFinder, FontFinderError, FontFinderFilters)
 from foundrytools_cli_2.lib.logger import logger, logger_filter
 from foundrytools_cli_2.lib.timer import Timer
 from foundrytools_cli_2.snippets.ps_correct_contours import correct_otf_contours
@@ -55,7 +51,7 @@ def fix_contours(
         logger_filter.level = "DEBUG"
 
     filters = FontFinderFilters(filter_out_tt=True, filter_out_variable=True)
-    options = FontLoadOptions(recalc_timestamp=recalc_timestamp)
+    options = TTFontOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(
             input_path=input_path, recursive=recursive, options=options, filters=filters
@@ -107,7 +103,7 @@ def subr(
         logger_filter.level = "DEBUG"
 
     filters = FontFinderFilters(filter_out_tt=True, filter_out_variable=True)
-    options = FontLoadOptions(recalc_timestamp=recalc_timestamp)
+    options = TTFontOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(
             input_path=input_path, recursive=recursive, options=options, filters=filters
@@ -126,7 +122,7 @@ def subr(
                 logger.info("Subroutinizing...")
                 font.ps_subroutinize()
                 out_file = font.get_output_file(output_dir=output_dir, overwrite=overwrite)
-                font.save_to_file(out_file)
+                font.save(out_file)
                 logger.success(f"File saved to {out_file}")
             except Exception as e:  # pylint: disable=broad-except
                 logger.error(e)
@@ -156,7 +152,7 @@ def desubr(
         logger_filter.level = "DEBUG"
 
     filters = FontFinderFilters(filter_out_tt=True, filter_out_variable=True)
-    options = FontLoadOptions(recalc_timestamp=recalc_timestamp)
+    options = TTFontOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(
             input_path=input_path, recursive=recursive, options=options, filters=filters
@@ -175,7 +171,7 @@ def desubr(
                 logger.info("Desubroutinizing...")
                 font.ps_desubroutinize()
                 out_file = font.get_output_file(output_dir=output_dir, overwrite=overwrite)
-                font.save_to_file(out_file)
+                font.save(out_file)
                 logger.success(f"File saved to {out_file}")
             except Exception as e:  # pylint: disable=broad-except
                 logger.error(e)
