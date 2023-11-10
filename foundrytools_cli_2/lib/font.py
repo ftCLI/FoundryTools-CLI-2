@@ -373,10 +373,10 @@ class Font:
             raise NotImplementedError("Scaling upem is only supported for TrueType fonts.")
 
         if new_upem not in range(MIN_UPM, MAX_UPM + 1):
-            raise ValueError(f'units_per_em must be in the range {MAX_UPM} to {MAX_UPM}.')
+            raise ValueError(f"units_per_em must be in the range {MAX_UPM} to {MAX_UPM}.")
 
-        if self.ttfont['head'].unitsPerEm == new_upem:
-            raise ValueError(f'Font already has {new_upem} units per em. No need to scale upem.')
+        if self.ttfont["head"].unitsPerEm == new_upem:
+            raise ValueError(f"Font already has {new_upem} units per em. No need to scale upem.")
 
         scale_upem(self.ttfont, new_upem=new_upem)
 

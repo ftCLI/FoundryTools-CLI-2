@@ -3,7 +3,7 @@ from typing import Optional
 
 import click
 
-from foundrytools_cli_2.lib.click_options import (
+from foundrytools_cli_2.lib.click.click_options import (
     input_path_argument,
     recursive_flag,
     recalc_timestamp_flag,
