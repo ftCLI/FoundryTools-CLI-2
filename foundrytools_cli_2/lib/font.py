@@ -1,7 +1,7 @@
+import typing as t
 from contextlib import contextmanager
 from io import BytesIO
 from pathlib import Path
-import typing as t
 
 from cffsubr import subroutinize, desubroutinize
 from dehinter.font import dehint
@@ -9,7 +9,7 @@ from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib.scaleUpem import scale_upem
-from fontTools.ttLib.ttFont import TTFont
+from fontTools.ttLib import TTFont
 
 from foundrytools_cli_2.lib.constants import (
     WOFF_FLAVOR,
@@ -25,7 +25,6 @@ from foundrytools_cli_2.lib.constants import (
     MIN_UPM,
     MAX_UPM,
 )
-from foundrytools_cli_2.lib.logger import logger
 
 
 class Font:
@@ -36,7 +35,7 @@ class Font:
 
     def __init__(
         self,
-        source: t.Union[str, Path, bytes, BytesIO, TTFont],
+        source: t.Union[str, Path, BytesIO, TTFont],
         lazy: t.Optional[bool] = None,
         recalc_bboxes: bool = True,
         recalc_timestamp: bool = False,
@@ -64,8 +63,6 @@ class Font:
 
         if isinstance(source, (str, Path)):
             self._initialize_from_file(source, lazy, recalc_bboxes, recalc_timestamp)
-        elif isinstance(source, bytes):
-            self._initialize_from_bytes(source, lazy, recalc_bboxes, recalc_timestamp)
         elif isinstance(source, BytesIO):
             self._initialize_from_bytesio(source, lazy, recalc_bboxes, recalc_timestamp)
         elif isinstance(source, TTFont):
@@ -106,18 +103,6 @@ class Font:
         self._bytesio = BytesIO()
         ttfont.save(self._bytesio, reorderTables=False)
         self._bytesio.seek(0)
-        self._ttfont = TTFont(
-            self._bytesio, lazy=lazy, recalcBBoxes=recalc_bboxes, recalcTimestamp=recalc_timestamp
-        )
-
-    def _initialize_from_bytes(
-        self,
-        bytez: bytes,
-        lazy: t.Optional[bool],
-        recalc_bboxes: bool,
-        recalc_timestamp: bool,
-    ) -> None:
-        self._bytesio = BytesIO(bytez)
         self._ttfont = TTFont(
             self._bytesio, lazy=lazy, recalcBBoxes=recalc_bboxes, recalcTimestamp=recalc_timestamp
         )
@@ -376,26 +361,24 @@ class Font:
 
         dehint(self)
 
-    def tt_scale_upem(self, units_per_em: int) -> None:
+    def tt_scale_upem(self, new_upem: int) -> None:
         """
         Scale the font's unitsPerEm value to the given value.
 
         Args:
-            units_per_em (int): The new unitsPerEm value.
+            new_upem (int): The new unitsPerEm value.
         """
 
         if not self.is_tt:
             raise NotImplementedError("Scaling upem is only supported for TrueType fonts.")
 
-        if units_per_em not in range(MIN_UPM, MAX_UPM + 1):
-            logger.error(f"units_per_em must be in the range {MAX_UPM} to {MAX_UPM}.")
-            return
+        if new_upem not in range(MIN_UPM, MAX_UPM + 1):
+            raise ValueError(f'units_per_em must be in the range {MAX_UPM} to {MAX_UPM}.')
 
-        if self.ttfont["head"].unitsPerEm == units_per_em:
-            logger.warning(f"Font already has {units_per_em} units per em. No need to scale upem.")
-            return
+        if self.ttfont['head'].unitsPerEm == new_upem:
+            raise ValueError(f'Font already has {new_upem} units per em. No need to scale upem.')
 
-        scale_upem(self.ttfont, new_upem=units_per_em)
+        scale_upem(self.ttfont, new_upem=new_upem)
 
     @contextmanager
     def _restore_flavor(self) -> t.Iterator[None]:
