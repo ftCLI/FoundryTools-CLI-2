@@ -121,7 +121,7 @@ def ttf2otf(
 
     for font in fonts:
         print()
-        with font.ttfont, Timer(logger=logger.success, text="Font converted in {:0.3f} seconds"):
+        with font, Timer(logger=logger.success, text="Font converted in {:0.3f} seconds"):
             try:
                 logger.info(f"Converting {font.file}")
 

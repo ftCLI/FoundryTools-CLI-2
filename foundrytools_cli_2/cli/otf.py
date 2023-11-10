@@ -67,7 +67,7 @@ def fix_contours(
         raise click.Abort(e)
 
     for font in fonts:
-        with font.ttfont:
+        with font:
             try:
                 print()
                 logger.info(f"Checking file {font.file}")

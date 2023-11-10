@@ -56,8 +56,6 @@ class Font:
                 on save. Default is False.
         """
 
-        super().__init__()
-
         self._file: t.Optional[Path] = None
         self._bytesio: t.Optional[BytesIO] = None
         self._ttfont: t.Optional[TTFont] = None
