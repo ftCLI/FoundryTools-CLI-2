@@ -8,4 +8,4 @@ disable =
     W1203, # Use % formatting in logging functions and pass the % parameters as arguments
 
 ignore-paths:
-    tests/
+    .tests/*
