@@ -6,6 +6,3 @@ disable =
     R0914, # Too many local variables
     W0212, # Access to a protected member of a client class
     W1203, # Use % formatting in logging functions and pass the % parameters as arguments
-
-ignore =
-    tests/*,
