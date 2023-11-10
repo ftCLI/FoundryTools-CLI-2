@@ -7,5 +7,5 @@ disable =
     W0212, # Access to a protected member of a client class
     W1203, # Use % formatting in logging functions and pass the % parameters as arguments
 
-ignore-paths =
-    tests/**
+ignore-patterns =
+    test_.*?py,
