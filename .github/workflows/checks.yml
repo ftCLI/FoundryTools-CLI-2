@@ -1,10 +1,6 @@
 name: Checks
 
-on:
-  push:
-    paths-ignore:
-      - "docs/**"
-      - "tests/**"
+on: [push]
 
 
 jobs:
@@ -34,7 +30,7 @@ jobs:
         pylint $(git ls-files '*.py')
     - name: Analysing the code with mypy
       run: |
-        mypy $(git ls-files '*.py')
+        mypy $(git ls-files '*.py' --exclude 'tests')
     - name: Running ft-cli
       run: |
         ft-cli --help
