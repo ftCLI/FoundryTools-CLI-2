@@ -67,17 +67,17 @@ def fix_contours(
         raise click.Abort(e)
 
     for font in fonts:
-        with font.tt_font:
+        with font.ttfont:
             try:
                 print()
-                logger.info(f"Checking file {font.file_path}")
+                logger.info(f"Checking file {font.file}")
                 logger.info("Correcting contours...")
                 correct_otf_contours(font, min_area=min_area)
                 if subroutinize:
                     logger.info("Subroutinizing...")
                     font.ps_subroutinize()
-                output_file = font.get_output_path(output_dir=output_dir, overwrite=overwrite)
-                font.tt_font.save(output_file)
+                output_file = font.get_output_file(output_dir=output_dir, overwrite=overwrite)
+                font.ttfont.save(output_file)
                 logger.success(f"File saved to {output_file}")
             except Exception as e:  # pylint: disable=broad-except
                 logger.error(e)
@@ -122,10 +122,10 @@ def subr(
         with font:
             try:
                 print()
-                logger.info(f"Checking file {font.file_path}")
+                logger.info(f"Checking file {font.file}")
                 logger.info("Subroutinizing...")
                 font.ps_subroutinize()
-                out_file = font.get_output_path(output_dir=output_dir, overwrite=overwrite)
+                out_file = font.get_output_file(output_dir=output_dir, overwrite=overwrite)
                 font.save_to_file(out_file)
                 logger.success(f"File saved to {out_file}")
             except Exception as e:  # pylint: disable=broad-except
@@ -171,10 +171,10 @@ def desubr(
         with font:
             try:
                 print()
-                logger.info(f"Checking file {font.file_path}")
+                logger.info(f"Checking file {font.file}")
                 logger.info("Desubroutinizing...")
                 font.ps_desubroutinize()
-                out_file = font.get_output_path(output_dir=output_dir, overwrite=overwrite)
+                out_file = font.get_output_file(output_dir=output_dir, overwrite=overwrite)
                 font.save_to_file(out_file)
                 logger.success(f"File saved to {out_file}")
             except Exception as e:  # pylint: disable=broad-except

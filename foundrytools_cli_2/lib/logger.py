@@ -5,12 +5,13 @@ from functools import partialmethod
 from loguru import logger
 
 
-class LoggerFilter:  # pylint: disable=too-few-public-methods
+class LoggerFilter(dict):  # pylint: disable=too-few-public-methods
     """
     A custom logger filter that filters out log records below the given level.
     """
 
     def __init__(self, level: str) -> None:
+        super().__init__()
         self.level = level
 
     def __call__(self, record: dict) -> bool:

@@ -66,12 +66,12 @@ def otf2ttf(
         print()
         with font:
             try:
-                logger.info(f"Converting {font.file_path}")
+                logger.info(f"Converting {font.file}")
                 tt = otf_to_ttf(font=font, max_err=tolerance, reverse_direction=True)
                 if target_upm:
                     logger.info(f"Scaling UPM to {target_upm}")
                     tt.tt_scale_upem(units_per_em=target_upm)
-                out_file = tt.get_output_path(output_dir=output_dir, overwrite=overwrite)
+                out_file = tt.get_output_file(output_dir=output_dir, overwrite=overwrite)
                 font.save_to_file(out_file)
                 logger.success(f"Saved {out_file}")
             except Exception as e:  # pylint: disable=broad-except
@@ -121,9 +121,9 @@ def ttf2otf(
 
     for font in fonts:
         print()
-        with font.tt_font, Timer(logger=logger.success, text="Font converted in {:0.3f} seconds"):
+        with font.ttfont, Timer(logger=logger.success, text="Font converted in {:0.3f} seconds"):
             try:
-                logger.info(f"Converting {font.file_path}")
+                logger.info(f"Converting {font.file}")
 
                 logger.info("Decomponentizing source font...")
                 font.tt_decomponentize()
@@ -142,7 +142,7 @@ def ttf2otf(
                     logger.info("Subroutinizing...")
                     otf.ps_subroutinize()
 
-                out_file = otf.get_output_path(output_dir=output_dir, overwrite=overwrite)
+                out_file = otf.get_output_file(output_dir=output_dir, overwrite=overwrite)
                 otf.save_to_file(out_file)
                 logger.success(f"Saved {out_file}")
             except Exception as e:  # pylint: disable=broad-except
