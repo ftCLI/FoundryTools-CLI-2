@@ -335,17 +335,17 @@ def min_area_option() -> t.Callable:
     return add_options(_min_area_option)
 
 
-def in_flavor_choice() -> t.Callable:
+def in_format_choice() -> t.Callable:
     """
     Add the flavor option to a click command.
 
     :return: a decorator that adds the flavor option to a click command
     """
-    _flavor_choice = [
+    _in_format_choice = [
         click.option(
             "-f",
-            "--flavor",
-            "in_flavor",
+            "--format",
+            "in_format",
             type=click.Choice(["woff", "woff2"]),
             default=None,
             help="""
@@ -354,20 +354,20 @@ def in_flavor_choice() -> t.Callable:
     """,
         )
     ]
-    return add_options(_flavor_choice)
+    return add_options(_in_format_choice)
 
 
-def out_flavor_choice() -> t.Callable:
+def out_format_choice() -> t.Callable:
     """
     Add the flavor option to a click command.
 
     :return: a decorator that adds the flavor option to a click command
     """
-    _out_flavor_choice = [
+    _out_format_choice = [
         click.option(
             "-f",
-            "--flavor",
-            "out_flavor",
+            "--format",
+            "out_format",
             type=click.Choice(["woff", "woff2"]),
             default=None,
             help="""
@@ -376,4 +376,4 @@ def out_flavor_choice() -> t.Callable:
     """,
         )
     ]
-    return add_options(_out_flavor_choice)
+    return add_options(_out_format_choice)

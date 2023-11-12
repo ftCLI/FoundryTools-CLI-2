@@ -21,8 +21,8 @@ from foundrytools_cli_2.lib.click.click_options import (
     tolerance_option,
     subroutinize_flag,
     debug_flag,
-    in_flavor_choice,
-    out_flavor_choice,
+    in_format_choice,
+    out_format_choice,
 )
 from foundrytools_cli_2.lib.font_finder import (
     FontFinder,
@@ -90,7 +90,7 @@ def otf2ttf(
                     suffix = TTF_EXTENSION
                 else:
                     suffix = ""
-                out_file = tt.get_output_file(
+                out_file = tt.make_out_file_name(
                     output_dir=output_dir,
                     overwrite=overwrite,
                     suffix=suffix,
@@ -171,7 +171,7 @@ def ttf2otf(
                     suffix = OTF_EXTENSION
                 else:
                     suffix = ""
-                out_file = otf.get_output_file(
+                out_file = otf.make_out_file_name(
                     output_dir=output_dir, overwrite=overwrite, suffix=suffix
                 )
                 otf.save(out_file)
@@ -187,7 +187,7 @@ def ttf2otf(
 @cli.command("wf2ft")
 @input_path_argument()
 @recursive_flag()
-@in_flavor_choice()
+@in_format_choice()
 @output_dir_option()
 @overwrite_flag()
 @recalc_timestamp_flag()
@@ -195,7 +195,7 @@ def ttf2otf(
 def wf2sfnt(
     input_path: Path,
     recursive: bool = False,
-    in_flavor: Optional[Literal["woff", "woff2"]] = None,
+    in_format: Optional[Literal["woff", "woff2"]] = None,
     output_dir: Optional[Path] = None,
     overwrite: bool = True,
     recalc_timestamp: bool = False,
@@ -205,9 +205,9 @@ def wf2sfnt(
     """
 
     filters = FontFinderFilter(filter_out_sfnt=True)
-    if in_flavor == "woff":
+    if in_format == "woff":
         filters.filter_out_woff2 = True
-    if in_flavor == "woff2":
+    if in_format == "woff2":
         filters.filter_out_woff = True
 
     options = TTFontOptions(recalc_timestamp=recalc_timestamp)
@@ -227,13 +227,22 @@ def wf2sfnt(
             try:
                 timer.start()
                 logger.info(f"Converting {font.file}")
-                suffix = font.real_extension  # See note below
+                # Get the extension of the input file to reuse it later as suffix. See note below.
+                suffix = font.get_real_extension()
                 font.ttfont.flavor = None
 
-                # What happens if we convert a WOFF and a WOFF2 with the same stem and the same
-                # sfntVersion? The file converted first will be overwritten by the second one.
-                # We need to add the suffix retrieved few lines above to avoid this.
-                out_file = font.get_output_file(
+                # If we don't add a suffix to the output file name here, an undesired overwriting
+                # may occur. For example, if we convert a WOFF and a WOFF2 with the same stem and
+                # the same sfntVersion, the file converted first will be overwritten by the second
+                # one. We need to add the suffix retrieved few lines above to avoid this.
+                #
+                # Usage example:
+                #   $ ftcli converter wf2ft ./fonts
+                #   Converting font.woff
+                #   Saved font.woff.ttf
+                #   Converting font.woff2
+                #   Saved font.woff2.ttf
+                out_file = font.make_out_file_name(
                     output_dir=output_dir, overwrite=overwrite, suffix=suffix
                 )
                 font.save(out_file, reorder_tables=False)
@@ -243,11 +252,13 @@ def wf2sfnt(
             except Exception as e:  # pylint: disable=broad-except
                 logger.error(e)
 
+    print()  # Add a newline after the last font before the timer message
+
 
 @cli.command("ft2wf")
 @input_path_argument()
 @recursive_flag()
-@out_flavor_choice()
+@out_format_choice()
 @output_dir_option()
 @overwrite_flag()
 @recalc_timestamp_flag()
@@ -255,7 +266,7 @@ def wf2sfnt(
 def sfnt2wf(
     input_path: Path,
     recursive: bool = False,
-    out_flavor: Optional[Literal["woff", "woff2"]] = None,
+    out_format: Optional[Literal["woff", "woff2"]] = None,
     output_dir: Optional[Path] = None,
     overwrite: bool = True,
     recalc_timestamp: bool = False,
@@ -281,17 +292,16 @@ def sfnt2wf(
         with font:
             try:
                 logger.info(f"Converting {font.file}")
-
-                suffix = font.real_extension
+                suffix = font.get_real_extension()
                 out_flavors = [WOFF_FLAVOR, WOFF2_FLAVOR]
-                if out_flavor:
-                    out_flavors = [out_flavor]
+                if out_format is not None:
+                    out_flavors = [out_format]
 
                 if WOFF_FLAVOR in out_flavors:
                     timer.start()
                     logger.info("Converting to WOFF...")
                     font.ttfont.flavor = WOFF_FLAVOR
-                    out_file = font.get_output_file(
+                    out_file = font.make_out_file_name(
                         output_dir=output_dir, overwrite=overwrite, suffix=suffix
                     )
                     font.save(out_file, reorder_tables=False)
@@ -302,7 +312,7 @@ def sfnt2wf(
                     timer.start()
                     logger.info("Converting to WOFF2...")
                     font.ttfont.flavor = WOFF2_FLAVOR
-                    out_file = font.get_output_file(
+                    out_file = font.make_out_file_name(
                         output_dir=output_dir, overwrite=overwrite, suffix=suffix
                     )
                     font.save(out_file, reorder_tables=False)

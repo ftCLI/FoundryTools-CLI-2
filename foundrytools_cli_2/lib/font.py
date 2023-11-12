@@ -204,26 +204,6 @@ class Font:
         """
         return self.ttfont.get(FVAR_TABLE_TAG) is not None
 
-    @property
-    def real_extension(self) -> str:
-        """
-        Get the real extension of the font. If the font is a web font, the extension will be
-        determined by the font flavor. If the font is a SFNT font, the extension will be determined
-        by the sfntVersion attribute.
-
-        Returns:
-            The extension of the font.
-        """
-        if self.is_woff:
-            return WOFF_EXTENSION
-        if self.is_woff2:
-            return WOFF2_EXTENSION
-        if self.is_ps:
-            return OTF_EXTENSION
-        if self.is_tt:
-            return TTF_EXTENSION
-        return self.ttfont.sfntVersion
-
     def save(
         self,
         file: t.Union[str, Path, BytesIO],
@@ -246,10 +226,30 @@ class Font:
         """
         self.ttfont.close()
 
-    def get_output_file(
+    def get_real_extension(self) -> str:
+        """
+        Get the real extension of the font. If the font is a web font, the extension will be
+        determined by the font flavor. If the font is a SFNT font, the extension will be determined
+        by the sfntVersion attribute.
+
+        Returns:
+            The extension of the font.
+        """
+        if self.is_woff:
+            return WOFF_EXTENSION
+        if self.is_woff2:
+            return WOFF2_EXTENSION
+        if self.is_ps:
+            return OTF_EXTENSION
+        if self.is_tt:
+            return TTF_EXTENSION
+        return self.ttfont.sfntVersion
+
+    def make_out_file_name(
         self,
         output_dir: t.Optional[Path] = None,
         overwrite: bool = True,
+        extension: t.Optional[str] = None,
         suffix: str = "",
     ) -> Path:
         """
@@ -263,6 +263,8 @@ class Font:
         Args:
             output_dir: Path to the output directory.
             overwrite: A boolean indicating whether to overwrite existing files.
+            extension: An optional extension to use for the output file. If not specified, the
+                extension will be determined by the font type.
             suffix: An optional suffix to append to the file name.
 
         Returns:
@@ -274,7 +276,10 @@ class Font:
 
         # We check elsewhere if the output directory is writable, no need to check it here.
         out_dir = output_dir or self.file.parent
-        extension = self.real_extension
+        extension = extension or self.get_real_extension()
+
+        # Clean up the file name by removing the extensions used as file name suffix as added by
+        # possible previous conversions.
         file_name = (
             self.file.stem.replace(OTF_EXTENSION, "")
             .replace(TTF_EXTENSION, "")
@@ -338,7 +343,7 @@ class Font:
         if not self.is_tt:
             raise NotImplementedError("Only TrueType fonts are supported.")
 
-        dehint(self)
+        dehint(self.ttfont)
 
     def tt_scale_upem(self, new_upem: int) -> None:
         """
