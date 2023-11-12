@@ -333,3 +333,47 @@ def min_area_option() -> t.Callable:
         )
     ]
     return add_options(_min_area_option)
+
+
+def in_flavor_choice() -> t.Callable:
+    """
+    Add the flavor option to a click command.
+
+    :return: a decorator that adds the flavor option to a click command
+    """
+    _flavor_choice = [
+        click.option(
+            "-f",
+            "--flavor",
+            "in_flavor",
+            type=click.Choice(["woff", "woff2"]),
+            default=None,
+            help="""
+            By default, the script converts both woff and woff2 flavored web fonts to SFNT fonts
+            (TrueType or OpenType). Use this option to convert only woff or woff2 flavored web fonts.
+    """,
+        )
+    ]
+    return add_options(_flavor_choice)
+
+
+def out_flavor_choice() -> t.Callable:
+    """
+    Add the flavor option to a click command.
+
+    :return: a decorator that adds the flavor option to a click command
+    """
+    _out_flavor_choice = [
+        click.option(
+            "-f",
+            "--flavor",
+            "out_flavor",
+            type=click.Choice(["woff", "woff2"]),
+            default=None,
+            help="""
+            By default, the script converts SFNT fonts to both woff and woff2 flavored web fonts.
+            Use this option to convert only to woff or woff2 flavored web fonts.
+    """,
+        )
+    ]
+    return add_options(_out_flavor_choice)

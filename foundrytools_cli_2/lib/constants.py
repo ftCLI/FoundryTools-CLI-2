@@ -24,4 +24,3 @@ class TTFontOptions:
     lazy: t.Optional[bool] = None
     recalc_timestamp: bool = False
     recalc_bboxes: bool = True
-

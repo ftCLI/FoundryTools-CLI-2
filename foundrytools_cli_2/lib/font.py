@@ -274,13 +274,13 @@ class Font:
 
         # We check elsewhere if the output directory is writable, no need to check it here.
         out_dir = output_dir or self.file.parent
-        file_name = self.file.stem
         extension = self.real_extension
-
-        # In some cases we may need to add a suffix to the file name. If the suffix is already
-        # present, we remove it before adding it again.
-        if suffix != "":
-            file_name = file_name.replace(suffix, "")
+        file_name = (
+            self.file.stem.replace(OTF_EXTENSION, "")
+            .replace(TTF_EXTENSION, "")
+            .replace(WOFF2_EXTENSION, "")
+            .replace(WOFF_EXTENSION, "")
+        )
 
         out_file = Path(
             makeOutputFileName(

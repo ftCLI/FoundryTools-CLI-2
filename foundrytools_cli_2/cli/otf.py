@@ -14,7 +14,7 @@ from foundrytools_cli_2.lib.click.click_options import (
     min_area_option,
 )
 from foundrytools_cli_2.lib.constants import TTFontOptions
-from foundrytools_cli_2.lib.font_finder import (FontFinder, FontFinderError, FontFinderFilters)
+from foundrytools_cli_2.lib.font_finder import FontFinder, FontFinderError, FontFinderFilter
 from foundrytools_cli_2.lib.logger import logger, logger_filter
 from foundrytools_cli_2.lib.timer import Timer
 from foundrytools_cli_2.snippets.ps_correct_contours import correct_otf_contours
@@ -50,7 +50,7 @@ def fix_contours(
     if debug:
         logger_filter.level = "DEBUG"
 
-    filters = FontFinderFilters(filter_out_tt=True, filter_out_variable=True)
+    filters = FontFinderFilter(filter_out_tt=True, filter_out_variable=True)
     options = TTFontOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(
@@ -102,7 +102,7 @@ def subr(
     if debug:
         logger_filter.level = "DEBUG"
 
-    filters = FontFinderFilters(filter_out_tt=True, filter_out_variable=True)
+    filters = FontFinderFilter(filter_out_tt=True, filter_out_variable=True)
     options = TTFontOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(
@@ -151,7 +151,7 @@ def desubr(
     if debug:
         logger_filter.level = "DEBUG"
 
-    filters = FontFinderFilters(filter_out_tt=True, filter_out_variable=True)
+    filters = FontFinderFilter(filter_out_tt=True, filter_out_variable=True)
     options = TTFontOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(

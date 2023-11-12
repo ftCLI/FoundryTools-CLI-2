@@ -10,7 +10,7 @@ from foundrytools_cli_2.lib.logger import logger
 
 
 @dataclass
-class FontFinderFilters:
+class FontFinderFilter:
     """
     A class that specifies which fonts to filter out when searching for fonts.
     """
@@ -56,7 +56,7 @@ class FontFinder:
         input_path: t.Union[str, Path],
         recursive: bool = False,
         options: t.Optional[TTFontOptions] = None,
-        filters: t.Optional[FontFinderFilters] = None,
+        filters: t.Optional[FontFinderFilter] = None,
     ) -> None:
         """
         Initialize the FontFinder class.
@@ -78,7 +78,7 @@ class FontFinder:
             raise FontFinderError(f"Invalid input path: {input_path}") from e
         self.recursive = recursive
         self.options = options or TTFontOptions()
-        self.filters = filters or FontFinderFilters()
+        self.filters = filters or FontFinderFilter()
 
         self._validate_filters()
 
@@ -123,6 +123,7 @@ class FontFinder:
         """
         try:
             next(self._generate_fonts())
+            return
         except StopIteration as e:
             raise FontFinderError(
                 f"No fonts matching the criteria found in {self.input_path}"
@@ -271,4 +272,4 @@ def _is_variable(font: Font) -> bool:
     return font.is_variable
 
 
-__all__ = ["FontFinder", "FontFinderError", "FontFinderFilters"]
+__all__ = ["FontFinder", "FontFinderError", "FontFinderFilter"]
