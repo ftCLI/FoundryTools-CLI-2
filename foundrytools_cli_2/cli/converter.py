@@ -3,7 +3,13 @@ from typing import Literal, Optional
 
 import click
 
-from foundrytools_cli_2.lib.constants import TTFontOptions, WOFF_FLAVOR, WOFF2_FLAVOR, OTF_EXTENSION
+from foundrytools_cli_2.lib.constants import (
+    TTFontOptions,
+    WOFF_FLAVOR,
+    WOFF2_FLAVOR,
+    OTF_EXTENSION,
+    TTF_EXTENSION,
+)
 
 from foundrytools_cli_2.lib.click.click_options import (
     input_path_argument,
@@ -80,7 +86,15 @@ def otf2ttf(
                 if target_upm:
                     logger.info(f"Scaling UPM to {target_upm}")
                     tt.tt_scale_upem(new_upem=target_upm)
-                out_file = tt.get_output_file(output_dir=output_dir, overwrite=overwrite)
+                if font.ttfont.flavor is not None:
+                    suffix = TTF_EXTENSION
+                else:
+                    suffix = ""
+                out_file = tt.get_output_file(
+                    output_dir=output_dir,
+                    overwrite=overwrite,
+                    suffix=suffix,
+                )
                 font.save(out_file)
                 timer.stop()
                 logger.success(f"Saved {out_file}")
