@@ -240,7 +240,7 @@ def wf2sfnt(
                 timer.stop()
                 logger.success(f"Saved {out_file}")
 
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-except
                 logger.error(e)
 
 
@@ -309,5 +309,5 @@ def sfnt2wf(
                     timer.stop()
                     logger.success(f"Saved {out_file}")
 
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-except
                 logger.error(e)
