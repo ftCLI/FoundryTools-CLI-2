@@ -350,7 +350,8 @@ def in_format_choice() -> t.Callable:
             default=None,
             help="""
             By default, the script converts both woff and woff2 flavored web fonts to SFNT fonts
-            (TrueType or OpenType). Use this option to convert only woff or woff2 flavored web fonts.
+            (TrueType or OpenType). Use this option to convert only woff or woff2 flavored web
+            fonts.
     """,
         )
     ]
