@@ -4,11 +4,7 @@ from typing import Optional
 import click
 
 from foundrytools_cli_2.lib.click.click_options import (
-    input_path_argument,
-    recursive_flag,
-    recalc_timestamp_flag,
-    overwrite_flag,
-    output_dir_option,
+    common_options,
     debug_flag,
     subroutinize_flag,
     min_area_option,
@@ -24,14 +20,10 @@ cli = click.Group()
 
 
 @cli.command("fix-contours")
-@input_path_argument()
-@recursive_flag()
 @min_area_option()
 @subroutinize_flag()
-@output_dir_option()
-@overwrite_flag()
-@recalc_timestamp_flag()
 @debug_flag()
+@common_options()
 @Timer(logger=logger.info)
 def fix_contours(
     input_path: Path,
@@ -81,17 +73,11 @@ def fix_contours(
 
 
 @cli.command("subr")
-@input_path_argument()
-@recursive_flag()
-@output_dir_option()
-@overwrite_flag()
-@recalc_timestamp_flag()
-@debug_flag()
+@common_options()
 @Timer(logger=logger.info)
 def subr(
     input_path: Path,
     recursive: bool = False,
-    debug: bool = False,
     output_dir: Optional[Path] = None,
     overwrite: bool = True,
     recalc_timestamp: bool = False,
@@ -99,9 +85,6 @@ def subr(
     """
     Subroutinize OpenType-PS fonts with ``cffsubr``.
     """
-
-    if debug:
-        logger_filter.level = "DEBUG"
 
     filters = FontFinderFilter(filter_out_tt=True, filter_out_variable=True)
     options = TTFontOptions(recalc_timestamp=recalc_timestamp)
@@ -130,17 +113,11 @@ def subr(
 
 
 @cli.command("desubr")
-@input_path_argument()
-@recursive_flag()
-@output_dir_option()
-@overwrite_flag()
-@recalc_timestamp_flag()
-@debug_flag()
+@common_options()
 @Timer(logger=logger.info)
 def desubr(
     input_path: Path,
     recursive: bool = False,
-    debug: bool = False,
     output_dir: Optional[Path] = None,
     overwrite: bool = True,
     recalc_timestamp: bool = False,
@@ -148,9 +125,6 @@ def desubr(
     """
     Desubroutinize OpenType-PS fonts with ``cffsubr``.
     """
-
-    if debug:
-        logger_filter.level = "DEBUG"
 
     filters = FontFinderFilter(filter_out_tt=True, filter_out_variable=True)
     options = TTFontOptions(recalc_timestamp=recalc_timestamp)
