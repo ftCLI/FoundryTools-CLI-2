@@ -6,7 +6,6 @@ from fontTools.ttLib.ttFont import TTLibError
 
 from foundrytools_cli_2.lib.constants import TTFontOptions
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.logger import logger
 
 
 @dataclass
@@ -159,8 +158,8 @@ class FontFinder:
                 )
                 if not any(condition and func(font) for condition, func in self._filter_conditions):
                     yield font
-            except TTLibError as e:
-                logger.debug(f"{file}: {e}")
+            except TTLibError:
+                pass
 
     def _generate_files(self) -> t.Generator[Path, None, None]:
         """
