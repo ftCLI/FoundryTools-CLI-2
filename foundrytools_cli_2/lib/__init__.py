@@ -1,5 +1,5 @@
 from .font import Font
-from .font_finder import FontFinder, FontFinderError
+from .font_finder import FontFinder, FontFinderError, FontFinderFilter
 from .logger import logger, LoggerFilter
 from .timer import Timer, TimerError
 
