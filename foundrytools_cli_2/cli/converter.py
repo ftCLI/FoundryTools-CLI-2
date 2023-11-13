@@ -35,7 +35,7 @@ from foundrytools_cli_2.snippets.ps2tt import otf_to_ttf
 from foundrytools_cli_2.snippets.tt2ps import ttf_to_otf, get_charstrings
 
 timer = Timer(
-    logger=logger.opt(colors=True).info,
+    logger=logger.info,
     text="Font converted in <cyan>{:0.3f} seconds</>",
 )
 
