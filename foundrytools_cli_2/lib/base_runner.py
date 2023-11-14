@@ -25,7 +25,7 @@ class BaseRunner(abc.ABC):
         overwrite: bool = False,
         reorder_tables: bool = False,
         **kwargs: Dict,
-    ) -> None:
+    ) -> None:  # pylint: disable=too-few-public-methods
         """
         Initialize the runner.
         """
