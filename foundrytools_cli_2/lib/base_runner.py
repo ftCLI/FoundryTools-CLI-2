@@ -1,29 +1,37 @@
-from abc import abstractmethod
+import abc
 from pathlib import Path
-import typing as t
+from typing import Optional, Dict, List
 
-from foundrytools_cli_2.lib.font import Font, TTFontOptions
+from foundrytools_cli_2.lib.font import Font
+from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.timer import Timer
-from foundrytools_cli_2.lib.font_finder import FontFinder, FontFinderError, FontFinderFilter
 
 
-class BaseRunner:
+class NoFontsFoundError(Exception):
+    """
+    An exception raised when no fonts are found.
+    """
+
+
+class BaseRunner(abc.ABC):
     """
     A base class for runners.
     """
     def __init__(
             self,
-            input_path: Path,
-            ttfont_options: t.Optional[TTFontOptions] = None,
-            finder_filter: t.Optional[FontFinderFilter] = None,
-            **kwargs,
+            fonts: List[Font],
+            output_dir: Optional[Path] = None,
+            overwrite: bool = False,
+            reorder_tables: bool = False,
+            **kwargs: Dict,
     ) -> None:
         """
         Initialize the runner.
         """
-        self.input_path = input_path
-        self.ttfont_options = ttfont_options or TTFontOptions()
-        self.finder_filter = finder_filter or FontFinderFilter()
+        self.fonts = fonts
+        self.output_dir = output_dir
+        self.overwrite = overwrite
+        self.reorder_tables = reorder_tables
         self._kwargs = kwargs
 
     @Timer(text="\nElapsed time: {0:.3f}s")
@@ -31,25 +39,42 @@ class BaseRunner:
         """
         Run the runner. This method must be overridden by subclasses.
         """
-        for font in self._find_fonts():
-            self._run(font)
+        self._validate_fonts()
+        for font in self.fonts:
+            try:
+                logger.info(f"Processing {font.file}")
+                self._process_font(font, **self._kwargs)
+                self._save_font(font)
+            except Exception as e:  # pylint: disable=broad-except
+                logger.exception(e)
 
-    def _find_fonts(self) -> t.List[Font]:
+    def _validate_fonts(self) -> None:
         """
-        Get the source fonts.
+        Validate the fonts.
         """
-        finder = FontFinder(
-            self.input_path, options=self.ttfont_options, filters=self.finder_filter
-        )
-        fonts = finder.find_fonts()
-        if not fonts:
-            raise FontFinderError("No fonts found.")
-        return fonts
+        if not self.fonts:
+            raise NoFontsFoundError("No valid fonts found")
 
-    @abstractmethod
-    @Timer(text="\nElapsed time: {0:.3f}s")
-    def _run(self, font: [Font], **kwargs) -> None:
+    @abc.abstractmethod
+    def _process_font(self, font: Font, **kwargs: Dict) -> None:
         """
         Run the runner. This method must be overridden by subclasses.
         """
         raise NotImplementedError
+
+    def _get_out_file_name(self, font: Font) -> Path:
+        """
+        Get the output file name.
+        """
+        return font.make_out_file_name(
+            output_dir=self.output_dir,
+            overwrite=self.overwrite,
+        )
+
+    def _save_font(self, font: Font) -> None:
+        """
+        Save the font.
+        """
+        out_file = self._get_out_file_name(font)
+        font.save(out_file, reorder_tables=self.reorder_tables)
+        logger.success(f"Saved {out_file}")

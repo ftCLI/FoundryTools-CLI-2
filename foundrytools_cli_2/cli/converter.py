@@ -4,7 +4,7 @@ from typing import Literal, Optional
 import click
 
 from foundrytools_cli_2.lib.constants import (
-    TTFontOptions,
+    TTFontInitOptions,
     WOFF_FLAVOR,
     WOFF2_FLAVOR,
     OTF_EXTENSION,
@@ -65,7 +65,7 @@ def otf2ttf(
     """
 
     filters = FontFinderFilter(filter_out_tt=True, filter_out_variable=True)
-    options = TTFontOptions(recalc_timestamp=recalc_timestamp)
+    options = TTFontInitOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(
             input_path=input_path, recursive=recursive, options=options, filters=filters
@@ -132,7 +132,7 @@ def ttf2otf(
         logger_filter.level = "DEBUG"
 
     filters = FontFinderFilter(filter_out_ps=True, filter_out_variable=True)
-    options = TTFontOptions(recalc_timestamp=recalc_timestamp)
+    options = TTFontInitOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(
             input_path=input_path, recursive=recursive, options=options, filters=filters
@@ -210,7 +210,7 @@ def wf2sfnt(
     if in_format == "woff2":
         filters.filter_out_woff = True
 
-    options = TTFontOptions(recalc_timestamp=recalc_timestamp)
+    options = TTFontInitOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(
             input_path=input_path, recursive=recursive, options=options, filters=filters
@@ -276,7 +276,7 @@ def sfnt2wf(
     """
 
     filters = FontFinderFilter(filter_out_woff=True, filter_out_woff2=True)
-    options = TTFontOptions(recalc_timestamp=recalc_timestamp)
+    options = TTFontInitOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(
             input_path=input_path, recursive=recursive, options=options, filters=filters

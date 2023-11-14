@@ -4,7 +4,7 @@ from pathlib import Path
 
 from fontTools.ttLib.ttFont import TTLibError
 
-from foundrytools_cli_2.lib.constants import TTFontOptions
+from foundrytools_cli_2.lib.constants import TTFontInitOptions
 from foundrytools_cli_2.lib.font import Font
 
 
@@ -54,7 +54,7 @@ class FontFinder:
         self,
         input_path: t.Union[str, Path],
         recursive: bool = False,
-        options: t.Optional[TTFontOptions] = None,
+        options: t.Optional[TTFontInitOptions] = None,
         filters: t.Optional[FontFinderFilter] = None,
     ) -> None:
         """
@@ -76,7 +76,7 @@ class FontFinder:
         except Exception as e:
             raise FontFinderError(f"Invalid input path: {input_path}") from e
         self.recursive = recursive
-        self.options = options or TTFontOptions()
+        self.options = options or TTFontInitOptions()
         self.filters = filters or FontFinderFilter()
 
         self._validate_filters()

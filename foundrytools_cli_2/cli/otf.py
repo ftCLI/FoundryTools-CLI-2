@@ -9,7 +9,7 @@ from foundrytools_cli_2.lib.click.click_options import (
     subroutinize_flag,
     min_area_option,
 )
-from foundrytools_cli_2.lib.constants import TTFontOptions
+from foundrytools_cli_2.lib.constants import TTFontInitOptions
 from foundrytools_cli_2.lib.font_finder import FontFinder, FontFinderError, FontFinderFilter
 from foundrytools_cli_2.lib.logger import logger, logger_filter
 from foundrytools_cli_2.lib.timer import Timer
@@ -44,7 +44,7 @@ def fix_contours(
         logger_filter.level = "DEBUG"
 
     filters = FontFinderFilter(filter_out_tt=True, filter_out_variable=True)
-    options = TTFontOptions(recalc_timestamp=recalc_timestamp)
+    options = TTFontInitOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(
             input_path=input_path, recursive=recursive, options=options, filters=filters
@@ -87,7 +87,7 @@ def subr(
     """
 
     filters = FontFinderFilter(filter_out_tt=True, filter_out_variable=True)
-    options = TTFontOptions(recalc_timestamp=recalc_timestamp)
+    options = TTFontInitOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(
             input_path=input_path, recursive=recursive, options=options, filters=filters
@@ -127,7 +127,7 @@ def desubr(
     """
 
     filters = FontFinderFilter(filter_out_tt=True, filter_out_variable=True)
-    options = TTFontOptions(recalc_timestamp=recalc_timestamp)
+    options = TTFontInitOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(
             input_path=input_path, recursive=recursive, options=options, filters=filters

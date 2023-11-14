@@ -1,5 +1,6 @@
 import typing as t
 from contextlib import contextmanager
+from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path
 
@@ -27,6 +28,27 @@ from foundrytools_cli_2.lib.constants import (
 )
 
 
+@dataclass
+class TTFontOptions:
+    """
+    A class that specifies how to load the font.
+
+    Attributes:
+        lazy: If lazy is set to True, many data structures are loaded lazily, upon access only. If
+            it is set to False, many data structures are loaded immediately. The default is
+            ``lazy=None`` which is somewhere in between.
+        recalc_timestamp: If true, sets the ``modified`` timestamp in the ``head`` table on save.
+            Default is False.
+        recalc_bboxes: If true (the default), recalculates ``glyf``, ``CFF ``, ``head`` bounding
+            box values and ``hhea``/``vhea`` min/max values on save. Also compiles the glyphs on
+            importing, which saves memory consumption and time.
+    """
+
+    lazy: t.Optional[bool] = None
+    recalc_timestamp: bool = False
+    recalc_bboxes: bool = True
+
+
 class Font:
     """
     The ``Font`` class adds additional properties and methods to the ``fontTools.ttLib.TTFont``
@@ -44,18 +66,16 @@ class Font:
         Initialize a Font object.
 
         Args:
-            source: A path to a font file or a BytesIO object.
+            source: A path to a font file, a BytesIO object or a TTFont object.
             lazy (bool): If lazy is set to True, many data structures are loaded lazily, upon access
                 only. If it is set to False, many data structures are loaded immediately. The
                 default is ``lazy=None`` which is somewhere in between.
-            recalc_bboxes: If true (the default), recalculates ``glyf``, ``CFF ``, ``head`` bounding
-                box values and ``hhea``/``vhea`` min/max values on save. Also compiles the glyphs on
-                importing, which saves memory consumption and time.
+            recalc_bboxes (bool): If true (the default), recalculates ``glyf``, ``CFF ``, ``head``
+                bounding box values and ``hhea``/``vhea`` min/max values on save. Also compiles the
+                glyphs on importing, which saves memory consumption and time.
             recalc_timestamp (bool): If true, sets the ``modified`` timestamp in the ``head`` table
                 on save. Default is False.
         """
-
-        super().__init__()
 
         self._file: t.Optional[Path] = None
         self._bytesio: t.Optional[BytesIO] = None
