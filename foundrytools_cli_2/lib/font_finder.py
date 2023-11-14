@@ -99,7 +99,6 @@ class FontFinder:
             A list of TTFont objects.
         """
         fonts: t.Generator = self._generate_fonts()
-        self._validate_fonts()
         return list(fonts)
 
     def generate_fonts(self) -> t.Generator[Font, None, None]:
@@ -110,7 +109,6 @@ class FontFinder:
             A generator of TTFont objects.
         """
         fonts: t.Generator = self._generate_fonts()
-        self._validate_fonts()
         return fonts
 
     def _validate_fonts(self) -> None:
