@@ -13,7 +13,7 @@ class NoFontsFoundError(Exception):
     """
 
 
-class BaseRunner(abc.ABC):
+class BaseRunner(abc.ABC):  # pylint: disable=too-few-public-methods
     """
     A base class for runners.
     """
@@ -25,7 +25,7 @@ class BaseRunner(abc.ABC):
         overwrite: bool = False,
         reorder_tables: bool = False,
         **kwargs: Dict,
-    ) -> None:  # pylint: disable=too-few-public-methods
+    ) -> None:
         """
         Initialize the runner.
         """
