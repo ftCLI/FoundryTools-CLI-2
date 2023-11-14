@@ -17,13 +17,14 @@ class BaseRunner(abc.ABC):
     """
     A base class for runners.
     """
+
     def __init__(
-            self,
-            fonts: List[Font],
-            output_dir: Optional[Path] = None,
-            overwrite: bool = False,
-            reorder_tables: bool = False,
-            **kwargs: Dict,
+        self,
+        fonts: List[Font],
+        output_dir: Optional[Path] = None,
+        overwrite: bool = False,
+        reorder_tables: bool = False,
+        **kwargs: Dict,
     ) -> None:
         """
         Initialize the runner.

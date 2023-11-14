@@ -32,6 +32,7 @@ class TTFontSaveOptions:
     """
     A class that specifies how to save the font.
     """
+
     output_dir: t.Optional[Path] = None
     overwrite: bool = False
     reorder_tables: bool = True
