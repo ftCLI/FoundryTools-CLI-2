@@ -36,6 +36,7 @@ logger.add(
 # Add a custom level to the logger
 logger.level("SKIP", no=27, color="<light-black><bold>", icon="⏭️")
 logger.__class__.skip = partialmethod(logger.__class__.log, "SKIP")  # type: ignore
+logger.opt(colors=True)
 
 
-__all__ = ["logger", "logger_filter"]
+__all__ = ["logger", "logger_filter", "LoggerFilter"]

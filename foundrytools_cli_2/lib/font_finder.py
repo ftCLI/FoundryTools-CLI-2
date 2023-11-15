@@ -3,23 +3,13 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from fontTools.ttLib.ttFont import TTLibError
+
+from foundrytools_cli_2.lib.constants import TTFontInitOptions
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.logger import logger
 
 
 @dataclass
-class FontLoadOptions:
-    """
-    A class that specifies how to load the font.
-    """
-
-    lazy: t.Optional[bool] = None
-    recalc_timestamp: bool = False
-    recalc_bboxes: bool = True
-
-
-@dataclass
-class FontFinderFilters:
+class FontFinderFilter:
     """
     A class that specifies which fonts to filter out when searching for fonts.
     """
@@ -64,8 +54,8 @@ class FontFinder:
         self,
         input_path: t.Union[str, Path],
         recursive: bool = False,
-        options: t.Optional[FontLoadOptions] = None,
-        filters: t.Optional[FontFinderFilters] = None,
+        options: t.Optional[TTFontInitOptions] = None,
+        filters: t.Optional[FontFinderFilter] = None,
     ) -> None:
         """
         Initialize the FontFinder class.
@@ -86,8 +76,8 @@ class FontFinder:
         except Exception as e:
             raise FontFinderError(f"Invalid input path: {input_path}") from e
         self.recursive = recursive
-        self.options = options or FontLoadOptions()
-        self.filters = filters or FontFinderFilters()
+        self.options = options or TTFontInitOptions()
+        self.filters = filters or FontFinderFilter()
 
         self._validate_filters()
 
@@ -109,7 +99,6 @@ class FontFinder:
             A list of TTFont objects.
         """
         fonts: t.Generator = self._generate_fonts()
-        self._validate_fonts()
         return list(fonts)
 
     def generate_fonts(self) -> t.Generator[Font, None, None]:
@@ -120,22 +109,7 @@ class FontFinder:
             A generator of TTFont objects.
         """
         fonts: t.Generator = self._generate_fonts()
-        self._validate_fonts()
         return fonts
-
-    def _validate_fonts(self) -> None:
-        """
-        Validates the fonts generator, raising an exception if it is empty.
-
-        Returns:
-            None
-        """
-        try:
-            next(self._generate_fonts())
-        except StopIteration as e:
-            raise FontFinderError(
-                f"No fonts matching the criteria found in {self.input_path}"
-            ) from e
 
     def _validate_filters(self) -> None:
         if self.filters.filter_out_tt and self.filters.filter_out_ps:
@@ -167,8 +141,8 @@ class FontFinder:
                 )
                 if not any(condition and func(font) for condition, func in self._filter_conditions):
                     yield font
-            except TTLibError as e:
-                logger.debug(f"{file}: {e}")
+            except TTLibError:
+                pass
 
     def _generate_files(self) -> t.Generator[Path, None, None]:
         """
@@ -280,4 +254,4 @@ def _is_variable(font: Font) -> bool:
     return font.is_variable
 
 
-__all__ = ["FontFinder", "FontFinderError", "FontFinderFilters", "FontLoadOptions"]
+__all__ = ["FontFinder", "FontFinderError", "FontFinderFilter"]

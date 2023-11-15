@@ -3,7 +3,26 @@ from pathlib import Path
 
 import click
 
-from foundrytools_cli_2.lib.click_callbacks import output_dir_callback
+from foundrytools_cli_2.lib.click.click_callbacks import output_dir_callback
+
+
+def common_options() -> t.Callable:
+    """
+    Add the common options to a click command.
+
+    :return: a decorator that adds the common options to a click command
+    """
+
+    return add_options(
+        [
+            input_path_argument(),
+            recursive_flag(),
+            output_dir_option(),
+            overwrite_flag(),
+            recalc_timestamp_flag(),
+            overwrite_flag(),
+        ]
+    )
 
 
 def add_options(options: t.List[t.Callable]) -> t.Callable:
@@ -214,50 +233,6 @@ def debug_flag() -> t.Callable:
     return add_options(_debug_flag)
 
 
-def common_options() -> t.Callable:
-    """
-    Add the common options to a click command.
-
-    :return: a decorator that adds the common options to a click command
-    """
-    _common_options = [
-        click.option(
-            "-out",
-            "--output-dir",
-            type=click.Path(path_type=Path, file_okay=False, resolve_path=True),
-            default=None,
-            callback=output_dir_callback,
-            help="""
-            Specify a directory where the output files are to be saved. If the output directory
-            doesn't exist, it will be automatically created. If not specified, files will be saved
-            to the source directory.
-            """,
-        ),
-        click.option(
-            "-rt",
-            "--recalc-timestamp",
-            is_flag=True,
-            default=False,
-            help="""
-            Recalculate the ``modified`` timestamp in the ``head`` table on save. By default, the
-            ``modified`` timestamp is kept.
-            """,
-        ),
-        click.option(
-            "-nw",
-            "--no-overwrite",
-            "overwrite",
-            is_flag=True,
-            default=True,
-            help="""
-            Do not overwrite existing files, but save them to a new file by adding numbers at the
-            end of file name. By default, files are overwritten.
-            """,
-        ),
-    ]
-    return add_options(_common_options)
-
-
 def tolerance_option() -> t.Callable:
     """
     Add the tolerance option to a click command.
@@ -333,3 +308,48 @@ def min_area_option() -> t.Callable:
         )
     ]
     return add_options(_min_area_option)
+
+
+def in_format_choice() -> t.Callable:
+    """
+    Add the flavor option to a click command.
+
+    :return: a decorator that adds the flavor option to a click command
+    """
+    _in_format_choice = [
+        click.option(
+            "-f",
+            "--format",
+            "in_format",
+            type=click.Choice(["woff", "woff2"]),
+            default=None,
+            help="""
+            By default, the script converts both woff and woff2 flavored web fonts to SFNT fonts
+            (TrueType or OpenType). Use this option to convert only woff or woff2 flavored web
+            fonts.
+    """,
+        )
+    ]
+    return add_options(_in_format_choice)
+
+
+def out_format_choice() -> t.Callable:
+    """
+    Add the flavor option to a click command.
+
+    :return: a decorator that adds the flavor option to a click command
+    """
+    _out_format_choice = [
+        click.option(
+            "-f",
+            "--format",
+            "out_format",
+            type=click.Choice(["woff", "woff2"]),
+            default=None,
+            help="""
+            By default, the script converts SFNT fonts to both woff and woff2 flavored web fonts.
+            Use this option to convert only to woff or woff2 flavored web fonts.
+    """,
+        )
+    ]
+    return add_options(_out_format_choice)

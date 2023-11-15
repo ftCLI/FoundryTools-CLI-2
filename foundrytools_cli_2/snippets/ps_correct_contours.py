@@ -4,7 +4,7 @@ from fontTools.ttLib.tables import C_F_F_
 
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.skia_tools import (
+from foundrytools_cli_2.lib.pathops.skia_tools import (
     skia_path_from_glyph,
     simplify_path,
     remove_tiny_paths,

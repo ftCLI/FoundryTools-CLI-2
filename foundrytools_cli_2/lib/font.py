@@ -1,15 +1,15 @@
+import typing as t
 from contextlib import contextmanager
 from io import BytesIO
 from pathlib import Path
-import typing as t
 
 from cffsubr import subroutinize, desubroutinize
 from dehinter.font import dehint
 from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
+from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
-from fontTools.ttLib.ttFont import TTFont
 
 from foundrytools_cli_2.lib.constants import (
     WOFF_FLAVOR,
@@ -25,7 +25,6 @@ from foundrytools_cli_2.lib.constants import (
     MIN_UPM,
     MAX_UPM,
 )
-from foundrytools_cli_2.lib.logger import logger
 
 
 class Font:
@@ -36,7 +35,7 @@ class Font:
 
     def __init__(
         self,
-        source: t.Union[str, Path, bytes, BytesIO, TTFont],
+        source: t.Union[str, Path, BytesIO, TTFont],
         lazy: t.Optional[bool] = None,
         recalc_bboxes: bool = True,
         recalc_timestamp: bool = False,
@@ -45,50 +44,45 @@ class Font:
         Initialize a Font object.
 
         Args:
-            source: A path to a font file or a BytesIO object.
+            source: A path to a font file, a BytesIO object or a TTFont object.
             lazy (bool): If lazy is set to True, many data structures are loaded lazily, upon access
                 only. If it is set to False, many data structures are loaded immediately. The
                 default is ``lazy=None`` which is somewhere in between.
-            recalc_bboxes: If true (the default), recalculates ``glyf``, ``CFF ``, ``head`` bounding
-                box values and ``hhea``/``vhea`` min/max values on save. Also compiles the glyphs on
-                importing, which saves memory consumption and time.
+            recalc_bboxes (bool): If true (the default), recalculates ``glyf``, ``CFF ``, ``head``
+                bounding box values and ``hhea``/``vhea`` min/max values on save. Also compiles the
+                glyphs on importing, which saves memory consumption and time.
             recalc_timestamp (bool): If true, sets the ``modified`` timestamp in the ``head`` table
                 on save. Default is False.
         """
-
-        super().__init__()
 
         self._file: t.Optional[Path] = None
         self._bytesio: t.Optional[BytesIO] = None
         self._ttfont: t.Optional[TTFont] = None
 
         if isinstance(source, (str, Path)):
-            self._initialize_from_file(source, lazy, recalc_bboxes, recalc_timestamp)
-        elif isinstance(source, bytes):
-            self._initialize_from_bytes(source, lazy, recalc_bboxes, recalc_timestamp)
+            self._init_from_file(source, lazy, recalc_bboxes, recalc_timestamp)
         elif isinstance(source, BytesIO):
-            self._initialize_from_bytesio(source, lazy, recalc_bboxes, recalc_timestamp)
+            self._init_from_bytesio(source, lazy, recalc_bboxes, recalc_timestamp)
         elif isinstance(source, TTFont):
-            self._initialize_from_tt_font(source, lazy, recalc_bboxes, recalc_timestamp)
+            self._init_from_tt_font(source, lazy, recalc_bboxes, recalc_timestamp)
         else:
             raise ValueError(
-                f"Invalid source type {type(source)}. "
-                f"Expected str, Path, bytes, BytesIO, or TTFont."
+                f"Invalid source type {type(source)}. Expected str, Path, BytesIO, or TTFont."
             )
 
-    def _initialize_from_file(
+    def _init_from_file(
         self,
         path: t.Union[str, Path],
         lazy: t.Optional[bool],
         recalc_bboxes: bool,
         recalc_timestamp: bool,
     ) -> None:
-        self._file = Path(path)
+        self._file = Path(path).resolve()
         self._ttfont = TTFont(
             path, lazy=lazy, recalcBBoxes=recalc_bboxes, recalcTimestamp=recalc_timestamp
         )
 
-    def _initialize_from_bytesio(
+    def _init_from_bytesio(
         self,
         bytesio: BytesIO,
         lazy: t.Optional[bool],
@@ -99,8 +93,9 @@ class Font:
         self._ttfont = TTFont(
             bytesio, lazy=lazy, recalcBBoxes=recalc_bboxes, recalcTimestamp=recalc_timestamp
         )
+        bytesio.close()
 
-    def _initialize_from_tt_font(
+    def _init_from_tt_font(
         self, ttfont: TTFont, lazy: t.Optional[bool], recalc_bboxes: bool, recalc_timestamp: bool
     ) -> None:
         self._bytesio = BytesIO()
@@ -110,28 +105,11 @@ class Font:
             self._bytesio, lazy=lazy, recalcBBoxes=recalc_bboxes, recalcTimestamp=recalc_timestamp
         )
 
-    def _initialize_from_bytes(
-        self,
-        bytez: bytes,
-        lazy: t.Optional[bool],
-        recalc_bboxes: bool,
-        recalc_timestamp: bool,
-    ) -> None:
-        self._bytesio = BytesIO(bytez)
-        self._ttfont = TTFont(
-            self._bytesio, lazy=lazy, recalcBBoxes=recalc_bboxes, recalcTimestamp=recalc_timestamp
-        )
-
     def __enter__(self) -> "Font":
         return self
 
     def __exit__(self, exc_type, exc_value, traceback) -> None:  # type: ignore
-        if isinstance(self._file, Path):
-            self._file.unlink()
-        if isinstance(self._bytesio, BytesIO):
-            self._bytesio.close()
-        if self._ttfont is not None:
-            self._ttfont.close()
+        self.close()
 
     def __repr__(self) -> str:
         return f"<Font file={self.file}, bytesio={self.bytesio}, ttfont={self.ttfont}>"
@@ -224,8 +202,29 @@ class Font:
         """
         return self.ttfont.get(FVAR_TABLE_TAG) is not None
 
-    @property
-    def real_extension(self) -> str:
+    def save(
+        self,
+        file: t.Union[str, Path, BytesIO],
+        reorder_tables: t.Optional[bool] = True,
+    ) -> None:
+        """
+        Save the font to a file.
+
+        Args:
+            file: The file path to save the font to.
+            reorder_tables: If true (the default), reorder the tables, sorting them by tag
+                (recommended by the OpenType specification). If false, retain the original font
+                order. If None, reorder by table dependency (fastest).
+        """
+        self.ttfont.save(file, reorderTables=reorder_tables)
+
+    def close(self) -> None:
+        """
+        Close the underlying TTFont object.
+        """
+        self.ttfont.close()
+
+    def get_real_extension(self) -> str:
         """
         Get the real extension of the font. If the font is a web font, the extension will be
         determined by the font flavor. If the font is a SFNT font, the extension will be determined
@@ -244,48 +243,11 @@ class Font:
             return TTF_EXTENSION
         return self.ttfont.sfntVersion
 
-    def save_to_file(
-        self,
-        file: t.Union[str, Path],
-        reorder_tables: t.Optional[bool] = True,
-    ) -> None:
-        """
-        Save the font to a file.
-
-        Args:
-            file: The file path to save the font to.
-            reorder_tables: If true (the default), reorder the tables, sorting them by tag
-                (recommended by the OpenType specification). If false, retain the original font
-                order. If None, reorder by table dependency (fastest).
-        """
-        self.ttfont.save(file, reorderTables=reorder_tables)
-
-    def save_to_bytesio(
-        self,
-        bytesio: t.Optional[BytesIO] = None,
-        reorder_tables: t.Optional[bool] = None,
-    ) -> BytesIO:
-        """
-        Save the font to a BytesIO object.
-
-        Args:
-            bytesio: A BytesIO object. If not specified, a new BytesIO object will be created.
-            reorder_tables: If true, reorder the tables, sorting them by tag (recommended by the
-                OpenType specification). If false, retain the original font order. If None
-                (the default), reorder by table dependency (fastest).
-
-        Returns:
-            A BytesIO object.
-        """
-        buf = bytesio or BytesIO()
-        self.ttfont.save(buf, reorderTables=reorder_tables)
-        buf.seek(0)
-        return buf
-
-    def get_output_file(
+    def make_out_file_name(
         self,
         output_dir: t.Optional[Path] = None,
         overwrite: bool = True,
+        extension: t.Optional[str] = None,
         suffix: str = "",
     ) -> Path:
         """
@@ -299,6 +261,8 @@ class Font:
         Args:
             output_dir: Path to the output directory.
             overwrite: A boolean indicating whether to overwrite existing files.
+            extension: An optional extension to use for the output file. If not specified, the
+                extension will be determined by the font type.
             suffix: An optional suffix to append to the file name.
 
         Returns:
@@ -310,13 +274,16 @@ class Font:
 
         # We check elsewhere if the output directory is writable, no need to check it here.
         out_dir = output_dir or self.file.parent
-        file_name = self.file.stem
-        extension = self.real_extension
+        extension = extension or self.get_real_extension()
 
-        # In some cases we may need to add a suffix to the file name. If the suffix is already
-        # present, we remove it before adding it again.
-        if suffix != "":
-            file_name = file_name.replace(suffix, "")
+        # Clean up the file name by removing the extensions used as file name suffix as added by
+        # possible previous conversions.
+        file_name = (
+            self.file.stem.replace(OTF_EXTENSION, "")
+            .replace(TTF_EXTENSION, "")
+            .replace(WOFF2_EXTENSION, "")
+            .replace(WOFF_EXTENSION, "")
+        )
 
         out_file = Path(
             makeOutputFileName(
@@ -374,28 +341,26 @@ class Font:
         if not self.is_tt:
             raise NotImplementedError("Only TrueType fonts are supported.")
 
-        dehint(self)
+        dehint(self.ttfont)
 
-    def tt_scale_upem(self, units_per_em: int) -> None:
+    def tt_scale_upem(self, new_upem: int) -> None:
         """
         Scale the font's unitsPerEm value to the given value.
 
         Args:
-            units_per_em (int): The new unitsPerEm value.
+            new_upem (int): The new unitsPerEm value.
         """
 
         if not self.is_tt:
             raise NotImplementedError("Scaling upem is only supported for TrueType fonts.")
 
-        if units_per_em not in range(MIN_UPM, MAX_UPM + 1):
-            logger.error(f"units_per_em must be in the range {MAX_UPM} to {MAX_UPM}.")
-            return
+        if new_upem not in range(MIN_UPM, MAX_UPM + 1):
+            raise ValueError(f"units_per_em must be in the range {MAX_UPM} to {MAX_UPM}.")
 
-        if self.ttfont["head"].unitsPerEm == units_per_em:
-            logger.warning(f"Font already has {units_per_em} units per em. No need to scale upem.")
-            return
+        if self.ttfont["head"].unitsPerEm == new_upem:
+            raise ValueError(f"Font already has {new_upem} units per em. No need to scale upem.")
 
-        scale_upem(self.ttfont, new_upem=units_per_em)
+        scale_upem(self.ttfont, new_upem=new_upem)
 
     @contextmanager
     def _restore_flavor(self) -> t.Iterator[None]:
