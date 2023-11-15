@@ -111,21 +111,6 @@ class FontFinder:
         fonts: t.Generator = self._generate_fonts()
         return fonts
 
-    def _validate_fonts(self) -> None:
-        """
-        Validates the fonts generator, raising an exception if it is empty.
-
-        Returns:
-            None
-        """
-        try:
-            next(self._generate_fonts())
-            return
-        except StopIteration as e:
-            raise FontFinderError(
-                f"No fonts matching the criteria found in {self.input_path}"
-            ) from e
-
     def _validate_filters(self) -> None:
         if self.filters.filter_out_tt and self.filters.filter_out_ps:
             raise FontFinderError("Cannot filter out both TrueType and PostScript fonts.")

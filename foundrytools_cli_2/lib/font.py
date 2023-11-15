@@ -1,6 +1,5 @@
 import typing as t
 from contextlib import contextmanager
-from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path
 
@@ -9,8 +8,8 @@ from dehinter.font import dehint
 from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
-from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib import TTFont
+from fontTools.ttLib.scaleUpem import scale_upem
 
 from foundrytools_cli_2.lib.constants import (
     WOFF_FLAVOR,
@@ -26,27 +25,6 @@ from foundrytools_cli_2.lib.constants import (
     MIN_UPM,
     MAX_UPM,
 )
-
-
-@dataclass
-class TTFontOptions:
-    """
-    A class that specifies how to load the font.
-
-    Attributes:
-        lazy: If lazy is set to True, many data structures are loaded lazily, upon access only. If
-            it is set to False, many data structures are loaded immediately. The default is
-            ``lazy=None`` which is somewhere in between.
-        recalc_timestamp: If true, sets the ``modified`` timestamp in the ``head`` table on save.
-            Default is False.
-        recalc_bboxes: If true (the default), recalculates ``glyf``, ``CFF ``, ``head`` bounding
-            box values and ``hhea``/``vhea`` min/max values on save. Also compiles the glyphs on
-            importing, which saves memory consumption and time.
-    """
-
-    lazy: t.Optional[bool] = None
-    recalc_timestamp: bool = False
-    recalc_bboxes: bool = True
 
 
 class Font:
