@@ -375,6 +375,7 @@ class Font:
             yield
         finally:
             self.ttfont.flavor = original_flavor
+        return None
 
     def ps_subroutinize(self) -> None:
         """
