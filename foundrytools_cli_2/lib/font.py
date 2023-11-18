@@ -297,7 +297,7 @@ class Font:  # pylint: disable=too-many-public-methods
         )
         return out_file
 
-    def get_axes(self) -> list[Axis]:
+    def get_axes(self) -> t.List[Axis]:
         """
         Get axes from a variable font.
 
@@ -308,7 +308,7 @@ class Font:  # pylint: disable=too-many-public-methods
 
         return [axis for axis in self.ttfont[FVAR_TABLE_TAG].axes if axis.flags == 0]
 
-    def get_instances(self) -> list[NamedInstance]:
+    def get_instances(self) -> t.List[NamedInstance]:
         """
         Get named instances from a variable font.
 
