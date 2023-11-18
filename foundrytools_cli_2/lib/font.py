@@ -28,7 +28,7 @@ from foundrytools_cli_2.lib.constants import (
 )
 
 
-class Font:
+class Font:  # pylint: disable=too-many-public-methods
     """
     The ``Font`` class adds additional properties and methods to the ``fontTools.ttLib.TTFont``
     class.
@@ -398,7 +398,6 @@ class Font:
             yield
         finally:
             self.ttfont.flavor = original_flavor
-        return None
 
     def ps_subroutinize(self) -> None:
         """
