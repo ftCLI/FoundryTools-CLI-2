@@ -10,6 +10,7 @@ from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
+from fontTools.ttLib.tables._f_v_a_r import NamedInstance, Axis
 
 from foundrytools_cli_2.lib.constants import (
     WOFF_FLAVOR,
@@ -295,6 +296,28 @@ class Font:
             )
         )
         return out_file
+
+    def get_axes(self) -> list[Axis]:
+        """
+        Get axes from a variable font.
+
+        :return: Axes.
+        """
+        if not self.is_variable:
+            raise NotImplementedError("Not a variable font.")
+
+        return [axis for axis in self.ttfont[FVAR_TABLE_TAG].axes if axis.flags == 0]
+
+    def get_instances(self) -> list[NamedInstance]:
+        """
+        Get named instances from a variable font.
+
+        :return: Named instances.
+        """
+        if not self.is_variable:
+            raise NotImplementedError("Not a variable font.")
+
+        return self.ttfont[FVAR_TABLE_TAG].instances
 
     def get_advance_widths(self) -> t.Dict[str, int]:
         """
