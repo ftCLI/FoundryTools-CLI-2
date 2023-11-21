@@ -38,8 +38,7 @@ class FontFinder:
     PostScript), font variations (static or variable), and font flavor ('woff', 'woff2' or
     ``None``).
 
-    The class returns a list of TTFont objects, or of TTFont subclass objects, that meet the
-    specified criteria.
+    The class returns a list of Font objects that meet the specified criteria.
 
     Attributes:
 
