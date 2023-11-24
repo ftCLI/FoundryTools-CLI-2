@@ -6,6 +6,7 @@ from pathlib import Path
 from cffsubr import subroutinize, desubroutinize
 from dehinter.font import dehint
 from fontTools.misc.cliTools import makeOutputFileName
+from fontTools.pens.boundsPen import BoundsPen
 from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
@@ -318,6 +319,17 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError("Not a variable font.")
 
         return self.ttfont[FVAR_TABLE_TAG].instances
+
+    def get_glyph_bounds(self, glyph_name: str) -> t.Dict[str, int]:
+        """
+        Get glyph bounds from a font.
+
+        :return: Glyph bounds.
+        """
+        glyph_set = self.ttfont.getGlyphSet()
+        bounds_pen = BoundsPen(glyphSet=glyph_set)
+        glyph_set[glyph_name].draw(bounds_pen)
+        return bounds_pen.bounds
 
     def get_advance_widths(self) -> t.Dict[str, int]:
         """
