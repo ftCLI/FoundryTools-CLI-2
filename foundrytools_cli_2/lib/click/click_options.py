@@ -20,7 +20,6 @@ def common_options() -> t.Callable:
             output_dir_option(),
             overwrite_flag(),
             recalc_timestamp_flag(),
-            overwrite_flag(),
         ]
     )
 
