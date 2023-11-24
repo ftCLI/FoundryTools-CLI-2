@@ -27,6 +27,7 @@ from foundrytools_cli_2.lib.constants import (
     MIN_UPM,
     MAX_UPM,
 )
+from foundrytools_cli_2.lib.otf.stems import get_stems
 
 
 class Font:  # pylint: disable=too-many-public-methods
@@ -345,7 +346,6 @@ class Font:  # pylint: disable=too-many-public-methods
                 for the font.
 
         """
-        from foundrytools_cli_2.lib.otf.stems import get_stems
 
         return get_stems(self.file, include_curved)
 
