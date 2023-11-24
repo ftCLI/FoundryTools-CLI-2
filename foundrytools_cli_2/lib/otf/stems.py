@@ -21,7 +21,7 @@ def parse_stemhist_file(file_path: Path) -> int:
 
 
 def get_stems_width(
-    font_file: Path, letters: str, include_curved: bool = False
+    font_file: Path, glyph_names: str, include_curved: bool = False
 ) -> t.Tuple[int, int]:
     """
 
@@ -32,7 +32,7 @@ def get_stems_width(
 
     Parameters:
         font_file: Path object representing the path to the font file.
-        letters: String containing the letters for which to calculate the stem width.
+        glyph_names: String containing the letters for which to calculate the stem width.
         include_curved: Optional boolean indicating whether to include curved stems in the
             calculation. Default is False.
 
@@ -41,7 +41,7 @@ def get_stems_width(
 
     """
     stemhist_base_path = font_file.parent / "stems"
-    stemhist_args = [font_file.as_posix(), "-g", letters, "-o", stemhist_base_path.as_posix()]
+    stemhist_args = [font_file.as_posix(), "-g", glyph_names, "-o", stemhist_base_path.as_posix()]
     if include_curved:
         stemhist_args.append("--all")
 
@@ -67,15 +67,15 @@ def get_stems(font_file: Path, include_curved: bool = False) -> t.Tuple[int, int
     straight = "A,E,F,H,I,K,L,M,N,T,V,W,X,Y,Z"
 
     straight_std_h_stem, straight_std_v_stem = get_stems_width(
-        font_file=font_file, letters=straight, include_curved=False
+        font_file=font_file, glyph_names=straight, include_curved=False
     )
 
     if not include_curved:
         return straight_std_h_stem, straight_std_v_stem
 
-    curved = "B,C,D,G,J,O,P,Q,R,S,U"
+    curved = "O,Q,S"
     curved_std_h_stem, curved_std_v_stem = get_stems_width(
-        font_file=font_file, letters=curved, include_curved=True
+        font_file=font_file, glyph_names=curved, include_curved=True
     )
 
     return max(straight_std_h_stem, curved_std_h_stem), max(straight_std_v_stem, curved_std_v_stem)
