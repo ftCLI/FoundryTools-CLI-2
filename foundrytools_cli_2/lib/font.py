@@ -322,7 +322,7 @@ class Font:  # pylint: disable=too-many-public-methods
 
     def get_glyph_bounds(self, glyph_name: str) -> t.Dict[str, int]:
         """
-        Get glyph bounds from a font.
+        Get glyph bounds using fontTools.pens.BoundsPen.
 
         :return: Glyph bounds.
         """
@@ -330,6 +330,63 @@ class Font:  # pylint: disable=too-many-public-methods
         bounds_pen = BoundsPen(glyphSet=glyph_set)
         glyph_set[glyph_name].draw(bounds_pen)
         return bounds_pen.bounds
+
+    def get_hinting_stems(self, include_curved: bool = False) -> t.Tuple[int, int]:
+        from foundrytools_cli_2.lib.otf.stems import get_stems
+
+        return get_stems(self.file, include_curved)
+
+    #
+    # def get_stems(self, include_curved: bool = False) -> t.Tuple[int, int]:
+    #     """
+    #     Get stem hints from a font.
+    #
+    #     :return: Stem hints.
+    #     """
+    #     if not self.file:
+    #         raise NotImplementedError("Stem hints can only be extracted from a font file.")
+    #     if not self.is_ps:
+    #         raise NotImplementedError("Stem hints are only supported for PostScript fonts.")
+    #
+    #     stemhist_base_path = self.file.parent / "stems"
+    #     h_stems_path = stemhist_base_path.with_suffix(".hstm.txt")
+    #     v_stems_path = stemhist_base_path.with_suffix(".vstm.txt")
+    #
+    #     straight = "A,E,F,H,I,K,L,M,N,T,V,W,X,Y,Z"
+    #     curved = "B,C,D,G,J,O,P,Q,R,S,U"
+    #
+    #     stemhist(args=[self.file.as_posix(), "-g", straight, "-o", stemhist_base_path.as_posix()])
+    #
+    #     with open(h_stems_path, "r") as h_stems_file:
+    #         line = h_stems_file.readlines()[2]
+    #         straight_std_h_stem = int(line[6:14].strip())
+    #
+    #     with open(v_stems_path, "r") as v_stems_file:
+    #         line = v_stems_file.readlines()[2]
+    #         straight_std_v_stem = int(line[6:14].strip())
+    #
+    #     if not include_curved:
+    #         return straight_std_h_stem, straight_std_v_stem
+    #
+    #     stemhist(
+    #         args=[self.file.as_posix(), "-g", curved, "-a", "-o", stemhist_base_path.as_posix()]
+    #     )
+    #
+    #     with open(h_stems_path, "r") as h_stems_file:
+    #         line = h_stems_file.readlines()[2]
+    #         curved_std_h_stem = int(line[6:14].strip())
+    #
+    #     with open(v_stems_path, "r") as v_stems_file:
+    #         line = v_stems_file.readlines()[2]
+    #         curved_std_v_stem = int(line[6:14].strip())
+    #
+    #     # h_stems_path.unlink()
+    #     # v_stems_path.unlink()
+    #
+    #     return (
+    #         max(straight_std_h_stem, curved_std_h_stem),
+    #         max(straight_std_v_stem, curved_std_v_stem),
+    #     )
 
     def get_advance_widths(self) -> t.Dict[str, int]:
         """

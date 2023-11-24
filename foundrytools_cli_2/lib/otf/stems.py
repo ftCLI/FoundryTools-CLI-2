@@ -21,7 +21,7 @@ def parse_stemhist_file(file_path: Path) -> int:
 
 
 def get_stems_width(
-        font_file: Path, letters: str, include_curved: bool = False
+    font_file: Path, letters: str, include_curved: bool = False
 ) -> t.Tuple[int, int]:
     """
 
