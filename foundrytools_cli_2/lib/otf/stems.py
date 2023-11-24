@@ -15,7 +15,7 @@ def parse_stemhist_file(file_path: Path) -> int:
         int: The value found in the stemhist file.
 
     """
-    with open(file_path, "r") as stem_file:
+    with open(file_path, "r", encoding="utf-8") as stem_file:
         line = stem_file.readlines()[2]
         return int(line[6:14].strip())
 
