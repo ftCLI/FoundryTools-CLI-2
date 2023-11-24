@@ -332,6 +332,19 @@ class Font:  # pylint: disable=too-many-public-methods
         return bounds_pen.bounds
 
     def get_hinting_stems(self, include_curved: bool = False) -> t.Tuple[int, int]:
+        """
+        Returns a tuple containing two integer values representing the hinting (StdHW and StdVW)
+        stems for the font.
+
+        Parameters:
+            include_curved (bool): If set to True, the hinting stems will include curved stems as
+                well. Default value is False.
+
+        Returns:
+            (tuple[int, int]): A tuple containing two integer values representing the hinting stems
+                for the font.
+
+        """
         from foundrytools_cli_2.lib.otf.stems import get_stems
 
         return get_stems(self.file, include_curved)
