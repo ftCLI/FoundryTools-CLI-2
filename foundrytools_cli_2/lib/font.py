@@ -346,6 +346,8 @@ class Font:  # pylint: disable=too-many-public-methods
                 for the font.
 
         """
+        if not self.file:
+            raise NotImplementedError("Stem hints can only be extracted from a font file.")
 
         return get_stems(self.file, include_curved)
 
