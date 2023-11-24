@@ -27,6 +27,7 @@ from foundrytools_cli_2.lib.constants import (
     MIN_UPM,
     MAX_UPM,
 )
+from foundrytools_cli_2.lib.otf.stems import get_stems
 
 
 class Font:  # pylint: disable=too-many-public-methods
@@ -322,7 +323,7 @@ class Font:  # pylint: disable=too-many-public-methods
 
     def get_glyph_bounds(self, glyph_name: str) -> t.Dict[str, int]:
         """
-        Get glyph bounds from a font.
+        Get glyph bounds using fontTools.pens.BoundsPen.
 
         :return: Glyph bounds.
         """
@@ -330,6 +331,25 @@ class Font:  # pylint: disable=too-many-public-methods
         bounds_pen = BoundsPen(glyphSet=glyph_set)
         glyph_set[glyph_name].draw(bounds_pen)
         return bounds_pen.bounds
+
+    def get_hinting_stems(self, include_curved: bool = False) -> t.Tuple[int, int]:
+        """
+        Returns a tuple containing two integer values representing the hinting (StdHW and StdVW)
+        stems for the font.
+
+        Parameters:
+            include_curved (bool): If set to True, the hinting stems will include curved stems as
+                well. Default value is False.
+
+        Returns:
+            (tuple[int, int]): A tuple containing two integer values representing the hinting stems
+                for the font.
+
+        """
+        if not self.file:
+            raise NotImplementedError("Stem hints can only be extracted from a font file.")
+
+        return get_stems(self.file, include_curved)
 
     def get_advance_widths(self) -> t.Dict[str, int]:
         """
