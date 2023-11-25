@@ -37,11 +37,11 @@ class Font:  # pylint: disable=too-many-public-methods
     """
 
     def __init__(
-            self,
-            source: t.Union[str, Path, BytesIO, TTFont],
-            lazy: t.Optional[bool] = None,
-            recalc_bboxes: bool = True,
-            recalc_timestamp: bool = False,
+        self,
+        source: t.Union[str, Path, BytesIO, TTFont],
+        lazy: t.Optional[bool] = None,
+        recalc_bboxes: bool = True,
+        recalc_timestamp: bool = False,
     ) -> None:
         """
         Initialize a Font object.
@@ -74,11 +74,11 @@ class Font:  # pylint: disable=too-many-public-methods
             )
 
     def _init_from_file(
-            self,
-            path: t.Union[str, Path],
-            lazy: t.Optional[bool],
-            recalc_bboxes: bool,
-            recalc_timestamp: bool,
+        self,
+        path: t.Union[str, Path],
+        lazy: t.Optional[bool],
+        recalc_bboxes: bool,
+        recalc_timestamp: bool,
     ) -> None:
         self._file = Path(path).resolve()
         self._ttfont = TTFont(
@@ -86,11 +86,11 @@ class Font:  # pylint: disable=too-many-public-methods
         )
 
     def _init_from_bytesio(
-            self,
-            bytesio: BytesIO,
-            lazy: t.Optional[bool],
-            recalc_bboxes: bool,
-            recalc_timestamp: bool,
+        self,
+        bytesio: BytesIO,
+        lazy: t.Optional[bool],
+        recalc_bboxes: bool,
+        recalc_timestamp: bool,
     ) -> None:
         self._bytesio = bytesio
         self._ttfont = TTFont(
@@ -99,8 +99,7 @@ class Font:  # pylint: disable=too-many-public-methods
         bytesio.close()
 
     def _init_from_tt_font(
-            self, ttfont: TTFont, lazy: t.Optional[bool], recalc_bboxes: bool,
-            recalc_timestamp: bool
+        self, ttfont: TTFont, lazy: t.Optional[bool], recalc_bboxes: bool, recalc_timestamp: bool
     ) -> None:
         self._bytesio = BytesIO()
         ttfont.save(self._bytesio, reorderTables=False)
@@ -207,9 +206,9 @@ class Font:  # pylint: disable=too-many-public-methods
         return self.ttfont.get(FVAR_TABLE_TAG) is not None
 
     def save(
-            self,
-            file: t.Union[str, Path, BytesIO],
-            reorder_tables: t.Optional[bool] = True,
+        self,
+        file: t.Union[str, Path, BytesIO],
+        reorder_tables: t.Optional[bool] = True,
     ) -> None:
         """
         Save the font to a file.
@@ -248,11 +247,11 @@ class Font:  # pylint: disable=too-many-public-methods
         return self.ttfont.sfntVersion
 
     def make_out_file_name(
-            self,
-            output_dir: t.Optional[Path] = None,
-            overwrite: bool = True,
-            extension: t.Optional[str] = None,
-            suffix: str = "",
+        self,
+        output_dir: t.Optional[Path] = None,
+        overwrite: bool = True,
+        extension: t.Optional[str] = None,
+        suffix: str = "",
     ) -> Path:
         """
         Get output file for a Font object. If ``output_dir`` is not specified, the output file will
