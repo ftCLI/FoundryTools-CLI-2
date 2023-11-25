@@ -3,6 +3,9 @@ import typing as t
 
 from afdko.otfautohint.__main__ import stemhist
 
+STRAIGHT = "A,E,F,H,I,K,L,M,N,T,V,W,X,Y,Z"
+CURVED = "O,Q,S"
+
 
 def parse_stemhist_file(file_path: Path) -> int:
     """
@@ -46,6 +49,7 @@ def get_stems_width(
         stemhist_args.append("--all")
 
     stemhist(args=stemhist_args)
+
     h_stems_path = stemhist_base_path.with_suffix(".hstm.txt")
     v_stems_path = stemhist_base_path.with_suffix(".vstm.txt")
     h_stem = parse_stemhist_file(h_stems_path)
@@ -53,7 +57,7 @@ def get_stems_width(
     return h_stem, v_stem
 
 
-def get_stems(font_file: Path, include_curved: bool = False) -> t.Tuple[int, int]:
+def recalc_stems(font_file: Path, include_curved: bool = False) -> t.Tuple[int, int]:
     """
     Get the standard horizontal and vertical stem widths for a given font file.
 
@@ -64,18 +68,16 @@ def get_stems(font_file: Path, include_curved: bool = False) -> t.Tuple[int, int
     :return: A tuple containing the maximum horizontal and vertical stem widths.
     :rtype: :class:`tuple` of :class:`int`
     """
-    straight = "A,E,F,H,I,K,L,M,N,T,V,W,X,Y,Z"
 
     straight_std_h_stem, straight_std_v_stem = get_stems_width(
-        font_file=font_file, glyph_names=straight, include_curved=False
+        font_file=font_file, glyph_names=STRAIGHT, include_curved=False
     )
 
     if not include_curved:
         return straight_std_h_stem, straight_std_v_stem
 
-    curved = "O,Q,S"
     curved_std_h_stem, curved_std_v_stem = get_stems_width(
-        font_file=font_file, glyph_names=curved, include_curved=True
+        font_file=font_file, glyph_names=CURVED, include_curved=True
     )
 
     return max(straight_std_h_stem, curved_std_h_stem), max(straight_std_v_stem, curved_std_v_stem)
