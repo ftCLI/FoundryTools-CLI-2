@@ -27,7 +27,7 @@ from foundrytools_cli_2.lib.constants import (
     MIN_UPM,
     MAX_UPM,
 )
-from foundrytools_cli_2.lib.otf.stems import get_stems
+from foundrytools_cli_2.lib.otf.stems import recalc_stems
 
 
 class Font:  # pylint: disable=too-many-public-methods
@@ -321,7 +321,7 @@ class Font:  # pylint: disable=too-many-public-methods
 
         return self.ttfont[FVAR_TABLE_TAG].instances
 
-    def get_glyph_bounds(self, glyph_name: str) -> t.Dict[str, int]:
+    def get_glyph_bounds(self, glyph_name: str) -> t.Tuple[int, int, int, int]:
         """
         Get glyph bounds using fontTools.pens.BoundsPen.
 
@@ -349,7 +349,7 @@ class Font:  # pylint: disable=too-many-public-methods
         if not self.file:
             raise NotImplementedError("Stem hints can only be extracted from a font file.")
 
-        return get_stems(self.file, include_curved)
+        return recalc_stems(self.file, include_curved)
 
     def get_advance_widths(self) -> t.Dict[str, int]:
         """

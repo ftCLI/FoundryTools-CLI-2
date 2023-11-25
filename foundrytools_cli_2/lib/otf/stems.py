@@ -3,6 +3,9 @@ import typing as t
 
 from afdko.otfautohint.__main__ import stemhist
 
+STRAIGHT = "A,E,F,H,I,K,L,M,N,T,V,W,X,Y,Z"
+CURVED = "O,Q,S"
+
 
 def parse_stemhist_file(file_path: Path) -> int:
     """
@@ -21,7 +24,7 @@ def parse_stemhist_file(file_path: Path) -> int:
 
 
 def get_stems_width(
-    font_file: Path, letters: str, include_curved: bool = False
+    font_file: Path, glyph_names: str, include_curved: bool = False
 ) -> t.Tuple[int, int]:
     """
 
@@ -32,7 +35,7 @@ def get_stems_width(
 
     Parameters:
         font_file: Path object representing the path to the font file.
-        letters: String containing the letters for which to calculate the stem width.
+        glyph_names: String containing the letters for which to calculate the stem width.
         include_curved: Optional boolean indicating whether to include curved stems in the
             calculation. Default is False.
 
@@ -41,11 +44,12 @@ def get_stems_width(
 
     """
     stemhist_base_path = font_file.parent / "stems"
-    stemhist_args = [font_file.as_posix(), "-g", letters, "-o", stemhist_base_path.as_posix()]
+    stemhist_args = [font_file.as_posix(), "-g", glyph_names, "-o", stemhist_base_path.as_posix()]
     if include_curved:
         stemhist_args.append("--all")
 
     stemhist(args=stemhist_args)
+
     h_stems_path = stemhist_base_path.with_suffix(".hstm.txt")
     v_stems_path = stemhist_base_path.with_suffix(".vstm.txt")
     h_stem = parse_stemhist_file(h_stems_path)
@@ -53,7 +57,7 @@ def get_stems_width(
     return h_stem, v_stem
 
 
-def get_stems(font_file: Path, include_curved: bool = False) -> t.Tuple[int, int]:
+def recalc_stems(font_file: Path, include_curved: bool = False) -> t.Tuple[int, int]:
     """
     Get the standard horizontal and vertical stem widths for a given font file.
 
@@ -64,18 +68,16 @@ def get_stems(font_file: Path, include_curved: bool = False) -> t.Tuple[int, int
     :return: A tuple containing the maximum horizontal and vertical stem widths.
     :rtype: :class:`tuple` of :class:`int`
     """
-    straight = "A,E,F,H,I,K,L,M,N,T,V,W,X,Y,Z"
 
     straight_std_h_stem, straight_std_v_stem = get_stems_width(
-        font_file=font_file, letters=straight, include_curved=False
+        font_file=font_file, glyph_names=STRAIGHT, include_curved=False
     )
 
     if not include_curved:
         return straight_std_h_stem, straight_std_v_stem
 
-    curved = "B,C,D,G,J,O,P,Q,R,S,U"
     curved_std_h_stem, curved_std_v_stem = get_stems_width(
-        font_file=font_file, letters=curved, include_curved=True
+        font_file=font_file, glyph_names=CURVED, include_curved=True
     )
 
     return max(straight_std_h_stem, curved_std_h_stem), max(straight_std_v_stem, curved_std_v_stem)
