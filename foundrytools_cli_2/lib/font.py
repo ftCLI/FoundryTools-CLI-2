@@ -321,7 +321,7 @@ class Font:  # pylint: disable=too-many-public-methods
 
         return self.ttfont[FVAR_TABLE_TAG].instances
 
-    def get_glyph_bounds(self, glyph_name: str) -> t.Tuple[int, int, int, int]:
+    def get_glyph_bounds(self, glyph_name: str) -> t.Dict[str, float]:
         """
         Get glyph bounds using fontTools.pens.BoundsPen.
 
@@ -330,7 +330,22 @@ class Font:  # pylint: disable=too-many-public-methods
         glyph_set = self.ttfont.getGlyphSet()
         bounds_pen = BoundsPen(glyphSet=glyph_set)
         glyph_set[glyph_name].draw(bounds_pen)
-        return bounds_pen.bounds
+        bounds = bounds_pen.bounds
+
+        return {"xMin": bounds[0], "yMin": bounds[1], "xMax": bounds[2], "yMax": bounds[3]}
+
+    def get_glyphs_bounds(self, glyph_names: t.List[str]) -> t.Dict[str, t.Dict[str, float]]:
+        """
+        Get glyphs bounds using fontTools.pens.BoundsPen.
+
+        :return: Glyphs bounds.
+        """
+        glyphs_bounds = {}
+        for glyph_name in glyph_names:
+            bounds = self.get_glyph_bounds(glyph_name)
+            glyphs_bounds[glyph_name] = bounds
+
+        return glyphs_bounds
 
     def get_hinting_stems(self, include_curved: bool = False) -> t.Tuple[int, int]:
         """
