@@ -13,21 +13,20 @@ from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import NamedInstance, Axis
 
-from foundrytools_cli_2.lib.constants import (
-    WOFF_FLAVOR,
-    WOFF2_FLAVOR,
-    WOFF_EXTENSION,
-    WOFF2_EXTENSION,
-    OTF_EXTENSION,
-    TTF_EXTENSION,
-    PS_SFNT_VERSION,
-    TT_SFNT_VERSION,
-    FVAR_TABLE_TAG,
-    GLYF_TABLE_TAG,
-    MIN_UPM,
-    MAX_UPM,
-)
 from foundrytools_cli_2.lib.otf.stems import recalc_stems
+
+PS_SFNT_VERSION = "OTTO"
+TT_SFNT_VERSION = "\0\1\0\0"
+WOFF_FLAVOR = "woff"
+WOFF2_FLAVOR = "woff2"
+OTF_EXTENSION = ".otf"
+TTF_EXTENSION = ".ttf"
+WOFF_EXTENSION = ".woff"
+WOFF2_EXTENSION = ".woff2"
+FVAR_TABLE_TAG = "fvar"
+GLYF_TABLE_TAG = "glyf"
+MIN_UPM = 16
+MAX_UPM = 16384
 
 
 class Font:  # pylint: disable=too-many-public-methods
