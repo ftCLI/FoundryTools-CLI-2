@@ -3,13 +3,7 @@ from typing import Literal, Optional
 
 import click
 
-from foundrytools_cli_2.lib.constants import (
-    TTFontInitOptions,
-    WOFF_FLAVOR,
-    WOFF2_FLAVOR,
-    OTF_EXTENSION,
-    TTF_EXTENSION,
-)
+from foundrytools_cli_2.lib.constants import TTFontInitOptions
 
 from foundrytools_cli_2.lib.click.click_options import (
     input_path_argument,
@@ -24,6 +18,7 @@ from foundrytools_cli_2.lib.click.click_options import (
     in_format_choice,
     out_format_choice,
 )
+from foundrytools_cli_2.lib.font import WOFF_FLAVOR, WOFF2_FLAVOR, OTF_EXTENSION, TTF_EXTENSION
 from foundrytools_cli_2.lib.font_finder import (
     FontFinder,
     FontFinderError,
