@@ -29,6 +29,17 @@ MIN_UPM = 16
 MAX_UPM = 16384
 
 
+class GlyphBounds(t.TypedDict):
+    """
+    A dictionary containing glyph bounds.
+    """
+
+    xMin: float
+    yMin: float
+    xMax: float
+    yMax: float
+
+
 class Font:  # pylint: disable=too-many-public-methods
     """
     The ``Font`` class adds additional properties and methods to the ``fontTools.ttLib.TTFont``
@@ -320,24 +331,39 @@ class Font:  # pylint: disable=too-many-public-methods
 
         return self.ttfont[FVAR_TABLE_TAG].instances
 
-    def get_glyph_bounds(self, glyph_name: str) -> t.Dict[str, float]:
+    def get_glyph_bounds(self, glyph_name: str) -> GlyphBounds:
         """
-        Get glyph bounds using fontTools.pens.BoundsPen.
+        Get the bounds of a glyph in the Font.
 
-        :return: Glyph bounds.
+        Parameters:
+            glyph_name (str): The name of the glyph.
+
+        Returns:
+            GlyphBounds: The bounds of the glyph, represented as a GlyphBounds object.
         """
         glyph_set = self.ttfont.getGlyphSet()
         bounds_pen = BoundsPen(glyphSet=glyph_set)
         glyph_set[glyph_name].draw(bounds_pen)
-        bounds = bounds_pen.bounds
+        bounds = GlyphBounds(
+            xMin=bounds_pen.bounds[0],
+            yMin=bounds_pen.bounds[1],
+            xMax=bounds_pen.bounds[2],
+            yMax=bounds_pen.bounds[3],
+        )
 
-        return {"xMin": bounds[0], "yMin": bounds[1], "xMax": bounds[2], "yMax": bounds[3]}
+        return bounds
 
-    def get_glyphs_bounds(self, glyph_names: t.List[str]) -> t.Dict[str, t.Dict[str, float]]:
+    def get_glyphs_bounds(self, glyph_names: t.List[str]) -> t.Dict[str, GlyphBounds]:
         """
-        Get glyphs bounds using fontTools.pens.BoundsPen.
+        Takes a list of glyph names as input and returns a dictionary of glyph bounds.
 
-        :return: Glyphs bounds.
+        Parameters:
+            `glyph_names` (List[str]): The list of glyph names for which the bounds are to be
+                calculated.
+
+        Returns:
+            `glyphs_bounds` (Dict[str, GlyphBounds]): A dictionary where the keys are the glyph
+            names and the values are the corresponding GlyphBounds.
         """
         glyphs_bounds = {}
         for glyph_name in glyph_names:
