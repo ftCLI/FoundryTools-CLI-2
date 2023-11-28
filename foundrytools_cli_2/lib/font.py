@@ -345,10 +345,10 @@ class Font:  # pylint: disable=too-many-public-methods
         bounds_pen = BoundsPen(glyphSet=glyph_set)
         glyph_set[glyph_name].draw(bounds_pen)
         bounds = GlyphBounds(
-            xMin=bounds_pen.bounds.xMin,
-            yMin=bounds_pen.bounds.yMin,
-            xMax=bounds_pen.bounds.xMax,
-            yMax=bounds_pen.bounds.yMax,
+            xMin=bounds_pen.bounds[0],
+            yMin=bounds_pen.bounds[1],
+            xMax=bounds_pen.bounds[2],
+            yMax=bounds_pen.bounds[3],
         )
 
         return bounds
