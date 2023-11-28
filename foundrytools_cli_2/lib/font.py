@@ -348,7 +348,7 @@ class Font:  # pylint: disable=too-many-public-methods
             xMin=bounds_pen.bounds.xMin,
             yMin=bounds_pen.bounds.yMin,
             xMax=bounds_pen.bounds.xMax,
-            yMax=bounds_pen.bounds.yMax
+            yMax=bounds_pen.bounds.yMax,
         )
 
         return bounds
