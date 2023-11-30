@@ -1,4 +1,5 @@
 import typing as t
+from collections import Counter
 from contextlib import contextmanager
 from io import BytesIO
 from pathlib import Path
@@ -331,6 +332,22 @@ class Font:  # pylint: disable=too-many-public-methods
 
         return self.ttfont[FVAR_TABLE_TAG].instances
 
+    def get_x_height(self) -> int:
+        """
+        Get the x-height of the font.
+
+        :return: The x-height of the font.
+        """
+        return self.ttfont["OS/2"].sxHeight
+
+    def get_cap_height(self) -> int:
+        """
+        Get the cap height of the font.
+
+        :return: The cap height of the font.
+        """
+        return self.ttfont["OS/2"].sCapHeight
+
     def get_glyph_bounds(self, glyph_name: str) -> GlyphBounds:
         """
         Get the bounds of a glyph in the Font.
@@ -342,7 +359,11 @@ class Font:  # pylint: disable=too-many-public-methods
             GlyphBounds: The bounds of the glyph, represented as a GlyphBounds object.
         """
         glyph_set = self.ttfont.getGlyphSet()
+        if glyph_name not in glyph_set:
+            raise ValueError(f"Glyph '{glyph_name}' does not exist in the font.")
+
         bounds_pen = BoundsPen(glyphSet=glyph_set)
+
         glyph_set[glyph_name].draw(bounds_pen)
         bounds = GlyphBounds(
             xMin=bounds_pen.bounds[0],
@@ -353,7 +374,7 @@ class Font:  # pylint: disable=too-many-public-methods
 
         return bounds
 
-    def get_glyphs_bounds(self, glyph_names: t.List[str]) -> t.Dict[str, GlyphBounds]:
+    def get_glyph_bounds_many(self, glyph_names: t.List[str]) -> t.Dict[str, GlyphBounds]:
         """
         Takes a list of glyph names as input and returns a dictionary of glyph bounds.
 
@@ -371,6 +392,86 @@ class Font:  # pylint: disable=too-many-public-methods
             glyphs_bounds[glyph_name] = bounds
 
         return glyphs_bounds
+
+    def get_hinting_zones(self):
+
+        def _get_zone(counter: Counter) -> t.List[float]:
+            most_common = counter.most_common(2)
+            if len(counter) == 1:
+                return [most_common[0][0], most_common[0][0]]
+            return sorted([most_common[0][0], most_common[1][0]])
+
+        def _lists_overlaps(lists: t.List[t.List[float]]) -> bool:
+            for i in range(len(lists) - 1):
+                if lists[i][1] > lists[i + 1][0]:
+                    return True
+            return False
+
+        def _fix_lists_overlaps(lists: t.List[t.List[float]]) -> t.List[t.List[float]]:
+            for i in range(len(lists) - 1):
+                if lists[i][1] > lists[i + 1][0]:
+                    lists[i + 1][0] = lists[i][1]
+                    lists[i + 1] = sorted(lists[i + 1])
+            return lists
+
+        uppercase_letters = [chr(i) for i in range(65, 91)]
+        uppercase_descenders = ["J", "Q"]
+
+        lower_case_letters = [chr(i) for i in range(97, 123)]
+        lower_case_descenders = ["g", "j", "p", "q", "y"]
+        lower_case_ascenders = ["b", "d", "f", "h", "k", "l", "t"]
+
+        # Get descender zone
+        descender = [gn for gn in lower_case_descenders if gn not in ["j"]]
+        descender_data = self.get_glyph_bounds_many(descender)
+
+        # Get baseline zone
+        baseline = [
+            gn
+            for gn in set(uppercase_letters + lower_case_letters)
+            - set(lower_case_descenders)
+            - set(uppercase_descenders)
+        ]
+        baseline_data = self.get_glyph_bounds_many(baseline)
+
+        # Get x-height zone
+        lowercase = [gn for gn in lower_case_letters if gn not in lower_case_ascenders + ["i", "j"]]
+        lowercase_data = self.get_glyph_bounds_many(lowercase)
+
+        # Get cap-height zone
+        uppercase = [gn for gn in uppercase_letters]
+        uppercase_data = self.get_glyph_bounds_many(uppercase)
+
+        # Get ascender zone
+        ascender = [gn for gn in lower_case_ascenders if gn not in ["t"]]
+        ascender_data = self.get_glyph_bounds_many(ascender)
+
+        descender_counter = Counter([v["yMin"] for v in descender_data.values()])
+        descender_zones = _get_zone(descender_counter)
+
+        baseline_counter = Counter([v["yMin"] for v in baseline_data.values()])
+        baseline_zones = _get_zone(baseline_counter)
+
+        x_height_counter = Counter([v["yMax"] for v in lowercase_data.values()])
+        x_height_zones = _get_zone(x_height_counter)
+
+        uppercase_counter = Counter([v["yMax"] for v in uppercase_data.values()])
+        uppercase_zones = _get_zone(uppercase_counter)
+
+        ascender_counter = Counter([v["yMax"] for v in ascender_data.values()])
+        ascender_zones = _get_zone(ascender_counter)
+
+        zones = sorted(
+            [descender_zones, baseline_zones, x_height_zones, uppercase_zones, ascender_zones]
+        )
+        if _lists_overlaps(zones):
+            zones = _fix_lists_overlaps(zones)
+
+        other_blues = [int(v) for v in zones[0]]
+        blue_values = [int(v) for v in zones[1] + zones[2] + zones[3] + zones[4]]
+
+        print("OtherBlues:", other_blues)
+        print("BlueValues:", blue_values)
 
     def get_hinting_stems(self, include_curved: bool = False) -> t.Tuple[int, int]:
         """
