@@ -117,7 +117,7 @@ def fix_lists_overlaps(lists: t.List[t.List[float]]) -> t.List[t.List[float]]:
 
 
 def calculate_zone(
-        font: TTFont, glyphs_list: t.List[str], min_or_max: t.Literal["yMin", "yMax"]
+    font: TTFont, glyphs_list: t.List[str], min_or_max: t.Literal["yMin", "yMax"]
 ) -> t.List[float]:
     """
     Calculates the minimum and maximum vertical values for a given zone.
@@ -187,9 +187,7 @@ def recalc_zones(font: TTFont) -> t.Tuple[t.List[int], t.List[int]]:
     ascender_glyphs = [gn for gn in lower_case_ascenders if gn not in ["t"]]
     ascender_zone = calculate_zone(font=font, glyphs_list=ascender_glyphs, min_or_max="yMax")
 
-    zones = sorted(
-        [descender_zone, baseline_zone, x_height_zone, uppercase_zone, ascender_zone]
-    )
+    zones = sorted([descender_zone, baseline_zone, x_height_zone, uppercase_zone, ascender_zone])
     if lists_overlaps(zones):
         zones = fix_lists_overlaps(zones)
 

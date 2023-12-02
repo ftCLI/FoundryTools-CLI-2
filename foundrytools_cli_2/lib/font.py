@@ -1,9 +1,9 @@
 import typing as t
-from collections import Counter
 from contextlib import contextmanager
 from io import BytesIO
 from pathlib import Path
 
+from afdko.otfautohint.report import Report
 from cffsubr import subroutinize, desubroutinize
 from dehinter.font import dehint
 from fontTools.misc.cliTools import makeOutputFileName
@@ -15,6 +15,7 @@ from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import NamedInstance, Axis
 
 from foundrytools_cli_2.lib.otf.stems import recalc_stems
+from foundrytools_cli_2.snippets.ps_recalc_zones import recalc_zones
 
 PS_SFNT_VERSION = "OTTO"
 TT_SFNT_VERSION = "\0\1\0\0"
@@ -393,87 +394,18 @@ class Font:  # pylint: disable=too-many-public-methods
 
         return glyphs_bounds
 
-    def get_hinting_zones(self):
+    def recalc_zones(self) -> t.Tuple[t.List[int], t.List[int]]:
+        """
+        Recalculates vertical alignment zones.
+        """
+        if not self.is_ps:
+            raise NotImplementedError(
+                "Recalculation of zones is only supported for PostScript fonts."
+            )
 
-        def _get_zone(counter: Counter) -> t.List[float]:
-            most_common = counter.most_common(2)
-            if len(counter) == 1:
-                return [most_common[0][0], most_common[0][0]]
-            return sorted([most_common[0][0], most_common[1][0]])
+        return recalc_zones(self.ttfont)
 
-        def _lists_overlaps(lists: t.List[t.List[float]]) -> bool:
-            for i in range(len(lists) - 1):
-                if lists[i][1] > lists[i + 1][0]:
-                    return True
-            return False
-
-        def _fix_lists_overlaps(lists: t.List[t.List[float]]) -> t.List[t.List[float]]:
-            for i in range(len(lists) - 1):
-                if lists[i][1] > lists[i + 1][0]:
-                    lists[i + 1][0] = lists[i][1]
-                    lists[i + 1] = sorted(lists[i + 1])
-            return lists
-
-        uppercase_letters = [chr(i) for i in range(65, 91)]
-        uppercase_descenders = ["J", "Q"]
-
-        lower_case_letters = [chr(i) for i in range(97, 123)]
-        lower_case_descenders = ["g", "j", "p", "q", "y"]
-        lower_case_ascenders = ["b", "d", "f", "h", "k", "l", "t"]
-
-        # Get descender zone
-        descender = [gn for gn in lower_case_descenders if gn not in ["j"]]
-        descender_data = self.get_glyph_bounds_many(descender)
-
-        # Get baseline zone
-        baseline = [
-            gn
-            for gn in set(uppercase_letters + lower_case_letters)
-            - set(lower_case_descenders)
-            - set(uppercase_descenders)
-        ]
-        baseline_data = self.get_glyph_bounds_many(baseline)
-
-        # Get x-height zone
-        lowercase = [gn for gn in lower_case_letters if gn not in lower_case_ascenders + ["i", "j"]]
-        lowercase_data = self.get_glyph_bounds_many(lowercase)
-
-        # Get cap-height zone
-        uppercase = [gn for gn in uppercase_letters]
-        uppercase_data = self.get_glyph_bounds_many(uppercase)
-
-        # Get ascender zone
-        ascender = [gn for gn in lower_case_ascenders if gn not in ["t"]]
-        ascender_data = self.get_glyph_bounds_many(ascender)
-
-        descender_counter = Counter([v["yMin"] for v in descender_data.values()])
-        descender_zones = _get_zone(descender_counter)
-
-        baseline_counter = Counter([v["yMin"] for v in baseline_data.values()])
-        baseline_zones = _get_zone(baseline_counter)
-
-        x_height_counter = Counter([v["yMax"] for v in lowercase_data.values()])
-        x_height_zones = _get_zone(x_height_counter)
-
-        uppercase_counter = Counter([v["yMax"] for v in uppercase_data.values()])
-        uppercase_zones = _get_zone(uppercase_counter)
-
-        ascender_counter = Counter([v["yMax"] for v in ascender_data.values()])
-        ascender_zones = _get_zone(ascender_counter)
-
-        zones = sorted(
-            [descender_zones, baseline_zones, x_height_zones, uppercase_zones, ascender_zones]
-        )
-        if _lists_overlaps(zones):
-            zones = _fix_lists_overlaps(zones)
-
-        other_blues = [int(v) for v in zones[0]]
-        blue_values = [int(v) for v in zones[1] + zones[2] + zones[3] + zones[4]]
-
-        print("OtherBlues:", other_blues)
-        print("BlueValues:", blue_values)
-
-    def get_hinting_stems(self, include_curved: bool = False) -> t.Tuple[int, int]:
+    def recalc_stems(self, include_curved: bool = False) -> t.Tuple[int, int]:
         """
         Returns a tuple containing two integer values representing the hinting (StdHW and StdVW)
         stems for the font.
@@ -491,6 +423,73 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError("Stem hints can only be extracted from a font file.")
 
         return recalc_stems(self.file, include_curved)
+
+    def set_zones(self, other_blues: t.List[int], blue_values: t.List[int]) -> None:
+        """
+        Set zones for a font.
+
+        :param other_blues: Other blues.
+        :param blue_values: Blue values.
+        """
+        if not self.is_ps:
+            raise NotImplementedError("Setting zones is only supported for PostScript fonts.")
+
+        self.ttfont["CFF "].cff.topDictIndex[0].Private.BlueValues = blue_values
+        self.ttfont["CFF "].cff.topDictIndex[0].Private.OtherBlues = other_blues
+
+    def set_stems(self, std_h_w: int, std_v_w: int) -> None:
+        """
+        Set stems for a font.
+
+        :param std_h_w: StdHW.
+        :param std_v_w: StdVW.
+        """
+        if not self.is_ps:
+            raise NotImplementedError("Setting stems is only supported for PostScript fonts.")
+
+        self.ttfont["CFF "].cff.topDictIndex[0].Private.StdHW = std_h_w
+        self.ttfont["CFF "].cff.topDictIndex[0].Private.StdVW = std_v_w
+
+    def t2charstring_to_data(self) -> None:
+        from afdko.otfautohint.__main__ import ReportOptions, get_stemhist_options, _validate_path
+
+        from afdko.otfautohint.autohint import fontWrapper, FontInstance, openFont
+        from afdko.otfautohint.hinter import glyphHinter
+
+        file_path = _validate_path(self.file)
+        _, parsed_args = get_stemhist_options(args=[file_path])
+        options = ReportOptions(parsed_args)
+        options.glyphList = [chr(i) for i in range(65, 91)] + [chr(i) for i in range(97, 123)]
+        options.report_all_stems = True
+        options.report_zones = True
+
+        font = openFont(file_path, options=options)
+        font_instance = FontInstance(font=font, inpath=file_path, outpath=file_path)
+
+        fw = fontWrapper(options=options, fil=[font_instance])
+        dict_record = fw.dictManager.getDictRecord()
+
+        hinter = glyphHinter(options=options, dictRecord=dict_record)
+        hinter.initialize(options=options, dictRecord=dict_record)
+        gmap = map(hinter.hint, fw)
+
+        report = Report()
+        for name, r in gmap:
+            report.glyphs[name] = r
+
+        h_stems, v_stems, top_zones, bot_zones = report._get_lists(options)
+        h_stems.sort(key=report._sort_count)
+        v_stems.sort(key=report._sort_count)
+        top_zones.sort(key=report._sort_count)
+        bot_zones.sort(key=report._sort_count)
+
+        print("H Stems:")
+        for st in h_stems:
+            print(st)
+
+        print("V Stems:")
+        for vs in v_stems:
+            print(vs)
 
     def get_advance_widths(self) -> t.Dict[str, int]:
         """
