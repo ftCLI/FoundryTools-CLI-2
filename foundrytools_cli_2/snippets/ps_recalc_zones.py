@@ -8,6 +8,9 @@ __all__ = ["recalc_zones"]
 
 
 class GlyphBounds(t.TypedDict):
+    """
+    A type representing the bounds of a glyph.
+    """
     xMin: float
     yMin: float
     xMax: float
