@@ -117,14 +117,14 @@ def fix_lists_overlaps(lists: t.List[t.List[float]]) -> t.List[t.List[float]]:
 
 
 def calculate_zone(
-    font: TTFont, glyphs_list: t.List[str], min_or_max: t.Literal["yMin", "yMax"]
+    font: TTFont, glyph_names: t.List[str], min_or_max: t.Literal["yMin", "yMax"]
 ) -> t.List[float]:
     """
     Calculates the minimum and maximum vertical values for a given zone.
 
     Parameters:
         font: TTFont object representing the font.
-        glyphs_list: List of glyph names to process.
+        glyph_names: List of glyph names to process.
         min_or_max: Literal specifying whether to process the minimum ('yMin') or maximum ('yMax')
             values.
 
@@ -132,8 +132,7 @@ def calculate_zone(
         List of float values representing the minimum or maximum vertical values for each glyph.
 
     """
-    names = [gn for gn in glyphs_list]
-    zone_data = get_glyph_bounds_many(font=font, glyph_names=names)
+    zone_data = get_glyph_bounds_many(font=font, glyph_names=glyph_names)
     counter = Counter([v[min_or_max] for v in zone_data.values()])
     return get_pair(counter)
 
@@ -162,7 +161,7 @@ def recalc_zones(font: TTFont) -> t.Tuple[t.List[int], t.List[int]]:
 
     # Get descender zone
     descender_glyphs = [gn for gn in lower_case_descenders if gn not in ["j"]]
-    descender_zone = calculate_zone(font=font, glyphs_list=descender_glyphs, min_or_max="yMin")
+    descender_zone = calculate_zone(font=font, glyph_names=descender_glyphs, min_or_max="yMin")
 
     # Get baseline zone
     baseline_glyphs = [
@@ -171,21 +170,21 @@ def recalc_zones(font: TTFont) -> t.Tuple[t.List[int], t.List[int]]:
         - set(lower_case_descenders)
         - set(uppercase_descenders)
     ]
-    baseline_zone = calculate_zone(font=font, glyphs_list=baseline_glyphs, min_or_max="yMin")
+    baseline_zone = calculate_zone(font=font, glyph_names=baseline_glyphs, min_or_max="yMin")
 
     # Get x-height zone
     x_height_glyphs = [
         gn for gn in lower_case_letters if gn not in lower_case_ascenders + ["i", "j"]
     ]
-    x_height_zone = calculate_zone(font=font, glyphs_list=x_height_glyphs, min_or_max="yMax")
+    x_height_zone = calculate_zone(font=font, glyph_names=x_height_glyphs, min_or_max="yMax")
 
     # Get cap-height zone
     uppercase_glyphs = [gn for gn in uppercase_letters]
-    uppercase_zone = calculate_zone(font=font, glyphs_list=uppercase_glyphs, min_or_max="yMax")
+    uppercase_zone = calculate_zone(font=font, glyph_names=uppercase_glyphs, min_or_max="yMax")
 
     # Get ascender zone
     ascender_glyphs = [gn for gn in lower_case_ascenders if gn not in ["t"]]
-    ascender_zone = calculate_zone(font=font, glyphs_list=ascender_glyphs, min_or_max="yMax")
+    ascender_zone = calculate_zone(font=font, glyph_names=ascender_glyphs, min_or_max="yMax")
 
     zones = sorted([descender_zone, baseline_zone, x_height_zone, uppercase_zone, ascender_zone])
     if lists_overlaps(zones):
