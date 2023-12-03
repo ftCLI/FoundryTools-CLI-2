@@ -1,4 +1,4 @@
-fonttools[woff,pathops,unicode] ==4.45.1
+fonttools[woff,pathops,unicode] ==4.46.0
 afdko == 4.0.0
 cffsubr == 0.2.9.post1
 click == 8.1.7
