@@ -13,8 +13,8 @@ from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import NamedInstance, Axis
 
-from foundrytools_cli_2.snippets.ps_recalc_stems import recalc_stems
-from foundrytools_cli_2.snippets.ps_recalc_zones import recalc_zones
+from foundrytools_cli_2.snippets.otf_recalc_stems import recalc_stems
+from foundrytools_cli_2.snippets.otf_recalc_zones import recalc_zones, GlyphBounds
 
 PS_SFNT_VERSION = "OTTO"
 TT_SFNT_VERSION = "\0\1\0\0"
@@ -28,17 +28,6 @@ FVAR_TABLE_TAG = "fvar"
 GLYF_TABLE_TAG = "glyf"
 MIN_UPM = 16
 MAX_UPM = 16384
-
-
-class GlyphBounds(t.TypedDict):
-    """
-    A dictionary containing glyph bounds.
-    """
-
-    xMin: float
-    yMin: float
-    xMax: float
-    yMax: float
 
 
 class Font:  # pylint: disable=too-many-public-methods
