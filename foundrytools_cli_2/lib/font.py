@@ -3,7 +3,6 @@ from contextlib import contextmanager
 from io import BytesIO
 from pathlib import Path
 
-from afdko.otfautohint.report import Report
 from cffsubr import subroutinize, desubroutinize
 from dehinter.font import dehint
 from fontTools.misc.cliTools import makeOutputFileName
@@ -14,8 +13,8 @@ from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import NamedInstance, Axis
 
-from foundrytools_cli_2.snippets.ps_recalc_zones import recalc_zones
 from foundrytools_cli_2.snippets.ps_recalc_stems import recalc_stems
+from foundrytools_cli_2.snippets.ps_recalc_zones import recalc_zones
 
 PS_SFNT_VERSION = "OTTO"
 TT_SFNT_VERSION = "\0\1\0\0"
@@ -405,22 +404,22 @@ class Font:  # pylint: disable=too-many-public-methods
 
         return recalc_zones(self.ttfont)
 
-    def recalc_stems(self, include_curved: bool = False) -> t.Tuple[int, int]:
+    def recalc_stems(self) -> t.Tuple[int, int]:
         """
         Returns a tuple containing two integer values representing the hinting (StdHW and StdVW)
         stems for the font.
 
-        Parameters:
-            include_curved (bool): If set to True, the hinting stems will include curved stems as
-                well. Default value is False.
-
         Returns:
             (tuple[int, int]): A tuple containing two integer values representing the hinting stems
                 for the font.
-
         """
         if not self.file:
             raise NotImplementedError("Stem hints can only be extracted from a font file.")
+
+        if not self.is_ps:
+            raise NotImplementedError(
+                "Recalculation of stems is only supported for PostScript fonts."
+            )
 
         return recalc_stems(self.file)
 

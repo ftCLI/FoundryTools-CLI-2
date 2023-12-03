@@ -10,7 +10,22 @@ from afdko.otfautohint.report import Report
 __all__ = ["get_stems", "recalc_stems"]
 
 
-def get_stems(file_path: Path, glyph_list: t.List[str]) -> t.Tuple:
+def get_stems(
+    file_path: Path, glyph_list: t.List[str]
+) -> t.Tuple[t.List[t.Tuple[int, int, t.List[str]]], t.List[t.Tuple[int, int, t.List[str]]]]:
+    """
+    Retrieves stem data from a font file for a given list of glyphs.
+
+    Parameters:
+        file_path`: The path to the font file.
+        glyph_list`: A list of glyph names for which stem data will be
+        retrieved.
+
+    Returns:
+        Tuple: a tuple containing two lists: the first list contains the horizontal stem data,
+        and the second list contains the vertical stem data. Each list contains tuples of the
+        form (stem width, stem count, glyph names).
+    """
     file_path = _validate_path(file_path)
     _, parsed_args = get_stemhist_options(args=[file_path])
     options = ReportOptions(parsed_args)
@@ -36,13 +51,32 @@ def get_stems(file_path: Path, glyph_list: t.List[str]) -> t.Tuple:
     h_stems.sort(key=report._sort_count)
     v_stems.sort(key=report._sort_count)
 
+    print("H Stems:", h_stems)
+
     return h_stems, v_stems
 
 
 def recalc_stems(file_path: Path) -> t.Tuple[int, int]:
+    """
+    Recalculates the StdHW and StdVW values for a given font file.
+
+    Parameters:
+        file_path: A `Path` object representing the path to the file.
+
+    Returns:
+        A tuple containing the recalculated stem values for horizontal and vertical stems. The first
+        value in the tuple represents the horizontal stem value, and the second value represents the
+        vertical stem value.
+
+    Example usage:
+    ```
+    file_path = Path("path/to/file")
+    h_stem, v_stem = recalc_stems(file_path)
+    ```
+    """
     h_list = ["A", "H", "T", "S", "C", "O"]
     v_list = ["E", "H", "I", "K", "L", "M", "N", "T"]
     h_stems, _ = get_stems(file_path=file_path, glyph_list=h_list)
     _, v_stems = get_stems(file_path=file_path, glyph_list=v_list)
 
-    return h_stems[0][1], v_stems[0][1]
+    return int(h_stems[0][1]), int(v_stems[0][1])
