@@ -14,8 +14,8 @@ from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import NamedInstance, Axis
 
-from foundrytools_cli_2.lib.otf.stems import recalc_stems
 from foundrytools_cli_2.snippets.ps_recalc_zones import recalc_zones
+from foundrytools_cli_2.snippets.ps_recalc_stems import recalc_stems
 
 PS_SFNT_VERSION = "OTTO"
 TT_SFNT_VERSION = "\0\1\0\0"
@@ -422,7 +422,7 @@ class Font:  # pylint: disable=too-many-public-methods
         if not self.file:
             raise NotImplementedError("Stem hints can only be extracted from a font file.")
 
-        return recalc_stems(self.file, include_curved)
+        return recalc_stems(self.file)
 
     def set_zones(self, other_blues: t.List[int], blue_values: t.List[int]) -> None:
         """
@@ -449,47 +449,6 @@ class Font:  # pylint: disable=too-many-public-methods
 
         self.ttfont["CFF "].cff.topDictIndex[0].Private.StdHW = std_h_w
         self.ttfont["CFF "].cff.topDictIndex[0].Private.StdVW = std_v_w
-
-    def t2charstring_to_data(self) -> None:
-        from afdko.otfautohint.__main__ import ReportOptions, get_stemhist_options, _validate_path
-
-        from afdko.otfautohint.autohint import fontWrapper, FontInstance, openFont
-        from afdko.otfautohint.hinter import glyphHinter
-
-        file_path = _validate_path(self.file)
-        _, parsed_args = get_stemhist_options(args=[file_path])
-        options = ReportOptions(parsed_args)
-        options.glyphList = [chr(i) for i in range(65, 91)] + [chr(i) for i in range(97, 123)]
-        options.report_all_stems = True
-        options.report_zones = True
-
-        font = openFont(file_path, options=options)
-        font_instance = FontInstance(font=font, inpath=file_path, outpath=file_path)
-
-        fw = fontWrapper(options=options, fil=[font_instance])
-        dict_record = fw.dictManager.getDictRecord()
-
-        hinter = glyphHinter(options=options, dictRecord=dict_record)
-        hinter.initialize(options=options, dictRecord=dict_record)
-        gmap = map(hinter.hint, fw)
-
-        report = Report()
-        for name, r in gmap:
-            report.glyphs[name] = r
-
-        h_stems, v_stems, top_zones, bot_zones = report._get_lists(options)
-        h_stems.sort(key=report._sort_count)
-        v_stems.sort(key=report._sort_count)
-        top_zones.sort(key=report._sort_count)
-        bot_zones.sort(key=report._sort_count)
-
-        print("H Stems:")
-        for st in h_stems:
-            print(st)
-
-        print("V Stems:")
-        for vs in v_stems:
-            print(vs)
 
     def get_advance_widths(self) -> t.Dict[str, int]:
         """
