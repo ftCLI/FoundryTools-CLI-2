@@ -168,12 +168,11 @@ def recalc_zones(font: TTFont) -> t.Tuple[t.List[int], t.List[int]]:
     descender_zone = calculate_zone(font=font, glyph_names=descender_glyphs, min_or_max="yMin")
 
     # Get baseline zone
-    baseline_glyphs = [
-        gn
-        for gn in set(uppercase_letters + lower_case_letters)
+    baseline_glyphs = list(
+        set(uppercase_letters + lower_case_letters)
         - set(lower_case_descenders)
         - set(uppercase_descenders)
-    ]
+    )
     baseline_zone = calculate_zone(font=font, glyph_names=baseline_glyphs, min_or_max="yMin")
 
     # Get x-height zone
@@ -183,8 +182,7 @@ def recalc_zones(font: TTFont) -> t.Tuple[t.List[int], t.List[int]]:
     x_height_zone = calculate_zone(font=font, glyph_names=x_height_glyphs, min_or_max="yMax")
 
     # Get cap-height zone
-    uppercase_glyphs = [gn for gn in uppercase_letters]
-    uppercase_zone = calculate_zone(font=font, glyph_names=uppercase_glyphs, min_or_max="yMax")
+    uppercase_zone = calculate_zone(font=font, glyph_names=uppercase_letters, min_or_max="yMax")
 
     # Get ascender zone
     ascender_glyphs = [gn for gn in lower_case_ascenders if gn not in ["t"]]
