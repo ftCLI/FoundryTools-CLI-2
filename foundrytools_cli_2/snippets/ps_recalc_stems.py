@@ -51,8 +51,6 @@ def get_stems(
     h_stems.sort(key=report._sort_count)
     v_stems.sort(key=report._sort_count)
 
-    print("H Stems:", h_stems)
-
     return h_stems, v_stems
 
 
@@ -75,7 +73,7 @@ def recalc_stems(file_path: Path) -> t.Tuple[int, int]:
     ```
     """
     h_list = ["A", "H", "T", "S", "C", "O"]
-    v_list = ["E", "H", "I", "K", "L", "M", "N", "T"]
+    v_list = ["E", "H", "I", "K", "L", "M", "N", "T", "U"]
     h_stems, _ = get_stems(file_path=file_path, glyph_list=h_list)
     _, v_stems = get_stems(file_path=file_path, glyph_list=v_list)
 
