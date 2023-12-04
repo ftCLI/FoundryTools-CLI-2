@@ -4,6 +4,23 @@ from collections import Counter
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.ttLib.ttFont import TTFont
 
+UPPERCASE_LETTERS = [chr(i) for i in range(65, 91)]
+UPPERCASE_DESCENDERS = ["J", "Q"]
+LOWERCASE_LETTERS = [chr(i) for i in range(97, 123)]
+LOWERCASE_DESCENDERS = ["f", "g", "j", "p", "q", "y"]
+LOWERCASE_ASCENDERS = ["b", "d", "f", "h", "k", "l", "t"]
+
+DESCENDER_GLYPHS = list(set(LOWERCASE_DESCENDERS) - {"f", "j"})
+BASELINE_GLYPHS = list(
+    set(UPPERCASE_LETTERS + LOWERCASE_LETTERS)
+    - set(LOWERCASE_DESCENDERS)
+    - set(UPPERCASE_DESCENDERS)
+)
+X_HEIGHT_GLYPHS = list(set(LOWERCASE_LETTERS) - set(LOWERCASE_ASCENDERS + ["i", "j"]))
+UPPERCASE_GLYPHS = UPPERCASE_LETTERS
+ASCENDER_GLYPHS = list(set(LOWERCASE_ASCENDERS) - {"t"})
+
+
 __all__ = ["recalc_zones"]
 
 
@@ -120,6 +137,28 @@ def fix_lists_overlaps(lists: t.List[t.List[float]]) -> t.List[t.List[float]]:
     return lists
 
 
+def fix_min_separation_limits(lists: t.List[t.List[float]]) -> t.List[t.List[float]]:
+    """
+    Fixes the minimum separation between zones.
+
+    Args:
+        lists (List[List[float]]): A list of lists of floats.
+
+    Returns:
+        List[List[float]]: The input list with the minimum separation between zones fixed.
+    """
+    for i in range(len(lists) - 1):
+        if lists[i + 1][0] - lists[i][1] < 3:
+            # If the difference between the two values is less than 3, then
+            # set the second value to the first value
+            if lists[i + 1][1] - lists[i][1] > 3:
+                lists[i + 1][0] = lists[i + 1][1]
+            else:
+                # Remove the second list
+                lists.pop(i + 1)
+    return lists
+
+
 def calculate_zone(
     font: TTFont, glyph_names: t.List[str], min_or_max: t.Literal["yMin", "yMax"]
 ) -> t.List[float]:
@@ -141,7 +180,14 @@ def calculate_zone(
     return get_pair(counter)
 
 
-def recalc_zones(font: TTFont) -> t.Tuple[t.List[int], t.List[int]]:
+def recalc_zones(
+    font: TTFont,
+    descender_glyphs: t.Optional[t.List[str]] = None,
+    baseline_glyphs: t.Optional[t.List[str]] = None,
+    x_height_glyphs: t.Optional[t.List[str]] = None,
+    uppercase_glyphs: t.Optional[t.List[str]] = None,
+    ascender_glyphs: t.Optional[t.List[str]] = None,
+) -> t.Tuple[t.List[int], t.List[int]]:
     """
     Recalc Zones
 
@@ -149,6 +195,16 @@ def recalc_zones(font: TTFont) -> t.Tuple[t.List[int], t.List[int]]:
 
     Parameters:
         font (TTFont): The TTFont object.
+        descender_glyphs (List[str]): A list of glyph names to use for calculating the descender
+            zone.
+        baseline_glyphs (List[str]): A list of glyph names to use for calculating the baseline
+            zone.
+        x_height_glyphs (List[str]): A list of glyph names to use for calculating the x-height
+            zone.
+        uppercase_glyphs (List[str]): A list of glyph names to use for calculating the uppercase
+            zone.
+        ascender_glyphs (List[str]): A list of glyph names to use for calculating the ascender
+            zone.
 
     Returns:
         Tuple[List[int], List[int]]: A tuple containing two lists. The first list contains the
@@ -156,41 +212,32 @@ def recalc_zones(font: TTFont) -> t.Tuple[t.List[int], t.List[int]]:
             BlueValues zones.
     """
 
-    uppercase_letters = [chr(i) for i in range(65, 91)]
-    lowercase_letters = [chr(i) for i in range(97, 123)]
+    if descender_glyphs is None:
+        descender_glyphs = DESCENDER_GLYPHS
+    if baseline_glyphs is None:
+        baseline_glyphs = BASELINE_GLYPHS
+    if x_height_glyphs is None:
+        x_height_glyphs = X_HEIGHT_GLYPHS
+    if uppercase_glyphs is None:
+        uppercase_glyphs = UPPERCASE_GLYPHS
+    if ascender_glyphs is None:
+        ascender_glyphs = ASCENDER_GLYPHS
 
-    uppercase_descenders = ["J", "Q"]
-    lowercase_descenders = ["f", "g", "j", "p", "q", "y"]
-    lowercase_ascenders = ["b", "d", "f", "h", "k", "l", "t"]
-
-    # Get descender zone
-    descender_glyphs = list(set(lowercase_descenders) - {"f", "j"})
     descender_zone = calculate_zone(font=font, glyph_names=descender_glyphs, min_or_max="yMin")
-
-    # Get baseline zone
-    baseline_glyphs = list(
-        set(uppercase_letters + lowercase_letters)
-        - set(lowercase_descenders)
-        - set(uppercase_descenders)
-    )
     baseline_zone = calculate_zone(font=font, glyph_names=baseline_glyphs, min_or_max="yMin")
-
-    # Get x-height zone
-    x_height_glyphs = list(set(lowercase_letters) - set(lowercase_ascenders + ["i", "j"]))
     x_height_zone = calculate_zone(font=font, glyph_names=x_height_glyphs, min_or_max="yMax")
-
-    # Get cap-height zone
-    uppercase_zone = calculate_zone(font=font, glyph_names=uppercase_letters, min_or_max="yMax")
-
-    # Get ascender zone
-    ascender_glyphs = list(set(lowercase_ascenders) - {"t"})
+    uppercase_zone = calculate_zone(font=font, glyph_names=uppercase_glyphs, min_or_max="yMax")
     ascender_zone = calculate_zone(font=font, glyph_names=ascender_glyphs, min_or_max="yMax")
 
     zones = sorted([descender_zone, baseline_zone, x_height_zone, uppercase_zone, ascender_zone])
     if lists_overlaps(zones):
         zones = fix_lists_overlaps(zones)
+    zones = fix_min_separation_limits(zones)
 
     other_blues = [int(v) for v in zones[0]]
-    blue_values = [int(v) for v in zones[1] + zones[2] + zones[3] + zones[4]]
+
+    blue_values = []
+    for zone in zones[1:]:
+        blue_values.extend([int(v) for v in zone])
 
     return other_blues, blue_values

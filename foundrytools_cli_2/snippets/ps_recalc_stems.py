@@ -7,6 +7,9 @@ from afdko.otfautohint.autohint import fontWrapper, FontInstance, openFont
 from afdko.otfautohint.hinter import glyphHinter
 from afdko.otfautohint.report import Report
 
+H_STEM_GLYPHS = ["A", "H", "T", "S", "C", "O"]
+V_STEM_GLYPHS = ["E", "H", "I", "K", "L", "M", "N", "T", "U"]
+
 __all__ = ["get_stems", "recalc_stems"]
 
 
@@ -31,8 +34,8 @@ def get_stems(
     options = ReportOptions(parsed_args)
     options.report_all_stems = True
     options.report_zones = False
-
     options.glyphList = glyph_list
+
     font = openFont(file_path, options=options)
     font_instance = FontInstance(font=font, inpath=file_path, outpath=file_path)
 
@@ -54,28 +57,32 @@ def get_stems(
     return h_stems, v_stems
 
 
-def recalc_stems(file_path: Path) -> t.Tuple[int, int]:
+def recalc_stems(
+    file_path: Path,
+    h_stems_glyphs: t.Optional[t.List[str]] = None,
+    v_stems_glyphs: t.Optional[t.List[str]] = None,
+) -> t.Tuple[int, int]:
     """
     Recalculates the StdHW and StdVW values for a given font file.
 
     Parameters:
         file_path: A `Path` object representing the path to the file.
+        h_stems_glyphs: A list of glyph names to use for calculating the horizontal stems.
+        v_stems_glyphs: A list of glyph names to use for calculating the vertical stems.
 
     Returns:
         A tuple containing the recalculated stem values for horizontal and vertical stems. The first
         value in the tuple represents the horizontal stem value, and the second value represents the
         vertical stem value.
-
-    Example usage:
-    ```
-    file_path = Path("path/to/file")
-    h_stem, v_stem = recalc_stems(file_path)
-    ```
     """
-    h_list = ["A", "H", "T", "S", "C", "O"]
-    v_list = ["E", "H", "I", "K", "L", "M", "N", "T", "U"]
-    h_stems, _ = get_stems(file_path=file_path, glyph_list=h_list)
-    _, v_stems = get_stems(file_path=file_path, glyph_list=v_list)
+
+    if h_stems_glyphs is None:
+        h_stems_glyphs = H_STEM_GLYPHS
+    if v_stems_glyphs is None:
+        v_stems_glyphs = V_STEM_GLYPHS
+
+    h_stems, _ = get_stems(file_path=file_path, glyph_list=h_stems_glyphs)
+    _, v_stems = get_stems(file_path=file_path, glyph_list=v_stems_glyphs)
 
     if not h_stems:
         raise ValueError("No horizontal stems found")
