@@ -6,7 +6,7 @@ from fontTools.pens.t2CharStringPen import T2CharStringPen
 
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.logger import logger
-from foundrytools_cli_2.snippets.ps2tt import otf_to_ttf
+from foundrytools_cli_2.snippets.ps_to_tt import otf_to_ttf
 
 
 def ttf_to_otf(font: Font, charstrings: dict) -> Font:
