@@ -58,7 +58,9 @@ def get_stems(
 
 
 def recalc_stems(
-    file_path: Path, h_stems_glyphs: t.List[str] = None, v_stems_glyphs: t.List[str] = None
+    file_path: Path,
+    h_stems_glyphs: t.Optional[t.List[str]] = None,
+    v_stems_glyphs: t.Optional[t.List[str]] = None,
 ) -> t.Tuple[int, int]:
     """
     Recalculates the StdHW and StdVW values for a given font file.

@@ -160,11 +160,11 @@ def calculate_zone(
 
 def recalc_zones(
     font: TTFont,
-    descender_glyphs: t.List[str] = None,
-    baseline_glyphs: t.List[str] = None,
-    x_height_glyphs: t.List[str] = None,
-    uppercase_glyphs: t.List[str] = None,
-    ascender_glyphs: t.List[str] = None,
+    descender_glyphs: t.Optional[t.List[str]] = None,
+    baseline_glyphs: t.Optional[t.List[str]] = None,
+    x_height_glyphs: t.Optional[t.List[str]] = None,
+    uppercase_glyphs: t.Optional[t.List[str]] = None,
+    ascender_glyphs: t.Optional[t.List[str]] = None,
 ) -> t.Tuple[t.List[int], t.List[int]]:
     """
     Recalc Zones
