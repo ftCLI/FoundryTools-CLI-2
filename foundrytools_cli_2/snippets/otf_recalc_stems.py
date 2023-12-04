@@ -77,4 +77,9 @@ def recalc_stems(file_path: Path) -> t.Tuple[int, int]:
     h_stems, _ = get_stems(file_path=file_path, glyph_list=h_list)
     _, v_stems = get_stems(file_path=file_path, glyph_list=v_list)
 
+    if not h_stems:
+        raise ValueError("No horizontal stems found")
+    if not v_stems:
+        raise ValueError("No vertical stems found")
+
     return int(h_stems[0][1]), int(v_stems[0][1])
