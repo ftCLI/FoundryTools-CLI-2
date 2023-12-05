@@ -3,7 +3,7 @@ from typing import Literal, Optional
 
 import click
 
-from foundrytools_cli_2.lib.constants import TTFontInitOptions
+from foundrytools_cli_2.lib.constants import FontInitOptions
 
 from foundrytools_cli_2.lib.click.click_options import (
     input_path_argument,
@@ -30,7 +30,7 @@ from foundrytools_cli_2.snippets.ps_to_tt import otf_to_ttf
 from foundrytools_cli_2.snippets.tt_to_ps import ttf_to_otf, get_charstrings
 
 timer = Timer(
-    logger=logger.info,
+    logger=logger.opt(colors=True).info,
     text="Font converted in <cyan>{:0.3f} seconds</>",
 )
 
@@ -60,12 +60,12 @@ def otf2ttf(
     """
 
     filters = FontFinderFilter(filter_out_tt=True, filter_out_variable=True)
-    options = TTFontInitOptions(recalc_timestamp=recalc_timestamp)
+    options = FontInitOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(
-            input_path=input_path, recursive=recursive, options=options, filters=filters
+            input_path=input_path, recursive=recursive, font_options=options, font_filter=filters
         )
-        fonts = finder.generate_fonts()
+        fonts = finder.find_fonts()
 
     except FontFinderError as e:
         logger.error(e)
@@ -127,10 +127,10 @@ def ttf2otf(
         logger_filter.level = "DEBUG"
 
     filters = FontFinderFilter(filter_out_ps=True, filter_out_variable=True)
-    options = TTFontInitOptions(recalc_timestamp=recalc_timestamp)
+    options = FontInitOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(
-            input_path=input_path, recursive=recursive, options=options, filters=filters
+            input_path=input_path, recursive=recursive, font_options=options, font_filter=filters
         )
         fonts = finder.find_fonts()
 
@@ -205,10 +205,10 @@ def wf2sfnt(
     if in_format == "woff2":
         filters.filter_out_woff = True
 
-    options = TTFontInitOptions(recalc_timestamp=recalc_timestamp)
+    options = FontInitOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(
-            input_path=input_path, recursive=recursive, options=options, filters=filters
+            input_path=input_path, recursive=recursive, font_options=options, font_filter=filters
         )
         fonts = finder.find_fonts()
 
@@ -271,10 +271,10 @@ def sfnt2wf(
     """
 
     filters = FontFinderFilter(filter_out_woff=True, filter_out_woff2=True)
-    options = TTFontInitOptions(recalc_timestamp=recalc_timestamp)
+    options = FontInitOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(
-            input_path=input_path, recursive=recursive, options=options, filters=filters
+            input_path=input_path, recursive=recursive, font_options=options, font_filter=filters
         )
         fonts = finder.find_fonts()
 
