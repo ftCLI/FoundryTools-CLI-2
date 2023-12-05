@@ -4,7 +4,7 @@ from pathlib import Path
 
 
 @dataclass
-class TTFontInitOptions:
+class FontInitOptions:
     """
     A class that specifies how to initialize the font.
     """
@@ -15,11 +15,11 @@ class TTFontInitOptions:
 
 
 @dataclass
-class TTFontSaveOptions:
+class FontSaveOptions:
     """
     A class that specifies how to save the font.
     """
 
     output_dir: t.Optional[Path] = None
     overwrite: bool = False
-    reorder_tables: bool = True
+    reorder_tables: t.Optional[bool] = True
