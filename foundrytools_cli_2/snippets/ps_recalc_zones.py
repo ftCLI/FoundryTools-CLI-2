@@ -21,7 +21,7 @@ UPPERCASE_GLYPHS = UPPERCASE_LETTERS
 ASCENDER_GLYPHS = list(set(LOWERCASE_ASCENDERS) - {"t"})
 
 
-__all__ = ["recalc_zones"]
+__all__ = ["recalc_zones", "GlyphBounds"]
 
 
 class GlyphBounds(t.TypedDict):
