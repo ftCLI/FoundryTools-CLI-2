@@ -117,7 +117,11 @@ class BaseRunner(metaclass=ABCMeta):
         try:
             return command(*args, **kwargs)
         except (
-                FontFinderError, NoFontsFoundError, LoggerError, FontSaveError, Exception
+            FontFinderError,
+            NoFontsFoundError,
+            LoggerError,
+            FontSaveError,
+            Exception,
         ) as e:  # pylint: disable=broad-except
             logger.error(e)
             return None
