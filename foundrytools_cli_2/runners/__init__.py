@@ -116,13 +116,13 @@ class BaseRunner(metaclass=ABCMeta):
         """
         try:
             return command(*args, **kwargs)
-        except (
+        except (  # pylint: disable=broad-except
             FontFinderError,
             NoFontsFoundError,
             LoggerError,
             FontSaveError,
             Exception,
-        ) as e:  # pylint: disable=broad-except
+        ) as e:
             logger.error(e)
             return None
 
