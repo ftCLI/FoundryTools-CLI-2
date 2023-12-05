@@ -69,7 +69,7 @@ class BaseRunner(metaclass=ABCMeta):
                 self._try_run(self.process_font, font, *args, **kwargs)
 
                 if not font_has_changed:
-                    logger.skip(f"Skipped {font.file}")
+                    logger.skip(f"Skipped {font.file}")  # type: ignore
                     continue
 
                 save_success = self._try_run(self._save_font, font)
@@ -77,7 +77,7 @@ class BaseRunner(metaclass=ABCMeta):
                     return
 
     @abstractmethod
-    def process_font(self, font: Font, *args, **kwargs) -> None:
+    def process_font(self, font: Font, *args: t.Any, **kwargs: t.Any) -> None:
         """
         Process the given font.
 
