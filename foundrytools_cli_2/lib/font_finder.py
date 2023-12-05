@@ -87,9 +87,9 @@ class FontFinder:
         Returns:
             A list of TTFont objects.
         """
-        return list(self._generate_fonts())
+        return list(self.generate_fonts())
 
-    def _generate_fonts(self) -> t.Generator[Font, None, None]:
+    def generate_fonts(self) -> t.Generator[Font, None, None]:
         """
         A generator that yields TTFont or TTFont subclass objects found in the input path.
 
