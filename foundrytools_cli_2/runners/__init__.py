@@ -3,7 +3,12 @@ from pathlib import Path
 import typing as t
 
 from foundrytools_cli_2.lib import Font, logger
-from foundrytools_cli_2.lib.font_finder import FontFinder, FontFinderFilter, FontFinderError, FontInitOptions
+from foundrytools_cli_2.lib.font_finder import (
+    FontFinder,
+    FontFinderFilter,
+    FontFinderError,
+    FontInitOptions,
+)
 
 
 class NoFontsFoundError(Exception):
@@ -20,15 +25,15 @@ class FontSaveError(Exception):
 
 class BaseArgs:
     def __init__(
-            self,
-            input_path: Path,
-            recursive: bool = False,
-            lazy: t.Optional[bool] = None,
-            recalc_timestamp: bool = False,
-            recalc_bboxes: bool = True,
-            output_dir: t.Optional[Path] = None,
-            overwrite: bool = True,
-            reorder_tables: t.Optional[bool] = True,
+        self,
+        input_path: Path,
+        recursive: bool = False,
+        lazy: t.Optional[bool] = None,
+        recalc_timestamp: bool = False,
+        recalc_bboxes: bool = True,
+        output_dir: t.Optional[Path] = None,
+        overwrite: bool = True,
+        reorder_tables: t.Optional[bool] = True,
     ) -> None:
         self.input_path = input_path
         self.recursive = recursive
@@ -70,7 +75,7 @@ class BaseRunner(metaclass=ABCMeta):
             logger.error(e)
             return
 
-        try :
+        try:
             self._validate_fonts(fonts)
         except NoFontsFoundError as e:
             logger.error(e)
