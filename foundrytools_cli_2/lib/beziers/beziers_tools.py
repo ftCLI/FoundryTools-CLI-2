@@ -1,8 +1,9 @@
 import typing as t
+
 from beziers.path import BezierPath
 from fontTools.misc.psCharStrings import T2CharString
-from fontTools.ttLib import TTFont
 from fontTools.pens.t2CharStringPen import T2CharStringPen
+from fontTools.ttLib import TTFont
 
 
 def handle_curve(pen: T2CharStringPen, nodes_list: list, i: int) -> int:
