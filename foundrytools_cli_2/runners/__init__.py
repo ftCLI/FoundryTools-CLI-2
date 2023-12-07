@@ -3,7 +3,12 @@ from pathlib import Path
 import typing as t
 
 from foundrytools_cli_2.lib import Font, logger
-from foundrytools_cli_2.lib.font_finder import FontFinder, FontFinderFilter, FontFinderError
+from foundrytools_cli_2.lib.font_finder import (
+    FontFinder,
+    FontFinderFilter,
+    FontFinderError,
+    FontInitOptions,
+)
 
 
 class NoFontsFoundError(Exception):
@@ -18,24 +23,44 @@ class FontSaveError(Exception):
     """Raised when there is an error saving a font"""
 
 
+class BaseArgs:  # pylint: disable=too-many-instance-attributes disable=too-few-public-methods
+    """
+    Base arguments for all runners
+    """
+
+    def __init__(
+        self,
+        input_path: Path,
+        recursive: bool = False,
+        lazy: t.Optional[bool] = None,
+        recalc_timestamp: bool = False,
+        recalc_bboxes: bool = True,
+        output_dir: t.Optional[Path] = None,
+        overwrite: bool = True,
+        reorder_tables: t.Optional[bool] = True,
+    ) -> None:
+        self.input_path = input_path
+        self.recursive = recursive
+        self.lazy = lazy
+        self.recalc_timestamp = recalc_timestamp
+        self.recalc_bboxes = recalc_bboxes
+        self.output_dir = output_dir
+        self.overwrite = overwrite
+        self.reorder_tables = reorder_tables
+
+
 class BaseRunner(metaclass=ABCMeta):
     """Base class for all runners"""
 
     def __init__(
         self,
         input_path: Path,
-        recursive: bool = False,
-        output_dir: t.Optional[Path] = None,
-        overwrite: bool = True,
-        recalc_timestamps: bool = False,
+        config: t.Optional[BaseArgs],
     ) -> None:
         self.input_path = input_path
-        self.recursive = recursive
-        self.output_dir = output_dir
-        self.overwrite = overwrite
-        self.recalc_timestamps = recalc_timestamps
+        self.config = config or BaseArgs(input_path)
+        self.font_filter = FontFinderFilter()
         self.task_name = "Processing"
-        self._filters = FontFinderFilter()
 
     def run(self, *args: t.Any, **kwargs: t.Any) -> None:
         """
@@ -48,12 +73,16 @@ class BaseRunner(metaclass=ABCMeta):
         Returns:
             None
         """
-        fonts = self._try_run(self._find_fonts)
-        if fonts is None:
+        try:
+            fonts = self._find_fonts()
+        except FontFinderError as e:
+            logger.error(e)
             return
 
-        is_valid = self._try_run(self._validate_fonts, fonts)
-        if not is_valid:
+        try:
+            self._validate_fonts(fonts)
+        except NoFontsFoundError as e:
+            logger.error(e)
             return
 
         for font in fonts:
@@ -79,18 +108,9 @@ class BaseRunner(metaclass=ABCMeta):
     @abstractmethod
     def process_font(self, font: Font, *args: t.Any, **kwargs: t.Any) -> None:
         """
-        Process the given font.
+        Process Font
 
-        Parameters:
-            font (Font): The font object to process.
-            args: Additional positional arguments.
-            kwargs: Additional keyword arguments.
-
-        Returns:
-            None.
-
-        Raises:
-            NotImplementedError: If the method is not implemented by a subclass.
+        This method is used to process a font. Must be implemented by subclasses.
         """
         raise NotImplementedError
 
@@ -135,11 +155,18 @@ class BaseRunner(metaclass=ABCMeta):
         Returns:
             A list of Font objects representing the found fonts.
         """
-        filters = self._filters
-        return FontFinder(self.input_path, font_filter=filters).find_fonts()
+        font_filter = self.font_filter
+        font_options = FontInitOptions()
+        font_options.lazy = self.config.lazy
+        font_options.recalc_timestamp = self.config.recalc_timestamp
+        font_options.recalc_bboxes = self.config.recalc_bboxes
+        return FontFinder(
+            self.input_path,
+            recursive=self.config.recursive,
+            font_filter=font_filter,
+        ).find_fonts()
 
-    @staticmethod
-    def _validate_fonts(fonts: t.List[Font]) -> None:
+    def _validate_fonts(self, fonts: t.List[Font]) -> None:
         """
         Validate Fonts
 
@@ -156,7 +183,7 @@ class BaseRunner(metaclass=ABCMeta):
             ValueError: If the list of fonts is empty.
         """
         if not fonts:
-            raise NoFontsFoundError("No fonts found")
+            raise NoFontsFoundError(f"No fonts found in {self.input_path}")
 
     def _log_current_font(self, font: Font) -> None:
         """
@@ -180,6 +207,8 @@ class BaseRunner(metaclass=ABCMeta):
         Returns:
             None.
         """
-        output_file = font.make_out_file_name(output_dir=self.output_dir, overwrite=self.overwrite)
-        font.save(output_file)
+        output_file = font.make_out_file_name(
+            output_dir=self.config.output_dir, overwrite=self.config.overwrite
+        )
+        font.save(output_file, reorder_tables=self.config.reorder_tables)
         logger.success(f"File saved to {output_file}")
