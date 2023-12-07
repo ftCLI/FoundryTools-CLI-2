@@ -23,7 +23,24 @@ class FontSaveError(Exception):
     """Raised when there is an error saving a font"""
 
 
-class BaseArgs:
+class BaseArgs:  # pylint: disable=too-many-instance-attributes disable=too-few-public-methods
+    """
+    Class: BaseArgs
+
+    This class represents the base arguments for font-related operations.
+
+    Attributes:
+
+    - `input_path` (Path): The path to the font file or directory.
+    - `recursive` (bool): Indicates whether to search for fonts recursively in subdirectories. Defaults to False.
+    - `lazy` (Optional[bool]): Indicates whether to lazily load the fonts. If None, it will be determined automatically. Defaults to None.
+    - `recalc_timestamp` (bool): Indicates whether to recalculate the font timestamp. Defaults to False.
+    - `recalc_bboxes` (bool): Indicates whether to recalculate the font bounding boxes. Defaults to True.
+    - `output_dir` (Optional[Path]): The directory where the output files will be saved. If None, the same directory as the input path will be used. Defaults to None.
+    - `overwrite` (bool): Indicates whether to overwrite existing output files. Defaults to True.
+    - `reorder_tables` (Optional[bool]): Indicates whether to reorder the font tables. If None, it will be determined automatically. Defaults to True.
+    """
+
     def __init__(
         self,
         input_path: Path,
@@ -103,6 +120,11 @@ class BaseRunner(metaclass=ABCMeta):
 
     @abstractmethod
     def process_font(self, font: Font, *args: t.Any, **kwargs: t.Any) -> None:
+        """
+        Process Font
+
+        This method is used to process a font. Must be implemented by subclasses.
+        """
         raise NotImplementedError
 
     @staticmethod
