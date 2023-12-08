@@ -74,10 +74,18 @@ class BaseRunner(metaclass=ABCMeta):
         Returns:
             None
         """
-        fonts = self._try_run(self._find_fonts)
-        if not self._try_run(self._validate_fonts, fonts):
-            return
+        fonts = self._get_valid_fonts()
+        if fonts:
+            self._process_fonts(fonts, *args, **kwargs)
 
+    def _get_valid_fonts(self) -> t.Optional[t.List[Font]]:
+        fonts = self._try_run(self._find_fonts)
+        if self._try_run(self._validate_fonts, fonts):
+            return fonts
+        else:
+            return None
+
+    def _process_fonts(self, fonts: t.List[Font], *args: t.Any, **kwargs: t.Any) -> None:
         for font in fonts:
             with font:
                 self._try_run(self.process_font, font, *args, **kwargs)

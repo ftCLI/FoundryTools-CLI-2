@@ -3,8 +3,6 @@ from typing import Literal, Optional
 
 import click
 
-from foundrytools_cli_2.lib.constants import FontInitOptions
-
 from foundrytools_cli_2.lib.click.click_options import (
     input_path_argument,
     recursive_flag,
@@ -14,17 +12,17 @@ from foundrytools_cli_2.lib.click.click_options import (
     target_upm_option,
     tolerance_option,
     subroutinize_flag,
-    debug_flag,
     in_format_choice,
     out_format_choice,
 )
+from foundrytools_cli_2.lib.constants import FontInitOptions
 from foundrytools_cli_2.lib.font import WOFF_FLAVOR, WOFF2_FLAVOR, OTF_EXTENSION, TTF_EXTENSION
 from foundrytools_cli_2.lib.font_finder import (
     FontFinder,
     FontFinderError,
     FontFinderFilter,
 )
-from foundrytools_cli_2.lib.logger import logger, logger_filter
+from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.timer import Timer
 from foundrytools_cli_2.snippets.ps_to_tt import otf_to_ttf
 from foundrytools_cli_2.snippets.tt_to_ps import ttf_to_otf, get_charstrings
@@ -58,13 +56,11 @@ def otf2ttf(
     """
     Convert PostScript flavored fonts to TrueType flavored fonts.
     """
-
-    filters = FontFinderFilter(filter_out_tt=True, filter_out_variable=True)
-    options = FontInitOptions(recalc_timestamp=recalc_timestamp)
     try:
-        finder = FontFinder(
-            input_path=input_path, recursive=recursive, font_options=options, font_filter=filters
-        )
+        finder = FontFinder(input_path=input_path, recursive=recursive)
+        finder.font_options.recalc_timestamp = recalc_timestamp
+        finder.font_filter.filter_out_ps = True
+        finder.font_filter.filter_out_variable = True
         fonts = finder.find_fonts()
 
     except FontFinderError as e:
@@ -106,7 +102,6 @@ def otf2ttf(
 @output_dir_option()
 @overwrite_flag()
 @recalc_timestamp_flag()
-@debug_flag()
 @Timer(logger=logger.info)
 def ttf2otf(
     input_path: Path,
@@ -117,14 +112,10 @@ def ttf2otf(
     overwrite: bool = True,
     target_upm: Optional[int] = None,
     recalc_timestamp: bool = False,
-    debug: bool = False,
 ) -> None:
     """
     Convert TrueType flavored fonts to PostScript flavored fonts.
     """
-
-    if debug:
-        logger_filter.level = "DEBUG"
 
     filters = FontFinderFilter(filter_out_ps=True, filter_out_variable=True)
     options = FontInitOptions(recalc_timestamp=recalc_timestamp)
