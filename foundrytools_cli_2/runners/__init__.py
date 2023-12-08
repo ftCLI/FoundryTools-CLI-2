@@ -82,8 +82,6 @@ class BaseRunner(metaclass=ABCMeta):
         fonts = self._try_run(self._find_fonts)
         if self._try_run(self._validate_fonts, fonts):
             return fonts
-        else:
-            return None
 
     def _process_fonts(self, fonts: t.List[Font], *args: t.Any, **kwargs: t.Any) -> None:
         for font in fonts:
