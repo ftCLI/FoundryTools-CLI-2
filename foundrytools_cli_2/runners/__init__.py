@@ -48,13 +48,13 @@ class BaseRunner(metaclass=ABCMeta):
     """Base class for all runners"""
 
     def __init__(
-            self,
-            input_path: Path,
-            recursive: bool = False,
-            load_options: t.Optional[FontInitOptions] = None,
-            save_options: t.Optional[FontSaveOptions] = None,
-            font_filter: t.Optional[FontFinderFilter] = None,
-            task_name: str = "Processing",
+        self,
+        input_path: Path,
+        recursive: bool = False,
+        load_options: t.Optional[FontInitOptions] = None,
+        save_options: t.Optional[FontSaveOptions] = None,
+        font_filter: t.Optional[FontFinderFilter] = None,
+        task_name: str = "Processing",
     ) -> None:
         self.input_path = input_path
         self.recursive = recursive
