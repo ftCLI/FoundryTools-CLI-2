@@ -9,7 +9,7 @@ from foundrytools_cli_2.lib.click.click_options import (
     min_area_option,
 )
 from foundrytools_cli_2.lib.constants import FontInitOptions
-from foundrytools_cli_2.lib.font_finder import FontFinder, FontFinderError, FontFinderFilter
+from foundrytools_cli_2.lib.font_finder import FontFinder, FinderError, FinderFilter
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.timer import Timer
 from foundrytools_cli_2.snippets.ps_correct_contours import correct_otf_contours
@@ -22,7 +22,6 @@ cli = click.Group()
 @min_area_option()
 @subroutinize_flag()
 @common_options()
-@Timer(logger=logger.info)
 def fix_contours(
     input_path: Path,
     recursive: bool = False,
@@ -37,7 +36,9 @@ def fix_contours(
     removing tiny paths.
     """
 
-    filters = FontFinderFilter(filter_out_tt=True, filter_out_variable=True)
+    filters = FinderFilter()
+    filters.filter_out_tt = True
+    filters.filter_out_variable = True
     options = FontInitOptions(recalc_timestamp=recalc_timestamp)
     try:
         finder = FontFinder(
@@ -45,7 +46,7 @@ def fix_contours(
         )
         fonts = finder.find_fonts()
 
-    except FontFinderError as e:
+    except FinderError as e:
         logger.error(e)
         raise click.Abort(e)
 
@@ -68,7 +69,6 @@ def fix_contours(
 
 @cli.command("subr")
 @common_options()
-@Timer(logger=logger.info)
 def subr(
     input_path: Path,
     recursive: bool = False,
@@ -88,7 +88,7 @@ def subr(
         )
         fonts = finder.find_fonts()
 
-    except FontFinderError as e:
+    except FinderError as e:
         logger.error(e)
         raise click.Abort(e)
 
@@ -128,7 +128,7 @@ def desubr(
         )
         fonts = finder.find_fonts()
 
-    except FontFinderError as e:
+    except FinderError as e:
         logger.error(e)
         raise click.Abort(e)
 
@@ -180,7 +180,7 @@ def recalc_stems_and_zones(
         )
         fonts = finder.find_fonts()
 
-    except FontFinderError as e:
+    except FinderError as e:
         logger.error(e)
         raise click.Abort(e)
 

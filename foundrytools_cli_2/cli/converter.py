@@ -39,7 +39,7 @@ def ttf2otf(**options: Any) -> None:
     """
     Convert TrueType flavored fonts to PostScript flavored fonts.
     """
-    from foundrytools_cli_2.snippets.tt_to_ps import main as tt_to_ps
+    from foundrytools_cli_2.snippets.tt_to_ps import ttf2otf as tt_to_ps
     runner = FontRunner(task=tt_to_ps, task_name="Converting", **options)
     runner.font_filter.filter_out_ps = True
     runner.font_filter.filter_out_variable = True
