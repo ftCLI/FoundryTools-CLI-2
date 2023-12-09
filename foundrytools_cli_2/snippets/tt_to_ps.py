@@ -9,7 +9,7 @@ from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.snippets.ps_to_tt import build_ttf
 
 
-def ttf_to_otf(font: Font, charstrings: dict) -> Font:
+def build_otf(font: Font, charstrings: dict) -> Font:
     """
     Convert a TrueType font to a OpenType-PS font.
 
@@ -167,7 +167,7 @@ def get_fallback_charstrings(font: Font, tolerance: float = 1.0) -> dict:
     Get the charstrings from a fallback OTF font.
     """
     t2_charstrings = get_t2_charstrings(font=font)
-    otf = ttf_to_otf(font=font, charstrings=t2_charstrings)
+    otf = build_otf(font=font, charstrings=t2_charstrings)
     # We have a fallback OTF font with incorrect contours direction here, so we need to set
     # reverse_direction to False. Later Qu2CuPen will reverse the direction of the contours.
     ttf = build_ttf(font=otf, max_err=tolerance, reverse_direction=False)
@@ -175,7 +175,7 @@ def get_fallback_charstrings(font: Font, tolerance: float = 1.0) -> dict:
     return fallback_charstrings
 
 
-def main(
+def ttf2otf(
     font: Font,
     tolerance: float = 1.0,
     target_upm: t.Optional[int] = None,
@@ -195,7 +195,7 @@ def main(
     charstrings = get_charstrings(font=font, tolerance=tolerance)
 
     logger.info("Converting to OTF...")
-    otf = ttf_to_otf(font=font, charstrings=charstrings)
+    otf = build_otf(font=font, charstrings=charstrings)
 
     if subroutinize:
         logger.info("Subroutinizing...")
