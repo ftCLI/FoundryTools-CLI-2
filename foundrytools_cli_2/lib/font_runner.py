@@ -2,8 +2,10 @@ import typing as t
 from dataclasses import dataclass
 from pathlib import Path
 
-from foundrytools_cli_2.lib import Font, logger, Timer, FontFinder
-from foundrytools_cli_2.lib.font_finder import FinderFilter, FinderOptions, FinderError
+from foundrytools_cli_2.lib.font import Font
+from foundrytools_cli_2.lib.font_finder import FontFinder, FinderFilter, FinderOptions, FinderError
+from foundrytools_cli_2.lib.logger import logger
+from foundrytools_cli_2.lib.timer import Timer
 
 
 class FontSaveError(Exception):
@@ -85,7 +87,7 @@ class FontRunner:
         else:
             logger.info(f"{self.task_name} {font}")
 
-    def _save_font(self, font: Font, suffix: str = "") -> None:
+    def _save_font(self, font: Font) -> None:
         output_file = font.make_out_file_name(
             output_dir=self.save_options.output_dir, overwrite=self.save_options.overwrite
         )
