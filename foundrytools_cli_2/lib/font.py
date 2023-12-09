@@ -1,9 +1,7 @@
 import typing as t
-from contextlib import contextmanager
 from io import BytesIO
 from pathlib import Path
 
-from cffsubr import subroutinize, desubroutinize
 from dehinter.font import dehint
 from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.boundsPen import BoundsPen
@@ -13,6 +11,7 @@ from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import NamedInstance, Axis
 
+from foundrytools_cli_2.snippets.cffsubr import cff_subr, cff_desubr
 from foundrytools_cli_2.snippets.ps_recalc_stems import recalc_stems
 from foundrytools_cli_2.snippets.ps_recalc_zones import recalc_zones, GlyphBounds
 
@@ -531,38 +530,16 @@ class Font:  # pylint: disable=too-many-public-methods
 
         scale_upem(self.ttfont, new_upem=new_upem)
 
-    @contextmanager
-    def _restore_flavor(self) -> t.Iterator[None]:
-        """
-        This is a workaround to support subroutinization and desubroutinization for WOFF and WOFF2
-        fonts with cffsubr without raising an exception. This context manager is used to temporarily
-        set the font flavor to None and restore it after subroutinization or desubroutinization.
-        """
-        original_flavor = self.ttfont.flavor
-        self.ttfont.flavor = None
-        try:
-            yield
-        finally:
-            self.ttfont.flavor = original_flavor
-
     def ps_subroutinize(self) -> None:
         """
         Subroutinize a PostScript font.
         """
 
-        if not self.is_ps:
-            raise NotImplementedError("Subroutinization is only supported for PostScript fonts.")
-
-        with self._restore_flavor():
-            subroutinize(otf=self.ttfont)
+        cff_subr(font=self.ttfont)
 
     def ps_desubroutinize(self) -> None:
         """
         Desubroutinize a PostScript font.
         """
 
-        if not self.is_ps:
-            raise NotImplementedError("Desubroutinization is only supported for PostScript fonts.")
-
-        with self._restore_flavor():
-            desubroutinize(otf=self.ttfont)
+        cff_desubr(font=self.ttfont)
