@@ -452,6 +452,33 @@ class Font:  # pylint: disable=too-many-public-methods
 
         return advance_widths
 
+    def to_woff(self) -> None:
+        """
+        Convert a font to WOFF.
+        """
+        if self.is_woff:
+            raise ValueError("Font is already a WOFF font.")
+
+        self.ttfont.flavor = WOFF_FLAVOR
+
+    def to_woff2(self) -> None:
+        """
+        Convert a font to WOFF2.
+        """
+        if self.is_woff2:
+            raise ValueError("Font is already a WOFF2 font.")
+
+        self.ttfont.flavor = WOFF2_FLAVOR
+
+    def to_sfnt(self) -> None:
+        """
+        Convert a font to SFNT.
+        """
+        if self.is_sfnt:
+            raise ValueError("Font is already a SFNT font.")
+
+        self.ttfont.flavor = None
+
     def tt_decomponentize(self) -> None:
         """
         Decomponentize a TrueType font.
