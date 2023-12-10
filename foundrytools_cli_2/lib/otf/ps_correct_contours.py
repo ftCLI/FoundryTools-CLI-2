@@ -2,7 +2,8 @@ from fontTools.fontBuilder import FontBuilder
 from fontTools.pens.t2CharStringPen import T2CharStringPen
 from fontTools.ttLib.tables import C_F_F_
 
-from foundrytools_cli_2.lib import Font, logger
+from foundrytools_cli_2.lib.font import Font
+from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.pathops.skia_tools import (
     remove_tiny_paths,
     same_path,

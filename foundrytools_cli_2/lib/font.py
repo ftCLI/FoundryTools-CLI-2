@@ -11,9 +11,9 @@ from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import NamedInstance, Axis
 
-from foundrytools_cli_2.snippets.cffsubr import cff_subr, cff_desubr
-from foundrytools_cli_2.snippets.ps_recalc_stems import recalc_stems
-from foundrytools_cli_2.snippets.ps_recalc_zones import recalc_zones, GlyphBounds
+from foundrytools_cli_2.lib.otf.cffsubr import cff_subr, cff_desubr
+from foundrytools_cli_2.lib.otf.ps_recalc_stems import recalc_stems
+from foundrytools_cli_2.lib.otf.ps_recalc_zones import recalc_zones, GlyphBounds
 
 PS_SFNT_VERSION = "OTTO"
 TT_SFNT_VERSION = "\0\1\0\0"
