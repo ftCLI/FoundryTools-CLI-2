@@ -1,5 +1,4 @@
-# pylint: disable=import-outside-toplevel
-# pylint: disable=no-untyped-def
+# pylint: disable=import-outside-toplevel, no-untyped-defs
 
 import click
 
@@ -7,6 +6,8 @@ from foundrytools_cli_2.lib.click.click_options import (
     common_options,
     subroutinize_flag,
     min_area_option,
+    zones_flag,
+    stems_flag,
 )
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font_runner import FontRunner
@@ -16,7 +17,9 @@ from foundrytools_cli_2.lib.timer import Timer
 cli = click.Group()
 
 
-@cli.command("recalc-sz")
+@cli.command("recalc-zs")
+@zones_flag()
+@stems_flag()
 @common_options()
 @Timer(logger=logger.info)
 def recalc_zs(**options) -> None:
