@@ -29,7 +29,7 @@ def sfnt_to_wf(
         out_formats = [out_format]
 
     if WOFF_FLAVOR in out_formats:
-        logger.info(f"Converting to WOFF")
+        logger.info("Converting to WOFF")
         font.to_woff()
         out_file = font.make_out_file_name(
             output_dir=output_dir, overwrite=overwrite, suffix=suffix
@@ -38,7 +38,7 @@ def sfnt_to_wf(
         logger.success(f"File saved to {out_file}")
 
     if WOFF2_FLAVOR in out_formats:
-        logger.info(f"Converting to WOFF2")
+        logger.info("Converting to WOFF2")
         font.to_woff2()
         out_file = font.make_out_file_name(
             output_dir=output_dir, overwrite=overwrite, suffix=suffix
