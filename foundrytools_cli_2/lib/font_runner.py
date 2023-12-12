@@ -1,9 +1,9 @@
 import typing as t
-from dataclasses import dataclass
 from pathlib import Path
 
+from foundrytools_cli_2.lib.constants import FinderOptions, SaveOptions
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font_finder import FontFinder, FinderOptions, FinderError
+from foundrytools_cli_2.lib.font_finder import FontFinder, FinderError
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.timer import Timer
 from foundrytools_cli_2.lib.utils.misc import log_current_font, save_font
@@ -17,27 +17,15 @@ class NoFontsFoundError(Exception):
     """Raised when no fonts are found by the FontFinder"""
 
 
-@dataclass
-class SaveOptions:
-    """
-    A class that specifies how to save the font.
-    """
-
-    reorder_tables: t.Optional[bool] = True
-    suffix: str = ""
-    output_dir: t.Optional[Path] = None
-    overwrite: bool = False
-
-
 class FontRunner:  # pylint: disable=too-few-public-methods
     """Base class for all runners"""
 
     def __init__(
-        self,
-        input_path: Path,
-        task: t.Callable,
-        auto_save: bool = True,
-        **options: t.Dict[str, t.Any],
+            self,
+            input_path: Path,
+            task: t.Callable,
+            auto_save: bool = True,
+            **options: t.Dict[str, t.Any],
     ) -> None:
         """
         Initialize a new instance of the class.
@@ -109,7 +97,7 @@ class FontRunner:  # pylint: disable=too-few-public-methods
 
     @staticmethod
     def _parse_options(
-        options: t.Dict[str, t.Any]
+            options: t.Dict[str, t.Any]
     ) -> t.Tuple[FinderOptions, SaveOptions, t.Dict[str, t.Any]]:
         """
         Parses options provided as a dictionary and returns three objects: FinderOptions,

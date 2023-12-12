@@ -4,19 +4,8 @@ from pathlib import Path
 
 from fontTools.ttLib.ttFont import TTLibError
 
+from foundrytools_cli_2.lib.constants import FinderOptions
 from foundrytools_cli_2.lib.font import Font
-
-
-@dataclass
-class FinderOptions:
-    """
-    A class that specifies the options to pass to the FontFinder class.
-    """
-
-    recursive: bool = False
-    lazy: t.Optional[bool] = None
-    recalc_bboxes: bool = True
-    recalc_timestamp: bool = False
 
 
 @dataclass
@@ -204,4 +193,4 @@ def _is_variable(font: Font) -> bool:
     return font.is_variable
 
 
-__all__ = ["FontFinder", "FinderError", "FinderFilter", "FinderOptions"]
+__all__ = ["FontFinder", "FinderError", "FinderFilter"]
