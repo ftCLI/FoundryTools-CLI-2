@@ -103,7 +103,7 @@ def woff2_to_sfnt(**options: t.Dict[str, t.Any]) -> None:
 @in_format_choice()
 @common_options()
 def wf_to_sfnt(
-        in_format: t.Optional[t.Literal["woff", "woff2"]], **options: t.Dict[str, t.Any]
+    in_format: t.Optional[t.Literal["woff", "woff2"]], **options: t.Dict[str, t.Any]
 ) -> None:
     """
     Convert WOFF and WOFF2 fonts to SFNT fonts.

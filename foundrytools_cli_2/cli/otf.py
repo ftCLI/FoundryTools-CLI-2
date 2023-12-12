@@ -29,9 +29,7 @@ def recalc_zs(**options: dict) -> None:
     """
     from foundrytools_cli_2.snippets.otf.recalc_zones_and_stems import recalc_zones_and_stems
 
-    runner = FontRunner(
-        task=recalc_zones_and_stems, **options
-    )
+    runner = FontRunner(task=recalc_zones_and_stems, **options)
     runner.finder.filter.filter_out_tt = True
     runner.run()
 
