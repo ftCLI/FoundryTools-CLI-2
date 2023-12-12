@@ -38,7 +38,7 @@ class FontRunner:
         task_name: str = "Processing",
         auto_save: bool = True,
         **options: t.Any,
-    ) -> None:
+    ) -> None:  # pylint: disable=too-few-public-methods
         """
         Initialize a new instance of the class.
 
@@ -77,7 +77,7 @@ class FontRunner:
 
                 try:
                     self.task(font, **self.callable_options)
-                except Exception as e:
+                except Exception as e:  # pylint: disable=broad-except
                     logger.error(f"{type(e).__name__}: {e}")
                     continue
 
