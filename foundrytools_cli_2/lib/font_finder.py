@@ -13,7 +13,7 @@ class FinderOptions:
     A class that specifies the options to pass to the FontFinder class.
     """
 
-    input_path: Path
+    input_path: t.Optional[Path] = None
     recursive: bool = False
     lazy: t.Optional[bool] = None
     recalc_bboxes: bool = True
