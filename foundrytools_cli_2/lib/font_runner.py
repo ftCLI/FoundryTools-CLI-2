@@ -55,8 +55,11 @@ class FontRunner:
         self.task = task
         self.task_name = task_name
 
-    @Timer(logger=logger.opt(colors=True).info, text=f"Elapsed time <cyan>{{:0.4f}} seconds</>")
+    @Timer(logger=logger.opt(colors=True).info, text="Elapsed time <cyan>{:0.4f} seconds</>")
     def run(self) -> None:
+        """
+        Executes a task processing multiple fonts.
+        """
         try:
             fonts = self._find_fonts()
         except (FinderError, NoFontsFoundError) as e:
