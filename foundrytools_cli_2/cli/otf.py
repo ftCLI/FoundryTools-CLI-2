@@ -1,4 +1,4 @@
-# pylint: disable=import-outside-toplevel, no-untyped-defs
+# pylint: disable=import-outside-toplevel
 
 import click
 
@@ -22,7 +22,7 @@ cli = click.Group()
 @stems_flag()
 @common_options()
 @Timer(logger=logger.info)
-def recalc_zs(**options) -> None:
+def recalc_zs(**options: dict) -> None:
     """
     Recalculates hinting stems and zones for the given font files.
     """
@@ -37,7 +37,7 @@ def recalc_zs(**options) -> None:
 
 @cli.command("subr")
 @common_options()
-def subr(**options) -> None:
+def subr(**options: dict) -> None:
     """
     Subroutinize OpenType-PS fonts with ``cffsubr``.
     """
@@ -49,7 +49,7 @@ def subr(**options) -> None:
 
 @cli.command("desubr")
 @common_options()
-def desubr(**options) -> None:
+def desubr(**options: dict) -> None:
     """
     Desubroutinize OpenType-PS fonts with ``cffsubr``.
     """
@@ -63,7 +63,7 @@ def desubr(**options) -> None:
 @min_area_option()
 @subroutinize_flag()
 @common_options()
-def fix_contours(**options) -> None:
+def fix_contours(**options: dict) -> None:
     """
     Fix the contours of OpenType-PS fonts by removing overlaps, correcting contours direction, and
     removing tiny paths.

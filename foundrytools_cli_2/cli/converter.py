@@ -1,4 +1,4 @@
-# pylint: disable=import-outside-toplevel, pylint: disable=no-untyped-defs
+# pylint: disable=import-outside-toplevel
 
 from typing import Any, Literal, Optional
 
@@ -23,7 +23,7 @@ cli = click.Group()
 @tolerance_option()
 @target_upm_option(help_msg="Scale the converted fonts to the specified UPM.")
 @common_options()
-def ps_to_tt(**options: Any) -> None:
+def ps_to_tt(**options: dict) -> None:
     """
     Convert PostScript flavored fonts to TrueType flavored fonts.
     """
@@ -40,7 +40,7 @@ def ps_to_tt(**options: Any) -> None:
 @target_upm_option(help_msg="Scale the converted fonts to the specified UPM.")
 @subroutinize_flag()
 @common_options()
-def ttf2otf(**options: Any) -> None:
+def ttf2otf(**options: dict) -> None:
     """
     Convert TrueType flavored fonts to PostScript flavored fonts.
     """
@@ -54,7 +54,7 @@ def ttf2otf(**options: Any) -> None:
 
 @cli.command("to-woff")
 @common_options()
-def sfnt_to_woff(**options: Any) -> None:
+def sfnt_to_woff(**options: dict) -> None:
     """
     Convert SFNT fonts to WOFF flavored fonts.
     """
@@ -66,7 +66,7 @@ def sfnt_to_woff(**options: Any) -> None:
 
 @cli.command("to-woff2")
 @common_options()
-def sfnt_to_woff2(**options: Any) -> None:
+def sfnt_to_woff2(**options: dict) -> None:
     """
     Convert SFNT fonts to WOFF2 flavored fonts.
     """
@@ -77,7 +77,7 @@ def sfnt_to_woff2(**options: Any) -> None:
 
 @cli.command("from-woff")
 @common_options()
-def woff_to_sfnt(**options: Any) -> None:
+def woff_to_sfnt(**options: dict) -> None:
     """
     Convert WOFF flavored fonts to SFNT fonts.
     """
@@ -89,7 +89,7 @@ def woff_to_sfnt(**options: Any) -> None:
 
 @cli.command("from-woff2")
 @common_options()
-def woff2_to_sfnt(**options: Any) -> None:
+def woff2_to_sfnt(**options: dict) -> None:
     """
     Convert WOFF2 flavored fonts to SFNT fonts.
     """
