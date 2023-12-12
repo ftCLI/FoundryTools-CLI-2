@@ -111,6 +111,17 @@ class FontRunner:  # pylint: disable=too-few-public-methods
     def _parse_options(
         options: t.Dict[str, t.Any]
     ) -> t.Tuple[FinderOptions, SaveOptions, t.Dict[str, t.Any]]:
+        """
+        Parses options provided as a dictionary and returns three objects: FinderOptions,
+        SaveOptions, and a dictionary of callable options.
+
+        Parameters:
+            options (Dict[str, Any]): A dictionary containing various options.
+
+        Returns:
+            Tuple[FinderOptions, SaveOptions, Dict[str, Any]]: A tuple containing three objects:
+            FinderOptions, SaveOptions, and a dictionary of callable options.
+        """
         finder_options = FinderOptions()
         save_options = SaveOptions()
         callable_options = {}
