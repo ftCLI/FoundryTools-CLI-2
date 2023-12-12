@@ -352,3 +352,43 @@ def out_format_choice() -> t.Callable:
         )
     ]
     return add_options(_out_format_choice)
+
+
+def zones_flag() -> t.Callable:
+    """
+    Add the zones option to a click command.
+
+    :return: a decorator that adds the zones option to a click command
+    """
+    _zones_flag = [
+        click.option(
+            "--no-zones",
+            "zones",
+            is_flag=True,
+            default=True,
+            help="""
+            Do not recalculate zones BlueValues and OtherBlues.
+            """,
+        )
+    ]
+    return add_options(_zones_flag)
+
+
+def stems_flag() -> t.Callable:
+    """
+    Add the stems option to a click command.
+
+    :return: a decorator that adds the stems option to a click command
+    """
+    _stems_flag = [
+        click.option(
+            "--no-stems",
+            "stems",
+            is_flag=True,
+            default=True,
+            help="""
+            Do not recalculate stems StdHW and StdVW.
+            """,
+        )
+    ]
+    return add_options(_stems_flag)

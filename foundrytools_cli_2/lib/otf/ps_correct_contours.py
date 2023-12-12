@@ -5,20 +5,21 @@ from fontTools.ttLib.tables import C_F_F_
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.pathops.skia_tools import (
-    skia_path_from_glyph,
-    simplify_path,
     remove_tiny_paths,
     same_path,
+    simplify_path,
+    skia_path_from_glyph,
     t2_charstring_from_skia_path,
 )
 
 
-def correct_otf_contours(font: Font, min_area: int = 25) -> None:
+def correct_otf_contours(font: Font, min_area: int = 25, subroutinize: bool = True) -> None:
     """
     Corrects the contours of an OTF font.
 
     :param font: the font
     :param min_area: the minimum area of a path
+    :param subroutinize: whether to subroutinize the charstrings
     :return: None
     """
 
@@ -68,3 +69,7 @@ def correct_otf_contours(font: Font, min_area: int = 25) -> None:
     fb.setupCFF(
         psName=ps_name, fontInfo=font_info, privateDict=private_dict, charStringsDict=charstrings
     )
+
+    if subroutinize:
+        logger.info("Subroutinizing...")
+        font.ps_subroutinize()

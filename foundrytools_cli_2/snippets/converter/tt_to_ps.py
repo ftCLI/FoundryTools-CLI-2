@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple
+import typing as t
 
 from fontTools.fontBuilder import FontBuilder
 from fontTools.pens.qu2cuPen import Qu2CuPen
@@ -6,10 +6,10 @@ from fontTools.pens.t2CharStringPen import T2CharStringPen
 
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.logger import logger
-from foundrytools_cli_2.snippets.ps_to_tt import otf_to_ttf
+from foundrytools_cli_2.snippets.converter.ps_to_tt import build_ttf
 
 
-def ttf_to_otf(font: Font, charstrings: dict) -> Font:
+def build_otf(font: Font, charstrings: dict) -> Font:
     """
     Convert a TrueType font to a OpenType-PS font.
 
@@ -91,14 +91,14 @@ def get_post_values(font: Font) -> dict:
     return post_info
 
 
-def get_charstrings(font: Font, tolerance: float = 1.0) -> Dict:
+def get_charstrings(font: Font, tolerance: float = 1.0) -> t.Dict:
     """
     Get CFF charstrings using Qu2CuPen, falling back to T2CharStringPen if Qu2CuPen fails.
 
     :return: CFF charstrings.
     """
 
-    charstrings: Dict = {}
+    charstrings: t.Dict = {}
     try:
         tolerance = tolerance / 1000 * font.ttfont["head"].unitsPerEm
         failed, charstrings = get_qu2cu_charstrings(font, tolerance=tolerance)
@@ -120,7 +120,7 @@ def get_charstrings(font: Font, tolerance: float = 1.0) -> Dict:
     return charstrings
 
 
-def get_qu2cu_charstrings(font: Font, tolerance: float = 1.0) -> Tuple[List, Dict]:
+def get_qu2cu_charstrings(font: Font, tolerance: float = 1.0) -> t.Tuple[t.List, t.Dict]:
     """
     Get CFF charstrings using Qu2CuPen
 
@@ -167,9 +167,36 @@ def get_fallback_charstrings(font: Font, tolerance: float = 1.0) -> dict:
     Get the charstrings from a fallback OTF font.
     """
     t2_charstrings = get_t2_charstrings(font=font)
-    otf = ttf_to_otf(font=font, charstrings=t2_charstrings)
+    otf = build_otf(font=font, charstrings=t2_charstrings)
     # We have a fallback OTF font with incorrect contours direction here, so we need to set
     # reverse_direction to False. Later Qu2CuPen will reverse the direction of the contours.
-    ttf = otf_to_ttf(font=otf, max_err=tolerance, reverse_direction=False)
+    ttf = build_ttf(font=otf, max_err=tolerance, reverse_direction=False)
     _, fallback_charstrings = get_qu2cu_charstrings(ttf, tolerance=tolerance)
     return fallback_charstrings
+
+
+def ttf2otf(
+    font: Font,
+    tolerance: float = 1.0,
+    target_upm: t.Optional[int] = None,
+    subroutinize: bool = True,
+) -> None:
+    """
+    Convert PostScript flavored fonts to TrueType flavored fonts.
+    """
+    logger.info("Decomponentizing source font...")
+    font.tt_decomponentize()
+
+    if target_upm:
+        logger.info(f"Scaling UPM to {target_upm}")
+        font.tt_scale_upem(new_upem=target_upm)
+
+    logger.info("Getting charstrings...")
+    charstrings = get_charstrings(font=font, tolerance=tolerance)
+
+    logger.info("Converting to OTF...")
+    otf = build_otf(font=font, charstrings=charstrings)
+
+    if subroutinize:
+        logger.info("Subroutinizing...")
+        otf.ps_subroutinize()

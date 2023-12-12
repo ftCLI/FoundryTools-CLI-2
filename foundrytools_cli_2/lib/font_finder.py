@@ -4,12 +4,12 @@ from pathlib import Path
 
 from fontTools.ttLib.ttFont import TTLibError
 
-from foundrytools_cli_2.lib.constants import FontInitOptions
+from foundrytools_cli_2.lib.constants import FinderOptions
 from foundrytools_cli_2.lib.font import Font
 
 
 @dataclass
-class FontFinderFilter:
+class FinderFilter:
     """
     A class that specifies which fonts to filter out when searching for fonts.
     """
@@ -23,7 +23,7 @@ class FontFinderFilter:
     filter_out_variable: bool = False
 
 
-class FontFinderError(Exception):
+class FinderError(Exception):
     """
     An exception raised by the FontFinder class.
     """
@@ -38,47 +38,37 @@ class FontFinder:
     PostScript), font variations (static or variable), and font flavor ('woff', 'woff2' or
     ``None``).
 
-    The class returns a list of Font objects that meet the specified criteria.
-
-    Attributes:
-
-        input_path: A Path object pointing to the input path. The input path can be a directory or a
-            file.
-        recursive: A boolean indicating whether to search recursively.
-        font_options: A FontLoadOptions object that specifies how to load the fonts.
-        font_filter: A FontFinderFilters object that specifies which fonts to filter out.
+    The class returns a list or a generator of Font objects that meet the specified criteria.
     """
 
     def __init__(
         self,
-        input_path: t.Union[str, Path],
-        recursive: bool = False,
-        font_options: t.Optional[FontInitOptions] = None,
-        font_filter: t.Optional[FontFinderFilter] = None,
+        input_path: Path,
+        options: FinderOptions,
+        filter_: t.Optional[FinderFilter] = None,
     ) -> None:
-        """
-        Initialize the FontFinder class.
+        """Initialize the FontFinder class.
 
-        Args:
-            input_path: A Path object pointing to the input path. The input path can be a directory
-                or a file.
-            recursive: A boolean indicating whether to search recursively.
-            font_options: A FontLoadOptions object that specifies how to load the fonts.
-            font_filter: A FontFinderFilters object that specifies which fonts to filter out.
+        Parameters:
+            options (FinderOptions): An instance of FinderOptions class that contains the options
+                for font finding.
+            filter_ (FontFinderFilter, optional): An instance of FontFinderFilter class that
+                specifies the filter conditions for font finding. Defaults to None.
 
-        Returns:
-            None
+        Raises:
+            FontFinderError: If the input path is invalid.
         """
+        self.input_path = input_path
+        self.options = options
 
         try:
-            self.input_path = Path(input_path).resolve(strict=True)
+            self.input_path = Path(self.input_path).resolve(strict=True)
         except Exception as e:
-            raise FontFinderError(f"Invalid input path: {input_path}") from e
-        self.recursive = recursive
-        self.font_options = font_options or FontInitOptions()
-        self.font_filter = font_filter or FontFinderFilter()
-        self._filter_conditions = self._generate_filter_conditions(self.font_filter)
-        self._validate_font_filter()
+            raise FinderError(f"Invalid input path: {self.input_path}") from e
+
+        self.filter = filter_ or FinderFilter()
+        self._filter_conditions = self._generate_filter_conditions(self.filter)
+        self._validate_filter_conditions()
 
     def find_fonts(self) -> t.List[Font]:
         """
@@ -91,19 +81,19 @@ class FontFinder:
 
     def generate_fonts(self) -> t.Generator[Font, None, None]:
         """
-        A generator that yields TTFont or TTFont subclass objects found in the input path.
+        Generates a collection of fonts.
 
         Returns:
-            A generator of TTFont or TTFont subclass objects.
+            A generator that yields instances of Font.
         """
         files = self._generate_files()
         for file in files:
             try:
                 font = Font(
                     file,
-                    lazy=self.font_options.lazy,
-                    recalc_timestamp=self.font_options.recalc_timestamp,
-                    recalc_bboxes=self.font_options.recalc_bboxes,
+                    lazy=self.options.lazy,
+                    recalc_timestamp=self.options.recalc_timestamp,
+                    recalc_bboxes=self.options.recalc_bboxes,
                 )
                 if not any(condition and func(font) for condition, func in self._filter_conditions):
                     yield font
@@ -123,12 +113,12 @@ class FontFinder:
         if is_file:
             yield self.input_path
         elif is_dir:
-            if self.recursive:
+            if self.options.recursive:
                 yield from (x for x in self.input_path.rglob("*") if x.is_file())
             else:
                 yield from (x for x in self.input_path.glob("*") if x.is_file())
 
-    def _validate_font_filter(self) -> None:
+    def _validate_filter_conditions(self) -> None:
         """
         Validates the font filter options.
 
@@ -138,19 +128,19 @@ class FontFinder:
         Raises:
             FontFinderError: If the font filter options are invalid.
         """
-        if self.font_filter.filter_out_tt and self.font_filter.filter_out_ps:
-            raise FontFinderError("Cannot filter out both TrueType and PostScript fonts.")
+        if self.filter.filter_out_tt and self.filter.filter_out_ps:
+            raise FinderError("Cannot filter out both TrueType and PostScript fonts.")
         if (
-            self.font_filter.filter_out_woff
-            and self.font_filter.filter_out_woff2
-            and self.font_filter.filter_out_sfnt
+            self.filter.filter_out_woff
+            and self.filter.filter_out_woff2
+            and self.filter.filter_out_sfnt
         ):
-            raise FontFinderError("Cannot filter out both web fonts and SFNT fonts.")
-        if self.font_filter.filter_out_static and self.font_filter.filter_out_variable:
-            raise FontFinderError("Cannot filter out both static and variable fonts.")
+            raise FinderError("Cannot filter out both web fonts and SFNT fonts.")
+        if self.filter.filter_out_static and self.filter.filter_out_variable:
+            raise FinderError("Cannot filter out both static and variable fonts.")
 
     @staticmethod
-    def _generate_filter_conditions(filter_: FontFinderFilter) -> t.List[t.Tuple[bool, t.Callable]]:
+    def _generate_filter_conditions(filter_: FinderFilter) -> t.List[t.Tuple[bool, t.Callable]]:
         """
         Generate filter conditions based on the provided FontFinderFilter object.
 
@@ -176,94 +166,31 @@ class FontFinder:
 
 
 def _is_woff(font: Font) -> bool:
-    """
-    Returns a boolean indicating whether the given font is a WOFF font.
-
-    Args:
-        font (Font): A Font object.
-
-    Returns:
-        bool: A boolean indicating whether the given font is a WOFF font.
-    """
     return font.is_woff
 
 
 def _is_woff2(font: Font) -> bool:
-    """
-    Returns a boolean indicating whether the given font is a WOFF2 font.
-
-    Args:
-        font (Font): A Font object.
-
-    Returns:
-        bool: A boolean indicating whether the given font is a WOFF2 font.
-    """
     return font.is_woff2
 
 
 def _is_sfnt(font: Font) -> bool:
-    """
-    Returns a boolean indicating whether the given font is a sfnt font.
-
-    Args:
-        font (Font): A TTFont object.
-
-    Returns:
-        bool: A boolean indicating whether the given font is a sfnt font.
-    """
     return font.is_sfnt
 
 
 def _is_ps(font: Font) -> bool:
-    """
-    Returns a boolean indicating whether the given font is an OpenType font.
-
-    Args:
-        font (Font): A Font object.
-
-    Returns:
-        bool: A boolean indicating whether the given font is an OpenType font.
-    """
     return font.is_ps
 
 
 def _is_tt(font: Font) -> bool:
-    """
-    Returns a boolean indicating whether the given font is a TrueType font.
-
-    Args:
-        font (Font): A Font object.
-
-    Returns:
-        bool: A boolean indicating whether the given font is a TrueType font.
-    """
     return font.is_tt
 
 
 def _is_static(font: Font) -> bool:
-    """
-    Returns a boolean indicating whether the given font is a static font.
-
-    Args:
-        font (Font): A Font object.
-
-    Returns:
-        bool: A boolean indicating whether the given font is a static font.
-    """
     return font.is_static
 
 
 def _is_variable(font: Font) -> bool:
-    """
-    Returns a boolean indicating whether the given font is a variable font.
-
-    Args:
-        font (Font): A Font object.
-
-    Returns:
-        bool: A boolean indicating whether the given font is a variable font.
-    """
     return font.is_variable
 
 
-__all__ = ["FontFinder", "FontFinderError", "FontFinderFilter"]
+__all__ = ["FontFinder", "FinderError", "FinderFilter"]

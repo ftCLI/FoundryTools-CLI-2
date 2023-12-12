@@ -4,9 +4,9 @@ from collections import Counter
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.ttLib.ttFont import TTFont
 
-UPPERCASE_LETTERS = [chr(i) for i in range(65, 91)]
+UPPERCASE_LETTERS = [chr(i) for i in range(65, 91)]  # A-Z
 UPPERCASE_DESCENDERS = ["J", "Q"]
-LOWERCASE_LETTERS = [chr(i) for i in range(97, 123)]
+LOWERCASE_LETTERS = [chr(i) for i in range(97, 123)]  # a-z
 LOWERCASE_DESCENDERS = ["f", "g", "j", "p", "q", "y"]
 LOWERCASE_ASCENDERS = ["b", "d", "f", "h", "k", "l", "t"]
 

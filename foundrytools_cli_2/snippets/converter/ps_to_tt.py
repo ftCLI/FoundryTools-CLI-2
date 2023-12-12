@@ -1,4 +1,4 @@
-from typing import Dict
+import typing as t
 
 from fontTools.pens.cu2quPen import Cu2QuPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
@@ -8,6 +8,7 @@ from fontTools.ttLib.tables._g_l_y_f import (
     Glyph,
 )  # pylint: disable=protected-access
 
+from foundrytools_cli_2.lib import logger
 from foundrytools_cli_2.lib.font import Font
 
 T_CFF = "CFF "
@@ -20,7 +21,7 @@ T_VORG = "VORG"
 MAXP_TABLE_VERSION = 0x00010000
 
 
-def otf_to_ttf(
+def build_ttf(
     font: Font, max_err: float = 1.0, reverse_direction: bool = True, post_format: float = 2.0
 ) -> Font:
     """
@@ -98,8 +99,8 @@ def update_hmtx(font: Font, glyf: table__g_l_y_f) -> None:
 
 
 def glyphs_to_quadratic(
-    glyphs: Dict, max_err: float = 1.0, reverse_direction: bool = False
-) -> Dict[str, Glyph]:
+    glyphs: t.Dict, max_err: float = 1.0, reverse_direction: bool = False
+) -> t.Dict[str, Glyph]:
     """
     Convert the glyphs of a font to quadratic.
 
@@ -122,3 +123,21 @@ def glyphs_to_quadratic(
         glyph.draw(cu2qu_pen)
         quad_glyphs[gname] = tt_pen.glyph()
     return quad_glyphs
+
+
+def otf2ttf(
+    font: Font,
+    tolerance: float = 1.0,
+    target_upm: t.Optional[int] = None,
+) -> None:
+    """
+    Convert PostScript flavored fonts to TrueType flavored fonts.
+    """
+    tt = build_ttf(font=font, max_err=tolerance, reverse_direction=True)
+    if target_upm:
+        logger.info(f"Scaling UPM to {target_upm}")
+        tt.tt_scale_upem(new_upem=target_upm)
+
+    out_file = font.make_out_file_name(overwrite=True)
+    tt.save(out_file)
+    logger.success(f"File saved to {out_file}")
