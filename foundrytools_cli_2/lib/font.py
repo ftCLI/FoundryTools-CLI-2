@@ -480,10 +480,13 @@ class Font:  # pylint: disable=too-many-public-methods
         if not self.is_ps:
             raise NotImplementedError("Getting zones is only supported for PostScript fonts.")
 
-        return (
-            getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "OtherBlues"),
-            getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "BlueValues"),
-        )
+        try:
+            return (
+                getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "OtherBlues"),
+                getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "BlueValues"),
+            )
+        except AttributeError:
+            return [], []
 
     def ps_get_stems(self) -> t.Tuple[int, int]:
         """
@@ -494,10 +497,13 @@ class Font:  # pylint: disable=too-many-public-methods
         if not self.is_ps:
             raise NotImplementedError("Getting stems is only supported for PostScript fonts.")
 
-        return (
-            getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "StdHW"),
-            getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "StdVW"),
-        )
+        try:
+            return (
+                getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "StdHW"),
+                getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "StdVW"),
+            )
+        except AttributeError:
+            return 0, 0
 
     def ps_set_zones(self, other_blues: t.List[int], blue_values: t.List[int]) -> None:
         """

@@ -31,7 +31,7 @@ def recalc_zs(input_path: Path, **options: dict) -> None:
     from foundrytools_cli_2.snippets.otf.recalc_zones_and_stems import recalc_zones_and_stems
 
     runner = FontRunner(input_path=input_path, task=recalc_zones_and_stems, **options)
-    runner.finder.filter.filter_out_tt = True
+    runner.filter.filter_out_tt = True
     runner.run()
 
 
@@ -43,7 +43,7 @@ def subr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
 
     runner = FontRunner(input_path=input_path, task=Font.ps_subroutinize, **options)
-    runner.finder.filter.filter_out_tt = True
+    runner.filter.filter_out_tt = True
     runner.run()
 
 
@@ -55,7 +55,7 @@ def desubr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
 
     runner = FontRunner(input_path=input_path, task=Font.ps_desubroutinize, **options)
-    runner.finder.filter.filter_out_tt = True
+    runner.filter.filter_out_tt = True
     runner.run()
 
 
@@ -70,6 +70,6 @@ def fix_contours(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
 
     runner = FontRunner(input_path=input_path, task=Font.ps_correct_contours, **options)
-    runner.finder.filter.filter_out_tt = True
-    runner.finder.filter.filter_out_variable = True
+    runner.filter.filter_out_tt = True
+    runner.filter.filter_out_variable = True
     runner.run()

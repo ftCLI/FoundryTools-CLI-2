@@ -15,8 +15,6 @@ def recalc_zones_and_stems(font: Font, zones: bool = True, stems: bool = True) -
         logger.info("Both zones and stems are disabled, nothing to do")
         return
 
-    font_has_changed = False
-
     if stems:
         logger.info("Getting stems...")
         current_std_h_w, current_std_v_w = font.ps_get_stems()
@@ -27,7 +25,6 @@ def recalc_zones_and_stems(font: Font, zones: bool = True, stems: bool = True) -
         if current_std_h_w == std_h_w and current_std_v_w == std_v_w:
             logger.info("Stems are already up-to-date")
         else:
-            font_has_changed = True
             font.ps_set_stems(std_h_w, std_v_w)
 
     if zones:
@@ -40,9 +37,4 @@ def recalc_zones_and_stems(font: Font, zones: bool = True, stems: bool = True) -
         if current_other_blues == other_blues and current_blue_values == blue_values:
             logger.info("Zones are already up-to-date")
         else:
-            font_has_changed = True
             font.ps_set_zones(other_blues, blue_values)
-
-    if not font_has_changed:
-        logger.info("Nothing to do")
-        return
