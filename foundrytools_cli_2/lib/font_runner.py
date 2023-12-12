@@ -3,7 +3,7 @@ from pathlib import Path
 
 from foundrytools_cli_2.lib.constants import FinderOptions, SaveOptions
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font_finder import FontFinder, FinderError
+from foundrytools_cli_2.lib.font_finder import FontFinder, FinderError, FinderFilter
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.timer import Timer
 from foundrytools_cli_2.lib.utils.misc import log_current_font, save_font
@@ -33,13 +33,13 @@ class FontRunner:  # pylint: disable=too-few-public-methods
             task (Callable): The task to be executed.
             auto_save (bool, optional): Flag indicating whether to automatically save the task
                 results. Defaults to True.
-            **options (Any): Additional options for the task.
+            **options (Dict[str, Any]): A dictionary containing various options.
         """
         self.input_path = input_path
         self._finder_options, self._save_options, self._callable_options = self._parse_options(
             options
         )
-        self.finder = self._init_font_finder()
+        self.filter = FinderFilter()
         self.auto_save = True
         self.task = task
 
@@ -86,10 +86,12 @@ class FontRunner:  # pylint: disable=too-few-public-methods
         return FontFinder(
             input_path=self.input_path,
             options=self._finder_options,
+            filter_=self.filter,
         )
 
     def _find_fonts(self) -> t.List[Font]:
-        fonts = self.finder.find_fonts()
+        finder = self._init_font_finder()
+        fonts = finder.find_fonts()
         if not fonts:
             raise NoFontsFoundError(f"No fonts found in {self.input_path}")
         return fonts

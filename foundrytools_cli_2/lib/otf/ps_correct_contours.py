@@ -1,8 +1,13 @@
 from fontTools.fontBuilder import FontBuilder
 from fontTools.pens.t2CharStringPen import T2CharStringPen
 from fontTools.ttLib.tables import C_F_F_
+from fontTools.ttLib.ttFont import TTFont
 
-from foundrytools_cli_2.lib.font import Font
+from foundrytools_cli_2.lib.font_builder.font_builder_tools import (
+    get_font_info,
+    get_private_dict,
+    get_ps_name,
+)
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.pathops.skia_tools import (
     remove_tiny_paths,
@@ -13,7 +18,7 @@ from foundrytools_cli_2.lib.pathops.skia_tools import (
 )
 
 
-def correct_otf_contours(font: Font, min_area: int = 25, subroutinize: bool = True) -> None:
+def correct_otf_contours(font: TTFont, min_area: int = 25) -> None:
     """
     Corrects the contours of an OTF font.
 
@@ -23,11 +28,8 @@ def correct_otf_contours(font: Font, min_area: int = 25, subroutinize: bool = Tr
     :return: None
     """
 
-    if not font.is_ps:
-        raise NotImplementedError("Not an OTF font")
-
-    cff_table: C_F_F_.table_C_F_F_ = font.ttfont["CFF "]
-    glyph_set = font.ttfont.getGlyphSet()
+    cff_table: C_F_F_.table_C_F_F_ = font["CFF "]
+    glyph_set = font.getGlyphSet()
     charstrings = {}
     modified = []
 
@@ -54,22 +56,11 @@ def correct_otf_contours(font: Font, min_area: int = 25, subroutinize: bool = Tr
 
     logger.info(f"{len(modified)} glyphs modified")
 
-    ps_name = cff_table.cff.fontNames[0]
-    font_info = {
-        key: value
-        for key, value in cff_table.cff.topDictIndex[0].rawDict.items()
-        if key not in ("FontBBox", "charset", "Encoding", "Private", "CharStrings")
-    }
-    private_dict = {
-        key: value
-        for key, value in cff_table.cff.topDictIndex[0].Private.rawDict.items()
-        if key not in ("Subrs", "defaultWidthX", "nominalWidthX")
-    }
-    fb = FontBuilder(font=font.ttfont)
+    ps_name = get_ps_name(cff_table=cff_table)
+    font_info = get_font_info(cff_table=cff_table)
+    private_dict = get_private_dict(cff_table=cff_table)
+    fb = FontBuilder(font=font)
+    fb.setupGlyphOrder(font.getGlyphOrder())
     fb.setupCFF(
         psName=ps_name, fontInfo=font_info, privateDict=private_dict, charStringsDict=charstrings
     )
-
-    if subroutinize:
-        logger.info("Subroutinizing...")
-        font.ps_subroutinize()

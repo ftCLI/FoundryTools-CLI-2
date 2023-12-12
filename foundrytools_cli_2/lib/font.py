@@ -13,6 +13,8 @@ from fontTools.ttLib.tables._f_v_a_r import NamedInstance, Axis
 from foundrytools_cli_2.lib.otf.cffsubr import cff_subr, cff_desubr
 from foundrytools_cli_2.lib.otf.ps_recalc_stems import recalc_stems
 from foundrytools_cli_2.lib.otf.ps_recalc_zones import recalc_zones
+from foundrytools_cli_2.lib.otf.ps_correct_contours import correct_otf_contours
+
 
 PS_SFNT_VERSION = "OTTO"
 TT_SFNT_VERSION = "\0\1\0\0"
@@ -422,6 +424,23 @@ class Font:  # pylint: disable=too-many-public-methods
 
         scale_upem(self.ttfont, new_upem=new_upem)
 
+    def ps_correct_contours(self, min_area: int = 25, subroutinize: bool = True) -> None:
+        """
+        Correct the contours of a PostScript font by removing tiny paths and correcting the
+        direction of paths.
+
+        :param min_area: The minimum area of a path to be retained.
+        :param subroutinize: Whether to subroutinize the charstrings.
+        """
+        if not self.is_ps:
+            raise NotImplementedError(
+                "PS Contour correction is only supported for PostScript fonts."
+            )
+
+        correct_otf_contours(font=self.ttfont, min_area=min_area)
+        if subroutinize:
+            self.ps_subroutinize()
+
     def ps_recalc_zones(self) -> t.Tuple[t.List[int], t.List[int]]:
         """
         Recalculates vertical alignment zones.
@@ -461,10 +480,13 @@ class Font:  # pylint: disable=too-many-public-methods
         if not self.is_ps:
             raise NotImplementedError("Getting zones is only supported for PostScript fonts.")
 
-        return (
-            getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "OtherBlues"),
-            getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "BlueValues"),
-        )
+        try:
+            return (
+                getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "OtherBlues"),
+                getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "BlueValues"),
+            )
+        except AttributeError:
+            return [], []
 
     def ps_get_stems(self) -> t.Tuple[int, int]:
         """
@@ -475,10 +497,13 @@ class Font:  # pylint: disable=too-many-public-methods
         if not self.is_ps:
             raise NotImplementedError("Getting stems is only supported for PostScript fonts.")
 
-        return (
-            getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "StdHW"),
-            getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "StdVW"),
-        )
+        try:
+            return (
+                getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "StdHW"),
+                getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "StdVW"),
+            )
+        except AttributeError:
+            return 0, 0
 
     def ps_set_zones(self, other_blues: t.List[int], blue_values: t.List[int]) -> None:
         """

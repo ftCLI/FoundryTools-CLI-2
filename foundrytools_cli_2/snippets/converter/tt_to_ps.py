@@ -197,6 +197,9 @@ def ttf2otf(
     logger.info("Converting to OTF...")
     otf = build_otf(font=font, charstrings=charstrings)
 
+    logger.info("Correcting contours...")
+    otf.ps_correct_contours(min_area=25, subroutinize=False)
+
     if subroutinize:
         logger.info("Subroutinizing...")
         otf.ps_subroutinize()
