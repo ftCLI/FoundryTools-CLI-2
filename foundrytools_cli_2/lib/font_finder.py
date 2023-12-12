@@ -13,7 +13,6 @@ class FinderOptions:
     A class that specifies the options to pass to the FontFinder class.
     """
 
-    input_path: t.Optional[Path] = None
     recursive: bool = False
     lazy: t.Optional[bool] = None
     recalc_bboxes: bool = True
@@ -55,6 +54,7 @@ class FontFinder:
 
     def __init__(
         self,
+        input_path: Path,
         options: FinderOptions,
         font_filter: t.Optional[FinderFilter] = None,
     ) -> None:
@@ -69,12 +69,13 @@ class FontFinder:
         Raises:
             FontFinderError: If the input path is invalid.
         """
+        self.input_path = input_path
         self.options = options
 
         try:
-            self.options.input_path = Path(self.options.input_path).resolve(strict=True)
+            self.input_path = Path(self.input_path).resolve(strict=True)
         except Exception as e:
-            raise FinderError(f"Invalid input path: {self.options.input_path}") from e
+            raise FinderError(f"Invalid input path: {self.input_path}") from e
 
         self.filter = font_filter or FinderFilter()
         self._filter_conditions = self._generate_filter_conditions(self.filter)
@@ -117,16 +118,16 @@ class FontFinder:
         Returns:
             List[Path]: A list of files in the input path.
         """
-        is_file = self.options.input_path.is_file()
-        is_dir = self.options.input_path.is_dir()
+        is_file = self.input_path.is_file()
+        is_dir = self.input_path.is_dir()
 
         if is_file:
-            yield self.options.input_path
+            yield self.input_path
         elif is_dir:
             if self.options.recursive:
-                yield from (x for x in self.options.input_path.rglob("*") if x.is_file())
+                yield from (x for x in self.input_path.rglob("*") if x.is_file())
             else:
-                yield from (x for x in self.options.input_path.glob("*") if x.is_file())
+                yield from (x for x in self.input_path.glob("*") if x.is_file())
 
     def _validate_filter_conditions(self) -> None:
         """

@@ -34,10 +34,11 @@ class FontRunner:  # pylint: disable=too-few-public-methods
 
     def __init__(
         self,
+        input_path: Path,
         task: t.Callable,
         task_name: str = "Processing",
         auto_save: bool = True,
-        **options: t.Any,
+        **options: t.Dict[str, t.Any],
     ) -> None:
         """
         Initialize a new instance of the class.
@@ -49,6 +50,7 @@ class FontRunner:  # pylint: disable=too-few-public-methods
                 results. Defaults to True.
             **options (Any): Additional options for the task.
         """
+        self.input_path = input_path
         self.finder_options, self.save_options, self.callable_options = self._parse_options(options)
         self.font_filter = FinderFilter()
         self.auto_save = auto_save
@@ -96,12 +98,13 @@ class FontRunner:  # pylint: disable=too-few-public-methods
 
     def _find_fonts(self) -> t.List[Font]:
         fonts = FontFinder(
+            input_path=self.input_path,
             options=self.finder_options,
             font_filter=self.font_filter,
         ).find_fonts()
 
         if not fonts:
-            raise NoFontsFoundError(f"No fonts found in {self.finder_options.input_path}")
+            raise NoFontsFoundError(f"No fonts found in {self.input_path}")
         return fonts
 
     def _parse_options(
