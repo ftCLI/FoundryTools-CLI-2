@@ -49,7 +49,7 @@ def ttf2otf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     runner = FontRunner(input_path=input_path, task=tt_to_ps, **options)
     runner.finder.filter.filter_out_ps = True
-    runner.finder.filter_out_variable = True
+    runner.finder.filter.filter_out_variable = True
     runner.run()
 
 
