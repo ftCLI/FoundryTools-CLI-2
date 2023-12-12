@@ -6,6 +6,7 @@ from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font_finder import FontFinder, FinderFilter, FinderOptions, FinderError
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.timer import Timer
+from foundrytools_cli_2.lib.utils.misc import log_current_font, save_font
 
 
 class FontSaveError(Exception):
@@ -23,6 +24,7 @@ class SaveOptions:
     """
 
     reorder_tables: t.Optional[bool] = True
+    suffix: str = ""
     output_dir: t.Optional[Path] = None
     overwrite: bool = False
 
@@ -30,10 +32,27 @@ class SaveOptions:
 class FontRunner:
     """Base class for all runners"""
 
-    def __init__(self, task: t.Callable, task_name: str = "Processing", **options: t.Any) -> None:
+    def __init__(
+        self,
+        task: t.Callable,
+        task_name: str = "Processing",
+        auto_save: bool = True,
+        **options: t.Any,
+    ) -> None:
+        """
+        Initialize a new instance of the class.
+
+        Args:
+            task (Callable): The task to be executed.
+            task_name (str, optional): Name of the task. Defaults to "Processing".
+            auto_save (bool, optional): Flag indicating whether to automatically save the task
+                results. Defaults to True.
+            **options (Any): Additional options for the task.
+        """
         self.options = options
         self.finder_options, self.save_options, self.callable_options = self._parse_options()
         self.font_filter = FinderFilter()
+        self.auto_save = auto_save
         self.task = task
         self.task_name = task_name
 
@@ -52,8 +71,7 @@ class FontRunner:
                     text=f"{self.task_name} time: <cyan>{{:0.4f}} seconds</>",
                 )
                 timer.start()
-
-                self._log_current_font(font)
+                log_current_font(font)
 
                 try:
                     self.task(font, **self.callable_options)
@@ -61,11 +79,16 @@ class FontRunner:
                     logger.error(f"{type(e).__name__}: {e}")
                     continue
 
-                try:
-                    self._save_font(font)
-                except Exception as e:
-                    logger.error(f"{type(e).__name__}: {e}")
+                if not self.auto_save:
+                    timer.stop()
+                    print()  # Add a newline after each font
                     continue
+
+                try:
+                    save_font(font, **self.save_options.__dict__)
+                except Exception as e:  # pylint: disable=broad-except
+                    logger.exception(f"{type(e).__name__}: {e}")
+
                 timer.stop()
                 print()  # Add a newline after each font
 
@@ -79,25 +102,10 @@ class FontRunner:
             raise NoFontsFoundError(f"No fonts found in {self.finder_options.input_path}")
         return fonts
 
-    def _log_current_font(self, font: Font) -> None:
-        if hasattr(font, "file"):
-            logger.info(f"{self.task_name} {font.file}")
-        elif hasattr(font, "bytesio"):
-            logger.info(f"{self.task_name} {font.bytesio}")
-        else:
-            logger.info(f"{self.task_name} {font}")
-
-    def _save_font(self, font: Font) -> None:
-        output_file = font.make_out_file_name(
-            output_dir=self.save_options.output_dir, overwrite=self.save_options.overwrite
-        )
-        font.save(output_file, reorder_tables=self.save_options.reorder_tables)
-        logger.success(f"File saved to {output_file}")
-
     def _parse_options(self) -> t.Tuple[FinderOptions, SaveOptions, t.Dict[str, t.Any]]:
-        font_options = FinderOptions()
-        path_options = SaveOptions()
-        run_options = {}
+        finder_options = FinderOptions()
+        save_options = SaveOptions()
+        callable_options = {}
 
         def _set_opts_attr(option_group, key, value):
             if hasattr(option_group, key):
@@ -106,7 +114,7 @@ class FontRunner:
             return False
 
         for k, v in self.options.items():
-            if not _set_opts_attr(font_options, k, v) and not _set_opts_attr(path_options, k, v):
-                run_options[k] = v
+            if not _set_opts_attr(finder_options, k, v) and not _set_opts_attr(save_options, k, v):
+                callable_options[k] = v
 
-        return font_options, path_options, run_options
+        return finder_options, save_options, callable_options

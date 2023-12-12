@@ -4,7 +4,6 @@ from pathlib import Path
 
 from dehinter.font import dehint
 from fontTools.misc.cliTools import makeOutputFileName
-from fontTools.pens.boundsPen import BoundsPen
 from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
@@ -13,7 +12,7 @@ from fontTools.ttLib.tables._f_v_a_r import NamedInstance, Axis
 
 from foundrytools_cli_2.lib.otf.cffsubr import cff_subr, cff_desubr
 from foundrytools_cli_2.lib.otf.ps_recalc_stems import recalc_stems
-from foundrytools_cli_2.lib.otf.ps_recalc_zones import recalc_zones, GlyphBounds
+from foundrytools_cli_2.lib.otf.ps_recalc_zones import recalc_zones
 
 PS_SFNT_VERSION = "OTTO"
 TT_SFNT_VERSION = "\0\1\0\0"
@@ -85,11 +84,7 @@ class Font:  # pylint: disable=too-many-public-methods
         )
 
     def _init_from_bytesio(
-        self,
-        bytesio: BytesIO,
-        lazy: t.Optional[bool],
-        recalc_bboxes: bool,
-        recalc_timestamp: bool,
+        self, bytesio: BytesIO, lazy: t.Optional[bool], recalc_bboxes: bool, recalc_timestamp: bool
     ) -> None:
         self._bytesio = bytesio
         self._ttfont = TTFont(
@@ -277,15 +272,13 @@ class Font:  # pylint: disable=too-many-public-methods
         # We check elsewhere if the output directory is writable, no need to check it here.
         out_dir = output_dir or self.file.parent
         extension = extension or self.get_real_extension()
+        file_name = self.file.stem
 
         # Clean up the file name by removing the extensions used as file name suffix as added by
         # possible previous conversions.
-        file_name = (
-            self.file.stem.replace(OTF_EXTENSION, "")
-            .replace(TTF_EXTENSION, "")
-            .replace(WOFF2_EXTENSION, "")
-            .replace(WOFF_EXTENSION, "")
-        )
+        if suffix != "":
+            for extension in [OTF_EXTENSION, TTF_EXTENSION, WOFF2_EXTENSION, WOFF_EXTENSION]:
+                file_name = file_name.replace(extension, "")
 
         out_file = Path(
             makeOutputFileName(
@@ -335,107 +328,6 @@ class Font:  # pylint: disable=too-many-public-methods
         :return: The cap height of the font.
         """
         return self.ttfont["OS/2"].sCapHeight
-
-    def get_glyph_bounds(self, glyph_name: str) -> GlyphBounds:
-        """
-        Get the bounds of a glyph in the Font.
-
-        Parameters:
-            glyph_name (str): The name of the glyph.
-
-        Returns:
-            GlyphBounds: The bounds of the glyph, represented as a GlyphBounds object.
-        """
-        glyph_set = self.ttfont.getGlyphSet()
-        if glyph_name not in glyph_set:
-            raise ValueError(f"Glyph '{glyph_name}' does not exist in the font.")
-
-        bounds_pen = BoundsPen(glyphSet=glyph_set)
-
-        glyph_set[glyph_name].draw(bounds_pen)
-        bounds = GlyphBounds(
-            xMin=bounds_pen.bounds[0],
-            yMin=bounds_pen.bounds[1],
-            xMax=bounds_pen.bounds[2],
-            yMax=bounds_pen.bounds[3],
-        )
-
-        return bounds
-
-    def get_glyph_bounds_many(self, glyph_names: t.List[str]) -> t.Dict[str, GlyphBounds]:
-        """
-        Takes a list of glyph names as input and returns a dictionary of glyph bounds.
-
-        Parameters:
-            `glyph_names` (List[str]): The list of glyph names for which the bounds are to be
-                calculated.
-
-        Returns:
-            `glyphs_bounds` (Dict[str, GlyphBounds]): A dictionary where the keys are the glyph
-            names and the values are the corresponding GlyphBounds.
-        """
-        glyphs_bounds = {}
-        for glyph_name in glyph_names:
-            bounds = self.get_glyph_bounds(glyph_name)
-            glyphs_bounds[glyph_name] = bounds
-
-        return glyphs_bounds
-
-    def recalc_zones(self) -> t.Tuple[t.List[int], t.List[int]]:
-        """
-        Recalculates vertical alignment zones.
-        """
-        if not self.is_ps:
-            raise NotImplementedError(
-                "Recalculation of zones is only supported for PostScript fonts."
-            )
-
-        return recalc_zones(self.ttfont)
-
-    def recalc_stems(self) -> t.Tuple[int, int]:
-        """
-        Returns a tuple containing two integer values representing the hinting (StdHW and StdVW)
-        stems for the font.
-
-        Returns:
-            (tuple[int, int]): A tuple containing two integer values representing the hinting stems
-                for the font.
-        """
-        if not self.file:
-            raise NotImplementedError("Stem hints can only be extracted from a font file.")
-
-        if not self.is_ps:
-            raise NotImplementedError(
-                "Recalculation of stems is only supported for PostScript fonts."
-            )
-
-        return recalc_stems(self.file)
-
-    def set_zones(self, other_blues: t.List[int], blue_values: t.List[int]) -> None:
-        """
-        Set zones for a font.
-
-        :param other_blues: Other blues.
-        :param blue_values: Blue values.
-        """
-        if not self.is_ps:
-            raise NotImplementedError("Setting zones is only supported for PostScript fonts.")
-
-        setattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "BlueValues", blue_values)
-        setattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "OtherBlues", other_blues)
-
-    def set_stems(self, std_h_w: int, std_v_w: int) -> None:
-        """
-        Set stems for a font.
-
-        :param std_h_w: StdHW.
-        :param std_v_w: StdVW.
-        """
-        if not self.is_ps:
-            raise NotImplementedError("Setting stems is only supported for PostScript fonts.")
-
-        setattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "StdHW", std_h_w)
-        setattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "StdVW", std_v_w)
 
     def get_advance_widths(self) -> t.Dict[str, int]:
         """
@@ -529,6 +421,90 @@ class Font:  # pylint: disable=too-many-public-methods
             raise ValueError(f"Font already has {new_upem} units per em. No need to scale upem.")
 
         scale_upem(self.ttfont, new_upem=new_upem)
+
+    def ps_recalc_zones(self) -> t.Tuple[t.List[int], t.List[int]]:
+        """
+        Recalculates vertical alignment zones.
+        """
+        if not self.is_ps:
+            raise NotImplementedError(
+                "Recalculation of zones is only supported for PostScript fonts."
+            )
+
+        return recalc_zones(self.ttfont)
+
+    def ps_recalc_stems(self) -> t.Tuple[int, int]:
+        """
+        Returns a tuple containing two integer values representing the hinting (StdHW and StdVW)
+        stems for the font.
+
+        Returns:
+            (tuple[int, int]): A tuple containing two integer values representing the hinting stems
+                for the font.
+        """
+        if not self.file:
+            raise NotImplementedError("Stem hints can only be extracted from a font file.")
+
+        if not self.is_ps:
+            raise NotImplementedError(
+                "Recalculation of stems is only supported for PostScript fonts."
+            )
+
+        return recalc_stems(self.file)
+
+    def ps_get_zones(self) -> t.Tuple[t.List[int], t.List[int]]:
+        """
+        Get zones from a font.
+
+        :return: Zones.
+        """
+        if not self.is_ps:
+            raise NotImplementedError("Getting zones is only supported for PostScript fonts.")
+
+        return (
+            getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "OtherBlues"),
+            getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "BlueValues"),
+        )
+
+    def ps_get_stems(self) -> t.Tuple[int, int]:
+        """
+        Get stems from a font.
+
+        :return: Stems.
+        """
+        if not self.is_ps:
+            raise NotImplementedError("Getting stems is only supported for PostScript fonts.")
+
+        return (
+            getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "StdHW"),
+            getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "StdVW"),
+        )
+
+    def ps_set_zones(self, other_blues: t.List[int], blue_values: t.List[int]) -> None:
+        """
+        Set zones for a font.
+
+        :param other_blues: Other blues.
+        :param blue_values: Blue values.
+        """
+        if not self.is_ps:
+            raise NotImplementedError("Setting zones is only supported for PostScript fonts.")
+
+        setattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "BlueValues", blue_values)
+        setattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "OtherBlues", other_blues)
+
+    def ps_set_stems(self, std_h_w: int, std_v_w: int) -> None:
+        """
+        Set stems for a font.
+
+        :param std_h_w: StdHW.
+        :param std_v_w: StdVW.
+        """
+        if not self.is_ps:
+            raise NotImplementedError("Setting stems is only supported for PostScript fonts.")
+
+        setattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "StdHW", std_h_w)
+        setattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "StdVW", std_v_w)
 
     def ps_subroutinize(self) -> None:
         """
