@@ -24,7 +24,6 @@ class FontRunner:  # pylint: disable=too-few-public-methods
             self,
             input_path: Path,
             task: t.Callable,
-            auto_save: bool = True,
             **options: t.Dict[str, t.Any],
     ) -> None:
         """
@@ -41,7 +40,7 @@ class FontRunner:  # pylint: disable=too-few-public-methods
             options
         )
         self.finder = self._init_font_finder()
-        self.auto_save = auto_save
+        self.auto_save = True
         self.task = task
 
     @Timer(logger=logger.opt(colors=True).info, text="Elapsed time <cyan>{:0.4f} seconds</>")

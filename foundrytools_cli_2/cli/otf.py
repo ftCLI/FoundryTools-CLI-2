@@ -1,5 +1,6 @@
 # pylint: disable=import-outside-toplevel
 import typing as t
+from pathlib import Path
 
 import click
 
@@ -23,37 +24,37 @@ cli = click.Group()
 @stems_flag()
 @common_options()
 @Timer(logger=logger.info)
-def recalc_zs(**options: dict) -> None:
+def recalc_zs(input_path: Path, **options: dict) -> None:
     """
     Recalculates hinting stems and zones for the given font files.
     """
     from foundrytools_cli_2.snippets.otf.recalc_zones_and_stems import recalc_zones_and_stems
 
-    runner = FontRunner(task=recalc_zones_and_stems, **options)
+    runner = FontRunner(input_path=input_path, task=recalc_zones_and_stems, **options)
     runner.finder.filter.filter_out_tt = True
     runner.run()
 
 
 @cli.command("subr")
 @common_options()
-def subr(**options: t.Dict[str, t.Any]) -> None:
+def subr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Subroutinize OpenType-PS fonts with ``cffsubr``.
     """
 
-    runner = FontRunner(task=Font.ps_subroutinize, **options)
+    runner = FontRunner(input_path=input_path, task=Font.ps_subroutinize, **options)
     runner.finder.filter.filter_out_tt = True
     runner.run()
 
 
 @cli.command("desubr")
 @common_options()
-def desubr(**options: t.Dict[str, t.Any]) -> None:
+def desubr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Desubroutinize OpenType-PS fonts with ``cffsubr``.
     """
 
-    runner = FontRunner(task=Font.ps_desubroutinize, **options)
+    runner = FontRunner(input_path=input_path, task=Font.ps_desubroutinize, **options)
     runner.finder.filter.filter_out_tt = True
     runner.run()
 
@@ -62,13 +63,13 @@ def desubr(**options: t.Dict[str, t.Any]) -> None:
 @min_area_option()
 @subroutinize_flag()
 @common_options()
-def fix_contours(**options: t.Dict[str, t.Any]) -> None:
+def fix_contours(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Fix the contours of OpenType-PS fonts by removing overlaps, correcting contours direction, and
     removing tiny paths.
     """
     from foundrytools_cli_2.lib.otf.ps_correct_contours import correct_otf_contours
 
-    runner = FontRunner(task=correct_otf_contours, **options)
+    runner = FontRunner(input_path=input_path, task=correct_otf_contours, **options)
     runner.finder.filter.filter_out_tt = True
     runner.run()
