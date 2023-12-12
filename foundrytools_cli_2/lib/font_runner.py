@@ -29,7 +29,7 @@ class SaveOptions:
     overwrite: bool = False
 
 
-class FontRunner:
+class FontRunner:  # pylint: disable=too-few-public-methods
     """Base class for all runners"""
 
     def __init__(
@@ -38,7 +38,7 @@ class FontRunner:
         task_name: str = "Processing",
         auto_save: bool = True,
         **options: t.Any,
-    ) -> None:  # pylint: disable=too-few-public-methods
+    ) -> None:
         """
         Initialize a new instance of the class.
 
