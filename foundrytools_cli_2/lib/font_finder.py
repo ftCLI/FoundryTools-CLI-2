@@ -56,14 +56,14 @@ class FontFinder:
         self,
         input_path: Path,
         options: FinderOptions,
-        font_filter: t.Optional[FinderFilter] = None,
+        filter_: t.Optional[FinderFilter] = None,
     ) -> None:
         """Initialize the FontFinder class.
 
         Parameters:
             options (FinderOptions): An instance of FinderOptions class that contains the options
                 for font finding.
-            font_filter (FontFinderFilter, optional): An instance of FontFinderFilter class that
+            filter_ (FontFinderFilter, optional): An instance of FontFinderFilter class that
                 specifies the filter conditions for font finding. Defaults to None.
 
         Raises:
@@ -77,7 +77,7 @@ class FontFinder:
         except Exception as e:
             raise FinderError(f"Invalid input path: {self.input_path}") from e
 
-        self.filter = font_filter or FinderFilter()
+        self.filter = filter_ or FinderFilter()
         self._filter_conditions = self._generate_filter_conditions(self.filter)
         self._validate_filter_conditions()
 
