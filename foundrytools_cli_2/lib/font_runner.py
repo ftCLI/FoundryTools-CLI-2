@@ -104,7 +104,9 @@ class FontRunner:
             raise NoFontsFoundError(f"No fonts found in {self.finder_options.input_path}")
         return fonts
 
-    def _parse_options(self, options: t.Dict[str, t.Any]) -> t.Tuple[FinderOptions, SaveOptions, t.Dict[str, t.Any]]:
+    def _parse_options(
+        self, options: t.Dict[str, t.Any]
+    ) -> t.Tuple[FinderOptions, SaveOptions, t.Dict[str, t.Any]]:
         finder_options = FinderOptions()
         save_options = SaveOptions()
         callable_options = {}
