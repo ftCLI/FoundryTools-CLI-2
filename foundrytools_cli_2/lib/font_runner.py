@@ -33,7 +33,7 @@ class FontRunner:  # pylint: disable=too-few-public-methods
             task (Callable): The task to be executed.
             auto_save (bool, optional): Flag indicating whether to automatically save the task
                 results. Defaults to True.
-            **options (Any): Additional options for the task.
+            **options (Dict[str, Any]): A dictionary containing various options.
         """
         self.input_path = input_path
         self._finder_options, self._save_options, self._callable_options = self._parse_options(
