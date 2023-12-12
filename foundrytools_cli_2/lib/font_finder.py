@@ -20,6 +20,7 @@ class FinderOptions:
     recalc_timestamp: bool = False
 
 
+@dataclass
 class FinderFilter:
     """
     A class that specifies which fonts to filter out when searching for fonts.
