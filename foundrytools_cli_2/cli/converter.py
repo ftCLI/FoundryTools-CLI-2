@@ -1,4 +1,4 @@
-# pylint: disable=import-outside-toplevel
+# pylint: disable=import-outside-toplevel, no-untyped-def
 
 from typing import Any, Literal, Optional
 
