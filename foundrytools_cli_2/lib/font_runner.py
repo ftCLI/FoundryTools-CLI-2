@@ -114,7 +114,7 @@ class FontRunner:  # pylint: disable=too-few-public-methods
         callable_options = {}
 
         def _set_opts_attr(
-                option_group: t.Union[FinderOptions, SaveOptions], key: str, value: t.Any
+            option_group: t.Union[FinderOptions, SaveOptions], key: str, value: t.Any
         ) -> bool:
             """Set an attribute on an option group"""
             if hasattr(option_group, key):
