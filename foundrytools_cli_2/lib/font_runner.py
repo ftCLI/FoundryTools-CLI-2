@@ -21,10 +21,10 @@ class FontRunner:  # pylint: disable=too-few-public-methods
     """Base class for all runners"""
 
     def __init__(
-            self,
-            input_path: Path,
-            task: t.Callable,
-            **options: t.Dict[str, t.Any],
+        self,
+        input_path: Path,
+        task: t.Callable,
+        **options: t.Dict[str, t.Any],
     ) -> None:
         """
         Initialize a new instance of the class.
@@ -96,7 +96,7 @@ class FontRunner:  # pylint: disable=too-few-public-methods
 
     @staticmethod
     def _parse_options(
-            options: t.Dict[str, t.Any]
+        options: t.Dict[str, t.Any]
     ) -> t.Tuple[FinderOptions, SaveOptions, t.Dict[str, t.Any]]:
         """
         Parses options provided as a dictionary and returns three objects: FinderOptions,
