@@ -68,8 +68,8 @@ def fix_contours(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Fix the contours of OpenType-PS fonts by removing overlaps, correcting contours direction, and
     removing tiny paths.
     """
-    from foundrytools_cli_2.lib.otf.ps_correct_contours import correct_otf_contours
 
-    runner = FontRunner(input_path=input_path, task=correct_otf_contours, **options)
+    runner = FontRunner(input_path=input_path, task=Font.ps_correct_contours, **options)
     runner.finder.filter.filter_out_tt = True
+    runner.finder.filter.filter_out_variable = True
     runner.run()

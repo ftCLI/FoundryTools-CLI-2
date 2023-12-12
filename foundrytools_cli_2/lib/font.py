@@ -13,6 +13,8 @@ from fontTools.ttLib.tables._f_v_a_r import NamedInstance, Axis
 from foundrytools_cli_2.lib.otf.cffsubr import cff_subr, cff_desubr
 from foundrytools_cli_2.lib.otf.ps_recalc_stems import recalc_stems
 from foundrytools_cli_2.lib.otf.ps_recalc_zones import recalc_zones
+from foundrytools_cli_2.lib.otf.ps_correct_contours import correct_otf_contours
+
 
 PS_SFNT_VERSION = "OTTO"
 TT_SFNT_VERSION = "\0\1\0\0"
@@ -421,6 +423,23 @@ class Font:  # pylint: disable=too-many-public-methods
             raise ValueError(f"Font already has {new_upem} units per em. No need to scale upem.")
 
         scale_upem(self.ttfont, new_upem=new_upem)
+
+    def ps_correct_contours(self, min_area: int = 25, subroutinize: bool = True) -> None:
+        """
+        Correct the contours of a PostScript font by removing tiny paths and correcting the
+        direction of paths.
+
+        :param min_area: The minimum area of a path to be retained.
+        :param subroutinize: Whether to subroutinize the charstrings.
+        """
+        if not self.is_ps:
+            raise NotImplementedError(
+                "PS Contour correction is only supported for PostScript fonts."
+            )
+
+        correct_otf_contours(font=self.ttfont, min_area=min_area)
+        if subroutinize:
+            cff_subr(font=self.ttfont)
 
     def ps_recalc_zones(self) -> t.Tuple[t.List[int], t.List[int]]:
         """

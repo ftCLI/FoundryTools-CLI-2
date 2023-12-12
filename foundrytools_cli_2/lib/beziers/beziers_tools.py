@@ -66,3 +66,19 @@ def bezier_to_charstring(paths: t.List[BezierPath], font: TTFont, glyph_name: st
 
     charstring = pen.getCharString()
     return charstring
+
+
+def get_charstrings_dict(font: TTFont) -> t.Dict[str, T2CharString]:
+    glyph_set = font.getGlyphSet()
+    charstrings_dict = {}
+    for k, v in glyph_set.items():
+        bezier_paths: t.List[BezierPath] = BezierPath.fromFonttoolsGlyph(font, glyphname=k)
+        for bp in bezier_paths:
+            bp.tidy()
+            bp.flatten()
+            bp.balance()
+            bp.round()
+        charstring: T2CharString = bezier_to_charstring(bezier_paths, font, glyph_name=k)
+        charstrings_dict[k] = charstring
+
+    return charstrings_dict
