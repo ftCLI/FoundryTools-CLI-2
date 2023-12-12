@@ -49,8 +49,7 @@ class FontRunner:
                 results. Defaults to True.
             **options (Any): Additional options for the task.
         """
-        self.options = options
-        self.finder_options, self.save_options, self.callable_options = self._parse_options()
+        self.finder_options, self.save_options, self.callable_options = self._parse_options(options)
         self.font_filter = FinderFilter()
         self.auto_save = auto_save
         self.task = task
@@ -102,7 +101,7 @@ class FontRunner:
             raise NoFontsFoundError(f"No fonts found in {self.finder_options.input_path}")
         return fonts
 
-    def _parse_options(self) -> t.Tuple[FinderOptions, SaveOptions, t.Dict[str, t.Any]]:
+    def _parse_options(self, options: t.Dict[str, t.Any]) -> t.Tuple[FinderOptions, SaveOptions, t.Dict[str, t.Any]]:
         finder_options = FinderOptions()
         save_options = SaveOptions()
         callable_options = {}
@@ -113,7 +112,7 @@ class FontRunner:
                 return True
             return False
 
-        for k, v in self.options.items():
+        for k, v in options.items():
             if not _set_opts_attr(finder_options, k, v) and not _set_opts_attr(save_options, k, v):
                 callable_options[k] = v
 
