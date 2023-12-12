@@ -69,9 +69,12 @@ def bezier_to_charstring(paths: t.List[BezierPath], font: TTFont, glyph_name: st
 
 
 def get_charstrings_dict(font: TTFont) -> t.Dict[str, T2CharString]:
+    """
+    Gets the charstrings of a font by converting the Bezier paths of each glyph to a T2CharString.
+    """
     glyph_set = font.getGlyphSet()
     charstrings_dict = {}
-    for k, v in glyph_set.items():
+    for k in glyph_set.keys():
         bezier_paths: t.List[BezierPath] = BezierPath.fromFonttoolsGlyph(font, glyphname=k)
         for bp in bezier_paths:
             bp.tidy()
