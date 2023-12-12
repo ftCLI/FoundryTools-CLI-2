@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font_finder import FontFinder, FinderFilter, FinderOptions, FinderError
+from foundrytools_cli_2.lib.font_finder import FontFinder, FinderOptions, FinderError
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.timer import Timer
 from foundrytools_cli_2.lib.utils.misc import log_current_font, save_font
@@ -105,18 +105,14 @@ class FontRunner:  # pylint: disable=too-few-public-methods
         )
 
     def _find_fonts(self) -> t.List[Font]:
-        fonts = FontFinder(
-            input_path=self.input_path,
-            options=self._finder_options,
-            font_filter=self.font_filter,
-        ).find_fonts()
-
+        fonts = self.finder.find_fonts()
         if not fonts:
             raise NoFontsFoundError(f"No fonts found in {self.input_path}")
         return fonts
 
+    @staticmethod
     def _parse_options(
-        self, options: t.Dict[str, t.Any]
+        options: t.Dict[str, t.Any]
     ) -> t.Tuple[FinderOptions, SaveOptions, t.Dict[str, t.Any]]:
         finder_options = FinderOptions()
         save_options = SaveOptions()
