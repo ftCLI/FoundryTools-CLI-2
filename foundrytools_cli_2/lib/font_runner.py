@@ -36,7 +36,6 @@ class FontRunner:  # pylint: disable=too-few-public-methods
         self,
         input_path: Path,
         task: t.Callable,
-        task_name: str = "Processing",
         auto_save: bool = True,
         **options: t.Dict[str, t.Any],
     ) -> None:
@@ -45,7 +44,6 @@ class FontRunner:  # pylint: disable=too-few-public-methods
 
         Args:
             task (Callable): The task to be executed.
-            task_name (str, optional): Name of the task. Defaults to "Processing".
             auto_save (bool, optional): Flag indicating whether to automatically save the task
                 results. Defaults to True.
             **options (Any): Additional options for the task.
@@ -57,7 +55,6 @@ class FontRunner:  # pylint: disable=too-few-public-methods
         self.finder = self._init_font_finder()
         self.auto_save = auto_save
         self.task = task
-        self.task_name = task_name
 
     @Timer(logger=logger.opt(colors=True).info, text="Elapsed time <cyan>{:0.4f} seconds</>")
     def run(self) -> None:
@@ -74,7 +71,7 @@ class FontRunner:  # pylint: disable=too-few-public-methods
             with font:
                 timer = Timer(
                     logger=logger.opt(colors=True).info,
-                    text=f"{self.task_name} time: <cyan>{{:0.4f}} seconds</>",
+                    text="Processing time: <cyan>{:0.4f} seconds</>",
                 )
                 timer.start()
                 log_current_font(font)
