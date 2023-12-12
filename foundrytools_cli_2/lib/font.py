@@ -277,8 +277,8 @@ class Font:  # pylint: disable=too-many-public-methods
         # Clean up the file name by removing the extensions used as file name suffix as added by
         # possible previous conversions.
         if suffix != "":
-            for extension in [OTF_EXTENSION, TTF_EXTENSION, WOFF2_EXTENSION, WOFF_EXTENSION]:
-                file_name = file_name.replace(extension, "")
+            for ext in [OTF_EXTENSION, TTF_EXTENSION, WOFF2_EXTENSION, WOFF_EXTENSION]:
+                file_name = file_name.replace(ext, "")
 
         out_file = Path(
             makeOutputFileName(
