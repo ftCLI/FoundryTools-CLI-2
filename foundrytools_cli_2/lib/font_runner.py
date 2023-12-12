@@ -51,8 +51,10 @@ class FontRunner:  # pylint: disable=too-few-public-methods
             **options (Any): Additional options for the task.
         """
         self.input_path = input_path
-        self.finder_options, self.save_options, self.callable_options = self._parse_options(options)
-        self.font_filter = FinderFilter()
+        self._finder_options, self._save_options, self._callable_options = self._parse_options(
+            options
+        )
+        self.finder = self._init_font_finder()
         self.auto_save = auto_save
         self.task = task
         self.task_name = task_name
@@ -78,7 +80,7 @@ class FontRunner:  # pylint: disable=too-few-public-methods
                 log_current_font(font)
 
                 try:
-                    self.task(font, **self.callable_options)
+                    self.task(font, **self._callable_options)
                 except Exception as e:  # pylint: disable=broad-except
                     logger.error(f"{type(e).__name__}: {e}")
                     continue
@@ -89,17 +91,23 @@ class FontRunner:  # pylint: disable=too-few-public-methods
                     continue
 
                 try:
-                    save_font(font, **self.save_options.__dict__)
+                    save_font(font, **self._save_options.__dict__)
                 except Exception as e:  # pylint: disable=broad-except
                     logger.exception(f"{type(e).__name__}: {e}")
 
                 timer.stop()
                 print()  # Add a newline after each font
 
+    def _init_font_finder(self) -> FontFinder:
+        return FontFinder(
+            input_path=self.input_path,
+            options=self._finder_options,
+        )
+
     def _find_fonts(self) -> t.List[Font]:
         fonts = FontFinder(
             input_path=self.input_path,
-            options=self.finder_options,
+            options=self._finder_options,
             font_filter=self.font_filter,
         ).find_fonts()
 

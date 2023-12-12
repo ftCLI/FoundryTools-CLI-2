@@ -31,7 +31,7 @@ def recalc_zs(**options: dict) -> None:
     runner = FontRunner(
         task=recalc_zones_and_stems, task_name="Recalculating zones and stems of", **options
     )
-    runner.font_filter.filter_out_tt = True
+    runner.finder.filter.filter_out_tt = True
     runner.run()
 
 
@@ -43,7 +43,7 @@ def subr(**options: dict) -> None:
     """
 
     runner = FontRunner(task=Font.ps_subroutinize, task_name="Subroutinizing", **options)
-    runner.font_filter.filter_out_tt = True
+    runner.finder.filter.filter_out_tt = True
     runner.run()
 
 
@@ -55,7 +55,7 @@ def desubr(**options: dict) -> None:
     """
 
     runner = FontRunner(task=Font.ps_desubroutinize, task_name="Desubroutinizing", **options)
-    runner.font_filter.filter_out_tt = True
+    runner.finder.filter.filter_out_tt = True
     runner.run()
 
 
@@ -71,5 +71,5 @@ def fix_contours(**options: dict) -> None:
     from foundrytools_cli_2.lib.otf.ps_correct_contours import correct_otf_contours
 
     runner = FontRunner(task=correct_otf_contours, task_name="Fixing contours of", **options)
-    runner.font_filter.filter_out_tt = True
+    runner.finder.filter.filter_out_tt = True
     runner.run()
