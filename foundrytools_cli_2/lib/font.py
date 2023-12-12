@@ -439,7 +439,7 @@ class Font:  # pylint: disable=too-many-public-methods
 
         correct_otf_contours(font=self.ttfont, min_area=min_area)
         if subroutinize:
-            cff_subr(font=self.ttfont)
+            self.ps_subroutinize()
 
     def ps_recalc_zones(self) -> t.Tuple[t.List[int], t.List[int]]:
         """
