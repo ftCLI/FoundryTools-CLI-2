@@ -114,6 +114,7 @@ class FontRunner:  # pylint: disable=too-few-public-methods
         callable_options = {}
 
         def _set_opts_attr(option_group, key, value):
+            """Set an attribute on an option group"""
             if hasattr(option_group, key):
                 setattr(option_group, key, value)
                 return True
