@@ -98,8 +98,7 @@ class FontRunner:  # pylint: disable=too-few-public-methods
         return fonts
 
     def _parse_options(
-        self,
-        options: t.Dict[str, t.Any]
+        self, options: t.Dict[str, t.Any]
     ) -> t.Tuple[FinderOptions, SaveOptions, t.Dict[str, t.Any]]:
         """
         Parses options provided as a dictionary and returns three objects: FinderOptions,
