@@ -67,7 +67,7 @@ class FontRunner:  # pylint: disable=too-few-public-methods
                 try:
                     self.task(font, **self._callable_options)
                 except Exception as e:  # pylint: disable=broad-except
-                    logger.error(f"{type(e).__name__}: {e}")
+                    logger.exception(f"{type(e).__name__}: {e}")
                     continue
 
                 if not self.auto_save:
@@ -83,15 +83,10 @@ class FontRunner:  # pylint: disable=too-few-public-methods
                 timer.stop()
                 print()  # Add a newline after each font
 
-    def _init_font_finder(self) -> FontFinder:
-        return FontFinder(
-            input_path=self.input_path,
-            options=self._finder_options,
-            filter_=self.filter,
-        )
-
     def _find_fonts(self) -> t.List[Font]:
-        finder = self._init_font_finder()
+        finder = FontFinder(
+            input_path=self.input_path, options=self._finder_options, filter_=self.filter
+        )
         fonts = finder.find_fonts()
         if not fonts:
             raise NoFontsFoundError(f"No fonts found in {self.input_path}")
@@ -127,7 +122,7 @@ class FontRunner:  # pylint: disable=too-few-public-methods
         for k, v in options.items():
             _set_opts_attr(finder_options, k, v)
             _set_opts_attr(save_options, k, v)
-            if k != "return" and k in self.task.__annotations__:
+            if k != "return" and k in self.task.__annotations__:  # type: ignore
                 callable_options[k] = v
 
         return finder_options, save_options, callable_options
