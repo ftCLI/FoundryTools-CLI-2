@@ -36,12 +36,12 @@ class FontRunner:  # pylint: disable=too-few-public-methods
             **options (Dict[str, Any]): A dictionary containing various options.
         """
         self.input_path = input_path
+        self.task = task
+        self.filter = FinderFilter()
+        self.auto_save = True
         self._finder_options, self._save_options, self._callable_options = self._parse_options(
             options
         )
-        self.filter = FinderFilter()
-        self.auto_save = True
-        self.task = task
 
     @Timer(logger=logger.opt(colors=True).info, text="Elapsed time <cyan>{:0.4f} seconds</>")
     def run(self) -> None:
@@ -97,8 +97,8 @@ class FontRunner:  # pylint: disable=too-few-public-methods
             raise NoFontsFoundError(f"No fonts found in {self.input_path}")
         return fonts
 
-    @staticmethod
     def _parse_options(
+        self,
         options: t.Dict[str, t.Any]
     ) -> t.Tuple[FinderOptions, SaveOptions, t.Dict[str, t.Any]]:
         """
@@ -126,7 +126,9 @@ class FontRunner:  # pylint: disable=too-few-public-methods
             return False
 
         for k, v in options.items():
-            if not _set_opts_attr(finder_options, k, v) and not _set_opts_attr(save_options, k, v):
+            _set_opts_attr(finder_options, k, v)
+            _set_opts_attr(save_options, k, v)
+            if k != "return" and k in self.task.__annotations__:
                 callable_options[k] = v
 
         return finder_options, save_options, callable_options
