@@ -24,7 +24,7 @@ cli = click.Group("converter", help="Font conversion utilities.")
 @tolerance_option()
 @target_upm_option(help_msg="Scale the converted fonts to the specified UPM.")
 @common_options()
-def otf2ttf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def ps_to_tt(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Convert PostScript flavored fonts to TrueType flavored fonts.
     """
@@ -41,13 +41,13 @@ def otf2ttf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @target_upm_option(help_msg="Scale the converted fonts to the specified UPM.")
 @subroutinize_flag()
 @common_options()
-def ttf2otf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def tt2ps(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Convert TrueType flavored fonts to PostScript flavored fonts.
     """
-    from foundrytools_cli_2.snippets.converter.tt_to_ps import ttf2otf as tt_to_ps
+    from foundrytools_cli_2.snippets.converter.tt_to_ps import ttf2otf
 
-    runner = FontRunner(input_path=input_path, task=tt_to_ps, **options)
+    runner = FontRunner(input_path=input_path, task=ttf2otf, **options)
     runner.filter.filter_out_ps = True
     runner.filter.filter_out_variable = True
     runner.run()
