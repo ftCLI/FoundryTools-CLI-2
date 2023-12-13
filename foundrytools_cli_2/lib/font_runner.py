@@ -23,7 +23,7 @@ class FontRunner:  # pylint: disable=too-few-public-methods
     def __init__(
         self,
         input_path: Path,
-        task: t.Callable[..., t.Any],
+        task: t.Callable,
         **options: t.Dict[str, t.Any],
     ) -> None:
         """
@@ -36,12 +36,12 @@ class FontRunner:  # pylint: disable=too-few-public-methods
             **options (Dict[str, Any]): A dictionary containing various options.
         """
         self.input_path = input_path
-        self.task = task
         self._finder_options, self._save_options, self._callable_options = self._parse_options(
             options
         )
         self.filter = FinderFilter()
         self.auto_save = True
+        self.task = task
 
     @Timer(logger=logger.opt(colors=True).info, text="Elapsed time <cyan>{:0.4f} seconds</>")
     def run(self) -> None:
@@ -97,8 +97,8 @@ class FontRunner:  # pylint: disable=too-few-public-methods
             raise NoFontsFoundError(f"No fonts found in {self.input_path}")
         return fonts
 
+    @staticmethod
     def _parse_options(
-        self,
         options: t.Dict[str, t.Any]
     ) -> t.Tuple[FinderOptions, SaveOptions, t.Dict[str, t.Any]]:
         """
@@ -116,21 +116,17 @@ class FontRunner:  # pylint: disable=too-few-public-methods
         save_options = SaveOptions()
         callable_options = {}
 
-        def _set_attribute(
+        def _set_opts_attr(
             option_group: t.Union[FinderOptions, SaveOptions], key: str, value: t.Any
         ) -> bool:
             """Set an attribute on an option group"""
-            try:
+            if hasattr(option_group, key):
                 setattr(option_group, key, value)
                 return True
-            except AttributeError:
-                return False
+            return False
 
-        task_annotations = set(self.task.__annotations__.keys()) - {"return"}  # type: ignore
         for k, v in options.items():
-            _set_attribute(finder_options, k, v)
-            _set_attribute(save_options, k, v)
-            if k in task_annotations:
+            if not _set_opts_attr(finder_options, k, v) and not _set_opts_attr(save_options, k, v):
                 callable_options[k] = v
 
         return finder_options, save_options, callable_options
