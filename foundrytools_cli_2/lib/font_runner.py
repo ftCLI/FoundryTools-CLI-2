@@ -54,12 +54,13 @@ class FontRunner:  # pylint: disable=too-few-public-methods
             logger.error(e)
             return
 
+        timer = Timer(
+            logger=logger.opt(colors=True).info,
+            text="Processing time: <cyan>{:0.4f} seconds</>",
+        )
+
         for font in fonts:
             with font:
-                timer = Timer(
-                    logger=logger.opt(colors=True).info,
-                    text="Processing time: <cyan>{:0.4f} seconds</>",
-                )
                 timer.start()
                 log_current_font(font)
 
