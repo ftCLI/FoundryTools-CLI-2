@@ -137,7 +137,3 @@ def otf2ttf(
     if target_upm:
         logger.info(f"Scaling UPM to {target_upm}")
         tt.tt_scale_upem(new_upem=target_upm)
-
-    out_file = font.make_out_file_name(overwrite=True)
-    tt.save(out_file)
-    logger.success(f"File saved to {out_file}")
