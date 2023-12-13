@@ -17,14 +17,14 @@ from foundrytools_cli_2.lib.click.click_options import (
 )
 
 
-cli = click.Group()
+cli = click.Group("converter", help="Font conversion utilities.")
 
 
-@cli.command("ps2tt")
+@cli.command("otf2ttf")
 @tolerance_option()
 @target_upm_option(help_msg="Scale the converted fonts to the specified UPM.")
 @common_options()
-def ps_to_tt(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def otf2ttf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Convert PostScript flavored fonts to TrueType flavored fonts.
     """
@@ -36,7 +36,7 @@ def ps_to_tt(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("tt2ps")
+@cli.command("ttf2otf")
 @tolerance_option()
 @target_upm_option(help_msg="Scale the converted fonts to the specified UPM.")
 @subroutinize_flag()
@@ -53,57 +53,10 @@ def ttf2otf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("to-woff")
-@common_options()
-def sfnt_to_woff(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
-    """
-    Convert SFNT fonts to WOFF flavored fonts.
-    """
-    runner = FontRunner(input_path=input_path, task=Font.to_woff, **options)
-    runner.filter.filter_out_woff = True
-    runner.filter.filter_out_woff2 = True
-    runner.run()
-
-
-@cli.command("to-woff2")
-@common_options()
-def sfnt_to_woff2(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
-    """
-    Convert SFNT fonts to WOFF2 flavored fonts.
-    """
-    runner = FontRunner(input_path=input_path, task=Font.to_woff2, **options)
-    runner.filter.filter_out_woff2 = True
-    runner.run()
-
-
-@cli.command("from-woff")
-@common_options()
-def woff_to_sfnt(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
-    """
-    Convert WOFF flavored fonts to SFNT fonts.
-    """
-    runner = FontRunner(input_path=input_path, task=Font.to_sfnt, **options)
-    runner.filter.filter_out_sfnt = True
-    runner.filter.filter_out_woff = True
-    runner.run()
-
-
-@cli.command("from-woff2")
-@common_options()
-def woff2_to_sfnt(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
-    """
-    Convert WOFF2 flavored fonts to SFNT fonts.
-    """
-    runner = FontRunner(input_path=input_path, task=Font.to_sfnt, **options)
-    runner.filter.filter_out_sfnt = True
-    runner.filter.filter_out_woff2 = True
-    runner.run()
-
-
 @cli.command("wf2ft")
 @in_format_choice()
 @common_options()
-def wf_to_sfnt(
+def wf2ft(
     input_path: Path,
     in_format: t.Optional[t.Literal["woff", "woff2"]],
     **options: t.Dict[str, t.Any]
