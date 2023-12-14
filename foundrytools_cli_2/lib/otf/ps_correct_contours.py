@@ -1,4 +1,7 @@
+import typing as t
+
 from fontTools.fontBuilder import FontBuilder
+from fontTools.misc.psCharStrings import T2CharString
 from fontTools.pens.t2CharStringPen import T2CharStringPen
 from fontTools.ttLib.tables import C_F_F_
 from fontTools.ttLib.ttFont import TTFont
@@ -18,17 +21,15 @@ from foundrytools_cli_2.lib.pathops.skia_tools import (
 )
 
 
-def correct_otf_contours(font: TTFont, min_area: int = 25) -> None:
+def get_fixed_charstrings(
+    font: TTFont, min_area: int = 25
+) -> t.Tuple[t.Dict[str, T2CharString], t.List[str]]:
     """
-    Corrects the contours of an OTF font.
+    Get CFF charstrings using T2CharStringPen
 
-    :param font: the font
-    :param min_area: the minimum area of a path
-    :param subroutinize: whether to subroutinize the charstrings
-    :return: None
+    :return: CFF charstrings.
     """
 
-    cff_table: C_F_F_.table_C_F_F_ = font["CFF "]
     glyph_set = font.getGlyphSet()
     charstrings = {}
     modified = []
@@ -49,6 +50,21 @@ def correct_otf_contours(font: TTFont, min_area: int = 25) -> None:
             cs = t2_charstring_from_skia_path(path=path_2, width=v.width)
             charstrings[k] = cs
             modified.append(k)
+
+    return charstrings, modified
+
+
+def correct_otf_contours(font: TTFont, min_area: int = 25) -> None:
+    """
+    Corrects the contours of an OTF font.
+
+    :param font: the font
+    :param min_area: the minimum area of a path
+    :return: None
+    """
+
+    cff_table: C_F_F_.table_C_F_F_ = font["CFF "]
+    charstrings, modified = get_fixed_charstrings(font=font, min_area=min_area)
 
     if not modified:
         logger.info("No glyphs modified")
