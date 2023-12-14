@@ -1,6 +1,7 @@
 import typing as t
 
 from fontTools.fontBuilder import FontBuilder
+from fontTools.cffLib.width import optimizeWidths
 from fontTools.pens.qu2cuPen import Qu2CuPen
 from fontTools.pens.t2CharStringPen import T2CharStringPen
 
@@ -203,7 +204,7 @@ def ttf2otf(
     otf = build_otf(font=font, charstrings=charstrings)
 
     otf.save(out_file, reorder_tables=None)
-    otf = Font(out_file)
+    otf = Font(out_file, recalc_timestamp=recalc_timestamp)
 
     logger.info("Correcting contours...")
     otf.ps_correct_contours(min_area=25, subroutinize=False)
@@ -218,5 +219,15 @@ def ttf2otf(
         logger.info("Subroutinizing...")
         otf.ps_subroutinize()
 
+    otf.save(out_file, reorder_tables=None)
+    otf = Font(out_file, recalc_timestamp=recalc_timestamp)
+
+    hmtx = otf.ttfont["hmtx"]
+    widths = [m[0] for m in hmtx.metrics.values()]
+    default, nominal = optimizeWidths(widths)
+    otf.ttfont["CFF "].cff.topDictIndex[0].Private.defaultWidthX = default
+    otf.ttfont["CFF "].cff.topDictIndex[0].Private.nominalWidthX = nominal
+
     otf.save(out_file, reorder_tables=True)
+
     logger.success(f"File saved to {out_file}")
