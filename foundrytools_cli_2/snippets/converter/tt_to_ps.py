@@ -1,7 +1,7 @@
 import typing as t
+from pathlib import Path
 
 from fontTools.fontBuilder import FontBuilder
-from fontTools.cffLib.width import optimizeWidths
 from fontTools.pens.qu2cuPen import Qu2CuPen
 from fontTools.pens.t2CharStringPen import T2CharStringPen
 
@@ -181,7 +181,7 @@ def ttf2otf(
     tolerance: float = 1.0,
     target_upm: t.Optional[int] = None,
     subroutinize: bool = True,
-    output_dir: t.Optional[str] = None,
+    output_dir: t.Optional[Path] = None,
     recalc_timestamp: bool = False,
     overwrite: bool = True,
 ) -> None:
@@ -218,15 +218,6 @@ def ttf2otf(
     if subroutinize:
         logger.info("Subroutinizing...")
         otf.ps_subroutinize()
-
-    otf.save(out_file, reorder_tables=None)
-    otf = Font(out_file, recalc_timestamp=recalc_timestamp)
-
-    hmtx = otf.ttfont["hmtx"]
-    widths = [m[0] for m in hmtx.metrics.values()]
-    default, nominal = optimizeWidths(widths)
-    otf.ttfont["CFF "].cff.topDictIndex[0].Private.defaultWidthX = default
-    otf.ttfont["CFF "].cff.topDictIndex[0].Private.nominalWidthX = nominal
 
     otf.save(out_file, reorder_tables=True)
 
