@@ -22,7 +22,7 @@ from foundrytools_cli_2.lib.pathops.skia_tools import (
 
 
 def get_fixed_charstrings(
-        font: TTFont, min_area: int = 25
+    font: TTFont, min_area: int = 25
 ) -> t.Tuple[t.Dict[str, T2CharString], t.List[str]]:
     """
     Get CFF charstrings using T2CharStringPen
