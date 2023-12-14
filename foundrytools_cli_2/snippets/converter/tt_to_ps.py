@@ -180,15 +180,20 @@ def ttf2otf(
     tolerance: float = 1.0,
     target_upm: t.Optional[int] = None,
     subroutinize: bool = True,
+    output_dir: t.Optional[str] = None,
+    recalc_timestamp: bool = False,
+    overwrite: bool = True,
 ) -> None:
     """
     Convert PostScript flavored fonts to TrueType flavored fonts.
     """
+    out_file = font.make_out_file_name(extension=".otf", output_dir=output_dir, overwrite=overwrite)
+
     logger.info("Decomponentizing source font...")
     font.tt_decomponentize()
 
     if target_upm:
-        logger.info(f"Scaling UPM to {target_upm}")
+        logger.info(f"Scaling UPM to {target_upm}...")
         font.tt_scale_upem(new_upem=target_upm)
 
     logger.info("Getting charstrings...")
@@ -197,9 +202,21 @@ def ttf2otf(
     logger.info("Converting to OTF...")
     otf = build_otf(font=font, charstrings=charstrings)
 
+    otf.save(out_file, reorder_tables=None)
+    otf = Font(out_file)
+
     logger.info("Correcting contours...")
     otf.ps_correct_contours(min_area=25, subroutinize=False)
+
+    logger.info("Getting hinting values...")
+    zones = otf.ps_recalc_zones()
+    stems = otf.ps_recalc_stems()
+    otf.ps_set_zones(zones[0], zones[1])
+    otf.ps_set_stems(stems[0], stems[1])
 
     if subroutinize:
         logger.info("Subroutinizing...")
         otf.ps_subroutinize()
+
+    otf.save(out_file, reorder_tables=True)
+    logger.success(f"File saved to {out_file}")
