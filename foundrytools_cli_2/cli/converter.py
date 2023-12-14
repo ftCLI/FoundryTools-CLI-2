@@ -48,6 +48,7 @@ def tt2ps(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     from foundrytools_cli_2.snippets.converter.tt_to_ps import ttf2otf
 
     runner = FontRunner(input_path=input_path, task=ttf2otf, **options)
+    runner.auto_save = False
     runner.filter.filter_out_ps = True
     runner.filter.filter_out_variable = True
     runner.run()
