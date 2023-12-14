@@ -23,7 +23,7 @@ class FontRunner:  # pylint: disable=too-few-public-methods
     def __init__(
         self,
         input_path: Path,
-        task: t.Callable[..., t.Any],
+        task: t.Callable,
         **options: t.Dict[str, t.Any],
     ) -> None:
         """
@@ -37,11 +37,11 @@ class FontRunner:  # pylint: disable=too-few-public-methods
         """
         self.input_path = input_path
         self.task = task
+        self.filter = FinderFilter()
+        self.auto_save = True
         self._finder_options, self._save_options, self._callable_options = self._parse_options(
             options
         )
-        self.filter = FinderFilter()
-        self.auto_save = True
 
     @Timer(logger=logger.opt(colors=True).info, text="Elapsed time <cyan>{:0.4f} seconds</>")
     def run(self) -> None:
@@ -67,7 +67,7 @@ class FontRunner:  # pylint: disable=too-few-public-methods
                 try:
                     self.task(font, **self._callable_options)
                 except Exception as e:  # pylint: disable=broad-except
-                    logger.error(f"{type(e).__name__}: {e}")
+                    logger.exception(f"{type(e).__name__}: {e}")
                     continue
 
                 if not self.auto_save:
@@ -83,15 +83,10 @@ class FontRunner:  # pylint: disable=too-few-public-methods
                 timer.stop()
                 print()  # Add a newline after each font
 
-    def _init_font_finder(self) -> FontFinder:
-        return FontFinder(
-            input_path=self.input_path,
-            options=self._finder_options,
-            filter_=self.filter,
-        )
-
     def _find_fonts(self) -> t.List[Font]:
-        finder = self._init_font_finder()
+        finder = FontFinder(
+            input_path=self.input_path, options=self._finder_options, filter_=self.filter
+        )
         fonts = finder.find_fonts()
         if not fonts:
             raise NoFontsFoundError(f"No fonts found in {self.input_path}")
@@ -115,21 +110,19 @@ class FontRunner:  # pylint: disable=too-few-public-methods
         save_options = SaveOptions()
         callable_options = {}
 
-        def _set_attribute(
+        def _set_opts_attr(
             option_group: t.Union[FinderOptions, SaveOptions], key: str, value: t.Any
         ) -> bool:
             """Set an attribute on an option group"""
-            try:
+            if hasattr(option_group, key):
                 setattr(option_group, key, value)
                 return True
-            except AttributeError:
-                return False
+            return False
 
-        task_annotations = set(self.task.__annotations__.keys()) - {"return"}  # type: ignore
         for k, v in options.items():
-            _set_attribute(finder_options, k, v)
-            _set_attribute(save_options, k, v)
-            if k in task_annotations:
+            _set_opts_attr(finder_options, k, v)
+            _set_opts_attr(save_options, k, v)
+            if k != "return" and k in self.task.__annotations__:  # type: ignore
                 callable_options[k] = v
 
         return finder_options, save_options, callable_options
