@@ -70,9 +70,6 @@ def wf2ft(
         runner.filter.filter_out_woff2 = True
     elif in_format == "woff2":
         runner.filter.filter_out_woff = True
-    else:
-        runner.filter.filter_out_woff = False
-        runner.filter.filter_out_woff2 = False
     runner.run()
 
 
