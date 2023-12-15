@@ -28,7 +28,7 @@ logger.remove()
 logger.add(
     sys.stderr,
     filter=logger_filter,
-    backtrace=True,
+    backtrace=False,
     colorize=True,
     format="[ <level>{level: <8}</level> ] " "<level>{message}</level>",
 )
