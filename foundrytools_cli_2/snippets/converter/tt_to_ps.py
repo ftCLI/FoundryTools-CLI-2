@@ -1,6 +1,7 @@
 import typing as t
 from pathlib import Path
 
+from afdko.fdkutils import run_shell_command
 from fontTools.fontBuilder import FontBuilder
 from fontTools.misc.psCharStrings import T2CharString
 from fontTools.pens.qu2cuPen import Qu2CuPen
@@ -9,6 +10,7 @@ from fontTools.ttLib import TTFont
 
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.logger import logger
+from foundrytools_cli_2.lib.otf.ps_correct_contours import get_fixed_charstrings
 from foundrytools_cli_2.snippets.converter.ps_to_tt import build_ttf
 
 
@@ -251,8 +253,6 @@ def ttf2otf_with_tx(
     """
     Convert PostScript flavored fonts to TrueType flavored fonts using tx.
     """
-    from foundrytools_cli_2.lib.otf.ps_correct_contours import get_fixed_charstrings
-    from afdko.fdkutils import run_shell_command
 
     out_file = font.make_out_file_name(extension=".otf", output_dir=output_dir, overwrite=overwrite)
     cff_file = font.make_out_file_name(extension=".cff", output_dir=output_dir, overwrite=overwrite)
