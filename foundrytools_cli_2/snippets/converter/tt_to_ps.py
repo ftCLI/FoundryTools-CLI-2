@@ -272,7 +272,7 @@ def ttf2otf_with_tx(
     charstrings_dict = get_t2_charstrings(font=font)
     font_info = get_cff_font_info(font)
     post_values = get_post_values(font)
-    private_dict = {}
+    private_dict: t.Dict[str, t.Any] = {}
 
     fb = FontBuilder(font=font.ttfont)
     fb.setupGlyphOrder(font.ttfont.getGlyphOrder())
