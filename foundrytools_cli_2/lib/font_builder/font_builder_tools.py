@@ -8,24 +8,34 @@ from fontTools.ttLib import TTFont
 def build_otf(
     font: TTFont,
     charstrings_dict: t.Dict[str, T2CharString],
-    font_info: t.Dict[str, t.Any],
-    private_dict: t.Dict[str, t.Any],
+    ps_name: t.Optional[str] = None,
+    font_info: t.Optional[t.Dict[str, t.Any]] = None,
+    private_dict: t.Optional[t.Dict[str, t.Any]] = None,
 ) -> None:
     """
     Builds an OpenType font with FontBuilder.
 
     Args:
-        font (TTFont): The TrueType font to convert.
+        font (TTFont): The TTFont object.
+        ps_name (str): The PostScript name of the font.
         charstrings_dict (dict): The charstrings dictionary.
         font_info (dict): The font info.
         private_dict (dict): The private dict.
     """
 
-    fb = FontBuilder(font=font, isTTF=False)
-    fb.setupGlyphOrder(font.getGlyphOrder())
+    if not ps_name:
+        ps_name = get_ps_name(font=font)
+    if not font_info:
+        font_info = get_font_info_dict(font=font)
+    if not private_dict:
+        private_dict = get_private_dict(font=font)
+
+    fb = FontBuilder(font=font)
+    fb.isTTF = False
     delete_ttf_tables(font=fb.font)
+    fb.setupGlyphOrder(font.getGlyphOrder())
     fb.setupCFF(
-        psName=font["name"].getDebugName(6),
+        psName=ps_name,
         charStringsDict=charstrings_dict,
         fontInfo=font_info,
         privateDict=private_dict,
