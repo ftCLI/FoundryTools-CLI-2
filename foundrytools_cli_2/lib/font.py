@@ -4,6 +4,7 @@ from pathlib import Path
 
 from dehinter.font import dehint
 from fontTools.misc.cliTools import makeOutputFileName
+from fontTools.pens.boundsPen import BoundsPen
 from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
@@ -14,7 +15,7 @@ from foundrytools_cli_2.lib.otf.cffsubr import cff_subr, cff_desubr
 from foundrytools_cli_2.lib.otf.ps_recalc_stems import recalc_stems
 from foundrytools_cli_2.lib.otf.ps_recalc_zones import recalc_zones
 from foundrytools_cli_2.lib.otf.ps_correct_contours import correct_otf_contours
-
+from foundrytools_cli_2.lib.ttf.from_otf import build_ttf
 
 PS_SFNT_VERSION = "OTTO"
 TT_SFNT_VERSION = "\0\1\0\0"
@@ -315,12 +316,54 @@ class Font:  # pylint: disable=too-many-public-methods
 
         return self.ttfont[FVAR_TABLE_TAG].instances
 
+    def get_glyph_bounds(self, glyph_name: str) -> t.Dict[str, float]:
+        """
+        Get the bounds of a glyph.
+
+        :param glyph_name: The name of the glyph.
+        :return: The bounds of the glyph.
+        """
+        glyph_set = self.ttfont.getGlyphSet()
+        if glyph_name not in glyph_set:
+            raise ValueError(f"Glyph '{glyph_name}' does not exist in the font.")
+
+        bounds_pen = BoundsPen(glyphSet=glyph_set)
+
+        glyph_set[glyph_name].draw(bounds_pen)
+        bounds = {
+            "xMin": bounds_pen.bounds[0],
+            "yMin": bounds_pen.bounds[1],
+            "xMax": bounds_pen.bounds[2],
+            "yMax": bounds_pen.bounds[3],
+        }
+
+        return bounds
+
+    def recalc_x_height(self) -> float:
+        """
+        Recalculate the x-height of the font.
+        """
+        return self.get_glyph_bounds("x")["yMax"]
+
+    def recalc_cap_height(self) -> float:
+        """
+        Recalculate the cap height of the font.
+        """
+        return self.get_glyph_bounds("H")["yMax"]
+
     def get_x_height(self) -> int:
         """
         Get the x-height of the font.
 
         :return: The x-height of the font.
         """
+        os2 = self.ttfont["OS/2"]
+        if os2.version < 2:
+            raise ValueError(
+                f"sxHeight is defined only in OS/2 version 2 and up. "
+                f"Current version is {os2.version}."
+            )
+
         return self.ttfont["OS/2"].sxHeight
 
     def get_cap_height(self) -> int:
@@ -329,21 +372,44 @@ class Font:  # pylint: disable=too-many-public-methods
 
         :return: The cap height of the font.
         """
+        os2 = self.ttfont["OS/2"]
+        if os2.version < 2:
+            raise ValueError(
+                f"sCapHeight is defined only in OS/2 version 2 and up. "
+                f"Current version is {os2.version}."
+            )
+
         return self.ttfont["OS/2"].sCapHeight
 
-    def get_advance_widths(self) -> t.Dict[str, int]:
+    def set_x_height(self, x_height: float) -> None:
         """
-        Get advance widths from a font.
+        Set the x-height of the font.
 
-        :return: Advance widths.
+        :param x_height: The x-height of the font.
         """
-        advance_widths = {}
-        glyph_set = self.ttfont.getGlyphSet()
+        os2 = self.ttfont["OS/2"]
+        if os2.version < 2:
+            raise ValueError(
+                f"sxHeight is defined only in OS/2 version 2 and up. "
+                f"Current version is {os2.version}."
+            )
 
-        for k, v in glyph_set.items():
-            advance_widths[k] = v.width
+        setattr(os2, "sxHeight", x_height)
 
-        return advance_widths
+    def set_cap_height(self, cap_height: float) -> None:
+        """
+        Set the cap height of the font.
+
+        :param cap_height: The cap height of the font.
+        """
+        os2 = self.ttfont["OS/2"]
+        if os2.version < 2:
+            raise ValueError(
+                f"sCapHeight is defined only in OS/2 version 2 and up. "
+                f"Current version is {os2.version}."
+            )
+
+        setattr(os2, "sCapHeight", cap_height)
 
     def to_woff(self) -> None:
         """
@@ -362,6 +428,17 @@ class Font:  # pylint: disable=too-many-public-methods
             raise ValueError("Font is already a WOFF2 font.")
 
         self.ttfont.flavor = WOFF2_FLAVOR
+
+    def to_ttf(self, max_err: float = 1.0, reverse_direction: bool = True) -> None:
+        """
+        Convert a font to TrueType.
+        """
+        if self.is_tt:
+            raise ValueError("Font is already a TrueType font.")
+        if self.is_variable:
+            raise NotImplementedError("Conversion to TrueType is not supported for variable fonts.")
+
+        build_ttf(font=self.ttfont, max_err=max_err, reverse_direction=reverse_direction)
 
     def to_sfnt(self) -> None:
         """

@@ -88,3 +88,19 @@ def ft2wf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.filter.filter_out_woff2 = True
     runner.auto_save = False
     runner.run()
+
+
+@cli.command("make-otf")
+@target_upm_option(help_msg="Scale the converted fonts to the specified UPM.")
+@common_options()
+def makeotf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Convert SFNT fonts to CFF-flavored OTF fonts.
+    """
+    from foundrytools_cli_2.snippets.converter.tt_to_ps import ttf2otf_with_tx
+
+    runner = FontRunner(input_path=input_path, task=ttf2otf_with_tx, **options)
+    runner.filter.filter_out_ps = True
+    runner.filter.filter_out_variable = True
+    runner.auto_save = False
+    runner.run()
