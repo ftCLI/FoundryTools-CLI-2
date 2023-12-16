@@ -15,6 +15,7 @@ from foundrytools_cli_2.lib.otf.cffsubr import cff_subr, cff_desubr
 from foundrytools_cli_2.lib.otf.ps_recalc_stems import recalc_stems
 from foundrytools_cli_2.lib.otf.ps_recalc_zones import recalc_zones
 from foundrytools_cli_2.lib.otf.ps_correct_contours import correct_otf_contours
+from foundrytools_cli_2.lib.ttf.from_otf import build_ttf
 
 PS_SFNT_VERSION = "OTTO"
 TT_SFNT_VERSION = "\0\1\0\0"
@@ -427,6 +428,17 @@ class Font:  # pylint: disable=too-many-public-methods
             raise ValueError("Font is already a WOFF2 font.")
 
         self.ttfont.flavor = WOFF2_FLAVOR
+
+    def to_ttf(self, max_err: float = 1.0, reverse_direction: bool = True) -> None:
+        """
+        Convert a font to TrueType.
+        """
+        if self.is_tt:
+            raise ValueError("Font is already a TrueType font.")
+        if self.is_variable:
+            raise NotImplementedError("Conversion to TrueType is not supported for variable fonts.")
+
+        build_ttf(font=self.ttfont, max_err=max_err, reverse_direction=reverse_direction)
 
     def to_sfnt(self) -> None:
         """
