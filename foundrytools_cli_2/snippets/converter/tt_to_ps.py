@@ -2,12 +2,24 @@ import typing as t
 from pathlib import Path
 
 from fontTools.fontBuilder import FontBuilder
+from fontTools.misc.psCharStrings import T2CharString
 from fontTools.pens.qu2cuPen import Qu2CuPen
 from fontTools.pens.t2CharStringPen import T2CharStringPen
+from fontTools.ttLib import TTFont
 
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.snippets.converter.ps_to_tt import build_ttf
+
+
+def delete_ttf_tables(font: TTFont) -> None:
+    """
+    Deletes TTF specific tables from a font.
+    """
+    ttf_tables = ["glyf", "cvt ", "loca", "fpgm", "prep", "gasp", "LTSH", "hdmx"]
+    for table in ttf_tables:
+        if table in font:
+            del font[table]
 
 
 def build_otf(font: Font, charstrings: dict) -> Font:
@@ -33,16 +45,7 @@ def build_otf(font: Font, charstrings: dict) -> Font:
         fontInfo=cff_font_info,
         privateDict={},
     )
-
-    advance_widths = font.get_advance_widths()
-
-    lsb = {}
-    for gn, cs in charstrings.items():
-        lsb[gn] = cs.calcBounds(None)[0] if cs.calcBounds(None) is not None else 0
-    metrics = {}
-    for gn, advance_width in advance_widths.items():
-        metrics[gn] = (advance_width, lsb[gn])
-
+    metrics = get_hmtx_values(font=fb.font, charstrings=charstrings)
     fb.setupHorizontalMetrics(metrics)
     fb.setupDummyDSIG()
     fb.setupMaxp()
@@ -51,11 +54,26 @@ def build_otf(font: Font, charstrings: dict) -> Font:
     return font
 
 
+def get_hmtx_values(
+    font: TTFont, charstrings: t.Dict[str, T2CharString]
+) -> t.Dict[str, t.Tuple[int, int]]:
+    """
+    Get the horizontal metrics for a font.
+    """
+    glyph_set = font.getGlyphSet()
+    advance_widths = {k: v.width for k, v in glyph_set.items()}
+    lsb = {}
+    for gn, cs in charstrings.items():
+        lsb[gn] = cs.calcBounds(None)[0] if cs.calcBounds(None) is not None else 0
+    metrics = {}
+    for gn, advance_width in advance_widths.items():
+        metrics[gn] = (advance_width, lsb[gn])
+    return metrics
+
+
 def get_cff_font_info(font: Font) -> dict:
     """
     Setup CFF topDict
-
-    :return: A dictionary of the font info.
     """
 
     font_revision = str(round(font.ttfont["head"].fontRevision, 3)).split(".")
@@ -169,8 +187,6 @@ def get_fallback_charstrings(font: Font, tolerance: float = 1.0) -> dict:
     """
     t2_charstrings = get_t2_charstrings(font=font)
     otf = build_otf(font=font, charstrings=t2_charstrings)
-    # We have a fallback OTF font with incorrect contours direction here, so we need to set
-    # reverse_direction to False. Later Qu2CuPen will reverse the direction of the contours.
     ttf = build_ttf(font=otf, max_err=tolerance, reverse_direction=False)
     _, fallback_charstrings = get_qu2cu_charstrings(ttf, tolerance=tolerance)
     return fallback_charstrings
@@ -206,8 +222,8 @@ def ttf2otf(
     otf.save(out_file, reorder_tables=None)
     otf = Font(out_file, recalc_timestamp=recalc_timestamp)
 
-    logger.info("Correcting contours...")
-    otf.ps_correct_contours(min_area=25, subroutinize=False)
+    # logger.info("Correcting contours...")
+    # otf.ps_correct_contours(min_area=25, subroutinize=False)
 
     logger.info("Getting hinting values...")
     zones = otf.ps_recalc_zones()
@@ -222,3 +238,89 @@ def ttf2otf(
     otf.save(out_file, reorder_tables=True)
 
     logger.success(f"File saved to {out_file}")
+
+
+def ttf2otf_with_tx(
+    font: Font,
+    target_upm: t.Optional[int] = None,
+    subroutinize: bool = True,
+    output_dir: t.Optional[Path] = None,
+    recalc_timestamp: bool = False,
+    overwrite: bool = True,
+) -> None:
+    """
+    Convert PostScript flavored fonts to TrueType flavored fonts using tx.
+    """
+    from foundrytools_cli_2.lib.otf.ps_correct_contours import get_fixed_charstrings
+    from afdko.fdkutils import run_shell_command
+
+    out_file = font.make_out_file_name(extension=".otf", output_dir=output_dir, overwrite=overwrite)
+    cff_file = font.make_out_file_name(extension=".cff", output_dir=output_dir, overwrite=overwrite)
+
+    if target_upm:
+        logger.info(f"Scaling UPM to {target_upm}...")
+        font.tt_scale_upem(new_upem=target_upm)
+        font.ttfont.save(out_file, reorderTables=None)
+        font = Font(out_file, recalc_timestamp=recalc_timestamp)
+        tx_command = ["tx", "-cff", "-S", "+V", "+b", str(out_file), str(cff_file)]
+        run_shell_command(tx_command, suppress_output=True)
+
+    tx_command = ["tx", "-cff", "-S", "+V", "+b", str(font.file), str(cff_file)]
+    run_shell_command(tx_command, suppress_output=True)
+
+    ps_name = font.ttfont["name"].getDebugName(6)
+    charstrings_dict = get_t2_charstrings(font=font)
+    font_info = get_cff_font_info(font)
+    post_values = get_post_values(font)
+    private_dict = {}
+
+    fb = FontBuilder(font=font.ttfont)
+    fb.setupGlyphOrder(font.ttfont.getGlyphOrder())
+    fb.isTTF = False
+    delete_ttf_tables(font=fb.font)
+    fb.setupCFF(
+        psName=ps_name,
+        charStringsDict=charstrings_dict,
+        fontInfo=font_info,
+        privateDict=private_dict,
+    )
+    fb.setupMaxp()
+    fb.setupPost(**post_values)
+    fb.font.save(out_file, reorderTables=True)
+
+    sfntedit_command = ["sfntedit", "-a", "CFF=" + str(cff_file), str(out_file)]
+    run_shell_command(sfntedit_command, suppress_output=True)
+
+    font = Font(out_file, recalc_timestamp=recalc_timestamp)
+    fb = FontBuilder(font=font.ttfont)
+    fb.setupGlyphOrder(font.ttfont.getGlyphOrder())
+    fb.isTTF = False
+    charstrings_dict, _ = get_fixed_charstrings(font=font.ttfont)
+
+    fb.setupCFF(
+        psName=ps_name,
+        charStringsDict=charstrings_dict,
+        fontInfo=font_info,
+        privateDict=private_dict,
+    )
+    mtx = get_hmtx_values(font=font.ttfont, charstrings=charstrings_dict)
+    fb.setupHorizontalMetrics(mtx)
+    fb.setupDummyDSIG()
+    fb.setupMaxp()
+    fb.setupPost(**post_values)
+
+    fb.font.save(out_file, reorderTables=None)
+    zones = font.ps_recalc_zones()
+    stems = font.ps_recalc_stems()
+    font.ps_set_zones(zones[0], zones[1])
+    font.ps_set_stems(stems[0], stems[1])
+
+    fb.font.save(out_file, reorderTables=True)
+    logger.success(f"File saved to {out_file}")
+
+    if subroutinize:
+        tx_command = ["tx", "-cff", "+S", "+V", "+b", str(out_file), str(cff_file)]
+        run_shell_command(tx_command, suppress_output=True)
+        run_shell_command(sfntedit_command)
+
+    cff_file.unlink(missing_ok=True)
