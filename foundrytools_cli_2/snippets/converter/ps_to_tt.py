@@ -2,7 +2,6 @@ import typing as t
 
 from foundrytools_cli_2.lib import logger
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.ttf.from_otf import build_ttf
 
 
 def otf2ttf(
