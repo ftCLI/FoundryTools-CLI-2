@@ -28,7 +28,7 @@ def ps_to_tt(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Convert PostScript flavored fonts to TrueType flavored fonts.
     """
-    from foundrytools_cli_2.snippets.converter.ps_to_tt import otf2ttf
+    from foundrytools_cli_2.snippets.converter.otf2ttf import otf2ttf
 
     runner = FontRunner(input_path=input_path, task=otf2ttf, **options)
     runner.filter.filter_out_tt = True
@@ -45,7 +45,7 @@ def tt2ps(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Convert TrueType flavored fonts to PostScript flavored fonts.
     """
-    from foundrytools_cli_2.snippets.converter.tt_to_ps import ttf2otf
+    from foundrytools_cli_2.snippets.converter.ttf2otf import ttf2otf
 
     runner = FontRunner(input_path=input_path, task=ttf2otf, **options)
     runner.auto_save = False
@@ -97,7 +97,7 @@ def makeotf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Convert SFNT fonts to CFF-flavored OTF fonts.
     """
-    from foundrytools_cli_2.snippets.converter.tt_to_ps import ttf2otf_with_tx
+    from foundrytools_cli_2.snippets.converter.ttf2otf import ttf2otf_with_tx
 
     runner = FontRunner(input_path=input_path, task=ttf2otf_with_tx, **options)
     runner.filter.filter_out_ps = True
