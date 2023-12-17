@@ -48,6 +48,7 @@ def tt2ps(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Convert TrueType flavored fonts to PostScript flavored fonts.
     """
     if options.get("mode") == "tx":
+        options.pop("tolerance")
         from foundrytools_cli_2.snippets.converter.ttf2otf import ttf2otf_with_tx as convert
     else:
         from foundrytools_cli_2.snippets.converter.ttf2otf import ttf2otf as convert
