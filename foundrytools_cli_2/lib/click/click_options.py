@@ -392,3 +392,25 @@ def stems_flag() -> t.Callable:
         )
     ]
     return add_options(_stems_flag)
+
+
+def ttf2otf_mode_choice() -> t.Callable:
+    """
+    Add the ttf2otf_mode option to a click command.
+
+    :return: a decorator that adds the ttf2otf_mode option to a click command
+    """
+    _ttf2otf_mode_choice = [
+        click.option(
+            "-m",
+            "--mode",
+            type=click.Choice(["qu2cu", "tx"]),
+            default="qu2cu",
+            help="""
+            Conversion mode. By default, the script uses the ``qu2cu`` mode. Quadratic curves are
+            converted to cubic curves using the Qu2CuPen. Use the ``tx`` mode to use the tx tool
+            from AFDKO to generate the CFF table instead of the Qu2CuPen.
+            """,
+        )
+    ]
+    return add_options(_ttf2otf_mode_choice)
