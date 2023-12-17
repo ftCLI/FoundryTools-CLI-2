@@ -53,7 +53,7 @@ def tt2ps(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
         options.pop("tolerance")
         task = ttf2otf_with_tx
     else:
-        task = ttf2otf  # mypy: ignore
+        task = ttf2otf  # type: ignore
 
     runner = FontRunner(input_path=input_path, task=task, **options)
     runner.auto_save = False
