@@ -50,6 +50,7 @@ def tt2ps(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     from foundrytools_cli_2.snippets.converter.ttf2otf import ttf2otf, ttf2otf_with_tx
 
     if options["mode"] == "tx":
+        options.pop("tolerance")
         task = ttf2otf_with_tx
     else:
         task = ttf2otf
