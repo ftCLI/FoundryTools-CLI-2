@@ -8,7 +8,7 @@ from foundrytools_cli_2.lib.font_builder.font_builder_tools import build_otf
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.otf.t2_charstrings import (
     fix_charstrings,
-    from_true_type,
+    quadratics_to_cubics,
     get_t2_charstrings,
 )
 
@@ -35,7 +35,7 @@ def ttf2otf(
         font.tt_scale_upem(new_upem=target_upm)
 
     logger.info("Getting charstrings...")
-    charstrings = from_true_type(font=font.ttfont, tolerance=tolerance)
+    charstrings = quadratics_to_cubics(font=font.ttfont, tolerance=tolerance)
 
     logger.info("Converting to OTF...")
     build_otf(font=font.ttfont, charstrings_dict=charstrings)
