@@ -406,6 +406,7 @@ def ttf2otf_mode_choice() -> t.Callable:
             "--mode",
             type=click.Choice(["qu2cu", "tx"]),
             default="qu2cu",
+            show_default=True,
             help="""
             Conversion mode. By default, the script uses the ``qu2cu`` mode. Quadratic curves are
             converted to cubic curves using the Qu2CuPen. Use the ``tx`` mode to use the tx tool
