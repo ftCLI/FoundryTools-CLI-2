@@ -47,13 +47,13 @@ def tt2ps(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Convert TrueType flavored fonts to PostScript flavored fonts.
     """
-    if options.get("mode") == "tx":
-        options.pop("tolerance")
-        from foundrytools_cli_2.snippets.converter.ttf2otf import ttf2otf_with_tx as convert
+    from foundrytools_cli_2.snippets.converter.ttf2otf import ttf2otf, ttf2otf_with_tx
+    if options["mode"] == "tx":
+        task = ttf2otf_with_tx
     else:
-        from foundrytools_cli_2.snippets.converter.ttf2otf import ttf2otf as convert
+        task = ttf2otf
 
-    runner = FontRunner(input_path=input_path, task=convert, **options)
+    runner = FontRunner(input_path=input_path, task=task, **options)
     runner.auto_save = False
     runner.filter.filter_out_ps = True
     runner.filter.filter_out_variable = True
