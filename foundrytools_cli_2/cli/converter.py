@@ -14,6 +14,7 @@ from foundrytools_cli_2.lib.click.click_options import (
     common_options,
     in_format_choice,
     out_format_choice,
+    ttf2otf_mode_choice,
 )
 
 
@@ -24,7 +25,7 @@ cli = click.Group("converter", help="Font conversion utilities.")
 @tolerance_option()
 @target_upm_option(help_msg="Scale the converted fonts to the specified UPM.")
 @common_options()
-def ps_to_tt(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def ps2tt(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Convert PostScript flavored fonts to TrueType flavored fonts.
     """
@@ -37,6 +38,7 @@ def ps_to_tt(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("ttf2otf")
+@ttf2otf_mode_choice()
 @tolerance_option()
 @target_upm_option(help_msg="Scale the converted fonts to the specified UPM.")
 @subroutinize_flag()
@@ -45,9 +47,15 @@ def tt2ps(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Convert TrueType flavored fonts to PostScript flavored fonts.
     """
-    from foundrytools_cli_2.snippets.converter.ttf2otf import ttf2otf
+    from foundrytools_cli_2.snippets.converter.ttf2otf import ttf2otf, ttf2otf_with_tx
 
-    runner = FontRunner(input_path=input_path, task=ttf2otf, **options)
+    if options["mode"] == "tx":
+        options.pop("tolerance")
+        task = ttf2otf_with_tx
+    else:
+        task = ttf2otf  # type: ignore
+
+    runner = FontRunner(input_path=input_path, task=task, **options)
     runner.auto_save = False
     runner.filter.filter_out_ps = True
     runner.filter.filter_out_variable = True
@@ -86,21 +94,5 @@ def ft2wf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner = FontRunner(input_path=input_path, task=sfnt_to_wf, **options)
     runner.filter.filter_out_woff = True
     runner.filter.filter_out_woff2 = True
-    runner.auto_save = False
-    runner.run()
-
-
-@cli.command("make-otf")
-@target_upm_option(help_msg="Scale the converted fonts to the specified UPM.")
-@common_options()
-def makeotf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
-    """
-    Convert SFNT fonts to CFF-flavored OTF fonts.
-    """
-    from foundrytools_cli_2.snippets.converter.ttf2otf import ttf2otf_with_tx
-
-    runner = FontRunner(input_path=input_path, task=ttf2otf_with_tx, **options)
-    runner.filter.filter_out_ps = True
-    runner.filter.filter_out_variable = True
     runner.auto_save = False
     runner.run()
