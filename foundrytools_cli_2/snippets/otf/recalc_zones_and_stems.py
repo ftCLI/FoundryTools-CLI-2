@@ -2,7 +2,7 @@ from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.logger import logger
 
 
-def recalc_zones_and_stems(font: Font, zones: bool = True, stems: bool = True) -> None:
+def main(font: Font, zones: bool = True, stems: bool = True) -> None:
     """
     Recalculates the hinting zones and stems of an OTF font.
 
