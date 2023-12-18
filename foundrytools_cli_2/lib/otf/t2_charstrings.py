@@ -211,8 +211,6 @@ def from_beziers(font: TTFont) -> t.Dict[str, T2CharString]:
         bezier_paths: t.List[BezierPath] = BezierPath.fromFonttoolsGlyph(font, glyphname=k)
         for bp in bezier_paths:
             bp.addExtremes()
-            bp.balance()
-            bp.round()
         charstring: T2CharString = bezier_to_charstring(bezier_paths, font, glyph_name=k)
         charstrings_dict[k] = charstring
 
