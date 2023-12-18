@@ -13,6 +13,15 @@ def main(
     overwrite: bool = False,
     recalc_timestamp: bool = False,
 ) -> None:
+    """
+    Checks the outlines of an OpenType-PS font with afdko's checkoutlinesufo.
+
+    Args:
+        font (Font): The font to check.
+        output_dir (t.Optional[Path]): The directory where the font will be saved.
+        overwrite (bool): Whether to overwrite the output file if it already exists.
+        recalc_timestamp (bool): Whether to recalculate the font's timestamp.
+    """
     in_file = font.file
     out_file = font.make_out_file_name(output_dir=output_dir, overwrite=overwrite)
 
