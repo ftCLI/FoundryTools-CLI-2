@@ -28,9 +28,9 @@ def recalc_zs(input_path: Path, **options: dict) -> None:
     """
     Recalculates hinting stems and zones for the given font files.
     """
-    from foundrytools_cli_2.snippets.otf.recalc_zones_and_stems import recalc_zones_and_stems
+    from foundrytools_cli_2.snippets.otf.recalc_zones_and_stems import main
 
-    runner = FontRunner(input_path=input_path, task=recalc_zones_and_stems, **options)
+    runner = FontRunner(input_path=input_path, task=main, **options)
     runner.filter.filter_out_tt = True
     runner.run()
 
@@ -72,4 +72,34 @@ def fix_contours(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner = FontRunner(input_path=input_path, task=Font.ps_correct_contours, **options)
     runner.filter.filter_out_tt = True
     runner.filter.filter_out_variable = True
+    runner.run()
+
+
+@cli.command("add-extremes")
+@common_options()
+@subroutinize_flag()
+def add_extremes(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Add missing extreme points to OpenType-PS fonts.
+    """
+    from foundrytools_cli_2.snippets.otf.add_extremes import main
+
+    runner = FontRunner(input_path=input_path, task=main, **options)
+    runner.filter.filter_out_tt = True
+    runner.filter.filter_out_variable = True
+    runner.run()
+
+
+@cli.command("check-outlines")
+@common_options()
+def check_outlines(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Check the outlines of OpenType-PS fonts with ``afdko.checkoutlinesufo``.
+    """
+    from foundrytools_cli_2.snippets.otf.check_outlines import main
+
+    runner = FontRunner(input_path=input_path, task=main, **options)
+    runner.filter.filter_out_tt = True
+    runner.filter.filter_out_variable = True
+    runner.auto_save = False
     runner.run()
