@@ -5,17 +5,15 @@ from pathlib import Path
 from dehinter.font import dehint
 from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.boundsPen import BoundsPen
-from fontTools.pens.recordingPen import DecomposingRecordingPen
-from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import NamedInstance, Axis
 
+from foundrytools_cli_2.lib.otf.afdko_tools import cff_subr, cff_desubr
+from foundrytools_cli_2.lib.otf.font_builder import build_otf
 from foundrytools_cli_2.lib.otf.hinting_stems import recalc_stems
 from foundrytools_cli_2.lib.otf.hinting_zones import recalc_zones
 from foundrytools_cli_2.lib.otf.t2_charstrings import fix_charstrings, quadratics_to_cubics
-from foundrytools_cli_2.lib.otf.font_builder import build_otf
-from foundrytools_cli_2.lib.otf.afdko_tools import cff_subr, cff_desubr
 from foundrytools_cli_2.lib.ttf.decomponentize import decomponentize
 from foundrytools_cli_2.lib.ttf.from_otf import build_ttf
 
