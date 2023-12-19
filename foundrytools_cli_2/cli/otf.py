@@ -24,7 +24,6 @@ cli = click.Group()
 @zones_flag()
 @stems_flag()
 @common_options()
-@Timer(logger=logger.info)
 def recalc_zs(input_path: Path, **options: dict) -> None:
     """
     Recalculates hinting stems and zones for the given font files.
