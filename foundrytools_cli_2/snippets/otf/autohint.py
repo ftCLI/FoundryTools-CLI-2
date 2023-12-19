@@ -49,7 +49,7 @@ def main(
         )
 
 
-def validate_font(font: Font):
+def validate_font(font: Font) -> None:
     """
     Checks that the font is a PostScript font.
     """
@@ -65,7 +65,7 @@ def process_font_file(
     no_flex: bool = False,
     no_hint_sub: bool = False,
     reference_font: t.Optional[Path] = None,
-):
+) -> None:
     """
     Applies hinting to an OpenType-PS font file and returns the font's 'CFF ' table.
     """
@@ -102,7 +102,7 @@ def hint_font_file(
     no_flex: bool = False,
     no_hint_sub: bool = False,
     reference_font: t.Optional[Path] = None,
-):
+) -> None:
     """
     Applies hinting to an OpenType-PS font file and returns the font's 'CFF ' table.
     """
