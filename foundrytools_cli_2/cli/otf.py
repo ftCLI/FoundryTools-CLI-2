@@ -69,7 +69,9 @@ def fix_contours(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     removing tiny paths.
     """
 
-    runner = FontRunner(input_path=input_path, task=Font.ps_correct_contours, **options)
+    from foundrytools_cli_2.snippets.otf.fix_contours import main
+
+    runner = FontRunner(input_path=input_path, task=main, **options)
     runner.filter.filter_out_tt = True
     runner.filter.filter_out_variable = True
     runner.run()

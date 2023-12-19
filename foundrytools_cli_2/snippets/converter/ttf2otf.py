@@ -4,11 +4,9 @@ from pathlib import Path
 from afdko.fdkutils import run_shell_command
 
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font_builder.font_builder_tools import build_otf
+from foundrytools_cli_2.lib.otf.font_builder import build_otf
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.otf.t2_charstrings import (
-    fix_charstrings,
-    quadratics_to_cubics,
     get_t2_charstrings,
 )
 
@@ -35,16 +33,15 @@ def ttf2otf(
         font.tt_scale_upem(new_upem=target_upm)
 
     logger.info("Getting charstrings...")
-    charstrings = quadratics_to_cubics(font=font.ttfont, tolerance=tolerance)
 
     logger.info("Converting to OTF...")
-    build_otf(font=font.ttfont, charstrings_dict=charstrings)
-    font.save(out_file, reorder_tables=None)
-    otf = Font(out_file, recalc_timestamp=recalc_timestamp)
+    font.to_otf(tolerance=tolerance)
 
     logger.info("Correcting contours...")
-    fixed_charstrings, _ = fix_charstrings(font=otf.ttfont)
-    build_otf(font=otf.ttfont, charstrings_dict=fixed_charstrings)
+    font.ps_correct_contours()
+
+    font.save(out_file, reorder_tables=None)
+    otf = Font(out_file, recalc_timestamp=recalc_timestamp)
 
     logger.info("Getting hinting values...")
     zones = otf.ps_recalc_zones()
@@ -96,8 +93,7 @@ def ttf2otf_with_tx(
 
     logger.info("Correcting contours...")
     font = Font(out_file, recalc_timestamp=recalc_timestamp)
-    charstrings_dict, _ = fix_charstrings(font=font.ttfont)
-    build_otf(font=font.ttfont, charstrings_dict=charstrings_dict)
+    font.ps_correct_contours()
     font.save(out_file, reorder_tables=None)
 
     logger.info("Getting hinting values...")
