@@ -67,6 +67,7 @@ class FontRunner:  # pylint: disable=too-few-public-methods
                 try:
                     self.task(font, **self._callable_options)
                 except Exception as e:  # pylint: disable=broad-except
+                    timer.stop()
                     logger.exception(f"{type(e).__name__}: {e}")
                     continue
 
@@ -78,6 +79,7 @@ class FontRunner:  # pylint: disable=too-few-public-methods
                 try:
                     save_font(font, **self._save_options.__dict__)
                 except Exception as e:  # pylint: disable=broad-except
+                    timer.stop()
                     logger.exception(f"{type(e).__name__}: {e}")
 
                 timer.stop()
