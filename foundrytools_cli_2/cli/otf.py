@@ -14,8 +14,6 @@ from foundrytools_cli_2.lib.click.click_options import (
 )
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font_runner import FontRunner
-from foundrytools_cli_2.lib.logger import logger
-from foundrytools_cli_2.lib.timer import Timer
 
 cli = click.Group()
 
