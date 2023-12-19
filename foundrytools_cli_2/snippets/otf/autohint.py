@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import typing as t
 
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.logger import logger
@@ -13,7 +14,7 @@ def main(
     decimal: bool = False,
     no_flex: bool = False,
     no_hint_sub: bool = False,
-    reference_font: Path = None,
+    reference_font: t.Optional[Path] = None,
 ) -> None:
     """
     Applies hinting to an OpenType-PS font file and returns the font's 'CFF ' table.
@@ -63,7 +64,7 @@ def process_font_file(
     decimal: bool = False,
     no_flex: bool = False,
     no_hint_sub: bool = False,
-    reference_font: Path = None,
+    reference_font: t.Optional[Path] = None,
 ):
     """
     Applies hinting to an OpenType-PS font file and returns the font's 'CFF ' table.
@@ -100,7 +101,7 @@ def hint_font_file(
     decimal: bool = False,
     no_flex: bool = False,
     no_hint_sub: bool = False,
-    reference_font: Path = None,
+    reference_font: t.Optional[Path] = None,
 ):
     """
     Applies hinting to an OpenType-PS font file and returns the font's 'CFF ' table.

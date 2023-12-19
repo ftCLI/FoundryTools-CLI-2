@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Iterator
+import typing as t
 
 from afdko.otfautohint.__main__ import ACOptions, _validate_path
 from afdko.otfautohint.autohint import fontWrapper, FontInstance, openFont
@@ -12,7 +12,7 @@ __all__ = ["cff_subr", "cff_desubr", "hint_font"]
 
 
 @contextmanager
-def _restore_flavor(font: TTFont) -> Iterator[None]:
+def _restore_flavor(font: TTFont) -> t.Iterator[None]:
     """
     This is a workaround to support subroutinization and desubroutinization for WOFF and WOFF2
     fonts with cffsubr without raising an exception. This context manager is used to temporarily
@@ -59,7 +59,7 @@ def hint_font(
     decimal: bool = False,
     no_flex: bool = False,
     no_hint_sub: bool = False,
-    reference_font: Path = None,
+    reference_font: t.Optional[Path] = None,
 ) -> table_C_F_F_:
     """
     Applies hinting to an OpenType-PS font file and returns the font's 'CFF ' table.
