@@ -49,6 +49,9 @@ def main(
 
 
 def validate_font(font: Font):
+    """
+    Checks that the font is a PostScript font.
+    """
     if not font.is_ps:
         raise ValueError("Font is not a PostScript font.")
 
@@ -62,6 +65,9 @@ def process_font_file(
     no_hint_sub: bool = False,
     reference_font: Path = None,
 ):
+    """
+    Applies hinting to an OpenType-PS font file and returns the font's 'CFF ' table.
+    """
     # Create a temporary file using os module
     temp = os.path.join(os.path.dirname(os.path.abspath(__file__)), "temp.otf")
     try:
@@ -96,6 +102,9 @@ def hint_font_file(
     no_hint_sub: bool = False,
     reference_font: Path = None,
 ):
+    """
+    Applies hinting to an OpenType-PS font file and returns the font's 'CFF ' table.
+    """
     logger.info("Hinting font...")
     font.ttfont["CFF "] = hint_font(
         in_file=in_file,
