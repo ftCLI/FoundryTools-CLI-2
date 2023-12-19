@@ -5,17 +5,16 @@ from pathlib import Path
 from dehinter.font import dehint
 from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.boundsPen import BoundsPen
-from fontTools.pens.recordingPen import DecomposingRecordingPen
-from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import NamedInstance, Axis
 
+from foundrytools_cli_2.lib.otf.afdko_tools import cff_subr, cff_desubr
+from foundrytools_cli_2.lib.otf.font_builder import build_otf
 from foundrytools_cli_2.lib.otf.hinting_stems import recalc_stems
 from foundrytools_cli_2.lib.otf.hinting_zones import recalc_zones
 from foundrytools_cli_2.lib.otf.t2_charstrings import fix_charstrings, quadratics_to_cubics
-from foundrytools_cli_2.lib.otf.font_builder import build_otf
-from foundrytools_cli_2.lib.otf.afdko_tools import cff_subr, cff_desubr
+from foundrytools_cli_2.lib.ttf.decomponentize import decomponentize
 from foundrytools_cli_2.lib.ttf.from_otf import build_ttf
 
 PS_SFNT_VERSION = "OTTO"
@@ -472,20 +471,7 @@ class Font:  # pylint: disable=too-many-public-methods
         if not self.is_tt:
             raise NotImplementedError("Decomponentization is only supported for TrueType fonts.")
 
-        glyph_set = self.ttfont.getGlyphSet()
-        glyf_table = self.ttfont[GLYF_TABLE_TAG]
-        dr_pen = DecomposingRecordingPen(glyph_set)
-        tt_pen = TTGlyphPen(None)
-
-        for glyph_name in self.ttfont.glyphOrder:
-            glyph = glyf_table[glyph_name]
-            if not glyph.isComposite():
-                continue
-            dr_pen.value = []
-            tt_pen.init()
-            glyph.draw(dr_pen, glyf_table)
-            dr_pen.replay(tt_pen)
-            glyf_table[glyph_name] = tt_pen.glyph()
+        decomponentize(self.ttfont)
 
     def tt_remove_hints(self) -> None:
         """
