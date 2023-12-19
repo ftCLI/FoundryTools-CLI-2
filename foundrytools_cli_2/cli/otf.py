@@ -10,6 +10,7 @@ from foundrytools_cli_2.lib.click.click_options import (
     min_area_option,
     zones_flag,
     stems_flag,
+    autohint_options,
 )
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font_runner import FontRunner
@@ -104,4 +105,20 @@ def check_outlines(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.filter.filter_out_tt = True
     runner.filter.filter_out_variable = True
     runner.auto_save = False
+    runner.run()
+
+
+@cli.command("autohint")
+@autohint_options()
+@subroutinize_flag()
+@common_options()
+def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Autohint OpenType fonts with ``afdko.autohint``.
+    """
+    from foundrytools_cli_2.snippets.otf.autohint import main
+
+    runner = FontRunner(input_path=input_path, task=main, **options)
+    runner.filter.filter_out_tt = True
+    runner.filter.filter_out_variable = True
     runner.run()
