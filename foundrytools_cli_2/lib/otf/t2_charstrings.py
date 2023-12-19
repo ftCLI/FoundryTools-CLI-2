@@ -16,7 +16,7 @@ from foundrytools_cli_2.lib.pathops.skia_tools import (
     t2_charstring_from_skia_path,
 )
 
-from foundrytools_cli_2.lib.font_builder.font_builder_tools import build_otf
+from foundrytools_cli_2.lib.otf.font_builder import build_otf
 from foundrytools_cli_2.lib.ttf.from_otf import build_ttf
 
 

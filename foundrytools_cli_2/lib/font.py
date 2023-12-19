@@ -11,10 +11,11 @@ from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import NamedInstance, Axis
 
-from foundrytools_cli_2.snippets.otf.cffsubr import cff_subr, cff_desubr
-from foundrytools_cli_2.lib.otf.ps_recalc_stems import recalc_stems
-from foundrytools_cli_2.lib.otf.ps_recalc_zones import recalc_zones
-from foundrytools_cli_2.snippets.otf.fix_contours import correct_otf_contours
+from foundrytools_cli_2.lib.otf.hinting_stems import recalc_stems
+from foundrytools_cli_2.lib.otf.hinting_zones import recalc_zones
+from foundrytools_cli_2.lib.otf.t2_charstrings import fix_charstrings, quadratics_to_cubics
+from foundrytools_cli_2.lib.otf.font_builder import build_otf
+from foundrytools_cli_2.lib.otf.afdko_tools import cff_subr, cff_desubr
 from foundrytools_cli_2.lib.ttf.from_otf import build_ttf
 
 PS_SFNT_VERSION = "OTTO"
@@ -440,6 +441,20 @@ class Font:  # pylint: disable=too-many-public-methods
 
         build_ttf(font=self.ttfont, max_err=max_err, reverse_direction=reverse_direction)
 
+    def to_otf(self, tolerance: float = 1.0) -> None:
+        """
+        Convert a font to PostScript.
+        """
+        if self.is_ps:
+            raise ValueError("Font is already a PostScript font.")
+        if self.is_variable:
+            raise NotImplementedError(
+                "Conversion to PostScript is not supported for variable fonts."
+            )
+
+        charstrings = quadratics_to_cubics(font=self.ttfont, tolerance=tolerance)
+        build_otf(font=self.ttfont, charstrings_dict=charstrings)
+
     def to_sfnt(self) -> None:
         """
         Convert a font to SFNT.
@@ -501,22 +516,22 @@ class Font:  # pylint: disable=too-many-public-methods
 
         scale_upem(self.ttfont, new_upem=new_upem)
 
-    def ps_correct_contours(self, min_area: int = 25, subroutinize: bool = True) -> None:
+    def ps_correct_contours(self, min_area: int = 25) -> t.List[str]:
         """
         Correct the contours of a PostScript font by removing tiny paths and correcting the
         direction of paths.
 
         :param min_area: The minimum area of a path to be retained.
-        :param subroutinize: Whether to subroutinize the charstrings.
         """
         if not self.is_ps:
             raise NotImplementedError(
-                "PS Contour correction is only supported for PostScript fonts."
+                "PS Contour correction is only supported for PostScript flavored fonts."
             )
 
-        correct_otf_contours(font=self.ttfont, min_area=min_area)
-        if subroutinize:
-            self.ps_subroutinize()
+        charstrings, modified = fix_charstrings(font=self.ttfont, min_area=min_area)
+        build_otf(font=self.ttfont, charstrings_dict=charstrings)
+
+        return modified
 
     def ps_recalc_zones(self) -> t.Tuple[t.List[int], t.List[int]]:
         """

@@ -1,24 +1,29 @@
-from fontTools.ttLib.ttFont import TTFont
-
-from foundrytools_cli_2.lib.font_builder.font_builder_tools import build_otf
+from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.logger import logger
-from foundrytools_cli_2.lib.otf.t2_charstrings import fix_charstrings
 
 
-def correct_otf_contours(font: TTFont, min_area: int = 25) -> None:
+def main(font: Font, min_area: int = 25, subroutinize: bool = True) -> None:
     """
-    Corrects the contours of an OTF font.
+    Corrects contours of the given font by removing overlaps, correcting the direction of the
+    contours, and removing tiny paths. Optionally, subroutinizes the font after correcting the
+    contours.
 
-    Args:
-        font (TTFont): The font to correct.
-        min_area (int): The minimum area of a path to keep.
+    Parameters:
+        font (Font): The font object to be corrected.
+        min_area (int, optional): The minimum area of a contour to be considered. Defaults to 25.
+        subroutinize (bool, optional): Flag to indicate whether to subroutinize the font.
+            Defaults to True.
+
+    Returns:
+        None
     """
-
-    charstrings, modified = fix_charstrings(font=font, min_area=min_area)
-
+    logger.info("Correcting contours...")
+    modified = font.ps_correct_contours(min_area=min_area)
     if not modified:
-        logger.info("No glyphs modified")
+        logger.info("No contours were modified")
         return
 
-    logger.info(f"{len(modified)} glyphs modified")
-    build_otf(font=font, charstrings_dict=charstrings)
+    logger.info(f"{len(modified)} contours were modified")
+    if subroutinize:
+        logger.info("Subroutinizing...")
+        font.ps_subroutinize()
