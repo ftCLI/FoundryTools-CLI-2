@@ -1,4 +1,5 @@
 import os
+from io import BytesIO
 from pathlib import Path
 import typing as t
 
@@ -15,6 +16,7 @@ def main(
     no_flex: bool = False,
     no_hint_sub: bool = False,
     reference_font: t.Optional[Path] = None,
+    subroutinize: bool = True,
 ) -> None:
     """
     Applies hinting to an OpenType-PS font file and returns the font's 'CFF ' table.
@@ -47,6 +49,15 @@ def main(
             no_hint_sub,
             reference_font,
         )
+
+    buf = BytesIO()
+    font.ttfont.save(buf, reorderTables=None)
+    temp_font = Font(buf)
+
+    if subroutinize:
+        logger.info("Subroutinizing...")
+        temp_font.ps_subroutinize()
+        font.ttfont["CFF "] = temp_font.ttfont["CFF "]
 
 
 def validate_font(font: Font) -> None:
