@@ -11,6 +11,16 @@ from foundrytools_cli_2.lib.logger import logger
 
 
 def get_instance_file_name(font: Font, instance: NamedInstance) -> str:
+    """
+    Returns the file name of an instance of a font.
+
+    Parameters:
+        font (Font): The font object.
+        instance (NamedInstance): The instance object.
+
+    Returns:
+        str: The file name of the instance.
+    """
     if hasattr(instance, "postscriptNameID") and instance.postscriptNameID < 65535:
         instance_file_name = font.ttfont["name"].getDebugName(instance.postscriptNameID)
 
@@ -32,13 +42,45 @@ def get_instance_file_name(font: Font, instance: NamedInstance) -> str:
     return sanitize_filename(instance_file_name)
 
 
-def get_font_instances(font: Font, instances: t.List[NamedInstance]) -> t.List[NamedInstance]:
+def get_font_instances(
+    font: Font, instances: t.Optional[t.List[NamedInstance]] = None
+) -> t.List[NamedInstance]:
+    """
+    Get font instances.
+
+    This method returns a list of font instances. If the `instances` parameter is not empty,
+    it returns the provided instances as is. Otherwise, it calls the `get_instances()` method
+    on the `font` object and returns the obtained instances.
+
+    :param font: The font object to retrieve instances from.
+    :type font: Font
+
+    :param instances: The list of font instances. If provided, it will be returned as is.
+        If not provided, the instances will be obtained from the `font` object.
+    :type instances: List[NamedInstance]
+
+    :return: The list of font instances.
+    :rtype: List[NamedInstance]
+    """
     return font.get_instances() if not instances else instances
 
 
 def create_static_instance(
     font: Font, instance: NamedInstance, update_name_table: bool = True
 ) -> Font.ttfont.__class__:
+    """
+    Creates a static instance of a variable font.
+
+    Args:
+        font (Font): The variable font.
+        instance (NamedInstance): The instance definition.
+        update_name_table (bool, optional): Specifies whether to update the font names table.
+            Defaults to True.
+
+    Returns:
+        Font.ttfont.__class__: The static instance font.
+
+    """
     return instantiateVariableFont(
         varfont=font.ttfont,
         axisLimits=instance.coordinates,
@@ -52,6 +94,20 @@ def create_static_instance(
 def get_output_file(
     font: Font, instance: NamedInstance, output_dir: Path, overwrite: bool = True
 ) -> Path:
+    """
+    Get the output file path for a given font instance.
+
+    :param font: The font object.
+    :type font: Font
+    :param instance: The named instance object.
+    :type instance: NamedInstance
+    :param output_dir: The directory where the output file will be saved. Default is None.
+    :type output_dir: Path
+    :param overwrite: Whether to overwrite the output file if it already exists. Default is True.
+    :type overwrite: bool
+    :return: The output file path.
+    :rtype: Path
+    """
     instance_file_name = get_instance_file_name(font=font, instance=instance)
     output_dir = Path(output_dir) if output_dir else font.file.parent
     extension = font.get_real_extension()
@@ -60,10 +116,34 @@ def get_output_file(
 
 
 def save_static_instance(out_file: Path, static_instance: Font.ttfont.__class__):
+    """
+    Save Static Instance
+
+    Saves a static instance of a Font.ttfont class to a file.
+
+    Parameters:
+    - out_file (Path): The path to the output file.
+    - static_instance (Font.ttfont.__class__): The static instance of the Font.ttfont class to be
+        saved.
+
+    """
     static_instance.save(file=out_file)
 
 
 def log_success(out_file):
+    """
+    Log a success message indicating that a static instance has been saved to the specified output
+        file.
+
+    Parameters:
+    out_file (str): The name of the output file where the static instance is saved.
+
+    Returns:
+    None
+
+    Example:
+    log_success("output.txt")
+    """
     logger.success(f"Static instance saved to {out_file}")
 
 
@@ -74,6 +154,19 @@ def main(
     update_name_table: bool = True,
     overwrite: bool = True,
 ) -> None:
+    """
+    Generate static font instances based on given parameters.
+
+    Args:
+        font: The font object.
+        instances: Optional. A list of NamedInstance objects representing the instances to process.
+        output_dir: Optional. The directory where the static instances will be saved.
+        update_name_table: Optional. Whether to update the name table of the font instances.
+        overwrite: Optional. Whether to overwrite existing files in the output directory.
+
+    Returns:
+        None
+    """
     instances = get_font_instances(font, instances)
     for instance in instances:
         static_instance = create_static_instance(font, instance, update_name_table)
