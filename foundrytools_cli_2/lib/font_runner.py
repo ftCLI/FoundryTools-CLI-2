@@ -63,7 +63,7 @@ class FontRunner:  # pylint: disable=too-few-public-methods
                 timer.start()
 
                 try:
-                    logger.info(f"Processing file {font.file.name}")
+                    self._log_current_file(font)
                     self.task(font, **self._callable_options)
                 except Exception as e:  # pylint: disable=broad-except
                     timer.stop()
@@ -129,6 +129,18 @@ class FontRunner:  # pylint: disable=too-few-public-methods
                 callable_options[k] = v
 
         return finder_options, save_options, callable_options
+
+    @staticmethod
+    def _log_current_file(font: Font) -> None:
+        """
+        Logs the current font information.
+
+        Parameters:
+            font (Font): The font to log.
+        """
+        if not hasattr(font, "file"):
+            raise ValueError("Font does not have a file attribute")
+        logger.info(f"Processing file {font.file}")
 
     def _get_out_file_name(self, font: Font) -> Path:
         """
