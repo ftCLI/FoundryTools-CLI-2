@@ -37,7 +37,7 @@ def get_font_instances(font: Font, instances: t.List[NamedInstance]) -> t.List[N
 
 
 def create_static_instance(
-        font: Font, instance: NamedInstance, update_name_table: bool = True
+    font: Font, instance: NamedInstance, update_name_table: bool = True
 ) -> Font.ttfont.__class__:
     return instantiateVariableFont(
         varfont=font.ttfont,
@@ -50,7 +50,7 @@ def create_static_instance(
 
 
 def get_output_file(
-        font: Font, instance: NamedInstance, output_dir: Path, overwrite: bool = True
+    font: Font, instance: NamedInstance, output_dir: Path, overwrite: bool = True
 ) -> Path:
     instance_file_name = get_instance_file_name(font=font, instance=instance)
     output_dir = Path(output_dir) if output_dir else font.file.parent
@@ -68,11 +68,11 @@ def log_success(out_file):
 
 
 def main(
-        font: Font,
-        instances: t.Optional[t.List[NamedInstance]] = None,
-        output_dir: t.Optional[Path] = None,
-        update_name_table: bool = True,
-        overwrite: bool = True,
+    font: Font,
+    instances: t.Optional[t.List[NamedInstance]] = None,
+    output_dir: t.Optional[Path] = None,
+    update_name_table: bool = True,
+    overwrite: bool = True,
 ) -> None:
     instances = get_font_instances(font, instances)
     for instance in instances:
