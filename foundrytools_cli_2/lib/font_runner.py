@@ -138,8 +138,8 @@ class FontRunner:  # pylint: disable=too-few-public-methods
         Parameters:
             font (Font): The font to log.
         """
-        if not hasattr(font, "file"):
-            raise ValueError("Font does not have a file attribute")
+        if font.file is None:
+            raise ValueError("Font file is None")
         logger.info(f"Processing file {font.file}")
 
     def _get_out_file_name(self, font: Font) -> Path:
