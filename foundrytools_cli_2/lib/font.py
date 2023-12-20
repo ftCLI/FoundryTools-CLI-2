@@ -277,11 +277,11 @@ class Font:  # pylint: disable=too-many-public-methods
                 "Cannot get output file for a BytesIO object without providing a file name."
             )
 
-        # We check elsewhere if the output directory is writable, no need to check it here.
         file = file or self.file
+        assert isinstance(file, Path)
+        file_name = file.stem
         out_dir = output_dir or file.parent
         extension = extension or self.get_real_extension()
-        file_name = file.stem
 
         # Clean up the file name by removing the extensions used as file name suffix as added by
         # possible previous conversions.
