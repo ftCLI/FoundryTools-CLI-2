@@ -107,8 +107,7 @@ def get_output_dir(font: Font, output_dir: t.Optional[Path] = None) -> Path:
         return output_dir
     if font.file is None:
         raise ValueError("The font file path is not defined.")
-    else:
-        return font.file.parent
+    return font.file.parent
 
 
 def get_output_file(
