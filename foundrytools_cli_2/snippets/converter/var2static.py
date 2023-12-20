@@ -2,6 +2,7 @@ import typing as t
 from pathlib import Path
 
 from fontTools.misc.cliTools import makeOutputFileName
+from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables._f_v_a_r import NamedInstance
 from fontTools.varLib.instancer import instantiateVariableFont, OverlapMode
 from pathvalidate import sanitize_filename
@@ -67,7 +68,7 @@ def get_font_instances(
 
 def create_static_instance(
     font: Font, instance: NamedInstance, update_name_table: bool = True
-) -> Font.ttfont.__class__:
+) -> TTFont:
     """
     Creates a static instance of a variable font.
 
@@ -91,6 +92,26 @@ def create_static_instance(
     )
 
 
+def get_output_dir(font: Font, output_dir: t.Optional[Path] = None) -> Path:
+    """
+    Get the output directory for the static font instances.
+
+    :param font: The font object.
+    :type font: Font
+    :param output_dir: The directory where the static instances will be saved. Default is None.
+    :type output_dir: Path
+    :return: The output directory.
+    :rtype: Path
+    """
+    if output_dir:
+        return output_dir
+    else:
+        if font.file is None:
+            raise ValueError("The font file path is not defined.")
+        else:
+            return font.file.parent
+
+
 def get_output_file(
     font: Font, instance: NamedInstance, output_dir: Path, overwrite: bool = True
 ) -> Path:
@@ -109,13 +130,12 @@ def get_output_file(
     :rtype: Path
     """
     instance_file_name = get_instance_file_name(font=font, instance=instance)
-    output_dir = Path(output_dir) if output_dir else font.file.parent
     extension = font.get_real_extension()
     out_file = makeOutputFileName(instance_file_name, output_dir, extension, overwrite)
     return Path(out_file)
 
 
-def save_static_instance(out_file: Path, static_instance: Font.ttfont.__class__):
+def save_static_instance(out_file: Path, static_instance: TTFont) -> None:
     """
     Save Static Instance
 
@@ -130,7 +150,7 @@ def save_static_instance(out_file: Path, static_instance: Font.ttfont.__class__)
     static_instance.save(file=out_file)
 
 
-def log_success(out_file):
+def log_success(out_file: Path) -> None:
     """
     Log a success message indicating that a static instance has been saved to the specified output
         file.
@@ -170,6 +190,7 @@ def main(
     instances = get_font_instances(font, instances)
     for instance in instances:
         static_instance = create_static_instance(font, instance, update_name_table)
+        output_dir = get_output_dir(font, output_dir)
         out_file = get_output_file(font, instance, output_dir, overwrite)
         save_static_instance(out_file, static_instance)
         log_success(out_file)
