@@ -61,9 +61,9 @@ class FontRunner:  # pylint: disable=too-few-public-methods
         for font in fonts:
             with font:
                 timer.start()
-                logger.info(f"Processing file {font.file.name}")
 
                 try:
+                    logger.info(f"Processing file {font.file.name}")
                     self.task(font, **self._callable_options)
                 except Exception as e:  # pylint: disable=broad-except
                     timer.stop()

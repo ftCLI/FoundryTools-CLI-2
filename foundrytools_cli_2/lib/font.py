@@ -278,7 +278,9 @@ class Font:  # pylint: disable=too-many-public-methods
             )
 
         file = file or self.file
-        assert isinstance(file, Path)
+        if not isinstance(file, Path):
+            raise ValueError("File must be a Path object.")
+
         file_name = file.stem
         out_dir = output_dir or file.parent
         extension = extension or self.get_real_extension()
