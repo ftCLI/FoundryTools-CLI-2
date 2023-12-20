@@ -6,7 +6,6 @@ from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font_finder import FontFinder, FinderError, FinderFilter
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.timer import Timer
-from foundrytools_cli_2.lib.utils.misc import log_current_font, save_font
 
 
 class FontSaveError(Exception):
@@ -62,9 +61,9 @@ class FontRunner:  # pylint: disable=too-few-public-methods
         for font in fonts:
             with font:
                 timer.start()
-                log_current_font(font)
 
                 try:
+                    self._log_current_file(font)
                     self.task(font, **self._callable_options)
                 except Exception as e:  # pylint: disable=broad-except
                     timer.stop()
@@ -77,7 +76,9 @@ class FontRunner:  # pylint: disable=too-few-public-methods
                     continue
 
                 try:
-                    save_font(font, **self._save_options.__dict__)
+                    out_file = self._get_out_file_name(font)
+                    font.save(out_file, reorder_tables=self._save_options.reorder_tables)
+                    logger.success(f"File saved to {out_file}")
                 except Exception as e:  # pylint: disable=broad-except
                     timer.stop()
                     logger.exception(f"{type(e).__name__}: {e}")
@@ -128,3 +129,32 @@ class FontRunner:  # pylint: disable=too-few-public-methods
                 callable_options[k] = v
 
         return finder_options, save_options, callable_options
+
+    @staticmethod
+    def _log_current_file(font: Font) -> None:
+        """
+        Logs the current font information.
+
+        Parameters:
+            font (Font): The font to log.
+        """
+        if font.file is None:
+            raise ValueError("Font file is None")
+        logger.info(f"Processing file {font.file}")
+
+    def _get_out_file_name(self, font: Font) -> Path:
+        """
+        Returns the output file name for a given font.
+
+        Parameters:
+            font (Font): The font to get the output file name for.
+
+        Returns:
+            str: The output file name.
+        """
+        return font.make_out_file_name(
+            output_dir=self._save_options.output_dir,
+            extension=font.get_real_extension(),
+            overwrite=self._save_options.overwrite,
+            suffix=self._save_options.suffix,
+        )
