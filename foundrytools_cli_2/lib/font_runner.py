@@ -6,7 +6,6 @@ from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font_finder import FontFinder, FinderError, FinderFilter
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.timer import Timer
-from foundrytools_cli_2.lib.utils.misc import log_current_font
 
 
 class FontSaveError(Exception):
@@ -62,7 +61,7 @@ class FontRunner:  # pylint: disable=too-few-public-methods
         for font in fonts:
             with font:
                 timer.start()
-                log_current_font(font)
+                logger.info(f"Processing file {font.file.name}")
 
                 try:
                     self.task(font, **self._callable_options)
