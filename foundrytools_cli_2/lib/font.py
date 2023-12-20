@@ -245,6 +245,7 @@ class Font:  # pylint: disable=too-many-public-methods
 
     def make_out_file_name(
         self,
+        file: t.Optional[Path] = None,
         output_dir: t.Optional[Path] = None,
         overwrite: bool = True,
         extension: t.Optional[str] = None,
@@ -259,6 +260,8 @@ class Font:  # pylint: disable=too-many-public-methods
         before adding it again.
 
         Args:
+            file: The file name to use for the output file. If not specified, the file name will be
+                determined by the input file.
             output_dir: Path to the output directory.
             overwrite: A boolean indicating whether to overwrite existing files.
             extension: An optional extension to use for the output file. If not specified, the
@@ -269,13 +272,16 @@ class Font:  # pylint: disable=too-many-public-methods
             A Path object pointing to the output file.
         """
 
-        if self.file is None:
-            raise ValueError("Cannot get output file for a BytesIO object.")
+        if file is None and self.file is None:
+            raise ValueError(
+                "Cannot get output file for a BytesIO object without providing a file name."
+            )
 
         # We check elsewhere if the output directory is writable, no need to check it here.
-        out_dir = output_dir or self.file.parent
+        file = file or self.file
+        out_dir = output_dir or file.parent
         extension = extension or self.get_real_extension()
-        file_name = self.file.stem
+        file_name = file.stem
 
         # Clean up the file name by removing the extensions used as file name suffix as added by
         # possible previous conversions.
@@ -285,11 +291,11 @@ class Font:  # pylint: disable=too-many-public-methods
 
         out_file = Path(
             makeOutputFileName(
-                file_name,
-                extension=extension,
-                suffix=suffix,
+                input=file_name,
                 outputDir=out_dir,
+                extension=extension,
                 overWrite=overwrite,
+                suffix=suffix,
             )
         )
         return out_file
