@@ -22,46 +22,41 @@ def get_instance_file_name(font: Font, instance: NamedInstance) -> str:
     Returns:
         str: The file name of the instance.
     """
+    name_table = font.ttfont["name"]
+
     if hasattr(instance, "postscriptNameID") and instance.postscriptNameID < 65535:
-        instance_file_name = font.ttfont["name"].getDebugName(instance.postscriptNameID)
+        instance_file_name = name_table.getDebugName(instance.postscriptNameID)
+        return sanitize_filename(instance_file_name)
 
+    if hasattr(instance, "subfamilyNameID") and instance.subfamilyNameID > 0:
+        subfamily_name = name_table.getDebugName(instance.subfamilyNameID)
     else:
-        if hasattr(instance, "subfamilyNameID") and instance.subfamilyNameID > 0:
-            subfamily_name = font.ttfont["name"].getDebugName(instance.subfamilyNameID)
-        else:
-            subfamily_name = "_".join([f"{k}_{v}" for k, v in instance.coordinates.items()])
+        subfamily_name = "_".join([f"{k}_{v}" for k, v in instance.coordinates.items()])
 
-        if font.ttfont["name"].getBestFamilyName() is not None:
-            family_name = font.ttfont["name"].getBestFamilyName()
-        elif font.file is not None:
-            family_name = font.file.stem
-        else:
-            family_name = "UnknownFamily"
+    if name_table.getBestFamilyName() is not None:
+        family_name = name_table.getBestFamilyName()
+    elif font.file is not None:
+        family_name = font.file.stem
+    else:
+        family_name = "UnknownFamily"
 
-        instance_file_name = f"{family_name}-{subfamily_name}".replace(" ", "")
+    instance_file_name = f"{family_name}-{subfamily_name}".replace(" ", "")
 
     return sanitize_filename(instance_file_name)
 
 
-def get_font_instances(
+def get_instances(
     font: Font, instances: t.Optional[t.List[NamedInstance]] = None
 ) -> t.List[NamedInstance]:
     """
-    Get font instances.
+    Returns a list of font instances. If the `instances` parameter is not empty, it returns the
+    provided instances as is. Otherwise, it calls the `get_instances()` method on the `font` object
+    and returns the obtained instances.
 
-    This method returns a list of font instances. If the `instances` parameter is not empty,
-    it returns the provided instances as is. Otherwise, it calls the `get_instances()` method
-    on the `font` object and returns the obtained instances.
-
-    :param font: The font object to retrieve instances from.
-    :type font: Font
-
-    :param instances: The list of font instances. If provided, it will be returned as is.
-        If not provided, the instances will be obtained from the `font` object.
-    :type instances: List[NamedInstance]
-
-    :return: The list of font instances.
-    :rtype: List[NamedInstance]
+    Args:
+        font (Font): The font object.
+        instances (Optional[List[NamedInstance]]): Optional. A list of font instances.
+            Defaults to None.
     """
     return font.get_instances() if not instances else instances
 
@@ -116,16 +111,15 @@ def get_output_file(
     """
     Get the output file path for a given font instance.
 
-    :param font: The font object.
-    :type font: Font
-    :param instance: The named instance object.
-    :type instance: NamedInstance
-    :param output_dir: The directory where the output file will be saved. Default is None.
-    :type output_dir: Path
-    :param overwrite: Whether to overwrite the output file if it already exists. Default is True.
-    :type overwrite: bool
-    :return: The output file path.
-    :rtype: Path
+    Args:
+        font (Font): The font object.
+        instance (NamedInstance): The instance object.
+        output_dir (Path): The output directory.
+        overwrite (bool, optional): Whether to overwrite existing files in the output directory.
+            Defaults to True.
+
+    Returns:
+        Path: The output file path.
     """
     instance_file_name = get_instance_file_name(font=font, instance=instance)
     extension = font.get_real_extension()
@@ -135,15 +129,7 @@ def get_output_file(
 
 def save_static_instance(out_file: Path, static_instance: TTFont) -> None:
     """
-    Save Static Instance
-
-    Saves a static instance of a Font.ttfont class to a file.
-
-    Parameters:
-    - out_file (Path): The path to the output file.
-    - static_instance (Font.ttfont.__class__): The static instance of the Font.ttfont class to be
-        saved.
-
+    Save the static instance to the specified output file.
     """
     static_instance.save(file=out_file)
 
@@ -151,16 +137,7 @@ def save_static_instance(out_file: Path, static_instance: TTFont) -> None:
 def log_success(out_file: Path) -> None:
     """
     Log a success message indicating that a static instance has been saved to the specified output
-        file.
-
-    Parameters:
-    out_file (str): The name of the output file where the static instance is saved.
-
-    Returns:
-    None
-
-    Example:
-    log_success("output.txt")
+    file.
     """
     logger.success(f"Static instance saved to {out_file}")
 
@@ -185,9 +162,11 @@ def main(
     Returns:
         None
     """
-    instances = get_font_instances(font, instances)
+    instances = get_instances(font, instances)
     for instance in instances:
         static_instance = create_static_instance(font, instance, update_name_table)
+        del static_instance["STAT"]
+        static_instance["name"].removeUnusedNames(static_instance)
         output_dir = get_output_dir(font, output_dir)
         out_file = get_output_file(font, instance, output_dir, overwrite)
         save_static_instance(out_file, static_instance)
