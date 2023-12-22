@@ -15,7 +15,7 @@ from foundrytools_cli_2.lib.click.click_options import (
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font_runner import FontRunner
 
-cli = click.Group()
+cli = click.Group(help="Utilities for editing OpenType-PS fonts.")
 
 
 @cli.command("recalc-zs")
