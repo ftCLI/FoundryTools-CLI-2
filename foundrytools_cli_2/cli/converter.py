@@ -96,3 +96,19 @@ def ft2wf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.filter.filter_out_woff2 = True
     runner.auto_save = False
     runner.run()
+
+
+@cli.command("var2static")
+@common_options()
+def var2static(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Convert variable fonts to static fonts.
+    """
+
+    from foundrytools_cli_2.snippets.converter.var2static import main
+
+    runner = FontRunner(input_path=input_path, task=main, **options)
+    runner.filter.filter_out_static = True
+    runner.filter.filter_out_ps = True
+    runner.auto_save = False
+    runner.run()
