@@ -1,2 +1,2 @@
 black==23.12.1
-setuptools==69.0.2
+setuptools==69.0.3
