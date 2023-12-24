@@ -117,8 +117,6 @@ def del_mac_names(
     """
     name_table: TableName = font.ttfont["name"]
     name_copy = deepcopy(name_table)
-    name_table.del_mac_names(
-        name_ids=name_ids_to_process, language_string=language_string
-    )
+    name_table.del_mac_names(name_ids=name_ids_to_process, language_string=language_string)
     if not _compare_name_tables(font=font, first=name_table, second=name_copy):
         font.modified = True
