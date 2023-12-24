@@ -27,3 +27,5 @@ def main(font: Font, min_area: int = 25, subroutinize: bool = True) -> None:
     if subroutinize:
         logger.info("Subroutinizing...")
         font.ps_subroutinize()
+
+    font.modified = True

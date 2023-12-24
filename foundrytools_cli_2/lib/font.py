@@ -43,6 +43,7 @@ class Font:  # pylint: disable=too-many-public-methods
         lazy: t.Optional[bool] = None,
         recalc_bboxes: bool = True,
         recalc_timestamp: bool = False,
+        modified: bool = False,
     ) -> None:
         """
         Initialize a Font object.
@@ -62,6 +63,7 @@ class Font:  # pylint: disable=too-many-public-methods
         self._file: t.Optional[Path] = None
         self._bytesio: t.Optional[BytesIO] = None
         self._ttfont: t.Optional[TTFont] = None
+        self.modified = modified
 
         if isinstance(source, (str, Path)):
             self._init_from_file(source, lazy, recalc_bboxes, recalc_timestamp)
@@ -427,6 +429,7 @@ class Font:  # pylint: disable=too-many-public-methods
             raise ValueError("Font is already a WOFF font.")
 
         self.ttfont.flavor = WOFF_FLAVOR
+        self.modified = True
 
     def to_woff2(self) -> None:
         """
@@ -436,6 +439,7 @@ class Font:  # pylint: disable=too-many-public-methods
             raise ValueError("Font is already a WOFF2 font.")
 
         self.ttfont.flavor = WOFF2_FLAVOR
+        self.modified = True
 
     def to_ttf(self, max_err: float = 1.0, reverse_direction: bool = True) -> None:
         """
@@ -447,6 +451,7 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError("Conversion to TrueType is not supported for variable fonts.")
 
         build_ttf(font=self.ttfont, max_err=max_err, reverse_direction=reverse_direction)
+        self.modified = True
 
     def to_otf(self, tolerance: float = 1.0) -> None:
         """
@@ -461,6 +466,7 @@ class Font:  # pylint: disable=too-many-public-methods
 
         charstrings = quadratics_to_cubics(font=self.ttfont, tolerance=tolerance)
         build_otf(font=self.ttfont, charstrings_dict=charstrings)
+        self.modified = True
 
     def to_sfnt(self) -> None:
         """
@@ -470,6 +476,7 @@ class Font:  # pylint: disable=too-many-public-methods
             raise ValueError("Font is already a SFNT font.")
 
         self.ttfont.flavor = None
+        self.modified = True
 
     def tt_decomponentize(self) -> None:
         """
@@ -480,6 +487,7 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError("Decomponentization is only supported for TrueType fonts.")
 
         decomponentize(self.ttfont)
+        self.modified = True
 
     def tt_remove_hints(self) -> None:
         """
@@ -490,6 +498,7 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError("Only TrueType fonts are supported.")
 
         dehint(self.ttfont)
+        self.modified = True
 
     def tt_scale_upem(self, new_upem: int) -> None:
         """
@@ -509,6 +518,7 @@ class Font:  # pylint: disable=too-many-public-methods
             raise ValueError(f"Font already has {new_upem} units per em. No need to scale upem.")
 
         scale_upem(self.ttfont, new_upem=new_upem)
+        self.modified = True
 
     def ps_correct_contours(self, min_area: int = 25) -> t.List[str]:
         """
@@ -522,10 +532,10 @@ class Font:  # pylint: disable=too-many-public-methods
                 "PS Contour correction is only supported for PostScript flavored fonts."
             )
 
-        charstrings, modified = fix_charstrings(font=self.ttfont, min_area=min_area)
+        charstrings, modified_glyphs = fix_charstrings(font=self.ttfont, min_area=min_area)
         build_otf(font=self.ttfont, charstrings_dict=charstrings)
 
-        return modified
+        return modified_glyphs
 
     def ps_recalc_zones(self) -> t.Tuple[t.List[int], t.List[int]]:
         """
@@ -623,6 +633,7 @@ class Font:  # pylint: disable=too-many-public-methods
         """
 
         cff_subr(font=self.ttfont)
+        self.modified = True
 
     def ps_desubroutinize(self) -> None:
         """
@@ -630,3 +641,4 @@ class Font:  # pylint: disable=too-many-public-methods
         """
 
         cff_desubr(font=self.ttfont)
+        self.modified = True

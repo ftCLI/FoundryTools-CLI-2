@@ -61,7 +61,6 @@ class FontRunner:  # pylint: disable=too-few-public-methods
         for font in fonts:
             with font:
                 timer.start()
-                out_file = self._get_out_file_name(font)
 
                 try:
                     self._log_current_file(font)
@@ -76,7 +75,14 @@ class FontRunner:  # pylint: disable=too-few-public-methods
                     print()  # Add a newline after each font
                     continue
 
+                if not font.modified:
+                    logger.skip("No changes made")  # type: ignore
+                    timer.stop()
+                    print()
+                    continue
+
                 try:
+                    out_file = self._get_out_file_name(font)
                     font.save(out_file, reorder_tables=self._save_options.reorder_tables)
                     logger.success(f"File saved to {out_file}")
                 except Exception as e:  # pylint: disable=broad-except

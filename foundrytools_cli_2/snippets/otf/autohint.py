@@ -3,6 +3,8 @@ from io import BytesIO
 from pathlib import Path
 import typing as t
 
+from afdko.fdkutils import get_temp_dir_path, get_temp_file_path
+
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.otf.afdko_tools import hint_font
@@ -30,6 +32,7 @@ def main(
         no_flex: [Optional] Boolean flag to disable flex hinting.
         no_hint_sub: [Optional] Boolean flag to disable hint substitution during hinting.
         reference_font: [Optional] Path to a reference font file.
+        subroutinize: [Optional] Boolean flag to subroutinize the font after hinting.
     """
 
     validate_font(font)
@@ -80,16 +83,18 @@ def process_font_file(
     """
     Applies hinting to an OpenType-PS font file and returns the font's 'CFF ' table.
     """
-    # Create a temporary file using os module
-    temp = os.path.join(os.path.dirname(os.path.abspath(__file__)), "temp.otf")
+    # Create a temporary file
+    temp_dir = get_temp_dir_path()
+    temp_file = Path(get_temp_file_path(temp_dir))
+    logger.info(f"Hinting font to {temp_file}...")
     try:
         flavor = font.ttfont.flavor
         if flavor:
             font.to_sfnt()
-        font.ttfont.save(temp, reorderTables=None)
+        font.ttfont.save(temp_file, reorderTables=None)
         hint_font_file(
             font,
-            Path(temp),
+            temp_file,
             allow_changes,
             allow_no_blues,
             decimal,
@@ -100,8 +105,10 @@ def process_font_file(
         font.ttfont.flavor = flavor
     finally:
         # Remove the temporary file if it exists
-        if os.path.exists(temp):
-            os.remove(temp)
+        if os.path.exists(temp_file):
+            os.remove(temp_file)
+        if os.path.exists(temp_dir):
+            os.rmdir(temp_dir)
 
 
 def hint_font_file(
@@ -127,3 +134,4 @@ def hint_font_file(
         no_hint_sub=no_hint_sub,
         reference_font=reference_font,
     )
+    font.modified = True

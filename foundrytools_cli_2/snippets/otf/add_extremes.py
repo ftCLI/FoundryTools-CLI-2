@@ -19,3 +19,4 @@ def main(font: Font, subroutinize: bool = True) -> None:
     if subroutinize:
         logger.info("Subroutinizing")
         font.ps_subroutinize()
+    font.modified = True
