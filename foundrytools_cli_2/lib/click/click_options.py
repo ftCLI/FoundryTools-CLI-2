@@ -600,7 +600,7 @@ def skip_name_ids() -> t.Callable:
     return add_options(_exclude_name_ids_option)
 
 
-def platform_id_option() -> t.Callable:
+def platform_id() -> t.Callable:
     """
     Add the platform_id option to a click command.
 
@@ -629,7 +629,7 @@ def platform_id_option() -> t.Callable:
     return add_options(_platform_id_option)
 
 
-def language_string_option() -> t.Callable:
+def language_string() -> t.Callable:
     """
     Add the language_string option to a click command.
 

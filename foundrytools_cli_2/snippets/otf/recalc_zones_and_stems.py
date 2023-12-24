@@ -26,6 +26,7 @@ def main(font: Font, zones: bool = True, stems: bool = True) -> None:
             logger.info("Stems are already up-to-date")
         else:
             font.ps_set_stems(std_h_w, std_v_w)
+            font.modified = True
 
     if zones:
         logger.info("Getting zones...")
@@ -38,3 +39,4 @@ def main(font: Font, zones: bool = True, stems: bool = True) -> None:
             logger.info("Zones are already up-to-date")
         else:
             font.ps_set_zones(other_blues, blue_values)
+            font.modified = True
