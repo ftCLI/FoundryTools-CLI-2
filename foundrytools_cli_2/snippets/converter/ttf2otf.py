@@ -37,11 +37,11 @@ def ttf2otf(
     logger.info("Converting to OTF...")
     font.to_otf(tolerance=tolerance)
 
-    logger.info("Correcting contours...")
-    font.ps_correct_contours()
-
     font.save(out_file, reorder_tables=None)
     otf = Font(out_file, recalc_timestamp=recalc_timestamp)
+
+    logger.info("Correcting contours...")
+    font.ps_correct_contours()
 
     logger.info("Getting hinting values...")
     zones = otf.ps_recalc_zones()
