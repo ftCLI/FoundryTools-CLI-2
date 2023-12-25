@@ -101,22 +101,25 @@ def del_names(
 
 def del_mac_names(
     font: Font,
-    name_ids_to_process: t.Tuple[int],
-    language_string: t.Optional[str] = None,
+    delete_all: bool = False,
 ) -> None:
     """
-    Updates the name table of a font file by deleting NameRecords.
+    Deletes Macintosh-specific font names from the given font. By default, the following names are
+    kept: 1 (Font Family Name), 2 (Font Subfamily Name), 4 (Full Font Name), 5 (Version String),
+    6 (PostScript Name).
 
     Parameters:
-        font (Font): The Font object representing the font file.
-        name_ids_to_process (tuple[int]): A tuple of name IDs to delete.
-        platform_id (Optional[int]): The platform ID of the name records to delete. Defaults to
-            None.
-        language_string (Optional[str]): The language of the name records to delete. Defaults to
-            None.
+        font (Font): The font object to delete the Macintosh-specific names from.
+        delete_all (bool): Optional. If True, all Macintosh-specific names will be deleted.
+
+    Returns:
+        None
     """
     name_table: TableName = font.ttfont["name"]
     name_copy = deepcopy(name_table)
-    name_table.del_mac_names(name_ids=name_ids_to_process, language_string=language_string)
+    name_ids_to_delete = set(name.nameID for name in name_table.names if name.platformID == 1)
+    if not delete_all:
+        name_ids_to_delete.difference_update({1, 2, 4, 5, 6})
+    name_table.del_names(name_ids=tuple(name_ids_to_delete))
     if not _compare_name_tables(font=font, first=name_table, second=name_copy):
         font.modified = True
