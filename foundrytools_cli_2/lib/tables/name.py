@@ -52,7 +52,7 @@ class TableName(table__n_a_m_e):
 
     def del_names(
         self,
-        name_ids: t.Tuple[int],
+        name_ids: t.Iterable[int],
         platform_id: t.Optional[int] = None,
         language_string: t.Optional[str] = None,
     ) -> None:
