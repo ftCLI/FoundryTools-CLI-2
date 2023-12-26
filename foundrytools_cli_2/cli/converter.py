@@ -68,7 +68,7 @@ def tt2ps(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 def wf2ft(
     input_path: Path,
     in_format: t.Optional[t.Literal["woff", "woff2"]],
-    **options: t.Dict[str, t.Any]
+    **options: t.Dict[str, t.Any],
 ) -> None:
     """
     Convert WOFF and WOFF2 fonts to SFNT fonts.
