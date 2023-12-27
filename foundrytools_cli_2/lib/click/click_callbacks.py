@@ -34,30 +34,35 @@ def output_dir_callback(
     return value
 
 
-# def choice_to_int_callback(
-#     ctx: click.Context, param: click.Parameter, value: t.Union[str, t.Tuple[str]]
-# ) -> t.Optional[t.Union[int, t.Tuple[int, ...]]]:
-#     """
-#     Callback for click options that accept a choice. Converts the choice to an integer or a tuple
-#     of integers.
-#
-#     If the value is None or the click context is resilient, returns None. If the parameter is
-#     multiple, converts a click choice tuple of strings to a tuple of integers. Otherwise, converts
-#     a click choice string to an integer.
-#     :param ctx: click Context
-#     :param param: click Parameter
-#     :param value: string or tuple of strings to convert
-#     :return: an integer or a tuple of integers
-#     """
-#
-#     # we do not check if the values can be converted to integers here because the click.Choice
-#     # should be correctly built.
-#     if not value or ctx.resilient_parsing:
-#         return None
-#     if param.multiple:
-#         return tuple(sorted(set(int(v) for v in value)))
-#     return int(value)
-#
+def choice_to_int_callback(
+    ctx: click.Context, _: click.Parameter, value: t.Union[str, t.Tuple[str, ...]]
+) -> t.Optional[t.Union[int, t.Tuple[int, ...]]]:
+    """
+    Callback for click options that accept a choice. Converts the choice to an integer or a tuple
+    of integers.
+
+    If the value is None or the click context is resilient, returns None. If the parameter is
+    multiple, converts a click choice tuple of strings to a tuple of integers. Otherwise, converts
+    a click choice string to an integer.
+    :param ctx: click Context
+    :param _: click Parameter
+    :param value: string or tuple of strings to convert
+    :return: an integer or a tuple of integers
+    """
+
+    # we do not check if the values can be converted to integers here because the click.Choice
+    # should be correctly built.
+
+    def _to_int(val: str) -> int:
+        return int(val)
+
+    if not value or ctx.resilient_parsing:
+        return None
+    if isinstance(value, tuple):
+        return tuple(_to_int(v) for v in value)
+    return _to_int(value)
+
+
 #
 # def str_to_tuple_callback(
 #     ctx: click.Context, _: click.Parameter, value: t.Optional[str]
