@@ -5,7 +5,7 @@ from foundrytools_cli_2.lib.font import Font, WOFF_FLAVOR, WOFF2_FLAVOR
 from foundrytools_cli_2.lib.logger import logger
 
 
-def sfnt_to_wf(
+def main(
     font: Font,
     output_dir: t.Optional[Path] = None,
     out_format: t.Optional[t.Literal["woff", "woff2"]] = None,

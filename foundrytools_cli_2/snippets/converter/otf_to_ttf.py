@@ -4,7 +4,7 @@ from foundrytools_cli_2.lib import logger
 from foundrytools_cli_2.lib.font import Font
 
 
-def otf2ttf(
+def main(
     font: Font,
     tolerance: float = 1.0,
     target_upm: t.Optional[int] = None,
