@@ -36,7 +36,7 @@ class TableName(table__n_a_m_e):
         """
 
         # Remove the NameRecord before writing it to avoid duplicates
-        self.del_names(
+        self.remove_names(
             name_ids=(name_id,), platform_id=platform_id, language_string=language_string
         )
 
@@ -50,7 +50,7 @@ class TableName(table__n_a_m_e):
         names = {language_string: name_string}
         self.addMultilingualName(names, ttFont=font, nameID=name_id, windows=windows, mac=mac)
 
-    def del_names(
+    def remove_names(
         self,
         name_ids: t.Iterable[int],
         platform_id: t.Optional[int] = None,
@@ -152,12 +152,6 @@ class TableName(table__n_a_m_e):
     def strip_names(self) -> None:
         """
         Removes leading and trailing spaces from the names in the name table.
-
-        Parameters:
-        self (object): Reference to the class instance.
-
-        Returns:
-        None
         """
         for name in self.names:
             self.setName(
@@ -205,7 +199,8 @@ class TableName(table__n_a_m_e):
         lang_string: t.Optional[str] = None,
     ) -> t.List[NameRecord]:
         """
-        Filter name records based on given parameters.
+        Filters name records based on given parameters.
+
         Parameters:
             name_ids (Optional[List[int]]): A list of name IDs to filter the name records. If None,
                 all name records are considered.
@@ -217,6 +212,7 @@ class TableName(table__n_a_m_e):
                 IDs are considered.
             lang_string (Optional[str]): A language string to filter the name records. If None, all
                 language strings are considered.
+
         Returns:
             List[NameRecord]: A list of filtered name records.
         """

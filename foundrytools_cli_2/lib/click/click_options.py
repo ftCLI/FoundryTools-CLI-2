@@ -3,7 +3,7 @@ from pathlib import Path
 
 import click
 
-from foundrytools_cli_2.lib.click.click_callbacks import output_dir_callback
+from foundrytools_cli_2.lib.click.click_callbacks import output_dir_callback, choice_to_int_callback
 
 
 def add_options(options: t.List[t.Callable]) -> t.Callable:
@@ -629,6 +629,33 @@ def platform_id() -> t.Callable:
     return add_options(_platform_id_option)
 
 
+def win_or_mac_platform_id() -> t.Callable:
+    """
+    Add the win_or_mac_platform_id option to a click command.
+
+    :return: a decorator that adds the win_or_mac_platform_id option to a click command
+    """
+    _win_or_mac_platform_id_option = [
+        click.option(
+            "-p",
+            "--platform-id",
+            type=click.Choice(choices=["1", "3"]),
+            callback=choice_to_int_callback,
+            default=None,
+            help="""
+            Specify the platform ID of the NameRecords to be modified.
+            
+            \b
+            1: Macintosh
+            3: Windows
+            
+            Example: ``-p 1`` will modify only NameRecords with platform ID 1.
+            """,
+        )
+    ]
+    return add_options(_win_or_mac_platform_id_option)
+
+
 def language_string() -> t.Callable:
     """
     Add the language_string option to a click command.
@@ -651,7 +678,7 @@ def language_string() -> t.Callable:
     return add_options(_language_string_option)
 
 
-def string_option() -> t.Callable:
+def name_string() -> t.Callable:
     """
     Add the string option to a click command.
 
@@ -672,7 +699,7 @@ def string_option() -> t.Callable:
     return add_options(_string_option)
 
 
-def old_string_option() -> t.Callable:
+def old_string() -> t.Callable:
     """
     Add the old_string option to a click command.
 
@@ -692,7 +719,7 @@ def old_string_option() -> t.Callable:
     return add_options(_old_string_option)
 
 
-def new_string_option() -> t.Callable:
+def new_string() -> t.Callable:
     """
     Add the new_string option to a click command.
 
@@ -705,8 +732,27 @@ def new_string_option() -> t.Callable:
             type=str,
             required=True,
             help="""
-            Specify the string to replace the old string.
+            Specify the string to replace the old string with.
             """,
         )
     ]
     return add_options(_new_string_option)
+
+
+def delete_all() -> t.Callable:
+    """
+    Add the delete_all_mac_names option to a click command.
+
+    :return: a decorator that adds the delete_all_mac_names option to a click command
+    """
+    _delete_all_mac_names_flag = [
+        click.option(
+            "--delete-all",
+            is_flag=True,
+            default=False,
+            help="""
+            Delete all Macintosh NameRecords.
+            """,
+        )
+    ]
+    return add_options(_delete_all_mac_names_flag)
