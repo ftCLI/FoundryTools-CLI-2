@@ -26,12 +26,13 @@ jobs:
         pip install "black<24" pylint mypy
         pip install -r requirements.txt
         pip install .
-    - name: Analysing the code with black
-      run: |
-        black --check --diff -l 100 .
-    - name: Analysing the code with pylint
-      run: |
-        pylint $(git ls-files '*.py')
+    - uses: chartboost/ruff-action@v1
+#    - name: Analysing the code with black
+#      run: |
+#        black --check --diff -l 100 .
+#    - name: Analysing the code with pylint
+#      run: |
+#        pylint $(git ls-files '*.py')
     - name: Analysing the code with mypy
       run: |
         mypy $(git ls-files '*.py')
