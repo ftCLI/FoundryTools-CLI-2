@@ -23,10 +23,7 @@ def main(
     # one.
     suffix = font.get_real_extension()
 
-    if out_format is None:
-        out_formats = [WOFF_FLAVOR, WOFF2_FLAVOR]
-    else:
-        out_formats = [out_format]
+    out_formats = [WOFF_FLAVOR, WOFF2_FLAVOR] if out_format is None else [out_format]
 
     if WOFF_FLAVOR in out_formats:
         logger.info("Converting to WOFF")

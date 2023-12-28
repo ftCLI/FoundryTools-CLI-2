@@ -107,7 +107,7 @@ def glyphs_to_quadratic(
     """
 
     quad_glyphs = {}
-    for gname in glyphs.keys():
+    for gname in glyphs:
         glyph = glyphs[gname]
         tt_pen = TTGlyphPen(glyphs)
         cu2qu_pen = Cu2QuPen(tt_pen, max_err=max_err, reverse_direction=reverse_direction)

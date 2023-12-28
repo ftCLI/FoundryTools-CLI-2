@@ -404,7 +404,7 @@ class Font:  # pylint: disable=too-many-public-methods
                 f"Current version is {os2.version}."
             )
 
-        setattr(os2, "sxHeight", x_height)
+        os2.sxHeight = x_height
 
     def set_cap_height(self, cap_height: float) -> None:
         """
@@ -419,7 +419,7 @@ class Font:  # pylint: disable=too-many-public-methods
                 f"Current version is {os2.version}."
             )
 
-        setattr(os2, "sCapHeight", cap_height)
+        os2.sCapHeight = cap_height
 
     def to_woff(self) -> None:
         """
@@ -578,8 +578,8 @@ class Font:  # pylint: disable=too-many-public-methods
 
         try:
             return (
-                getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "OtherBlues"),
-                getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "BlueValues"),
+                self.ttfont["CFF "].cff.topDictIndex[0].Private.OtherBlues,
+                self.ttfont["CFF "].cff.topDictIndex[0].Private.BlueValues,
             )
         except AttributeError:
             return [], []
@@ -595,8 +595,8 @@ class Font:  # pylint: disable=too-many-public-methods
 
         try:
             return (
-                getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "StdHW"),
-                getattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "StdVW"),
+                self.ttfont["CFF "].cff.topDictIndex[0].Private.StdHW,
+                self.ttfont["CFF "].cff.topDictIndex[0].Private.StdVW,
             )
         except AttributeError:
             return 0, 0
@@ -611,8 +611,8 @@ class Font:  # pylint: disable=too-many-public-methods
         if not self.is_ps:
             raise NotImplementedError("Setting zones is only supported for PostScript fonts.")
 
-        setattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "BlueValues", blue_values)
-        setattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "OtherBlues", other_blues)
+        self.ttfont["CFF "].cff.topDictIndex[0].Private.BlueValues = blue_values
+        self.ttfont["CFF "].cff.topDictIndex[0].Private.OtherBlues = other_blues
 
     def ps_set_stems(self, std_h_w: int, std_v_w: int) -> None:
         """
@@ -624,8 +624,8 @@ class Font:  # pylint: disable=too-many-public-methods
         if not self.is_ps:
             raise NotImplementedError("Setting stems is only supported for PostScript fonts.")
 
-        setattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "StdHW", std_h_w)
-        setattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "StdVW", std_v_w)
+        self.ttfont["CFF "].cff.topDictIndex[0].Private.StdHW = std_h_w
+        self.ttfont["CFF "].cff.topDictIndex[0].Private.StdVW = std_v_w
 
     def ps_subroutinize(self) -> None:
         """

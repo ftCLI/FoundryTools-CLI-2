@@ -27,7 +27,7 @@ def output_dir_callback(
     try:
         value.mkdir(parents=True, exist_ok=True)
     except Exception as e:
-        raise click.BadParameter(f"Could not create output directory: {e}")
+        raise click.BadParameter(f"Could not create output directory: {e}") from e
     # check if the output directory is writable
     if not os.access(value, os.W_OK):
         raise click.BadParameter(f"Output directory is not writable: {value}")

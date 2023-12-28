@@ -205,7 +205,7 @@ def from_beziers(font: TTFont) -> t.Dict[str, T2CharString]:
     """
     glyph_set = font.getGlyphSet()
     charstrings_dict = {}
-    for k in glyph_set.keys():
+    for k in glyph_set:
         bezier_paths: t.List[BezierPath] = BezierPath.fromFonttoolsGlyph(font, glyphname=k)
         for bp in bezier_paths:
             bp.addExtremes()

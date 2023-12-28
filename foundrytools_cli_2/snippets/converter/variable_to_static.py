@@ -58,7 +58,7 @@ def get_instances(
         instances (Optional[List[NamedInstance]]): Optional. A list of font instances.
             Defaults to None.
     """
-    return font.get_instances() if not instances else instances
+    return instances if instances else font.get_instances()
 
 
 def create_static_instance(
