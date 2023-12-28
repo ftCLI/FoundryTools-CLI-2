@@ -4,8 +4,9 @@ from pathlib import Path
 from afdko.otfautohint.__main__ import ACOptions
 
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.otf.afdko_tools import hint_font
+
+from . import get_file_to_process
 
 
 def main(
@@ -18,7 +19,6 @@ def main(
     reference_font: t.Optional[Path] = None,
     output_dir: t.Optional[Path] = None,
     overwrite: bool = True,
-    recalc_timestamp: bool = False,
 ) -> None:
     """
     Applies hinting to an OpenType-PS font file and returns the font's 'CFF ' table.
@@ -34,7 +34,6 @@ def main(
         reference_font: [Optional] Path to a reference font file.
         output_dir: [Optional] The directory where the font will be saved.
         overwrite: [Optional] Whether to overwrite the output file if it already exists.
-        recalc_timestamp: [Optional] Whether to recalculate the font's timestamp.
     """
 
     if not font.is_ps:
@@ -48,22 +47,8 @@ def main(
     options.no_hint_sub = no_hint_sub
     options.reference_font = reference_font
 
-    in_file = font.file
-    out_file = font.make_out_file_name(output_dir=output_dir, overwrite=overwrite)
-
     flavor = font.ttfont.flavor
-    if flavor is not None:
-        font.to_sfnt()
-
-    if in_file != out_file or flavor is not None:
-        font.save(out_file)
-
-    hinted_font = hint_font(in_file=out_file, options=options)
+    file_to_process = get_file_to_process(font, output_dir=output_dir, overwrite=overwrite)
+    hinted_font = hint_font(in_file=file_to_process, options=options)
     font.ttfont["CFF "] = hinted_font["CFF "]
-
-    if flavor is not None:
-        font = Font(out_file, recalc_timestamp=recalc_timestamp)
-        font.ttfont.flavor = flavor
-        font.ttfont.save(out_file)
-
-    logger.success(f"File saved to {out_file}")
+    font.ttfont.flavor = flavor

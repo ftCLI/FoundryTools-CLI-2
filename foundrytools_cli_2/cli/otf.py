@@ -27,7 +27,6 @@ def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.filter.filter_out_tt = True
-    runner.auto_save = False
     runner.run()
 
 
