@@ -283,9 +283,9 @@ class Font:  # pylint: disable=too-many-public-methods
         if not isinstance(file, Path):
             raise ValueError("File must be a Path object.")
 
-        file_name = file.stem
         out_dir = output_dir or file.parent
         extension = extension or self.get_real_extension()
+        file_name = file.stem + extension
 
         # Clean up the file name by removing the extensions used as file name suffix as added by
         # possible previous conversions.
