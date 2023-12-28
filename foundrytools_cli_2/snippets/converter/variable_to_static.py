@@ -4,7 +4,7 @@ from pathlib import Path
 from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables._f_v_a_r import NamedInstance
-from fontTools.varLib.instancer import instantiateVariableFont, OverlapMode
+from fontTools.varLib.instancer import OverlapMode, instantiateVariableFont
 from pathvalidate import sanitize_filename
 
 from foundrytools_cli_2.lib.font import Font

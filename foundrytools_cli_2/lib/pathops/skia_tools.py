@@ -1,5 +1,5 @@
 import itertools
-from typing import Mapping, Callable
+from typing import Callable, Mapping
 
 import pathops
 from fontTools.misc.psCharStrings import T2CharString

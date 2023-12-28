@@ -3,7 +3,7 @@ from pathlib import Path
 
 from foundrytools_cli_2.lib.constants import FinderOptions, SaveOptions
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font_finder import FontFinder, FinderError, FinderFilter
+from foundrytools_cli_2.lib.font_finder import FinderError, FinderFilter, FontFinder
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.timer import Timer
 

@@ -1,9 +1,9 @@
+import typing as t
 from contextlib import contextmanager
 from pathlib import Path
-import typing as t
 
 from afdko.otfautohint.__main__ import ACOptions, _validate_path
-from afdko.otfautohint.autohint import fontWrapper, FontInstance, openFont
+from afdko.otfautohint.autohint import FontInstance, fontWrapper, openFont
 from cffsubr import desubroutinize, subroutinize
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables.C_F_F_ import table_C_F_F_

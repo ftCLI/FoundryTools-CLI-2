@@ -7,9 +7,9 @@ from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
-from fontTools.ttLib.tables._f_v_a_r import NamedInstance, Axis
+from fontTools.ttLib.tables._f_v_a_r import Axis, NamedInstance
 
-from foundrytools_cli_2.lib.otf.afdko_tools import cff_subr, cff_desubr
+from foundrytools_cli_2.lib.otf.afdko_tools import cff_desubr, cff_subr
 from foundrytools_cli_2.lib.otf.font_builder import build_otf
 from foundrytools_cli_2.lib.otf.hinting_stems import recalc_stems
 from foundrytools_cli_2.lib.otf.hinting_zones import recalc_zones

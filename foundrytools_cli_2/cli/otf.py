@@ -5,10 +5,10 @@ from pathlib import Path
 import click
 
 from foundrytools_cli_2.lib.click.click_options import (
-    common_options,
-    subroutinize_flag,
-    min_area_option,
     autohint_options,
+    common_options,
+    min_area_option,
+    subroutinize_flag,
 )
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font_runner import FontRunner

@@ -2,12 +2,11 @@ import typing as t
 
 from fontTools.pens.cu2quPen import Cu2QuPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
-from fontTools.ttLib import newTable, TTFont
+from fontTools.ttLib import TTFont, newTable
 from fontTools.ttLib.tables._g_l_y_f import (
-    table__g_l_y_f,
     Glyph,
-)  # pylint: disable=protected-access
-
+    table__g_l_y_f,
+)
 
 T_CFF = "CFF "
 T_LOCA = "loca"

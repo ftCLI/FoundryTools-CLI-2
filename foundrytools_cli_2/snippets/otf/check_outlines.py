@@ -1,5 +1,5 @@
-from pathlib import Path
 import typing as t
+from pathlib import Path
 
 from afdko.checkoutlinesufo import run as check_outlines
 

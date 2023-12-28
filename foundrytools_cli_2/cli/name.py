@@ -6,16 +6,16 @@ import click
 
 from foundrytools_cli_2.lib.click.click_options import (
     common_options,
+    delete_all,
+    language_string,
     name_id,
     name_ids,
-    skip_name_ids,
-    platform_id,
-    win_or_mac_platform_id,
     name_string,
-    old_string,
     new_string,
-    language_string,
-    delete_all,
+    old_string,
+    platform_id,
+    skip_name_ids,
+    win_or_mac_platform_id,
 )
 from foundrytools_cli_2.lib.font_runner import FontRunner
 
