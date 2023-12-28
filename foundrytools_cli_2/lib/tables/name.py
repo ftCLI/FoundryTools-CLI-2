@@ -2,10 +2,10 @@ import typing as t
 
 from fontTools.ttLib import TTFont, registerCustomTableClass
 from fontTools.ttLib.tables._n_a_m_e import (
-    table__n_a_m_e,
-    NameRecord,
     _MAC_LANGUAGE_CODES,
     _WINDOWS_LANGUAGE_CODES,
+    NameRecord,
+    table__n_a_m_e,
 )
 
 registerCustomTableClass("name", "foundrytools_cli_2.lib.tables.name", "TableName")

@@ -1,11 +1,11 @@
 import typing as t
 from pathlib import Path
 
-from foundrytools_cli_2.lib.font import Font, WOFF_FLAVOR, WOFF2_FLAVOR
+from foundrytools_cli_2.lib.font import WOFF2_FLAVOR, WOFF_FLAVOR, Font
 from foundrytools_cli_2.lib.logger import logger
 
 
-def sfnt_to_wf(
+def main(
     font: Font,
     output_dir: t.Optional[Path] = None,
     out_format: t.Optional[t.Literal["woff", "woff2"]] = None,
@@ -23,10 +23,7 @@ def sfnt_to_wf(
     # one.
     suffix = font.get_real_extension()
 
-    if out_format is None:
-        out_formats = [WOFF_FLAVOR, WOFF2_FLAVOR]
-    else:
-        out_formats = [out_format]
+    out_formats = [WOFF_FLAVOR, WOFF2_FLAVOR] if out_format is None else [out_format]
 
     if WOFF_FLAVOR in out_formats:
         logger.info("Converting to WOFF")

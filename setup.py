@@ -1,6 +1,6 @@
-import io
 from pathlib import Path
 from typing import List
+
 import setuptools
 
 this_directory = Path(__file__).parent
@@ -11,7 +11,7 @@ def _get_requirements() -> List[str]:
     """
     Relax hard pinning in setup.py
     """
-    with io.open("requirements.txt", encoding="utf-8") as requirements:
+    with open("requirements.txt", encoding="utf-8") as requirements:
         return [line.replace("==", ">=") for line in requirements.readlines()]
 
 

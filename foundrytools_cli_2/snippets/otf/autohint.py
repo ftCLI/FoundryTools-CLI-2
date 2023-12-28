@@ -1,7 +1,7 @@
 import os
+import typing as t
 from io import BytesIO
 from pathlib import Path
-import typing as t
 
 from afdko.fdkutils import get_temp_dir_path, get_temp_file_path
 

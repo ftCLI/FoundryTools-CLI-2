@@ -1,7 +1,6 @@
-from fontTools.ttLib import TTFont
-
 from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
+from fontTools.ttLib import TTFont
 
 
 def decomponentize(font: TTFont) -> None:

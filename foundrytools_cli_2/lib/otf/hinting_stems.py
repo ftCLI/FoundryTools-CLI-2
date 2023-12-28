@@ -1,9 +1,8 @@
 import typing as t
-
 from pathlib import Path
 
-from afdko.otfautohint.__main__ import ReportOptions, get_stemhist_options, _validate_path
-from afdko.otfautohint.autohint import fontWrapper, FontInstance, openFont
+from afdko.otfautohint.__main__ import ReportOptions, _validate_path, get_stemhist_options
+from afdko.otfautohint.autohint import FontInstance, fontWrapper, openFont
 from afdko.otfautohint.hinter import glyphHinter
 from afdko.otfautohint.report import Report
 

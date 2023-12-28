@@ -5,12 +5,10 @@ from pathlib import Path
 import click
 
 from foundrytools_cli_2.lib.click.click_options import (
-    common_options,
-    subroutinize_flag,
-    min_area_option,
-    zones_flag,
-    stems_flag,
     autohint_options,
+    common_options,
+    min_area_option,
+    subroutinize_flag,
 )
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font_runner import FontRunner
@@ -18,15 +16,41 @@ from foundrytools_cli_2.lib.font_runner import FontRunner
 cli = click.Group(help="Utilities for editing OpenType-PS fonts.")
 
 
-@cli.command("recalc-zs")
-@zones_flag()
-@stems_flag()
+@cli.command("autohint")
+@autohint_options()
+@subroutinize_flag()
 @common_options()
-def recalc_zs(input_path: Path, **options: dict) -> None:
+def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Recalculates hinting stems and zones for the given font files.
+    Autohint OpenType-PS fonts with ``afdko.otfautohint``.
     """
-    from foundrytools_cli_2.snippets.otf.recalc_zones_and_stems import main
+    from foundrytools_cli_2.snippets.otf.autohint import main
+
+    runner = FontRunner(input_path=input_path, task=main, **options)
+    runner.filter.filter_out_tt = True
+    runner.run()
+
+
+@cli.command("recalc-stems")
+@common_options()
+def recalc_stems(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Recalculates hinting stems for the given font files.
+    """
+    from foundrytools_cli_2.snippets.otf.recalc_zones_and_stems import recalc_stems as main
+
+    runner = FontRunner(input_path=input_path, task=main, **options)
+    runner.filter.filter_out_tt = True
+    runner.run()
+
+
+@cli.command("recalc-zones")
+@common_options()
+def recalc_zones(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Recalculates hinting zones for the given font files.
+    """
+    from foundrytools_cli_2.snippets.otf.recalc_zones_and_stems import recalc_zones as main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.filter.filter_out_tt = True
@@ -75,21 +99,6 @@ def fix_contours(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("add-extremes")
-@common_options()
-@subroutinize_flag()
-def add_extremes(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
-    """
-    Add missing extreme points to OpenType-PS fonts.
-    """
-    from foundrytools_cli_2.snippets.otf.add_extremes import main
-
-    runner = FontRunner(input_path=input_path, task=main, **options)
-    runner.filter.filter_out_tt = True
-    runner.filter.filter_out_variable = True
-    runner.run()
-
-
 @cli.command("check-outlines")
 @common_options()
 def check_outlines(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
@@ -105,16 +114,16 @@ def check_outlines(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("autohint")
-@autohint_options()
-@subroutinize_flag()
+@cli.command("add-extremes")
 @common_options()
-def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+@subroutinize_flag()
+def add_extremes(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Autohint OpenType fonts with ``afdko.autohint``.
+    Add missing extreme points to OpenType-PS fonts.
     """
-    from foundrytools_cli_2.snippets.otf.autohint import main
+    from foundrytools_cli_2.snippets.otf.add_extremes import main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.filter.filter_out_tt = True
+    runner.filter.filter_out_variable = True
     runner.run()

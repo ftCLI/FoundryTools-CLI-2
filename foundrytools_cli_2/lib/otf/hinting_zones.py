@@ -114,10 +114,7 @@ def lists_overlaps(lists: t.List[t.List[float]]) -> bool:
     Returns:
         bool: True if there are overlapping intervals, False otherwise.
     """
-    for i in range(len(lists) - 1):
-        if lists[i][1] > lists[i + 1][0]:
-            return True
-    return False
+    return any(lists[i][1] > lists[i + 1][0] for i in range(len(lists) - 1))
 
 
 def fix_lists_overlaps(lists: t.List[t.List[float]]) -> t.List[t.List[float]]:
