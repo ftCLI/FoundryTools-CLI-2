@@ -46,10 +46,7 @@ def ttf_to_otf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Convert TrueType flavored fonts to PostScript flavored fonts.
     """
-    from foundrytools_cli_2.snippets.converter.ttf_to_otf import (
-        ttf2otf,
-        ttf2otf_with_tx,
-    )
+    from foundrytools_cli_2.snippets.converter.ttf_to_otf import ttf2otf, ttf2otf_with_tx
 
     if options["mode"] == "tx":
         options.pop("tolerance")
