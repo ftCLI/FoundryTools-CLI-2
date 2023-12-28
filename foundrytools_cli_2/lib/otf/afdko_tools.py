@@ -6,7 +6,6 @@ from afdko.otfautohint.__main__ import ACOptions, _validate_path
 from afdko.otfautohint.autohint import FontInstance, fontWrapper, openFont
 from cffsubr import desubroutinize, subroutinize
 from fontTools.ttLib import TTFont
-from fontTools.ttLib.tables.C_F_F_ import table_C_F_F_
 
 __all__ = ["cff_subr", "cff_desubr", "hint_font"]
 
@@ -54,41 +53,22 @@ def cff_desubr(font: TTFont) -> None:
 
 def hint_font(
     in_file: Path,
-    allow_changes: bool = False,
-    allow_no_blues: bool = False,
-    decimal: bool = False,
-    no_flex: bool = False,
-    no_hint_sub: bool = False,
-    reference_font: t.Optional[Path] = None,
-) -> table_C_F_F_:
+    options: ACOptions,
+) -> TTFont:
     """
-    Applies hinting to an OpenType-PS font file and returns the font's 'CFF ' table.
+    Applies hinting to an OpenType-PS font file and returns the hinted TTFont object.
 
     Parameters:
         in_file: Path to the font file.
-        allow_changes: [Optional] Boolean flag to allow changes to the font during hinting.
-        allow_no_blues: [Optional] Boolean flag to allow hinting without blue zones.
-        decimal: [Optional] Boolean flag to specify whether to round coordinates to integers during
-            hinting.
-        no_flex: [Optional] Boolean flag to disable flex hinting.
-        no_hint_sub: [Optional] Boolean flag to disable hint substitution during hinting.
-        reference_font: [Optional] Path to a reference font file.
+        options: An ACOptions object containing the options to use for hinting.
 
     Returns:
-        table_C_F_F_: The 'CFF ' table of the hinted font.
+        TTFont: A hinted TTFont object.
     """
 
     in_file = _validate_path(in_file)
-    options = ACOptions()
-    options.allowChanges = allow_changes
-    options.allowNoBlues = allow_no_blues
-    options.roundCoords = not decimal
-    options.referenceFont = reference_font
-    options.noFlex = no_flex
-    options.noHintSub = no_hint_sub
-
     font = openFont(in_file, options=options)
     font_instance = FontInstance(font=font, inpath=in_file, outpath=None)
     fw = fontWrapper(options=options, fil=[font_instance])
     fw.hint()
-    return fw.fontInstances[0].font.ttFont["CFF "]
+    return fw.fontInstances[0].font.ttFont
