@@ -27,13 +27,12 @@ def main(
 
     flavor = font.ttfont.flavor
     if flavor is not None:
-        font.ttfont.flavor = None
-        font.ttfont.save(out_file)
+        font.to_sfnt()
 
-    if in_file != out_file:
-        font.ttfont.save(out_file)
+    if in_file != out_file or flavor is not None:
+        font.save(out_file)
 
-    check_outlines([out_file.as_posix(), "--error-correction-mode"])
+    check_outlines(args=[out_file.as_posix(), "--error-correction-mode"])
 
     if flavor is not None:
         font = Font(out_file, recalc_timestamp=recalc_timestamp)

@@ -18,7 +18,6 @@ cli = click.Group(help="Utilities for editing OpenType-PS fonts.")
 
 @cli.command("autohint")
 @autohint_options()
-@subroutinize_flag()
 @common_options()
 def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
@@ -28,6 +27,7 @@ def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.filter.filter_out_tt = True
+    runner.auto_save = False
     runner.run()
 
 
