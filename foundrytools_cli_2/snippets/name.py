@@ -73,7 +73,7 @@ def del_mac_names(
     """
     name_table: TableName = font.ttfont["name"]
     name_copy = deepcopy(name_table)
-    name_ids_to_delete = set(name.nameID for name in name_table.names if name.platformID == 1)
+    name_ids_to_delete = {name.nameID for name in name_table.names if name.platformID == 1}
     if not delete_all:
         name_ids_to_delete.difference_update({1, 2, 4, 5, 6})
     name_table.remove_names(name_ids=name_ids_to_delete, platform_id=1)
