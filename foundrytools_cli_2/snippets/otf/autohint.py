@@ -52,3 +52,4 @@ def main(
     hinted_font = hint_font(in_file=file_to_process, options=options)
     font.ttfont["CFF "] = hinted_font["CFF "]
     font.ttfont.flavor = flavor
+    font.modified = True
