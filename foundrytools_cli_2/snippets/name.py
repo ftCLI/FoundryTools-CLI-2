@@ -13,10 +13,10 @@ def _compare_name_tables(font: Font, first: TableName, second: TableName) -> boo
 
 
 def del_names(
-    font: Font,
-    name_ids_to_process: t.Tuple[int],
-    platform_id: t.Optional[int] = None,
-    language_string: t.Optional[str] = None,
+        font: Font,
+        name_ids_to_process: t.Tuple[int],
+        platform_id: t.Optional[int] = None,
+        language_string: t.Optional[str] = None,
 ) -> None:
     """
     Updates the name table of a font file by deleting NameRecords.
@@ -56,8 +56,8 @@ def del_empty_names(font: Font) -> None:
 
 
 def del_mac_names(
-    font: Font,
-    delete_all: bool = False,
+        font: Font,
+        delete_all: bool = False,
 ) -> None:
     """
     Deletes Macintosh-specific font names from the given font. By default, the following names are
@@ -81,12 +81,26 @@ def del_mac_names(
         font.modified = True
 
 
+def del_unused_names(font: Font) -> None:
+    """
+    Removes unused NameRecords from the name table.
+
+    Parameters:
+        font (Font): The Font object.
+    """
+    name_table: TableName = font.ttfont["name"]
+    name_copy = deepcopy(name_table)
+    name_table.removeUnusedNames(font.ttfont)
+    if not _compare_name_tables(font=font, first=name_table, second=name_copy):
+        font.modified = True
+
+
 def find_replace(
-    font: Font,
-    old_string: str,
-    new_string: str,
-    name_ids_to_process: t.Optional[t.Tuple[int]] = None,
-    name_ids_to_skip: t.Optional[t.Tuple[int]] = None,
+        font: Font,
+        old_string: str,
+        new_string: str,
+        name_ids_to_process: t.Optional[t.Tuple[int]] = None,
+        name_ids_to_skip: t.Optional[t.Tuple[int]] = None,
 ) -> None:
     """
     Updates the name table of a font file by replacing occurrences of one string with another.
@@ -113,11 +127,11 @@ def find_replace(
 
 
 def set_name(
-    font: Font,
-    name_id: int,
-    name_string: str,
-    platform_id: t.Optional[int] = None,
-    language_string: str = "en",
+        font: Font,
+        name_id: int,
+        name_string: str,
+        platform_id: t.Optional[int] = None,
+        language_string: str = "en",
 ) -> None:
     """
     Updates the name table of a font file by setting the string value of a NameRecord.

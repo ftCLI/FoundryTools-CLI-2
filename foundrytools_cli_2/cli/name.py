@@ -62,6 +62,18 @@ def del_mac_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
+@cli.command("del-unused-names")
+@common_options()
+def del_unused_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Delete unused names from the name table of the given font files.
+    """
+    from foundrytools_cli_2.snippets.name import del_unused_names as main
+
+    runner = FontRunner(input_path=input_path, task=main, **options)
+    runner.run()
+
+
 @cli.command("find-replace")
 @old_string()
 @new_string()
