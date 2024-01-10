@@ -183,7 +183,7 @@ class TableName(table__n_a_m_e):
         """
         Returns a set of name IDs to be used for filtering.
         """
-        all_name_ids = set(name.nameID for name in self.names)
+        all_name_ids = {name.nameID for name in self.names}
         if name_ids_to_process:
             all_name_ids.intersection_update(name_ids_to_process)
         if name_ids_to_skip:

@@ -6,6 +6,8 @@ from afdko.checkoutlinesufo import run as check_outlines
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.logger import logger
 
+from . import get_file_to_process
+
 
 def main(
     font: Font,
@@ -22,22 +24,13 @@ def main(
         overwrite (bool): Whether to overwrite the output file if it already exists.
         recalc_timestamp (bool): Whether to recalculate the font's timestamp.
     """
-    in_file = font.file
-    out_file = font.make_out_file_name(output_dir=output_dir, overwrite=overwrite)
-
     flavor = font.ttfont.flavor
-    if flavor is not None:
-        font.ttfont.flavor = None
-        font.ttfont.save(out_file)
-
-    if in_file != out_file:
-        font.ttfont.save(out_file)
-
-    check_outlines([out_file.as_posix(), "--error-correction-mode"])
+    file_to_process = get_file_to_process(font, output_dir=output_dir, overwrite=overwrite)
+    check_outlines(args=[file_to_process.as_posix(), "--error-correction-mode"])
 
     if flavor is not None:
-        font = Font(out_file, recalc_timestamp=recalc_timestamp)
+        font = Font(file_to_process, recalc_timestamp=recalc_timestamp)
         font.ttfont.flavor = flavor
-        font.ttfont.save(out_file)
+        font.save(file_to_process)
 
-    logger.success(f"File saved to {out_file}")
+    logger.success(f"File saved to {file_to_process}")

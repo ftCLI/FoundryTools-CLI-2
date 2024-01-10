@@ -18,7 +18,6 @@ cli = click.Group(help="Utilities for editing OpenType-PS fonts.")
 
 @cli.command("autohint")
 @autohint_options()
-@subroutinize_flag()
 @common_options()
 def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
@@ -37,7 +36,7 @@ def recalc_stems(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Recalculates hinting stems for the given font files.
     """
-    from foundrytools_cli_2.snippets.otf.recalc_zones_and_stems import recalc_stems as main
+    from foundrytools_cli_2.snippets.otf.recalc_stems import main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.filter.filter_out_tt = True
@@ -50,7 +49,7 @@ def recalc_zones(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Recalculates hinting zones for the given font files.
     """
-    from foundrytools_cli_2.snippets.otf.recalc_zones_and_stems import recalc_zones as main
+    from foundrytools_cli_2.snippets.otf.recalc_zones import main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.filter.filter_out_tt = True
