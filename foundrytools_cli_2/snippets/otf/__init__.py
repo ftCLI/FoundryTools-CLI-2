@@ -13,6 +13,8 @@ def get_file_to_process(
     :param font: the Font object
     :param output_dir: the output directory
     :param overwrite: whether to overwrite the output file if it already exists
+
+    :return: the file be processed (Path) by AFDKO's modules
     """
     in_file = font.file
     out_file = font.make_out_file_name(output_dir=output_dir, overwrite=overwrite)
