@@ -1,12 +1,36 @@
 import typing as t
 from pathlib import Path
 
-from afdko.otfautohint.__main__ import ACOptions
+from afdko.otfautohint.__main__ import ACOptions, _validate_path
+from afdko.otfautohint.autohint import FontInstance, fontWrapper, openFont
+from fontTools.ttLib import TTFont
 
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.otf.afdko_tools import hint_font
 
 from . import get_file_to_process
+
+
+def hint_font(
+    in_file: Path,
+    options: ACOptions,
+) -> TTFont:
+    """
+    Applies hinting to an OpenType-PS font file and returns the hinted TTFont object.
+
+    Parameters:
+        in_file: Path to the font file.
+        options: An ACOptions object containing the options to use for hinting.
+
+    Returns:
+        TTFont: A hinted TTFont object.
+    """
+
+    in_file = _validate_path(in_file)
+    font = openFont(in_file, options=options)
+    font_instance = FontInstance(font=font, inpath=in_file, outpath=None)
+    fw = fontWrapper(options=options, fil=[font_instance])
+    fw.hint()
+    return fw.fontInstances[0].font.ttFont
 
 
 def main(
