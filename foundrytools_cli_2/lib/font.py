@@ -611,8 +611,8 @@ class Font:  # pylint: disable=too-many-public-methods
         if not self.is_ps:
             raise NotImplementedError("Setting zones is only supported for PostScript fonts.")
 
-        setattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "OtherBlues", other_blues)
-        setattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "BlueValues", blue_values)
+        self.ttfont["CFF "].cff.topDictIndex[0].Private.OtherBlues = other_blues
+        self.ttfont["CFF "].cff.topDictIndex[0].Private.BlueValues = blue_values
 
     def ps_set_stems(self, std_h_w: int, std_v_w: int) -> None:
         """
@@ -624,8 +624,8 @@ class Font:  # pylint: disable=too-many-public-methods
         if not self.is_ps:
             raise NotImplementedError("Setting stems is only supported for PostScript fonts.")
 
-        setattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "StdHW", std_h_w)
-        setattr(self.ttfont["CFF "].cff.topDictIndex[0].Private, "StdVW", std_v_w)
+        self.ttfont["CFF "].cff.topDictIndex[0].Private.StdHW = std_h_w
+        self.ttfont["CFF "].cff.topDictIndex[0].Private.StdVW = std_v_w
 
     def ps_subroutinize(self) -> None:
         """
