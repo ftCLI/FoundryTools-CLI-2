@@ -14,7 +14,7 @@ def set_weight_class(font: Font, weight_class: int) -> None:
         None
     """
     os_2_table = OS2Table(font.ttfont)
-    os_2_table.usWeightClass = weight_class
+    os_2_table.set_weight_class(weight_class)
     font.modified = os_2_table.modified
 
 
@@ -30,7 +30,7 @@ def set_width_class(font: Font, width_class: int) -> None:
         None
     """
     os_2_table = OS2Table(font.ttfont)
-    os_2_table.usWidthClass = width_class
+    os_2_table.set_width_class(width_class)
     font.modified = os_2_table.modified
 
 
@@ -77,26 +77,6 @@ def recalc_cap_height(font: Font) -> None:
         None
     """
     os_2_table = OS2Table(font.ttfont)
-    os_2_table.capHeight = font.recalc_cap_height()
+    cap_height = font.recalc_cap_height()
+    os_2_table.set_cap_height(cap_height)
     font.modified = os_2_table.modified
-
-
-def test(font: Font) -> None:
-    """
-    Test the OS/2 table of the given font file.
-
-    Parameters:
-        font (Font): The Font object representing the font file.
-
-    Returns:
-        None
-    """
-    os_2 = OS2Table(font.ttfont)
-    print(f"Font file: {font.file}")
-    print(f"usWeightClass: {os_2.table.usWeightClass}")
-    print(f"usWidthClass: {os_2.table.usWidthClass}")
-    print(f"fsSelection: {os_2.table.fsSelection} ({type(os_2.table.fsSelection)})")
-    os_2.set_oblique_bit()
-    print(f"Modified: {os_2.modified}")
-    os_2.clear_oblique_bit()
-    print(f"Modified: {os_2.modified}")
