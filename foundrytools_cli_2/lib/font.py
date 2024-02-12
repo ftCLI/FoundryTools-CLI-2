@@ -9,27 +9,29 @@ from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import Axis, NamedInstance
 
+from foundrytools_cli_2.lib.constants import (
+    FVAR_TABLE_TAG,
+    MAX_UPM,
+    MIN_UPM,
+    OS_2_TABLE_TAG,
+    OTF_EXTENSION,
+    PS_SFNT_VERSION,
+    TT_SFNT_VERSION,
+    TTF_EXTENSION,
+    WOFF2_EXTENSION,
+    WOFF2_FLAVOR,
+    WOFF_EXTENSION,
+    WOFF_FLAVOR,
+)
 from foundrytools_cli_2.lib.otf.afdko_tools import cff_desubr, cff_subr
 from foundrytools_cli_2.lib.otf.font_builder import build_otf
 from foundrytools_cli_2.lib.otf.hinting_stems import recalc_stems
 from foundrytools_cli_2.lib.otf.hinting_zones import recalc_zones
 from foundrytools_cli_2.lib.otf.t2_charstrings import fix_charstrings, quadratics_to_cubics
+from foundrytools_cli_2.lib.tables.head import HeadTable
+from foundrytools_cli_2.lib.tables.os_2 import OS2Table
 from foundrytools_cli_2.lib.ttf.decomponentize import decomponentize
 from foundrytools_cli_2.lib.ttf.from_otf import build_ttf
-
-PS_SFNT_VERSION = "OTTO"
-TT_SFNT_VERSION = "\0\1\0\0"
-WOFF_FLAVOR = "woff"
-WOFF2_FLAVOR = "woff2"
-OTF_EXTENSION = ".otf"
-TTF_EXTENSION = ".ttf"
-WOFF_EXTENSION = ".woff"
-WOFF2_EXTENSION = ".woff2"
-FVAR_TABLE_TAG = "fvar"
-GLYF_TABLE_TAG = "glyf"
-OS_2_TABLE_TAG = "OS/2"
-MIN_UPM = 16
-MAX_UPM = 16384
 
 
 class Font:  # pylint: disable=too-many-public-methods
@@ -205,6 +207,128 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         return self.ttfont.get(FVAR_TABLE_TAG) is not None
 
+    @property
+    def width_class(self) -> int:
+        """
+        Get the width class of the font.
+
+        :return: The width class of the font.
+        """
+        return self.ttfont[OS_2_TABLE_TAG].usWidthClass
+
+    @property
+    def is_italic(self) -> bool:
+        """
+        Check if the font is italic.
+
+        :return: True if the font is italic, False otherwise.
+        """
+        os_2 = OS2Table(self.ttfont)
+        head = HeadTable(self.ttfont)
+        return os_2.is_italic_bit_set() and head.is_italic_bit_set()
+
+    @property
+    def is_oblique(self) -> bool:
+        """
+        Check if the font is oblique.
+
+        :return: True if the font is oblique, False otherwise.
+        """
+        os_2 = OS2Table(self.ttfont)
+        return os_2.is_oblique_bit_set()
+
+    @property
+    def is_upright(self) -> bool:
+        """
+        Check if the font is upright.
+
+        :return: True if the font is upright, False otherwise.
+        """
+        return not self.is_italic and not self.is_oblique
+
+    @property
+    def is_bold(self) -> bool:
+        """
+        Check if the font is bold.
+
+        :return: True if the font is bold, False otherwise.
+        """
+        os_2 = OS2Table(self.ttfont)
+        head = HeadTable(self.ttfont)
+        return os_2.is_bold_bit_set() and head.is_bold_bit_set()
+
+    @property
+    def is_regular(self) -> bool:
+        """
+        Check if the font is regular.
+
+        :return: True if the font is regular, False otherwise.
+        """
+        os_2 = OS2Table(self.ttfont)
+        return os_2.is_regular_bit_set()
+
+    def set_italic_flag(self, value: bool) -> None:
+        """
+        Set the italic bit in the macStyle field of the 'head' table.
+        """
+        os_2 = OS2Table(self.ttfont)
+        head = HeadTable(self.ttfont)
+
+        if value:
+            os_2.set_italic_bit()
+            head.set_italic_bit()
+            os_2.clear_regular_bit()
+        else:
+            os_2.clear_italic_bit()
+            head.unset_italic_bit()
+            if not self.is_bold:
+                os_2.set_regular_bit()
+
+    def set_oblique_flag(self, value: bool) -> None:
+        """
+        Set the oblique bit in the macStyle field of the 'head' table.
+        """
+        os_2 = OS2Table(self.ttfont)
+
+        if value:
+            os_2.set_oblique_bit()
+        else:
+            os_2.clear_oblique_bit()
+
+    def set_bold_flag(self, value: bool) -> None:
+        """
+        Set the bold bit in the macStyle field of the 'head' table.
+        """
+        os_2 = OS2Table(self.ttfont)
+        head = HeadTable(self.ttfont)
+
+        if value:
+            os_2.set_bold_bit()
+            head.set_bold_bit()
+            os_2.clear_regular_bit()
+        else:
+            os_2.clear_bold_bit()
+            head.unset_bold_bit()
+            if not self.is_italic:
+                os_2.set_regular_bit()
+
+    def set_regular_flag(self, value: bool) -> None:
+        """
+        Set the regular bit in the macStyle field of the 'head' table.
+        """
+        os_2 = OS2Table(self.ttfont)
+        head = HeadTable(self.ttfont)
+
+        if value:
+            os_2.clear_bold_bit()
+            os_2.clear_italic_bit()
+            head.unset_bold_bit()
+            head.unset_italic_bit()
+            os_2.set_regular_bit()
+        else:
+            if self.is_bold or self.is_italic:
+                os_2.clear_regular_bit()
+
     def save(
         self,
         file: t.Union[str, Path, BytesIO],
@@ -361,66 +485,6 @@ class Font:  # pylint: disable=too-many-public-methods
         Recalculate the cap height of the font.
         """
         return self.get_glyph_bounds("H")["yMax"]
-
-    def get_x_height(self) -> int:
-        """
-        Get the x-height of the font.
-
-        :return: The x-height of the font.
-        """
-        os2 = self.ttfont["OS/2"]
-        if os2.version < 2:
-            raise ValueError(
-                f"sxHeight is defined only in OS/2 version 2 and up. "
-                f"Current version is {os2.version}."
-            )
-
-        return self.ttfont["OS/2"].sxHeight
-
-    def get_cap_height(self) -> int:
-        """
-        Get the cap height of the font.
-
-        :return: The cap height of the font.
-        """
-        os2 = self.ttfont["OS/2"]
-        if os2.version < 2:
-            raise ValueError(
-                f"sCapHeight is defined only in OS/2 version 2 and up. "
-                f"Current version is {os2.version}."
-            )
-
-        return self.ttfont["OS/2"].sCapHeight
-
-    def set_x_height(self, x_height: float) -> None:
-        """
-        Set the x-height of the font.
-
-        :param x_height: The x-height of the font.
-        """
-        os2 = self.ttfont["OS/2"]
-        if os2.version < 2:
-            raise ValueError(
-                f"sxHeight is defined only in OS/2 version 2 and up. "
-                f"Current version is {os2.version}."
-            )
-
-        os2.sxHeight = x_height
-
-    def set_cap_height(self, cap_height: float) -> None:
-        """
-        Set the cap height of the font.
-
-        :param cap_height: The cap height of the font.
-        """
-        os2 = self.ttfont["OS/2"]
-        if os2.version < 2:
-            raise ValueError(
-                f"sCapHeight is defined only in OS/2 version 2 and up. "
-                f"Current version is {os2.version}."
-            )
-
-        os2.sCapHeight = cap_height
 
     def to_woff(self) -> None:
         """
