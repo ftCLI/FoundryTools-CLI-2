@@ -24,7 +24,7 @@ def set_embed_level(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Set the fsType value of the OS/2 table of the given font files.
     """
-    from foundrytools_cli_2.snippets.os_2 import set_embed_level as main
+    from foundrytools_cli_2.snippets.os_2 import set_fs_selection as main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.run()

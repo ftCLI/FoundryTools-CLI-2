@@ -225,7 +225,7 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         os_2 = OS2Table(self.ttfont)
         head = HeadTable(self.ttfont)
-        return os_2.is_italic_bit_set() and head.is_italic_bit_set()
+        return os_2.is_italic and head.is_italic_bit_set()
 
     @property
     def is_oblique(self) -> bool:
@@ -235,16 +235,7 @@ class Font:  # pylint: disable=too-many-public-methods
         :return: True if the font is oblique, False otherwise.
         """
         os_2 = OS2Table(self.ttfont)
-        return os_2.is_oblique_bit_set()
-
-    @property
-    def is_upright(self) -> bool:
-        """
-        Check if the font is upright.
-
-        :return: True if the font is upright, False otherwise.
-        """
-        return not self.is_italic and not self.is_oblique
+        return os_2.is_oblique
 
     @property
     def is_bold(self) -> bool:
@@ -255,7 +246,7 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         os_2 = OS2Table(self.ttfont)
         head = HeadTable(self.ttfont)
-        return os_2.is_bold_bit_set() and head.is_bold_bit_set()
+        return os_2.is_bold and head.is_bold_bit_set()
 
     @property
     def is_regular(self) -> bool:
@@ -265,9 +256,9 @@ class Font:  # pylint: disable=too-many-public-methods
         :return: True if the font is regular, False otherwise.
         """
         os_2 = OS2Table(self.ttfont)
-        return os_2.is_regular_bit_set()
+        return os_2.is_regular
 
-    def set_italic_flag(self, value: bool) -> None:
+    def set_italic(self, value: bool) -> None:
         """
         Set the italic bit in the macStyle field of the 'head' table.
         """
@@ -275,27 +266,23 @@ class Font:  # pylint: disable=too-many-public-methods
         head = HeadTable(self.ttfont)
 
         if value:
-            os_2.set_italic_bit()
+            os_2.is_italic = True
             head.set_italic_bit()
-            os_2.clear_regular_bit()
+            os_2.is_regular = False
         else:
-            os_2.clear_italic_bit()
+            os_2.is_italic = False
             head.unset_italic_bit()
             if not self.is_bold:
-                os_2.set_regular_bit()
+                os_2.is_regular = True
 
-    def set_oblique_flag(self, value: bool) -> None:
+    def set_oblique(self, value: bool) -> None:
         """
         Set the oblique bit in the macStyle field of the 'head' table.
         """
         os_2 = OS2Table(self.ttfont)
+        os_2.is_oblique = value
 
-        if value:
-            os_2.set_oblique_bit()
-        else:
-            os_2.clear_oblique_bit()
-
-    def set_bold_flag(self, value: bool) -> None:
+    def set_bold(self, value: bool) -> None:
         """
         Set the bold bit in the macStyle field of the 'head' table.
         """
@@ -303,16 +290,16 @@ class Font:  # pylint: disable=too-many-public-methods
         head = HeadTable(self.ttfont)
 
         if value:
-            os_2.set_bold_bit()
+            os_2.is_bold = True
             head.set_bold_bit()
-            os_2.clear_regular_bit()
+            os_2.is_regular = False
         else:
-            os_2.clear_bold_bit()
+            os_2.is_bold = False
             head.unset_bold_bit()
             if not self.is_italic:
-                os_2.set_regular_bit()
+                os_2.is_regular = True
 
-    def set_regular_flag(self, value: bool) -> None:
+    def set_regular(self, value: bool) -> None:
         """
         Set the regular bit in the macStyle field of the 'head' table.
         """
@@ -320,14 +307,14 @@ class Font:  # pylint: disable=too-many-public-methods
         head = HeadTable(self.ttfont)
 
         if value:
-            os_2.clear_bold_bit()
-            os_2.clear_italic_bit()
+            os_2.is_bold = False
+            os_2.is_italic = False
             head.unset_bold_bit()
             head.unset_italic_bit()
-            os_2.set_regular_bit()
+            os_2.is_regular = True
         else:
             if self.is_bold or self.is_italic:
-                os_2.clear_regular_bit()
+                os_2.is_regular = False
 
     def save(
         self,
