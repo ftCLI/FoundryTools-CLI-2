@@ -57,6 +57,44 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         self.table.recalcAvgCharWidth(ttFont=self.font)
 
     @property
+    def weight_class(self) -> int:
+        """
+        Returns the usWeightClass value of the OS/2 table of the given font.
+        """
+        return self.table.usWeightClass
+
+    @weight_class.setter
+    def weight_class(self, value: int) -> None:
+        """
+        Sets the usWeightClass value of the OS/2 table of the given font.
+        """
+        if value < MIN_US_WEIGHT_CLASS or value > MAX_US_WEIGHT_CLASS:
+            raise ValueError(
+                f"Invalid value for usWeightClass: {value}. "
+                f"Expected a value between {MIN_US_WEIGHT_CLASS} and {MAX_US_WEIGHT_CLASS}."
+            )
+        self.table.usWeightClass = value
+
+    @property
+    def width_class(self) -> int:
+        """
+        Returns the usWidthClass value of the OS/2 table of the given font.
+        """
+        return self.table.usWidthClass
+
+    @width_class.setter
+    def width_class(self, value: int) -> None:
+        """
+        Sets the usWidthClass value of the OS/2 table of the given font.
+        """
+        if value < MIN_US_WIDTH_CLASS or value > MAX_US_WIDTH_CLASS:
+            raise ValueError(
+                f"Invalid value for usWidthClass: {value}. "
+                f"Expected a value between {MIN_US_WIDTH_CLASS} and {MAX_US_WIDTH_CLASS}."
+            )
+        self.table.usWidthClass = value
+
+    @property
     def embed_level(self) -> int:
         """
         Returns the fsType value of the OS/2 table of the given font.
@@ -119,44 +157,6 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
             self.table.fsType = set_nth_bit(self.table.fsType, 9)
         else:
             self.table.fsType = unset_nth_bit(self.table.fsType, 9)
-
-    @property
-    def weight_class(self) -> int:
-        """
-        Returns the usWeightClass value of the OS/2 table of the given font.
-        """
-        return self.table.usWeightClass
-
-    @weight_class.setter
-    def weight_class(self, value: int) -> None:
-        """
-        Sets the usWeightClass value of the OS/2 table of the given font.
-        """
-        if value < MIN_US_WEIGHT_CLASS or value > MAX_US_WEIGHT_CLASS:
-            raise ValueError(
-                f"Invalid value for usWeightClass: {value}. "
-                f"Expected a value between {MIN_US_WEIGHT_CLASS} and {MAX_US_WEIGHT_CLASS}."
-            )
-        self.table.usWeightClass = value
-
-    @property
-    def width_class(self) -> int:
-        """
-        Returns the usWidthClass value of the OS/2 table of the given font.
-        """
-        return self.table.usWidthClass
-
-    @width_class.setter
-    def width_class(self, value: int) -> None:
-        """
-        Sets the usWidthClass value of the OS/2 table of the given font.
-        """
-        if value < MIN_US_WIDTH_CLASS or value > MAX_US_WIDTH_CLASS:
-            raise ValueError(
-                f"Invalid value for usWidthClass: {value}. "
-                f"Expected a value between {MIN_US_WIDTH_CLASS} and {MAX_US_WIDTH_CLASS}."
-            )
-        self.table.usWidthClass = value
 
     @property
     def is_italic(self) -> bool:
