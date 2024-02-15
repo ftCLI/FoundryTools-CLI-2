@@ -13,7 +13,6 @@ from foundrytools_cli_2.lib.constants import (
     FVAR_TABLE_TAG,
     MAX_UPM,
     MIN_UPM,
-    OS_2_TABLE_TAG,
     OTF_EXTENSION,
     PS_SFNT_VERSION,
     TT_SFNT_VERSION,
@@ -208,15 +207,6 @@ class Font:  # pylint: disable=too-many-public-methods
         return self.ttfont.get(FVAR_TABLE_TAG) is not None
 
     @property
-    def width_class(self) -> int:
-        """
-        Get the width class of the font.
-
-        :return: The width class of the font.
-        """
-        return self.ttfont[OS_2_TABLE_TAG].usWidthClass
-
-    @property
     def is_italic(self) -> bool:
         """
         Check if the font is italic.
@@ -225,7 +215,7 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         os_2 = OS2Table(self.ttfont)
         head = HeadTable(self.ttfont)
-        return os_2.is_italic and head.is_italic_bit_set()
+        return os_2.is_italic and head.is_italic
 
     @property
     def is_oblique(self) -> bool:
@@ -246,7 +236,7 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         os_2 = OS2Table(self.ttfont)
         head = HeadTable(self.ttfont)
-        return os_2.is_bold and head.is_bold_bit_set()
+        return os_2.is_bold and head.is_bold
 
     @property
     def is_regular(self) -> bool:
@@ -267,11 +257,11 @@ class Font:  # pylint: disable=too-many-public-methods
 
         if value:
             os_2.is_italic = True
-            head.set_italic_bit()
+            head.is_italic = True
             os_2.is_regular = False
         else:
             os_2.is_italic = False
-            head.unset_italic_bit()
+            head.is_italic = False
             if not self.is_bold:
                 os_2.is_regular = True
 
@@ -291,11 +281,11 @@ class Font:  # pylint: disable=too-many-public-methods
 
         if value:
             os_2.is_bold = True
-            head.set_bold_bit()
+            head.is_bold = True
             os_2.is_regular = False
         else:
             os_2.is_bold = False
-            head.unset_bold_bit()
+            head.is_bold = False
             if not self.is_italic:
                 os_2.is_regular = True
 
@@ -309,8 +299,8 @@ class Font:  # pylint: disable=too-many-public-methods
         if value:
             os_2.is_bold = False
             os_2.is_italic = False
-            head.unset_bold_bit()
-            head.unset_italic_bit()
+            head.is_bold = False
+            head.is_italic = False
             os_2.is_regular = True
         else:
             if self.is_bold or self.is_italic:
