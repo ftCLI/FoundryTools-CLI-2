@@ -1,7 +1,7 @@
 from fontTools.ttLib import TTFont
 
 from foundrytools_cli_2.lib.tables.default import DefaultTbl
-from foundrytools_cli_2.lib.utils.misc import is_nth_bit_set, set_nth_bit, unset_nth_bit
+from foundrytools_cli_2.lib.utils.misc import is_nth_bit_set
 
 
 class HeadTable(DefaultTbl):
