@@ -9,19 +9,13 @@ from foundrytools_cli_2.lib.constants import (
     OS_2_TABLE_TAG,
 )
 from foundrytools_cli_2.lib.tables.default import DefaultTbl
-from foundrytools_cli_2.lib.utils.misc import is_nth_bit_set, set_nth_bit, unset_nth_bit
+from foundrytools_cli_2.lib.utils.misc import is_nth_bit_set
 
 
 class InvalidOS2VersionError(Exception):
     """
     Exception raised when trying to access a field that is not defined in the current OS/2 table
     version.
-    """
-
-
-class InvalidEmbedLevelError(Exception):
-    """
-    Exception raised when trying to set an invalid value for the embed_level field.
     """
 
 
@@ -114,15 +108,15 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         }
 
         if value not in bit_operands:
-            raise InvalidEmbedLevelError("Invalid value: embed_level must be 0, 2, 4 or 8.")
+            raise ValueError("Invalid value: embed_level must be 0, 2, 4 or 8.")
 
         bits_to_unset, bit_to_set = bit_operands[value]
 
         for b in bits_to_unset:
-            self.table.fsType = unset_nth_bit(self.table.fsType, b)
+            self.set_bit(field_name="fsType", pos=b, value=False)
 
         if bit_to_set is not None:
-            self.table.fsType = set_nth_bit(self.table.fsType, bit_to_set)
+            self.set_bit(field_name="fsType", pos=bit_to_set, value=True)
 
     @property
     def no_subsetting(self) -> bool:
@@ -136,10 +130,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the no_subsetting bit of the fsType field of the OS/2 table of the given font.
         """
-        if value:
-            self.table.fsType = set_nth_bit(self.table.fsType, 8)
-        else:
-            self.table.fsType = unset_nth_bit(self.table.fsType, 8)
+        self.set_bit(field_name="fsType", pos=8, value=value)
 
     @property
     def bitmap_embed_only(self) -> bool:
@@ -153,10 +144,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the bitmap_embed_only bit of the fsType field of the OS/2 table of the given font.
         """
-        if value:
-            self.table.fsType = set_nth_bit(self.table.fsType, 9)
-        else:
-            self.table.fsType = unset_nth_bit(self.table.fsType, 9)
+        self.set_bit(field_name="fsType", pos=9, value=value)
 
     @property
     def is_italic(self) -> bool:
@@ -170,10 +158,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the italic bit of the fsSelection field of the OS/2 table of the given font.
         """
-        if value:
-            self.table.fsSelection = set_nth_bit(self.table.fsSelection, 0)
-        else:
-            self.table.fsSelection = unset_nth_bit(self.table.fsSelection, 0)
+        self.set_bit(field_name="fsSelection", pos=0, value=value)
 
     @property
     def is_underscore(self) -> bool:
@@ -187,10 +172,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the underscore bit of the fsSelection field of the OS/2 table of the given font.
         """
-        if value:
-            self.table.fsSelection = set_nth_bit(self.table.fsSelection, 1)
-        else:
-            self.table.fsSelection = unset_nth_bit(self.table.fsSelection, 1)
+        self.set_bit(field_name="fsSelection", pos=1, value=value)
 
     @property
     def is_negative(self) -> bool:
@@ -204,10 +186,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the negative bit of the fsSelection field of the OS/2 table of the given font.
         """
-        if value:
-            self.table.fsSelection = set_nth_bit(self.table.fsSelection, 2)
-        else:
-            self.table.fsSelection = unset_nth_bit(self.table.fsSelection, 2)
+        self.set_bit(field_name="fsSelection", pos=2, value=value)
 
     @property
     def is_outlined(self) -> bool:
@@ -221,10 +200,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the outlined bit of the fsSelection field of the OS/2 table of the given font.
         """
-        if value:
-            self.table.fsSelection = set_nth_bit(self.table.fsSelection, 3)
-        else:
-            self.table.fsSelection = unset_nth_bit(self.table.fsSelection, 3)
+        self.set_bit(field_name="fsSelection", pos=3, value=value)
 
     @property
     def is_strikeout(self) -> bool:
@@ -238,10 +214,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the strikeout bit of the fsSelection field of the OS/2 table of the given font.
         """
-        if value:
-            self.table.fsSelection = set_nth_bit(self.table.fsSelection, 4)
-        else:
-            self.table.fsSelection = unset_nth_bit(self.table.fsSelection, 4)
+        self.set_bit(field_name="fsSelection", pos=4, value=value)
 
     @property
     def is_bold(self) -> bool:
@@ -255,10 +228,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the bold bit of the fsSelection field of the OS/2 table of the given font.
         """
-        if value:
-            self.table.fsSelection = set_nth_bit(self.table.fsSelection, 5)
-        else:
-            self.table.fsSelection = unset_nth_bit(self.table.fsSelection, 5)
+        self.set_bit(field_name="fsSelection", pos=5, value=value)
 
     @property
     def is_regular(self) -> bool:
@@ -272,10 +242,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the regular bit of the fsSelection field of the OS/2 table of the given font.
         """
-        if value:
-            self.table.fsSelection = set_nth_bit(self.table.fsSelection, 6)
-        else:
-            self.table.fsSelection = unset_nth_bit(self.table.fsSelection, 6)
+        self.set_bit(field_name="fsSelection", pos=6, value=value)
 
     @property
     def use_typo_metrics(self) -> bool:
@@ -289,10 +256,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the useTypoMetrics bit of the fsSelection field of the OS/2 table of the given font.
         """
-        if value:
-            self.table.fsSelection = set_nth_bit(self.table.fsSelection, 7)
-        else:
-            self.table.fsSelection = unset_nth_bit(self.table.fsSelection, 7)
+        self.set_bit(field_name="fsSelection", pos=7, value=value)
 
     @property
     def wws(self) -> bool:
@@ -306,10 +270,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the wws bit of the fsSelection field of the OS/2 table of the given font.
         """
-        if value:
-            self.table.fsSelection = set_nth_bit(self.table.fsSelection, 8)
-        else:
-            self.table.fsSelection = unset_nth_bit(self.table.fsSelection, 8)
+        self.set_bit(field_name="fsSelection", pos=8, value=value)
 
     @property
     def is_oblique(self) -> bool:
@@ -323,10 +284,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the oblique bit of the fsSelection field of the OS/2 table of the given font.
         """
-        if value:
-            self.table.fsSelection = set_nth_bit(self.table.fsSelection, 9)
-        else:
-            self.table.fsSelection = unset_nth_bit(self.table.fsSelection, 9)
+        self.set_bit(field_name="fsSelection", pos=9, value=value)
 
     @property
     def x_height(self) -> float:
