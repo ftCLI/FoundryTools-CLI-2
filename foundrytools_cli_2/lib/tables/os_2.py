@@ -44,12 +44,6 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         self.table.xAvgCharWidth = value
 
-    def recalc_avg_char_width(self) -> None:
-        """
-        Recalculates the xAvgCharWidth value of the OS/2 table of the given font.
-        """
-        self.table.recalcAvgCharWidth(ttFont=self.font)
-
     @property
     def weight_class(self) -> int:
         """
@@ -383,3 +377,9 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Sets the usWinDescent value of the OS/2 table of the given font.
         """
         self.table.usWinDescent = value
+
+    def recalc_avg_char_width(self) -> None:
+        """
+        Recalculates the xAvgCharWidth value of the OS/2 table of the given font.
+        """
+        self.table.recalcAvgCharWidth(ttFont=self.font)
