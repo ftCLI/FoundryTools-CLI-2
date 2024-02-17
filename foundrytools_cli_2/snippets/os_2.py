@@ -68,6 +68,36 @@ def set_width_class(font: Font, width_class: int) -> None:
     font.modified = os_2_table.modified
 
 
+def set_fs_type(
+    font: Font,
+    embed_level: t.Optional[int] = None,
+    no_subsetting: t.Optional[bool] = None,
+    bitmap_embed_only: t.Optional[bool] = None
+) -> None:
+    """
+    Sets the font's OS/2 table properties related to font embedding.
+
+    :param font: The `Font` object to modify.
+    :param embed_level: (Optional) The embed level to set in the OS/2 table. If not provided,
+        the embed level will not be modified.
+    :param no_subsetting: (Optional) Whether subsetting is allowed in the font. If not provided,
+        the subsetting property will not be modified.
+    :param bitmap_embed_only: (Optional) Whether only bitmap embedding is allowed in the font. If
+        not provided, the bitmap embedding property will not be modified.
+    :return: None
+    """
+    os_2_table = OS2Table(font.ttfont)
+    attrs = {
+        "embed_level": embed_level,
+        "no_subsetting": no_subsetting,
+        "bitmap_embed_only": bitmap_embed_only
+    }
+    for attr, value in attrs.items():
+        if value is not None:
+            setattr(os_2_table, attr, value)
+    font.modified = os_2_table.modified
+
+
 def set_fs_selection(
         font: Font,
         italic: t.Optional[bool] = None,

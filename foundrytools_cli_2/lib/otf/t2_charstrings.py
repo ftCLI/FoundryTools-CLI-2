@@ -8,7 +8,7 @@ from fontTools.pens.t2CharStringPen import T2CharStringPen
 from fontTools.ttLib import TTFont
 
 from foundrytools_cli_2.lib.logger import logger
-from foundrytools_cli_2.lib.otf.font_builder import build_otf
+from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.pathops.skia_tools import (
     remove_tiny_paths,
     same_path,
@@ -16,7 +16,7 @@ from foundrytools_cli_2.lib.pathops.skia_tools import (
     skia_path_from_glyph,
     t2_charstring_from_skia_path,
 )
-from foundrytools_cli_2.lib.ttf.from_otf import build_ttf
+from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
 
 __all__ = ["quadratics_to_cubics", "fix_charstrings", "from_beziers", "get_t2_charstrings"]
 
