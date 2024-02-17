@@ -8,9 +8,15 @@ from foundrytools_cli_2.lib.constants import (
     MIN_US_WIDTH_CLASS,
     OS_2_TABLE_TAG,
 )
-from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.tables.default import DefaultTbl
-from foundrytools_cli_2.lib.utils.misc import is_nth_bit_set, set_nth_bit, unset_nth_bit
+from foundrytools_cli_2.lib.utils.misc import is_nth_bit_set
+
+
+class InvalidOS2VersionError(Exception):
+    """
+    Exception raised when trying to access a field that is not defined in the current OS/2 table
+    version.
+    """
 
 
 class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
@@ -24,31 +30,67 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         super().__init__(font=font, table_tag=OS_2_TABLE_TAG)
 
-    def get_avg_char_width(self) -> int:
+    @property
+    def avg_char_width(self) -> int:
         """
         Returns the xAvgCharWidth value of the OS/2 table of the given font.
         """
         return self.table.xAvgCharWidth
 
-    def set_avg_char_width(self, value: int) -> None:
+    @avg_char_width.setter
+    def avg_char_width(self, value: int) -> None:
         """
         Sets the xAvgCharWidth value of the OS/2 table of the given font.
         """
         self.table.xAvgCharWidth = value
 
-    def recalc_avg_char_width(self) -> None:
+    @property
+    def weight_class(self) -> int:
         """
-        Recalculates the xAvgCharWidth value of the OS/2 table of the given font.
+        Returns the usWeightClass value of the OS/2 table of the given font.
         """
-        self.table.recalcAvgCharWidth(ttFont=self.font)
+        return self.table.usWeightClass
 
-    def get_embed_level(self) -> int:
+    @weight_class.setter
+    def weight_class(self, value: int) -> None:
+        """
+        Sets the usWeightClass value of the OS/2 table of the given font.
+        """
+        if value < MIN_US_WEIGHT_CLASS or value > MAX_US_WEIGHT_CLASS:
+            raise ValueError(
+                f"Invalid value for usWeightClass: {value}. "
+                f"Expected a value between {MIN_US_WEIGHT_CLASS} and {MAX_US_WEIGHT_CLASS}."
+            )
+        self.table.usWeightClass = value
+
+    @property
+    def width_class(self) -> int:
+        """
+        Returns the usWidthClass value of the OS/2 table of the given font.
+        """
+        return self.table.usWidthClass
+
+    @width_class.setter
+    def width_class(self, value: int) -> None:
+        """
+        Sets the usWidthClass value of the OS/2 table of the given font.
+        """
+        if value < MIN_US_WIDTH_CLASS or value > MAX_US_WIDTH_CLASS:
+            raise ValueError(
+                f"Invalid value for usWidthClass: {value}. "
+                f"Expected a value between {MIN_US_WIDTH_CLASS} and {MAX_US_WIDTH_CLASS}."
+            )
+        self.table.usWidthClass = value
+
+    @property
+    def embed_level(self) -> int:
         """
         Returns the fsType value of the OS/2 table of the given font.
         """
         return int(num2binary(self.table.fsType, 16)[9:17], 2)
 
-    def set_embed_level(self, value: int) -> None:
+    @embed_level.setter
+    def embed_level(self, value: int) -> None:
         """
         Sets the fsType value of the OS/2 table of the given font.
         """
@@ -65,305 +107,279 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         bits_to_unset, bit_to_set = bit_operands[value]
 
         for b in bits_to_unset:
-            self.table.fsType = unset_nth_bit(self.table.fsType, b)
+            self.set_bit(field_name="fsType", pos=b, value=False)
 
         if bit_to_set is not None:
-            self.table.fsType = set_nth_bit(self.table.fsType, bit_to_set)
+            self.set_bit(field_name="fsType", pos=bit_to_set, value=True)
 
-    def is_no_subsetting_bit_set(self) -> bool:
+    @property
+    def no_subsetting(self) -> bool:
         """
-        Check if the no_subsetting bit is set in the fsType field of the OS/2 table.
+        Returns the no_subsetting bit of the fsType field of the OS/2 table of the given font.
         """
         return is_nth_bit_set(self.table.fsType, 8)
 
-    def set_no_subsetting_bit(self) -> None:
+    @no_subsetting.setter
+    def no_subsetting(self, value: bool) -> None:
         """
-        Set the no_subsetting bit in the fsType field of the OS/2 table.
+        Sets the no_subsetting bit of the fsType field of the OS/2 table of the given font.
         """
-        self.table.fsType = set_nth_bit(self.table.fsType, 8)
+        self.set_bit(field_name="fsType", pos=8, value=value)
 
-    def clear_no_subsetting_bit(self) -> None:
+    @property
+    def bitmap_embed_only(self) -> bool:
         """
-        Clear the no_subsetting bit in the fsType field of the OS/2 table.
-        """
-        self.table.fsType = unset_nth_bit(self.table.fsType, 8)
-
-    def is_bitmap_embed_only_bit_set(self) -> bool:
-        """
-        Check if the bitmap_embed_only bit is set in the fsType field of the OS/2 table.
+        Returns the bitmap_embed_only bit of the fsType field of the OS/2 table of the given font.
         """
         return is_nth_bit_set(self.table.fsType, 9)
 
-    def set_bitmap_embed_only_bit(self) -> None:
+    @bitmap_embed_only.setter
+    def bitmap_embed_only(self, value: bool) -> None:
         """
-        Set the bitmap_embed_only bit in the fsType field of the OS/2 table.
+        Sets the bitmap_embed_only bit of the fsType field of the OS/2 table of the given font.
         """
-        self.table.fsType = set_nth_bit(self.table.fsType, 9)
+        self.set_bit(field_name="fsType", pos=9, value=value)
 
-    def clear_bitmap_embed_only_bit(self) -> None:
+    @property
+    def is_italic(self) -> bool:
         """
-        Clear the bitmap_embed_only bit in the fsType field of the OS/2 table.
-        """
-        self.table.fsType = unset_nth_bit(self.table.fsType, 9)
-
-    def get_weight_class(self) -> int:
-        """
-        Returns the usWeightClass value of the OS/2 table of the given font.
-        """
-        return self.table.usWeightClass
-
-    def set_weight_class(self, value: int) -> None:
-        """
-        Sets the usWeightClass value of the OS/2 table of the given font.
-        """
-        if not self.validate_value(
-                value, MIN_US_WEIGHT_CLASS, MAX_US_WEIGHT_CLASS, "usWeightClass"
-        ):
-            return
-        self.table.usWeightClass = value
-
-    def get_width_class(self) -> int:
-        """
-        Returns the usWidthClass value of the OS/2 table of the given font.
-        """
-        return self.table.usWidthClass
-
-    def set_width_class(self, value: int) -> None:
-        """
-        Sets the usWidthClass value of the OS/2 table of the given font.
-        """
-        if not self.validate_value(value, MIN_US_WIDTH_CLASS, MAX_US_WIDTH_CLASS, "usWidthClass"):
-            return
-        self.table.usWidthClass = value
-
-    def is_italic_bit_set(self) -> bool:
-        """
-        Check if the italic bit is set in the fsSelection field of the OS/2 table.
+        Returns the italic bit of the fsSelection field of the OS/2 table of the given font.
         """
         return is_nth_bit_set(self.table.fsSelection, 0)
 
-    def set_italic_bit(self) -> None:
+    @is_italic.setter
+    def is_italic(self, value: bool) -> None:
         """
-        Set the italic bit in the fsSelection field of the OS/2 table.
+        Sets the italic bit of the fsSelection field of the OS/2 table of the given font.
         """
-        self.table.fsSelection = set_nth_bit(self.table.fsSelection, 0)
+        self.set_bit(field_name="fsSelection", pos=0, value=value)
 
-    def clear_italic_bit(self) -> None:
+    @property
+    def is_underscore(self) -> bool:
         """
-        Clear the italic bit in the fsSelection field of the OS/2 table.
-        """
-        self.table.fsSelection = unset_nth_bit(self.table.fsSelection, 0)
-
-    def is_underscore_bit_set(self) -> bool:
-        """
-        Check if the underscore bit is set in the fsSelection field of the OS/2 table.
+        Returns the underscore bit of the fsSelection field of the OS/2 table of the given font.
         """
         return is_nth_bit_set(self.table.fsSelection, 1)
 
-    def set_underscore_bit(self) -> None:
+    @is_underscore.setter
+    def is_underscore(self, value: bool) -> None:
         """
-        Set the underscore bit in the fsSelection field of the OS/2 table.
+        Sets the underscore bit of the fsSelection field of the OS/2 table of the given font.
         """
-        self.table.fsSelection = set_nth_bit(self.table.fsSelection, 1)
+        self.set_bit(field_name="fsSelection", pos=1, value=value)
 
-    def clear_underscore_bit(self) -> None:
+    @property
+    def is_negative(self) -> bool:
         """
-        Clear the underscore bit in the fsSelection field of the OS/2 table.
-        """
-        self.table.fsSelection = unset_nth_bit(self.table.fsSelection, 1)
-
-    def is_negative_bit_set(self) -> bool:
-        """
-        Check if the negative bit is set in the fsSelection field of the OS/2 table.
+        Returns the negative bit of the fsSelection field of the OS/2 table of the given font.
         """
         return is_nth_bit_set(self.table.fsSelection, 2)
 
-    def set_negative_bit(self) -> None:
+    @is_negative.setter
+    def is_negative(self, value: bool) -> None:
         """
-        Set the negative bit in the fsSelection field of the OS/2 table.
+        Sets the negative bit of the fsSelection field of the OS/2 table of the given font.
         """
-        self.table.fsSelection = set_nth_bit(self.table.fsSelection, 2)
+        self.set_bit(field_name="fsSelection", pos=2, value=value)
 
-    def clear_negative_bit(self) -> None:
+    @property
+    def is_outlined(self) -> bool:
         """
-        Clear the negative bit in the fsSelection field of the OS/2 table.
-        """
-        self.table.fsSelection = unset_nth_bit(self.table.fsSelection, 2)
-
-    def is_outlined_bit_set(self) -> bool:
-        """
-        Check if the outlined bit is set in the fsSelection field of the OS/2 table.
+        Returns the outlined bit of the fsSelection field of the OS/2 table of the given font.
         """
         return is_nth_bit_set(self.table.fsSelection, 3)
 
-    def set_outlined_bit(self) -> None:
+    @is_outlined.setter
+    def is_outlined(self, value: bool) -> None:
         """
-        Set the outlined bit in the fsSelection field of the OS/2 table.
+        Sets the outlined bit of the fsSelection field of the OS/2 table of the given font.
         """
-        self.table.fsSelection = set_nth_bit(self.table.fsSelection, 3)
+        self.set_bit(field_name="fsSelection", pos=3, value=value)
 
-    def clear_outlined_bit(self) -> None:
+    @property
+    def is_strikeout(self) -> bool:
         """
-        Clear the outlined bit in the fsSelection field of the OS/2 table.
-        """
-        self.table.fsSelection = unset_nth_bit(self.table.fsSelection, 3)
-
-    def is_strikeout_bit_set(self) -> bool:
-        """
-        Check if the strikeout bit is set in the fsSelection field of the OS/2 table.
+        Returns the strikeout bit of the fsSelection field of the OS/2 table of the given font.
         """
         return is_nth_bit_set(self.table.fsSelection, 4)
 
-    def set_strikeout_bit(self) -> None:
+    @is_strikeout.setter
+    def is_strikeout(self, value: bool) -> None:
         """
-        Set the strikeout bit in the fsSelection field of the OS/2 table.
+        Sets the strikeout bit of the fsSelection field of the OS/2 table of the given font.
         """
-        self.table.fsSelection = set_nth_bit(self.table.fsSelection, 4)
+        self.set_bit(field_name="fsSelection", pos=4, value=value)
 
-    def clear_strikeout_bit(self) -> None:
+    @property
+    def is_bold(self) -> bool:
         """
-        Clear the strikeout bit in the fsSelection field of the OS/2 table.
-        """
-        self.table.fsSelection = unset_nth_bit(self.table.fsSelection, 4)
-
-    def is_bold_bit_set(self) -> bool:
-        """
-        Check if the bold bit is set in the fsSelection field of the OS/2 table.
+        Returns the bold bit of the fsSelection field of the OS/2 table of the given font.
         """
         return is_nth_bit_set(self.table.fsSelection, 5)
 
-    def set_bold_bit(self) -> None:
+    @is_bold.setter
+    def is_bold(self, value: bool) -> None:
         """
-        Set the bold bit in the fsSelection field of the OS/2 table.
+        Sets the bold bit of the fsSelection field of the OS/2 table of the given font.
         """
-        self.table.fsSelection = set_nth_bit(self.table.fsSelection, 5)
+        self.set_bit(field_name="fsSelection", pos=5, value=value)
 
-    def clear_bold_bit(self) -> None:
+    @property
+    def is_regular(self) -> bool:
         """
-        Clear the bold bit in the fsSelection field of the OS/2 table.
-        """
-        self.table.fsSelection = unset_nth_bit(self.table.fsSelection, 5)
-
-    def is_regular_bit_set(self) -> bool:
-        """
-        Check if the regular bit is set in the fsSelection field of the OS/2 table.
+        Returns the regular bit of the fsSelection field of the OS/2 table of the given font.
         """
         return is_nth_bit_set(self.table.fsSelection, 6)
 
-    def set_regular_bit(self) -> None:
+    @is_regular.setter
+    def is_regular(self, value: bool) -> None:
         """
-        Set the regular bit in the fsSelection field of the OS/2 table.
+        Sets the regular bit of the fsSelection field of the OS/2 table of the given font.
         """
-        self.table.fsSelection = set_nth_bit(self.table.fsSelection, 6)
+        self.set_bit(field_name="fsSelection", pos=6, value=value)
 
-    def clear_regular_bit(self) -> None:
+    @property
+    def use_typo_metrics(self) -> bool:
         """
-        Clear the regular bit in the fsSelection field of the OS/2 table.
-        """
-        self.table.fsSelection = unset_nth_bit(self.table.fsSelection, 6)
-
-    def is_use_typo_metrics_bit_set(self) -> bool:
-        """
-        Check if the useTypoMetrics bit is set in the fsSelection field of the OS/2 table.
+        Returns the useTypoMetrics bit of the fsSelection field of the OS/2 table of the given font.
         """
         return is_nth_bit_set(self.table.fsSelection, 7)
 
-    def set_use_typo_metrics_bit(self) -> None:
+    @use_typo_metrics.setter
+    def use_typo_metrics(self, value: bool) -> None:
         """
-        Set the useTypoMetrics bit in the fsSelection field of the OS/2 table.
+        Sets the useTypoMetrics bit of the fsSelection field of the OS/2 table of the given font.
         """
-        if self.table.version < 4:
-            logger.warning(
-                "fsSelection bit 7 (USE_TYPO_METRICS) is only defined in OS/2 version 4 and up."
-            )
-            return
-        self.table.fsSelection = set_nth_bit(self.table.fsSelection, 7)
+        self.set_bit(field_name="fsSelection", pos=7, value=value)
 
-    def clear_use_typo_metrics_bit(self) -> None:
+    @property
+    def wws(self) -> bool:
         """
-        Clear the useTypoMetrics bit in the fsSelection field of the OS/2 table.
-        """
-        self.table.fsSelection = unset_nth_bit(self.table.fsSelection, 7)
-
-    def is_wws_bit_set(self) -> bool:
-        """
-        Check if the wws bit is set in the fsSelection field of the OS/2 table.
+        Returns the wws bit of the fsSelection field of the OS/2 table of the given font.
         """
         return is_nth_bit_set(self.table.fsSelection, 8)
 
-    def set_wws_bit(self) -> None:
+    @wws.setter
+    def wws(self, value: bool) -> None:
         """
-        Set the wws bit in the fsSelection field of the OS/2 table.
+        Sets the wws bit of the fsSelection field of the OS/2 table of the given font.
         """
-        if self.table.version < 4:
-            logger.warning(
-                "fsSelection bit 8 (WWS) is only defined in OS/2 version 4 and up."
-            )
-            return
-        self.table.fsSelection = set_nth_bit(self.table.fsSelection, 8)
+        self.set_bit(field_name="fsSelection", pos=8, value=value)
 
-    def clear_wws_bit(self) -> None:
+    @property
+    def is_oblique(self) -> bool:
         """
-        Clear the wws bit in the fsSelection field of the OS/2 table.
-        """
-        self.table.fsSelection = unset_nth_bit(self.table.fsSelection, 8)
-
-    def is_oblique_bit_set(self) -> bool:
-        """
-        Check if the oblique bit is set in the fsSelection field of the OS/2 table.
+        Returns the oblique bit of the fsSelection field of the OS/2 table of the given font.
         """
         return is_nth_bit_set(self.table.fsSelection, 9)
 
-    def set_oblique_bit(self) -> None:
+    @is_oblique.setter
+    def is_oblique(self, value: bool) -> None:
         """
-        Set the oblique bit in the fsSelection field of the OS/2 table.
+        Sets the oblique bit of the fsSelection field of the OS/2 table of the given font.
         """
-        if self.table.version < 4:
-            logger.warning(
-                "fsSelection bit 9 (OBLIQUE) is only defined in OS/2 version 4 and up."
-            )
-            return
-        self.table.fsSelection = set_nth_bit(self.table.fsSelection, 9)
+        self.set_bit(field_name="fsSelection", pos=9, value=value)
 
-    def clear_oblique_bit(self) -> None:
-        """
-        Clear the oblique bit in the fsSelection field of the OS/2 table.
-        """
-        self.table.fsSelection = unset_nth_bit(self.table.fsSelection, 9)
-
-    def get_x_height(self) -> float:
+    @property
+    def x_height(self) -> float:
         """
         Returns the sxHeight value of the OS/2 table of the given font.
         """
         return self.table.sxHeight
 
-    def set_x_height(self, value: float) -> None:
+    @x_height.setter
+    def x_height(self, value: float) -> None:
         """
         Sets the sxHeight value of the OS/2 table of the given font.
         """
         self.table.sxHeight = value
 
-    def get_cap_height(self) -> float:
+    @property
+    def cap_height(self) -> float:
         """
         Returns the sCapHeight value of the OS/2 table of the given font.
         """
         return self.table.sCapHeight
 
-    def set_cap_height(self, value: float) -> None:
+    @cap_height.setter
+    def cap_height(self, value: float) -> None:
         """
         Sets the sCapHeight value of the OS/2 table of the given font.
         """
         self.table.sCapHeight = value
 
-    @staticmethod
-    def validate_value(value: int, min_value: int, max_value: int, attribute: str) -> bool:
+    @property
+    def typo_ascender(self) -> int:
         """
-        Validates values to be set
+        Sets the usTypoAscent value of the OS/2 table of the given font.
         """
-        if value < min_value or value > max_value:
-            logger.warning(
-                f"Invalid value for {attribute}: {value}. "
-                f"Expected a value between {min_value} and {max_value}."
-            )
-            return False
-        return True
+        return self.table.sTypoAscender
+
+    @typo_ascender.setter
+    def typo_ascender(self, value: int) -> None:
+        """
+        Sets the usTypoAscent value of the OS/2 table of the given font.
+        """
+        self.table.sTypoAscender = value
+
+    @property
+    def typo_descender(self) -> int:
+        """
+        Sets the usTypoDescent value of the OS/2 table of the given font.
+        """
+        return self.table.sTypoDescender
+
+    @typo_descender.setter
+    def typo_descender(self, value: int) -> None:
+        """
+        Sets the usTypoDescent value of the OS/2 table of the given font.
+        """
+        self.table.sTypoDescender = value
+
+    @property
+    def typo_line_gap(self) -> int:
+        """
+        Sets the usTypoLineGap value of the OS/2 table of the given font.
+        """
+        return self.table.sTypoLineGap
+
+    @typo_line_gap.setter
+    def typo_line_gap(self, value: int) -> None:
+        """
+        Sets the usTypoLineGap value of the OS/2 table of the given font.
+        """
+        self.table.sTypoLineGap = value
+
+    @property
+    def win_ascent(self) -> int:
+        """
+        Sets the usWinAscent value of the OS/2 table of the given font.
+        """
+        return self.table.usWinAscent
+
+    @win_ascent.setter
+    def win_ascent(self, value: int) -> None:
+        """
+        Sets the usWinAscent value of the OS/2 table of the given font.
+        """
+        self.table.usWinAscent = value
+
+    @property
+    def win_descent(self) -> int:
+        """
+        Sets the usWinDescent value of the OS/2 table of the given font.
+        """
+        return self.table.usWinDescent
+
+    @win_descent.setter
+    def win_descent(self, value: int) -> None:
+        """
+        Sets the usWinDescent value of the OS/2 table of the given font.
+        """
+        self.table.usWinDescent = value
+
+    def recalc_avg_char_width(self) -> None:
+        """
+        Recalculates the xAvgCharWidth value of the OS/2 table of the given font.
+        """
+        self.table.recalcAvgCharWidth(ttFont=self.font)

@@ -13,7 +13,6 @@ from foundrytools_cli_2.lib.constants import (
     FVAR_TABLE_TAG,
     MAX_UPM,
     MIN_UPM,
-    OS_2_TABLE_TAG,
     OTF_EXTENSION,
     PS_SFNT_VERSION,
     TT_SFNT_VERSION,
@@ -24,14 +23,14 @@ from foundrytools_cli_2.lib.constants import (
     WOFF_FLAVOR,
 )
 from foundrytools_cli_2.lib.otf.afdko_tools import cff_desubr, cff_subr
-from foundrytools_cli_2.lib.otf.font_builder import build_otf
 from foundrytools_cli_2.lib.otf.hinting_stems import recalc_stems
 from foundrytools_cli_2.lib.otf.hinting_zones import recalc_zones
+from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.otf.t2_charstrings import fix_charstrings, quadratics_to_cubics
 from foundrytools_cli_2.lib.tables.head import HeadTable
 from foundrytools_cli_2.lib.tables.os_2 import OS2Table
 from foundrytools_cli_2.lib.ttf.decomponentize import decomponentize
-from foundrytools_cli_2.lib.ttf.from_otf import build_ttf
+from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
 
 
 class Font:  # pylint: disable=too-many-public-methods
@@ -73,7 +72,7 @@ class Font:  # pylint: disable=too-many-public-methods
         elif isinstance(source, BytesIO):
             self._init_from_bytesio(source, lazy, recalc_bboxes, recalc_timestamp)
         elif isinstance(source, TTFont):
-            self._init_from_tt_font(source, lazy, recalc_bboxes, recalc_timestamp)
+            self._init_from_ttfont(source, lazy, recalc_bboxes, recalc_timestamp)
         else:
             raise ValueError(
                 f"Invalid source type {type(source)}. Expected str, Path, BytesIO, or TTFont."
@@ -100,7 +99,7 @@ class Font:  # pylint: disable=too-many-public-methods
         )
         bytesio.close()
 
-    def _init_from_tt_font(
+    def _init_from_ttfont(
         self, ttfont: TTFont, lazy: t.Optional[bool], recalc_bboxes: bool, recalc_timestamp: bool
     ) -> None:
         self._bytesio = BytesIO()
@@ -208,15 +207,6 @@ class Font:  # pylint: disable=too-many-public-methods
         return self.ttfont.get(FVAR_TABLE_TAG) is not None
 
     @property
-    def width_class(self) -> int:
-        """
-        Get the width class of the font.
-
-        :return: The width class of the font.
-        """
-        return self.ttfont[OS_2_TABLE_TAG].usWidthClass
-
-    @property
     def is_italic(self) -> bool:
         """
         Check if the font is italic.
@@ -225,7 +215,7 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         os_2 = OS2Table(self.ttfont)
         head = HeadTable(self.ttfont)
-        return os_2.is_italic_bit_set() and head.is_italic_bit_set()
+        return os_2.is_italic and head.is_italic
 
     @property
     def is_oblique(self) -> bool:
@@ -235,16 +225,7 @@ class Font:  # pylint: disable=too-many-public-methods
         :return: True if the font is oblique, False otherwise.
         """
         os_2 = OS2Table(self.ttfont)
-        return os_2.is_oblique_bit_set()
-
-    @property
-    def is_upright(self) -> bool:
-        """
-        Check if the font is upright.
-
-        :return: True if the font is upright, False otherwise.
-        """
-        return not self.is_italic and not self.is_oblique
+        return os_2.is_oblique
 
     @property
     def is_bold(self) -> bool:
@@ -255,7 +236,7 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         os_2 = OS2Table(self.ttfont)
         head = HeadTable(self.ttfont)
-        return os_2.is_bold_bit_set() and head.is_bold_bit_set()
+        return os_2.is_bold and head.is_bold
 
     @property
     def is_regular(self) -> bool:
@@ -265,9 +246,9 @@ class Font:  # pylint: disable=too-many-public-methods
         :return: True if the font is regular, False otherwise.
         """
         os_2 = OS2Table(self.ttfont)
-        return os_2.is_regular_bit_set()
+        return os_2.is_regular
 
-    def set_italic_flag(self, value: bool) -> None:
+    def set_italic(self, value: bool) -> None:
         """
         Set the italic bit in the macStyle field of the 'head' table.
         """
@@ -275,27 +256,23 @@ class Font:  # pylint: disable=too-many-public-methods
         head = HeadTable(self.ttfont)
 
         if value:
-            os_2.set_italic_bit()
-            head.set_italic_bit()
-            os_2.clear_regular_bit()
+            os_2.is_italic = True
+            head.is_italic = True
+            os_2.is_regular = False
         else:
-            os_2.clear_italic_bit()
-            head.unset_italic_bit()
+            os_2.is_italic = False
+            head.is_italic = False
             if not self.is_bold:
-                os_2.set_regular_bit()
+                os_2.is_regular = True
 
-    def set_oblique_flag(self, value: bool) -> None:
+    def set_oblique(self, value: bool) -> None:
         """
         Set the oblique bit in the macStyle field of the 'head' table.
         """
         os_2 = OS2Table(self.ttfont)
+        os_2.is_oblique = value
 
-        if value:
-            os_2.set_oblique_bit()
-        else:
-            os_2.clear_oblique_bit()
-
-    def set_bold_flag(self, value: bool) -> None:
+    def set_bold(self, value: bool) -> None:
         """
         Set the bold bit in the macStyle field of the 'head' table.
         """
@@ -303,16 +280,16 @@ class Font:  # pylint: disable=too-many-public-methods
         head = HeadTable(self.ttfont)
 
         if value:
-            os_2.set_bold_bit()
-            head.set_bold_bit()
-            os_2.clear_regular_bit()
+            os_2.is_bold = True
+            head.is_bold = True
+            os_2.is_regular = False
         else:
-            os_2.clear_bold_bit()
-            head.unset_bold_bit()
+            os_2.is_bold = False
+            head.is_bold = False
             if not self.is_italic:
-                os_2.set_regular_bit()
+                os_2.is_regular = True
 
-    def set_regular_flag(self, value: bool) -> None:
+    def set_regular(self, value: bool) -> None:
         """
         Set the regular bit in the macStyle field of the 'head' table.
         """
@@ -320,14 +297,14 @@ class Font:  # pylint: disable=too-many-public-methods
         head = HeadTable(self.ttfont)
 
         if value:
-            os_2.clear_bold_bit()
-            os_2.clear_italic_bit()
-            head.unset_bold_bit()
-            head.unset_italic_bit()
-            os_2.set_regular_bit()
+            os_2.is_bold = False
+            os_2.is_italic = False
+            head.is_bold = False
+            head.is_italic = False
+            os_2.is_regular = True
         else:
             if self.is_bold or self.is_italic:
-                os_2.clear_regular_bit()
+                os_2.is_regular = False
 
     def save(
         self,

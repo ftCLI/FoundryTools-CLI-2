@@ -11,20 +11,22 @@ from foundrytools_cli_2.lib.font_runner import FontRunner
 cli = click.Group(help="Utilities for editing the OS/2 table.", chain=True)
 
 
-@cli.command("set-embed-level")
+@cli.command("set-fs-type")
 @click.option(
-    "-l",
+    "-el",
     "--embed-level",
     type=click.Choice(["0", "2", "4", "8"]),
     callback=choice_to_int_callback,
     help="The new fsType value."
 )
+@click.option("--bmp-only/--no-bmp-only", default=None, help="Set the fsType value to 0.")
+@click.option("--no-subsetting/--allow-subsetting", default=None, help="Set the fsType value to 2.")
 @common_options()
-def set_embed_level(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def set_fs_type(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Set the fsType value of the OS/2 table of the given font files.
     """
-    from foundrytools_cli_2.snippets.os_2 import set_embed_level as main
+    from foundrytools_cli_2.snippets.os_2 import set_fs_type as main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.run()

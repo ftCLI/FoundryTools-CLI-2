@@ -1,6 +1,6 @@
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.logger import logger
-from foundrytools_cli_2.lib.otf.font_builder import build_otf
+from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.otf.t2_charstrings import fix_charstrings, from_beziers
 
 
