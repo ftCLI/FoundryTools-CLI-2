@@ -1,11 +1,7 @@
 import typing as t
 
 from fontTools.ttLib import TTFont
-from fontTools.ttLib.tables._n_a_m_e import (
-    _MAC_LANGUAGE_CODES,
-    _WINDOWS_LANGUAGE_CODES,
-    NameRecord,
-)
+from fontTools.ttLib.tables._n_a_m_e import _MAC_LANGUAGE_CODES, _WINDOWS_LANGUAGE_CODES, NameRecord
 
 from foundrytools_cli_2.lib.constants import NAME_TABLE_TAG
 from foundrytools_cli_2.lib.tables.default import DefaultTbl
