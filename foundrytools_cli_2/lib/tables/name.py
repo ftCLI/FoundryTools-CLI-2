@@ -26,7 +26,6 @@ class NameTable(DefaultTbl):
         Set the string of the specified NameRecord in the name table of a given font.
 
         Parameters:
-            font (TTFont): The TrueType font object.
             name_id (int): The ID of the name to be set.
             name_string (str): The string value of the name to be set.
             platform_id (Optional[int]): The platform ID of the name record. Defaults to None.
@@ -60,9 +59,13 @@ class NameTable(DefaultTbl):
         Deletes all name records that match the given name_ids, optionally filtering by platform_id
         and/or language_string.
 
-        :param name_ids: A list of name IDs to delete
-        :param platform_id: The platform ID of the name records to delete
-        :param language_string: The language of the name records to delete
+        Parameters:
+            name_ids (Iterable[int]): A list of name IDs to delete.
+            platform_id (Optional[int]): The platform ID of the name records to delete. Defaults to
+                None. If None, all platform IDs are considered. If 1, only Macintosh-specific names
+                are considered. If 3, only Windows-specific names are considered.
+            language_string (Optional[str]): The language of the name records to delete. Defaults to
+                None.
         """
 
         names = self.filter_names(
@@ -151,7 +154,7 @@ class NameTable(DefaultTbl):
 
     def strip_names(self) -> None:
         """
-        Removes leading and trailing spaces from the names in the name table.
+        Removes leading and trailing spaces from NameRecords in the name table.
         """
         for name in self.table.names:
             self.table.setName(
@@ -164,7 +167,7 @@ class NameTable(DefaultTbl):
 
     def remove_empty_names(self) -> None:
         """
-        Removes empty names from the name table.
+        Removes empty NameRecords from the name table.
         """
         for name in self.table.names:
             if str(name).strip() == "":
@@ -199,7 +202,7 @@ class NameTable(DefaultTbl):
         lang_string: t.Optional[str] = None,
     ) -> t.List[NameRecord]:
         """
-        Filters name records based on given parameters.
+        Filters NameRecords based on the given parameters.
 
         Parameters:
             name_ids (Optional[List[int]]): A list of name IDs to filter the name records. If None,
