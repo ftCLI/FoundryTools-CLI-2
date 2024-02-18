@@ -8,6 +8,7 @@ class HeadTable(DefaultTbl):
     """
     This class extends the fontTools `head` table to add some useful methods.
     """
+
     def __init__(self, font: TTFont) -> None:
         """
         Initializes the head table handler.

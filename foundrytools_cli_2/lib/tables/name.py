@@ -11,6 +11,7 @@ class NameTable(DefaultTbl):
     """
     This class extends the fontTools `name` table to add some useful methods.
     """
+
     def __init__(self, font: TTFont):
         super().__init__(font=font, table_tag=NAME_TABLE_TAG)
 

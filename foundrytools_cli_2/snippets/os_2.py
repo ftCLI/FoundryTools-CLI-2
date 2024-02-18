@@ -72,7 +72,7 @@ def set_fs_type(
     font: Font,
     embed_level: t.Optional[int] = None,
     no_subsetting: t.Optional[bool] = None,
-    bitmap_embed_only: t.Optional[bool] = None
+    bitmap_embed_only: t.Optional[bool] = None,
 ) -> None:
     """
     Sets the font's OS/2 table properties related to font embedding.
@@ -90,7 +90,7 @@ def set_fs_type(
     attrs = {
         "embed_level": embed_level,
         "no_subsetting": no_subsetting,
-        "bitmap_embed_only": bitmap_embed_only
+        "bitmap_embed_only": bitmap_embed_only,
     }
     for attr, value in attrs.items():
         if value is not None:
@@ -99,13 +99,13 @@ def set_fs_type(
 
 
 def set_fs_selection(
-        font: Font,
-        italic: t.Optional[bool] = None,
-        bold: t.Optional[bool] = None,
-        regular: t.Optional[bool] = None,
-        use_typo_metrics: t.Optional[bool] = None,
-        wws_consistent: t.Optional[bool] = None,
-        oblique: t.Optional[bool] = None,
+    font: Font,
+    italic: t.Optional[bool] = None,
+    bold: t.Optional[bool] = None,
+    regular: t.Optional[bool] = None,
+    use_typo_metrics: t.Optional[bool] = None,
+    wws_consistent: t.Optional[bool] = None,
+    oblique: t.Optional[bool] = None,
 ) -> None:
     """
     set_fs_selection method modifies the font's attributes based on the provided parameters. It
