@@ -5,7 +5,7 @@ from fontTools.ttLib import TTFont
 from foundrytools_cli_2.lib.utils.misc import set_nth_bit, unset_nth_bit
 
 
-class DefaultTbl:  # pylint: disable=too-few-public-methods
+class DefaultTbl:
     """
     Base class for all table classes.
     """

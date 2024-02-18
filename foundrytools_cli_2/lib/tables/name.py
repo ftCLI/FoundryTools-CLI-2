@@ -1,24 +1,25 @@
 import typing as t
 
-from fontTools.ttLib import TTFont, registerCustomTableClass
+from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables._n_a_m_e import (
     _MAC_LANGUAGE_CODES,
     _WINDOWS_LANGUAGE_CODES,
     NameRecord,
-    table__n_a_m_e,
 )
 
-registerCustomTableClass("name", "foundrytools_cli_2.lib.tables.name", "TableName")
+from foundrytools_cli_2.lib.constants import NAME_TABLE_TAG
+from foundrytools_cli_2.lib.tables.default import DefaultTbl
 
 
-class TableName(table__n_a_m_e):
+class NameTable(DefaultTbl):
     """
     This class extends the fontTools `name` table to add some useful methods.
     """
+    def __init__(self, font: TTFont):
+        super().__init__(font=font, table_tag=NAME_TABLE_TAG)
 
     def set_name(
         self,
-        font: TTFont,
         name_id: int,
         name_string: str,
         platform_id: t.Optional[int] = None,
@@ -48,7 +49,9 @@ class TableName(table__n_a_m_e):
             mac, windows = True, True
 
         names = {language_string: name_string}
-        self.addMultilingualName(names, ttFont=font, nameID=name_id, windows=windows, mac=mac)
+        self.table.addMultilingualName(
+            names, ttFont=self.font, nameID=name_id, windows=windows, mac=mac
+        )
 
     def remove_names(
         self,
@@ -69,7 +72,7 @@ class TableName(table__n_a_m_e):
             name_ids=set(name_ids), platform_id=platform_id, lang_string=language_string
         )
         for name in names:
-            self.removeNames(name.nameID, name.platformID, name.platEncID, name.langID)
+            self.table.removeNames(name.nameID, name.platformID, name.platEncID, name.langID)
 
     def find_replace(
         self,
@@ -103,7 +106,7 @@ class TableName(table__n_a_m_e):
         for name in names:
             if old_string in str(name):
                 string = str(name).replace(old_string, new_string).replace("  ", " ").strip()
-                self.setName(
+                self.table.setName(
                     string,
                     name.nameID,
                     name.platformID,
@@ -141,7 +144,7 @@ class TableName(table__n_a_m_e):
             if suffix is not None:
                 string = f"{string}{suffix}"
 
-            self.setName(
+            self.table.setName(
                 string=string,
                 nameID=name.nameID,
                 platformID=name.platformID,
@@ -153,8 +156,8 @@ class TableName(table__n_a_m_e):
         """
         Removes leading and trailing spaces from the names in the name table.
         """
-        for name in self.names:
-            self.setName(
+        for name in self.table.names:
+            self.table.setName(
                 str(name).strip(),
                 name.nameID,
                 name.platformID,
@@ -166,9 +169,9 @@ class TableName(table__n_a_m_e):
         """
         Removes empty names from the name table.
         """
-        for name in self.names:
+        for name in self.table.names:
             if str(name).strip() == "":
-                self.removeNames(
+                self.table.removeNames(
                     nameID=name.nameID,
                     platformID=name.platformID,
                     platEncID=name.platEncID,
@@ -183,7 +186,7 @@ class TableName(table__n_a_m_e):
         """
         Returns a set of name IDs to be used for filtering.
         """
-        all_name_ids = {name.nameID for name in self.names}
+        all_name_ids = {name.nameID for name in self.table.names}
         if name_ids_to_process:
             all_name_ids.intersection_update(name_ids_to_process)
         if name_ids_to_skip:
@@ -219,7 +222,7 @@ class TableName(table__n_a_m_e):
 
         return [
             name
-            for name in self.names
+            for name in self.table.names
             if (name_ids is None or name.nameID in name_ids)
             and (platform_id is None or name.platformID == platform_id)
             and (plat_enc_id is None or name.platEncID == plat_enc_id)
