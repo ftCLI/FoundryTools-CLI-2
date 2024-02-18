@@ -1,15 +1,7 @@
 import typing as t
-from copy import deepcopy
 
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.tables.name import TableName
-
-
-def _compare_name_tables(font: Font, first: TableName, second: TableName) -> bool:
-    """
-    Compares two name tables.
-    """
-    return first.compile(font.ttfont) == second.compile(font.ttfont)
+from foundrytools_cli_2.lib.tables.name import NameTable
 
 
 def del_names(
@@ -29,13 +21,11 @@ def del_names(
         language_string (Optional[str]): The language of the name records to delete. Defaults to
             None.
     """
-    name_table: TableName = font.ttfont["name"]
-    name_copy = deepcopy(name_table)
+    name_table = NameTable(font=font.ttfont)
     name_table.remove_names(
         name_ids=name_ids_to_process, platform_id=platform_id, language_string=language_string
     )
-    if not _compare_name_tables(font=font, first=name_table, second=name_copy):
-        font.modified = True
+    font.modified = name_table.modified
 
 
 def del_empty_names(font: Font) -> None:
@@ -48,11 +38,9 @@ def del_empty_names(font: Font) -> None:
     Returns:
         None
     """
-    name_table: TableName = font.ttfont["name"]
-    name_copy = deepcopy(name_table)
+    name_table = NameTable(font=font.ttfont)
     name_table.remove_empty_names()
-    if not _compare_name_tables(font=font, first=name_table, second=name_copy):
-        font.modified = True
+    font.modified = name_table.modified
 
 
 def del_mac_names(
@@ -71,14 +59,12 @@ def del_mac_names(
     Returns:
         None
     """
-    name_table: TableName = font.ttfont["name"]
-    name_copy = deepcopy(name_table)
-    name_ids_to_delete = {name.nameID for name in name_table.names if name.platformID == 1}
+    name_table = NameTable(font=font.ttfont)
+    name_ids_to_delete = {name.nameID for name in name_table.table.names if name.platformID == 1}
     if not delete_all:
         name_ids_to_delete.difference_update({1, 2, 4, 5, 6})
     name_table.remove_names(name_ids=name_ids_to_delete, platform_id=1)
-    if not _compare_name_tables(font=font, first=name_table, second=name_copy):
-        font.modified = True
+    font.modified = name_table.modified
 
 
 def del_unused_names(font: Font) -> None:
@@ -88,11 +74,9 @@ def del_unused_names(font: Font) -> None:
     Parameters:
         font (Font): The Font object.
     """
-    name_table: TableName = font.ttfont["name"]
-    name_copy = deepcopy(name_table)
-    name_table.removeUnusedNames(font.ttfont)
-    if not _compare_name_tables(font=font, first=name_table, second=name_copy):
-        font.modified = True
+    name_table = NameTable(font=font.ttfont)
+    name_table.table.removeUnusedNames(font.ttfont)
+    font.modified = name_table.modified
 
 
 def find_replace(
@@ -114,16 +98,14 @@ def find_replace(
         name_ids_to_skip (tuple[int], optional): A tuple of name IDs to skip. Default is an empty
             tuple.
     """
-    name_table: TableName = font.ttfont["name"]
-    name_copy = deepcopy(name_table)
+    name_table = NameTable(font=font.ttfont)
     name_table.find_replace(
         old_string=old_string,
         new_string=new_string,
         name_ids_to_process=name_ids_to_process,
         name_ids_to_skip=name_ids_to_skip,
     )
-    if not _compare_name_tables(font=font, first=name_table, second=name_copy):
-        font.modified = True
+    font.modified = name_table.modified
 
 
 def set_name(
@@ -143,17 +125,14 @@ def set_name(
         platform_id (Optional[int]): The platform ID of the name record. Defaults to None.
         language_string (str): The language code of the name record. Defaults to "en".
     """
-    name_table: TableName = font.ttfont["name"]
-    name_copy = deepcopy(name_table)
+    name_table = NameTable(font=font.ttfont)
     name_table.set_name(
-        font=font.ttfont,
         name_id=name_id,
         name_string=name_string,
         platform_id=platform_id,
         language_string=language_string,
     )
-    if not _compare_name_tables(font=font, first=name_table, second=name_copy):
-        font.modified = True
+    font.modified = name_table.modified
 
 
 def strip_names(font: Font) -> None:
@@ -163,8 +142,6 @@ def strip_names(font: Font) -> None:
     Parameters:
         font (Font): The Font object.
     """
-    name_table: TableName = font.ttfont["name"]
-    name_copy = deepcopy(name_table)
+    name_table = NameTable(font=font.ttfont)
     name_table.strip_names()
-    if not _compare_name_tables(font=font, first=name_table, second=name_copy):
-        font.modified = True
+    font.modified = name_table.modified
