@@ -1,6 +1,6 @@
 import typing as t
 
-from fontTools.ttLib import TTFont, registerCustomTableClass
+from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables._n_a_m_e import (
     _MAC_LANGUAGE_CODES,
     _WINDOWS_LANGUAGE_CODES,
