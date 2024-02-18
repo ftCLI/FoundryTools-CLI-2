@@ -14,6 +14,8 @@ class DefaultTbl:
         """
         Initializes the table.
         """
+        if table_tag not in font.reader.keys():
+            raise ValueError(f"Table {table_tag} not found in font")
         self.font = font
         self.table = font[table_tag]
         self.table_copy = deepcopy(self.table)
