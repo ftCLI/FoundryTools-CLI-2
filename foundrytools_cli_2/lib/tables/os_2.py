@@ -9,7 +9,7 @@ from foundrytools_cli_2.lib.constants import (
     OS_2_TABLE_TAG,
 )
 from foundrytools_cli_2.lib.tables.default import DefaultTbl
-from foundrytools_cli_2.lib.utils.misc import is_nth_bit_set
+from foundrytools_cli_2.lib.utils.bits_tools import is_nth_bit_set
 
 
 class InvalidOS2VersionError(Exception):

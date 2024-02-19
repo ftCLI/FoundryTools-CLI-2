@@ -2,7 +2,7 @@ from copy import deepcopy
 
 from fontTools.ttLib import TTFont
 
-from foundrytools_cli_2.lib.utils.misc import set_nth_bit, unset_nth_bit
+from foundrytools_cli_2.lib.utils.bits_tools import set_nth_bit, unset_nth_bit
 
 
 class DefaultTbl:

@@ -1,18 +1,3 @@
-import os
-import tempfile
-import typing as t
-from pathlib import Path
-
-
-def get_temp_file_path(directory: t.Optional[t.Union[str, Path]] = None) -> Path:
-    """
-    Returns a temporary file path.
-    """
-    file_descriptor, path = tempfile.mkstemp(dir=directory)
-    os.close(file_descriptor)
-    return Path(path)
-
-
 def is_nth_bit_set(x: int, n: int) -> bool:
     """
     If the nth bit of an integer x is set, return True, otherwise return False
@@ -56,7 +41,7 @@ def unset_nth_bit(x: int, n: int) -> int:
 
 def update_bit(num: int, value: bool, pos: int) -> int:
     """
-    Handle a bitwise operation on a field value.
+    Handle a bitwise operation on an integer.
 
     Parameters:
         num (int): The integer to modify.
