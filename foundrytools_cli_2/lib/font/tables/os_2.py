@@ -270,6 +270,11 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the bit 7 (USE_TYPO_METRICS) of the ``OS/2.fsSelection`` field.
         """
+        if self.table.version < 4:
+            raise InvalidOS2VersionError(
+                "fsSelection bit 7 (USE_TYPO_METRICS) is only defined in OS/2 table versions 4 and "
+                "up."
+            )
         self.set_bit(field_name="fsSelection", pos=7, value=value)
 
     @property
@@ -285,6 +290,10 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the bit 8 (WWS) of the ``OS/2.fsSelection`` field.
         """
+        if self.table.version < 4:
+            raise InvalidOS2VersionError(
+                "fsSelection bit 8 (WWS) is only defined in OS/2 table versions 4 and up."
+            )
         self.set_bit(field_name="fsSelection", pos=8, value=value)
 
     @property
@@ -292,6 +301,10 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Returns True if the bit 9 (OBLIQUE) of the ``OS/2.fsSelection`` field is set, False
         """
+        if self.table.version < 4:
+            raise InvalidOS2VersionError(
+                "fsSelection bit 9 (OBLIQUE) is only defined in OS/2 table versions 4 and up."
+            )
         return is_nth_bit_set(self.table.fsSelection, 9)
 
     @is_oblique.setter
