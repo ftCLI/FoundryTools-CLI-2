@@ -27,7 +27,7 @@ class HeadTable(DefaultTbl):
         """
         Set or unset the bold bit in the macStyle field of the 'head' table
         """
-        self.set_bit(field_name="macStyle", value=value, pos=0)
+        self.set_bit(field_name="macStyle", pos=0, value=value)
 
     @property
     def is_italic(self) -> bool:
@@ -41,4 +41,4 @@ class HeadTable(DefaultTbl):
         """
         Set or unset the italic bit in the macStyle field of the 'head' table
         """
-        self.set_bit(field_name="macStyle", value=value, pos=1)
+        self.set_bit(field_name="macStyle", pos=1, value=value)

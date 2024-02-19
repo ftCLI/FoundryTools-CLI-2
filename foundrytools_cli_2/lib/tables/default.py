@@ -27,7 +27,7 @@ class DefaultTbl:
         """
         return self.table.compile(self.font) != self.table_copy.compile(self.font)
 
-    def set_bit(self, field_name: str, value: bool, pos: int) -> None:
+    def set_bit(self, field_name: str, pos: int, value: bool) -> None:
         """
         Set the bit at the given position in the given field of the table.
         """
