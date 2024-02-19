@@ -29,10 +29,10 @@ class GlyphBounds(t.TypedDict):
     A type representing the bounds of a glyph.
     """
 
-    xMin: float
-    yMin: float
-    xMax: float
-    yMax: float
+    x_min: float
+    y_min: float
+    x_max: float
+    y_max: float
 
 
 def get_glyph_bounds(font: TTFont, glyph_name: str) -> GlyphBounds:
@@ -57,10 +57,10 @@ def get_glyph_bounds(font: TTFont, glyph_name: str) -> GlyphBounds:
 
     glyph_set[glyph_name].draw(bounds_pen)
     bounds = GlyphBounds(
-        xMin=bounds_pen.bounds[0],
-        yMin=bounds_pen.bounds[1],
-        xMax=bounds_pen.bounds[2],
-        yMax=bounds_pen.bounds[3],
+        x_min=bounds_pen.bounds[0],
+        y_min=bounds_pen.bounds[1],
+        x_max=bounds_pen.bounds[2],
+        y_max=bounds_pen.bounds[3],
     )
 
     return bounds
@@ -158,7 +158,7 @@ def fix_min_separation_limits(lists: t.List[t.List[float]], limit: int) -> t.Lis
 
 
 def calculate_zone(
-    font: TTFont, glyph_names: t.List[str], min_or_max: t.Literal["yMin", "yMax"]
+    font: TTFont, glyph_names: t.List[str], min_or_max: t.Literal["y_min", "y_max"]
 ) -> t.List[float]:
     """
     Calculates the minimum and maximum vertical values for a given zone.
@@ -221,11 +221,11 @@ def recalc_zones(
     if ascender_glyphs is None:
         ascender_glyphs = ASCENDER_GLYPHS
 
-    descender_zone = calculate_zone(font=font, glyph_names=descender_glyphs, min_or_max="yMin")
-    baseline_zone = calculate_zone(font=font, glyph_names=baseline_glyphs, min_or_max="yMin")
-    x_height_zone = calculate_zone(font=font, glyph_names=x_height_glyphs, min_or_max="yMax")
-    uppercase_zone = calculate_zone(font=font, glyph_names=uppercase_glyphs, min_or_max="yMax")
-    ascender_zone = calculate_zone(font=font, glyph_names=ascender_glyphs, min_or_max="yMax")
+    descender_zone = calculate_zone(font=font, glyph_names=descender_glyphs, min_or_max="y_min")
+    baseline_zone = calculate_zone(font=font, glyph_names=baseline_glyphs, min_or_max="y_min")
+    x_height_zone = calculate_zone(font=font, glyph_names=x_height_glyphs, min_or_max="y_max")
+    uppercase_zone = calculate_zone(font=font, glyph_names=uppercase_glyphs, min_or_max="y_max")
+    ascender_zone = calculate_zone(font=font, glyph_names=ascender_glyphs, min_or_max="y_max")
 
     zones = sorted([descender_zone, baseline_zone, x_height_zone, uppercase_zone, ascender_zone])
     if lists_overlaps(zones):
