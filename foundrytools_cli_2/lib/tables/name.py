@@ -133,8 +133,8 @@ class NameTable(DefaultTbl):
                 None, which means that NameRecords from all platforms are processed. If 1, only
                 NameRecords with platformID 1 (Macintosh) are processed. If 3, only NameRecords with
                 platformID 3 (Windows) are processed.
-            language_string (Optional[str]): The language of the name records to process. Defaults to
-                None, which means that NameRecords in all languages are processed.
+            language_string (Optional[str]): The language of the name records to process. Defaults
+                to None, which means that NameRecords in all languages are processed.
             prefix (Optional[str]): The prefix to append to the NameRecords. Defaults to None.
             suffix (Optional[str]): The suffix to append to the NameRecords. Defaults to None.
         """
