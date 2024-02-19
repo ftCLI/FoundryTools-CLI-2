@@ -9,7 +9,7 @@ from foundrytools_cli_2.lib.tables.default import DefaultTbl
 
 class NameTable(DefaultTbl):
     """
-    This class extends the fontTools `name` table to add some useful methods.
+    This class extends the fontTools ``name`` table to add some useful methods.
     """
 
     def __init__(self, font: TTFont):
@@ -23,12 +23,13 @@ class NameTable(DefaultTbl):
         language_string: str = "en",
     ) -> None:
         """
-        Set the string of the specified NameRecord in the name table of a given font.
+        Adds a NameRecord to the ``name`` table of a font.
 
         Parameters:
-            name_id (int): The ID of the name to be set.
-            name_string (str): The string value of the name to be set.
-            platform_id (Optional[int]): The platform ID of the name record. Defaults to None.
+            name_id (int): The NameID of the NameRecord to be set.
+            name_string (str): The string to write to the NameRecord.
+            platform_id (Optional[int]): The platformID of the NameRecord to be added. Defaults to
+                None, which means that the NameRecord will be set for both platformIDs (1 and 3).
             language_string (str): The language code of the name record. Defaults to "en".
         """
 
@@ -56,16 +57,16 @@ class NameTable(DefaultTbl):
         language_string: t.Optional[str] = None,
     ) -> None:
         """
-        Deletes all name records that match the given name_ids, optionally filtering by platform_id
-        and/or language_string.
+        Deletes the specified NameRecords from the ``name`` table of a font.
 
         Parameters:
             name_ids (Iterable[int]): A list of name IDs to delete.
             platform_id (Optional[int]): The platform ID of the name records to delete. Defaults to
-                None. If None, all platform IDs are considered. If 1, only Macintosh-specific names
-                are considered. If 3, only Windows-specific names are considered.
+                None. If None, both NameRecords with platformID 1 (Macintosh) and 3 (Windows) are
+                deleted. If 1, only NameRecords with platformID 1 (Macintosh) are deleted. If 3,
+                only NameRecords with platformID 3 (Windows) are deleted.
             language_string (Optional[str]): The language of the name records to delete. Defaults to
-                None.
+                None, which means that NameRecords in all languages are deleted.
         """
 
         names = self.filter_names(
@@ -83,20 +84,20 @@ class NameTable(DefaultTbl):
         platform_id: t.Optional[int] = None,
     ) -> None:
         """
-        This function will find and replace a string in the specified namerecords.
+        Finds and replaces occurrences of a string in the specified NameRecords of the ``name``
+        table of a font.
 
-        :param old_string: The string to be replaced
-        :type old_string: str
-        :param new_string: The string to replace the old string with
-        :type new_string: str
-        :param name_ids_to_process: A tuple of nameIDs to include in the search. If left blank, all
-            nameIDs will be included
-        :type name_ids_to_process: tuple
-        :param name_ids_to_skip: A tuple of nameIDs to skip in the search. If left blank, no nameID
-            will be skipped
-        :type name_ids_to_skip: tuple
-        :param platform_id: The platform ID of the name record to be changed
-        :type platform_id: int
+        Parameters:
+            old_string (str): The string to be replaced.
+            new_string (str): The string to replace the ``old_string`` with.
+            name_ids_to_process (tuple[int], optional): A tuple of name IDs to process. Default is
+                an empty tuple, which means all nameIDs are processed.
+            name_ids_to_skip (tuple[int], optional): A tuple of name IDs to skip. Default is an
+                empty tuple, which means no nameIDs are skipped.
+            platform_id (Optional[int]): The platform ID of the name records to process. Defaults to
+                None, which means that NameRecords from all platforms are processed. If 1, only
+                NameRecords with platformID 1 (Macintosh) are processed. If 3, only NameRecords with
+                platformID 3 (Windows) are processed.
         """
 
         name_ids = self._get_name_ids_for_filter(
@@ -126,11 +127,16 @@ class NameTable(DefaultTbl):
         Appends a prefix, a suffix, or both to the namerecords that match the name IDs, platform ID,
         and language string.
 
-        :param name_ids: A list of name IDs to filter by
-        :param platform_id: The platform ID of the namerecords where to append/prepend the string
-        :param language_string: The language string to filter by
-        :param prefix: The string to be added to the beginning of the namerecords
-        :param suffix: The string to append to the end of the namerecords
+        Parameters:
+            name_ids (Tuple[int]): A tuple of name IDs to process.
+            platform_id (Optional[int]): The platform ID of the name records to process. Defaults to
+                None, which means that NameRecords from all platforms are processed. If 1, only
+                NameRecords with platformID 1 (Macintosh) are processed. If 3, only NameRecords with
+                platformID 3 (Windows) are processed.
+            language_string (Optional[str]): The language of the name records to process. Defaults to
+                None, which means that NameRecords in all languages are processed.
+            prefix (Optional[str]): The prefix to append to the NameRecords. Defaults to None.
+            suffix (Optional[str]): The suffix to append to the NameRecords. Defaults to None.
         """
 
         names = self.filter_names(
