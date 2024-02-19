@@ -8,7 +8,7 @@ from foundrytools_cli_2.lib.constants import (
     MIN_US_WIDTH_CLASS,
     OS_2_TABLE_TAG,
 )
-from foundrytools_cli_2.lib.tables.default import DefaultTbl
+from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
 from foundrytools_cli_2.lib.utils.bits_tools import is_nth_bit_set
 
 
