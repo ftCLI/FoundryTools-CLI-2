@@ -56,7 +56,7 @@ def unset_nth_bit(x: int, n: int) -> int:
 
 def update_bit(num: int, value: bool, pos: int) -> int:
     """
-    Handle a bitwise operation on a field value.
+    Handle a bitwise operation on an integer.
 
     Parameters:
         num (int): The integer to modify.
