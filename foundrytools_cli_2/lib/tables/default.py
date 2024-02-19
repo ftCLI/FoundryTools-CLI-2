@@ -14,7 +14,7 @@ class DefaultTbl:
         """
         Initializes the table.
         """
-        if table_tag not in font.reader.keys():
+        if table_tag not in font.reader:
             raise ValueError(f"Table {table_tag} not found in font")
         self.font = font
         self.table = font[table_tag]
