@@ -5,7 +5,6 @@ from pathlib import Path
 
 import click
 
-from foundrytools_cli_2.lib import Font
 from foundrytools_cli_2.lib.click.options import (
     common_options,
     in_format_choice,
@@ -15,6 +14,7 @@ from foundrytools_cli_2.lib.click.options import (
     tolerance_option,
     ttf2otf_mode_choice,
 )
+from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font_runner import FontRunner
 
 cli = click.Group("converter", help="Font conversion utilities.")
