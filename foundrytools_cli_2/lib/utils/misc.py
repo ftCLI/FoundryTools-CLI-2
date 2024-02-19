@@ -52,3 +52,17 @@ def unset_nth_bit(x: int, n: int) -> int:
     :return: The number x with the nth bit set to 0.
     """
     return x & ~(1 << n)
+
+
+def update_bit(num: int, value: bool, pos: int) -> int:
+    """
+    Handle a bitwise operation on a field value.
+
+    Parameters:
+        num (int): The integer to modify.
+        pos (int): The position of the bit to update.
+        value (bool): If True, the bit will be set, otherwise it will be cleared.
+    """
+    if value:
+        return set_nth_bit(num, pos)
+    return unset_nth_bit(num, pos)

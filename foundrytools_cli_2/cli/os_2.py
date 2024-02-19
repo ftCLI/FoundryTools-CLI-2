@@ -17,7 +17,7 @@ cli = click.Group(help="Utilities for editing the OS/2 table.", chain=True)
     "--embed-level",
     type=click.Choice(["0", "2", "4", "8"]),
     callback=choice_to_int_callback,
-    help="The new fsType value."
+    help="The new fsType value.",
 )
 @click.option("--bmp-only/--no-bmp-only", default=None, help="Set the fsType value to 0.")
 @click.option("--no-subsetting/--allow-subsetting", default=None, help="Set the fsType value to 2.")

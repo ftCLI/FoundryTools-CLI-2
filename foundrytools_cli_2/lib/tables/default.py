@@ -14,6 +14,8 @@ class DefaultTbl:
         """
         Initializes the table.
         """
+        if table_tag not in font.reader:
+            raise ValueError(f"Table {table_tag} not found in font")
         self.font = font
         self.table = font[table_tag]
         self.table_copy = deepcopy(self.table)
@@ -25,7 +27,7 @@ class DefaultTbl:
         """
         return self.table.compile(self.font) != self.table_copy.compile(self.font)
 
-    def set_bit(self, field_name: str, value: bool, pos: int) -> None:
+    def set_bit(self, field_name: str, pos: int, value: bool) -> None:
         """
         Set the bit at the given position in the given field of the table.
         """
