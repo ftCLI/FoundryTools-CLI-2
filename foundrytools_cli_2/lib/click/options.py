@@ -503,7 +503,7 @@ def name_id(required: bool = True) -> t.Callable:
             default=None,
             help="""
             Specify the name ID of the NameRecords to be modified.
-            
+
             Example: ``-n 1`` will modify NameRecords with name ID 1.
             """,
         )
@@ -528,7 +528,7 @@ def name_ids(required: bool = True) -> t.Callable:
             default=None,
             help="""
             Specify the name IDs to be modified.
-            
+
             Example: ``-n 1 -n 2`` will modify name IDs 1 and 2.
             """,
         )
@@ -552,7 +552,7 @@ def skip_name_ids() -> t.Callable:
             default=None,
             help="""
             Specify the name IDs to be excluded.
-            
+
             Example: ``-n 1 -n 2`` will modify name IDs 1 and 2.
             """,
         )
@@ -574,14 +574,14 @@ def platform_id() -> t.Callable:
             default=None,
             help="""
             Specify the platform ID of the NameRecords to be modified.
-            
+
             \b
             0: Unicode 1.0 semantics (deprecated)
             1: Unicode 1.1 semantics (deprecated)
             2: ISO/IEC 10646 semantics (deprecated)
             3: Unicode 2.0 and onwards semantics, Unicode BMP only
             4: Unicode 2.0 and onwards semantics, Unicode full repertoire
-            
+
             Example: ``-p 1`` will modify only NameRecords with platform ID 1.
             """,
         )
@@ -604,11 +604,11 @@ def win_or_mac_platform_id() -> t.Callable:
             default=None,
             help="""
             Specify the platform ID of the NameRecords to be modified.
-            
+
             \b
             1: Macintosh
             3: Windows
-            
+
             Example: ``-p 1`` will modify only NameRecords with platform ID 1.
             """,
         )
@@ -630,7 +630,7 @@ def language_string() -> t.Callable:
             default="en",
             help="""
             Specify the language of the NameRecords to be modified.
-            
+
             Example: ``-l en`` will modify only NameRecords with language code "en".
             """,
         )
