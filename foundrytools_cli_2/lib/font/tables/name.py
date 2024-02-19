@@ -124,7 +124,7 @@ class NameTable(DefaultTbl):
         suffix: t.Optional[str] = None,
     ) -> None:
         """
-        Appends a prefix, a suffix, or both to the namerecords that match the name IDs, platform ID,
+        Appends a prefix, a suffix, or both to the NameRecords that match the nameID, platformID,
         and language string.
 
         Parameters:
@@ -160,7 +160,7 @@ class NameTable(DefaultTbl):
 
     def strip_names(self) -> None:
         """
-        Removes leading and trailing spaces from NameRecords in the name table.
+        Removes leading and trailing spaces from NameRecords in the ``name`` table.
         """
         for name in self.table.names:
             self.table.setName(
@@ -173,7 +173,7 @@ class NameTable(DefaultTbl):
 
     def remove_empty_names(self) -> None:
         """
-        Removes empty NameRecords from the name table.
+        Removes empty NameRecords from the ``name`` table.
         """
         for name in self.table.names:
             if str(name).strip() == "":
@@ -211,19 +211,19 @@ class NameTable(DefaultTbl):
         Filters NameRecords based on the given parameters.
 
         Parameters:
-            name_ids (Optional[List[int]]): A list of name IDs to filter the name records. If None,
+            name_ids (Optional[List[int]]): A list of nameIDs to filter the name records. If None,
                 all name records are considered.
-            platform_id (Optional[int]): A platform ID to filter the name records. If None, all
+            platform_id (Optional[int]): A platformID to filter the name records. If None, all
                 platform IDs are considered.
-            plat_enc_id (Optional[int]): A platform encoding ID to filter the name records. If None,
-                all platform encoding IDs are considered.
-            lang_id (Optional[int]): A language ID to filter the name records. If None, all language
+            plat_enc_id (Optional[int]): A platEncID to filter the name records. If None, all
+                platform encoding IDs are considered.
+            lang_id (Optional[int]): A langID to filter the name records. If None, all language
                 IDs are considered.
             lang_string (Optional[str]): A language string to filter the name records. If None, all
                 language strings are considered.
 
         Returns:
-            List[NameRecord]: A list of filtered name records.
+            List[NameRecord]: A list of filtered NameRecords.
         """
 
         return [
