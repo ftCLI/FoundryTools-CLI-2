@@ -22,8 +22,7 @@ from foundrytools_cli_2.lib.constants import (
     WOFF_EXTENSION,
     WOFF_FLAVOR,
 )
-from foundrytools_cli_2.lib.font.tables.head import HeadTable
-from foundrytools_cli_2.lib.font.tables.os_2 import OS2Table
+from foundrytools_cli_2.lib.font.tables import HeadTable, OS2Table
 from foundrytools_cli_2.lib.otf.afdko_tools import cff_desubr, cff_subr
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.otf.stems import recalc_stems
