@@ -1,7 +1,7 @@
 import typing as t
 
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.tables.os_2 import OS2Table
+from foundrytools_cli_2.lib.font.tables import OS2Table
 
 
 def recalc_cap_height(font: Font) -> None:

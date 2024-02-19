@@ -1,7 +1,8 @@
 import typing as t
 from pathlib import Path
 
-from foundrytools_cli_2.lib.font import WOFF2_FLAVOR, WOFF_FLAVOR, Font
+from foundrytools_cli_2.lib.constants import WOFF2_FLAVOR, WOFF_FLAVOR
+from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.logger import logger
 
 

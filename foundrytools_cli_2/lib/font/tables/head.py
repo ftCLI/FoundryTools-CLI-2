@@ -1,6 +1,6 @@
 from fontTools.ttLib import TTFont
 
-from foundrytools_cli_2.lib.tables.default import DefaultTbl
+from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
 from foundrytools_cli_2.lib.utils.bits_tools import is_nth_bit_set
 
 
