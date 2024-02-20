@@ -3,23 +3,8 @@ from pathlib import Path
 
 import click
 
+from foundrytools_cli_2.lib.click import add_options
 from foundrytools_cli_2.lib.click.callbacks import choice_to_int_callback, output_dir_callback
-
-
-def add_options(options: t.List[t.Callable]) -> t.Callable:
-    """
-    Add options to a click command.
-
-    :param options: a list of click options
-    :return: a decorator that adds the options to a click command
-    """
-
-    def _add_options(func: t.Callable) -> t.Callable:
-        for option in reversed(options):
-            func = option(func)
-        return func
-
-    return _add_options
 
 
 def common_options() -> t.Callable:
