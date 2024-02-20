@@ -532,7 +532,7 @@ def no_subsetting() -> t.Callable:
             is_flag=True,
             help="""
             Sets or clears the ``OS/2.fsType`` bit 8 (NO_SUBSETTING).
-            
+
             When this bit is set, the font may not be subsetted prior to embedding. Other embedding
             restrictions specified in bits 0 to 3 and bit 9 also apply.
             """,
@@ -556,7 +556,7 @@ def bitmap_embed_only() -> t.Callable:
             is_flag=True,
             help="""
             Sets or clears the ``OS/2.fsType`` bit 9 (BITMAP_EMBED_ONLY).
-            
+
             When this bit is set, only bitmaps contained in the font may be embedded. No outline
             data may be embedded. If there are no bitmaps available in the font, then the font is
             considered unembeddable and the embedding services will fail. Other embedding
