@@ -42,7 +42,7 @@ def width_class() -> t.Callable:
             "--width-class",
             type=click.IntRange(1, 9),
             help="""
-            The new usWidthClass value.
+            The new ``usWidthClass`` value.
 
             Indicates a relative change from the normal aspect ratio (width to height ratio) as
             specified by a font designer for the glyphs in a font.
@@ -64,10 +64,10 @@ def typo_ascender() -> t.Callable:
             "--typo-ascender",
             type=click.INT,
             help="""
-            The new sTypoAscender value.
+            The new ``sTypoAscender`` value.
 
             The typographic ascender of the font. This field should be combined with the
-            sTypoDescender and sTypoLineGap values to determine default line spacing.
+            ``sTypoDescender`` and ``sTypoLineGap`` values to determine default line spacing.
             """,
         )
     ]
@@ -86,10 +86,10 @@ def typo_descender() -> t.Callable:
             "--typo-descender",
             type=click.INT,
             help="""
-            The new sTypoDescender value.
+            The new ``sTypoDescender`` value.
 
             The typographic descender of the font. This field should be combined with the
-            sTypoAscender and sTypoLineGap values to determine default line spacing.
+            ``sTypoAscender`` and ``sTypoLineGap`` values to determine default line spacing.
             """,
         )
     ]
@@ -108,10 +108,10 @@ def typo_line_gap() -> t.Callable:
             "--typo-line-gap",
             type=click.INT,
             help="""
-            The new sTypoLineGap value.
+            The new ``sTypoLineGap`` value.
 
             The typographic line gap of the font. This field should be combined with the
-            sTypoAscender and sTypoDescender values to determine default line spacing.
+            ``sTypoAscender`` and ``sTypoDescender`` values to determine default line spacing.
             """,
         )
     ]
@@ -130,10 +130,10 @@ def win_ascent() -> t.Callable:
             "--win-ascent",
             type=click.INT,
             help="""
-            The new usWinAscent value.
+            The new ``usWinAscent`` value.
 
-            The “Windows ascender” metric. This should be used to specify the height above the
-            baseline for a clipping region.
+            This field represents the “Windows ascender” metric. This should be used to specify the
+            height above the baseline for a clipping region.
             """,
         )
     ]
@@ -152,10 +152,10 @@ def win_descent() -> t.Callable:
             "--win-descent",
             type=click.INT,
             help="""
-            The new usWinDescent value.
+            The new ``usWinDescent`` value.
 
-            The “Windows descender” metric. This should be used to specify the depth below the
-            baseline for a clipping region.
+            This field represents the “Windows descender” metric. This should be used to specify the
+            depth below the baseline for a clipping region.
             """,
         )
     ]
@@ -174,7 +174,7 @@ def x_height() -> t.Callable:
             "--x-height",
             type=click.INT,
             help="""
-            The new sxHeight value.
+            The new ``sxHeight`` value.
 
             This metric specifies the distance between the baseline and the approximate height of
             non-ascending lowercase letters measured in FUnits. This value would normally be
@@ -186,7 +186,7 @@ def x_height() -> t.Callable:
             This metric, if specified, can be used in font substitution: the xHeight value of one
             font can be scaled to approximate the apparent size of another.
 
-            This field was defined in version 2 of the OS/2 table.
+            This field was defined in version 2 of the ``OS/2`` table.
             """,
         )
     ]
@@ -205,7 +205,7 @@ def cap_height() -> t.Callable:
             "--cap-height",
             type=click.INT,
             help="""
-            The new sCapHeight value.
+            The new ``sCapHeight`` value.
 
             This metric specifies the distance between the baseline and the approximate height of
             uppercase letters measured in FUnits. This value would normally be specified by a type
@@ -219,7 +219,7 @@ def cap_height() -> t.Callable:
             drop capital, for instance, can be aligned to the sCapHeight metric of the first line of
             text.
 
-            This field was defined in version 2 of the OS/2 table.
+            This field was defined in version 2 of the ``OS/2`` table.
             """,
         )
     ]
@@ -240,14 +240,106 @@ def italic() -> t.Callable:
             default=None,
             is_flag=True,
             help="""
-            Sets or clears the OS/2.fsSelection bit 0 (ITALIC).
+            Sets or clears the ``OS/2.fsSelection`` bit 0 (ITALIC).
 
-            The bit 1 of the macStyle field in the 'head' table will be set to the same value as
-            bit 0 in the fsSelection field of the 'OS/2' table.
+            The bit 1 of the ``macStyle`` field in the ``head`` table will be set to the same value
+            as bit 0 in the fsSelection field of the ``OS/2`` table.
             """,
         )
     ]
     return add_options(_italic)
+
+
+def underscore() -> t.Callable:
+    """
+    Add the underscore option to a click command.
+
+    :return: the click command with the option added
+    """
+    _underscore = [
+        click.option(
+            "-us/-no-us",
+            "--underscore, --no-underscore",
+            "underscore",
+            default=None,
+            is_flag=True,
+            help="""
+            Sets or clears the ``OS/2.fsSelection`` bit 1 (UNDERSCORE).
+
+            Set to indicate that the font glyphs are underscored.
+            """,
+        )
+    ]
+    return add_options(_underscore)
+
+
+def negative() -> t.Callable:
+    """
+    Add the negative option to a click command.
+
+    :return: the click command with the option added
+    """
+    _negative = [
+        click.option(
+            "-ng/-no-ng",
+            "--negative, --no-negative",
+            "negative",
+            default=None,
+            is_flag=True,
+            help="""
+            Sets or clears the ``OS/2.fsSelection`` bit 2 (NEGATIVE).
+
+            Set this bit when the font glyphs have their foreground and background reversed.
+            """,
+        )
+    ]
+    return add_options(_negative)
+
+
+def outline() -> t.Callable:
+    """
+    Add the outline option to a click command.
+
+    :return: the click command with the option added
+    """
+    _outline = [
+        click.option(
+            "-ol/-no-ol",
+            "--outline, --no-outline",
+            "outline",
+            default=None,
+            is_flag=True,
+            help="""
+            Sets or clears the ``OS/2.fsSelection`` bit 3 (OUTLINE).
+
+            Set this bit when the font has outline glyphs.
+            """,
+        )
+    ]
+    return add_options(_outline)
+
+
+def strikeout() -> t.Callable:
+    """
+    Add the strikeout option to a click command.
+
+    :return: the click command with the option added
+    """
+    _strikeout = [
+        click.option(
+            "-so/-no-so",
+            "--strikeout, --no-strikeout",
+            "strikeout",
+            default=None,
+            is_flag=True,
+            help="""
+            Sets or clears the ``OS/2.fsSelection`` bit 4 (STRIKEOUT).
+
+            Set this bit when the font has glyphs that are overstruck.
+            """,
+        )
+    ]
+    return add_options(_strikeout)
 
 
 def bold() -> t.Callable:
@@ -264,10 +356,10 @@ def bold() -> t.Callable:
             default=None,
             is_flag=True,
             help="""
-            Sets or clears the OS/2.fsSelection bit 5 (BOLD).
+            Sets or clears the ``OS/2.fsSelection`` bit 5 (BOLD).
 
-            The bit 0 of the macStyle field in the 'head' table will be set to the same value as
-            bit 5 in the fsSelection field of the 'OS/2' table.
+            The bit 0 of the ``macStyle`` field in the ``head`` table will be set to the same value
+            as ``fsSelection`` bit 5.
             """,
         )
     ]
@@ -288,10 +380,10 @@ def regular() -> t.Callable:
             default=None,
             is_flag=True,
             help="""
-            Sets or clears the OS/2.fsSelection bit 6 (REGULAR).
+            Sets or clears the ``OS/2.fsSelection`` bit 6 (REGULAR).
 
-            If bit 6 is set, then OS/2.fsSelection bits 0 and 5 will be cleared, as well as the
-            macStyle bits 0 and 1 in the 'head' table.
+            If bit 6 is set, then ``OS/2.fsSelection`` bits 0 and 5 will be cleared, as well as the
+            ``macStyle`` bits 0 and 1 in the ``head`` table.
             """,
         )
     ]
@@ -312,12 +404,12 @@ def use_typo_metrics() -> t.Callable:
             default=None,
             is_flag=True,
             help="""
-            Sets or clears the OS/2.fsSelection bit 7 (USE_TYPO_METRICS).
+            Sets or clears the ``OS/2.fsSelection`` bit 7 (USE_TYPO_METRICS).
 
-            If set, it is strongly recommended that applications use OS/2.sTypoAscender -
-            OS/2.sTypoDescender + OS/2.sTypoLineGap as the default line spacing for this font.
+            If set, it is strongly recommended that applications use ``OS/2.sTypoAscender -
+            OS/2.sTypoDescender + OS/2.sTypoLineGap`` as the default line spacing for this font.
 
-            Bit 7 was defined in version 4 of the OS/2 table.
+            Bit 7 was defined in version 4 of the ``OS/2`` table.
             """,
         )
     ]
@@ -338,13 +430,13 @@ def wws_consistent() -> t.Callable:
             default=None,
             is_flag=True,
             help="""
-            Sets or clears the OS/2.fsSelection bit 8 (WWS_CONSISTENT).
+            Sets or clears the ``OS/2.fsSelection`` bit 8 (WWS_CONSISTENT).
 
-            If bit 8 is set, then 'name' table strings for family and subfamily are provided that
+            If bit 8 is set, then ``name`` table strings for family and subfamily are provided that
             are consistent with a weight/width/slope family model without requiring the use of name
             IDs 21 or 22.
 
-            Bit 8 was defined in version 4 of the OS/2 table.
+            Bit 8 was defined in version 4 of the ``OS/2`` table.
             """,
         )
     ]
@@ -365,7 +457,7 @@ def oblique() -> t.Callable:
             default=None,
             is_flag=True,
             help="""
-            Sets or clears the OS/2.fsSelection bit 9 (OBLIQUE).
+            Sets or clears the ``OS/2.fsSelection`` bit 9 (OBLIQUE).
 
             If bit 9 is set, then this font is to be considered an “oblique” style by processes
             which make a distinction between oblique and italic styles, such as Cascading Style
@@ -377,7 +469,7 @@ def oblique() -> t.Callable:
             italic. It may be set or unset independently of the ITALIC bit. In most cases, if
             OBLIQUE is set, then ITALIC will also be set, though this is not required.
 
-            Bit 9 was defined in version 4 of the OS/2 table.
+            Bit 9 was defined in version 4 of the ``OS/2`` table.
             """,
         )
     ]
@@ -439,6 +531,8 @@ def no_subsetting() -> t.Callable:
             default=None,
             is_flag=True,
             help="""
+            Sets or clears the ``OS/2.fsType`` bit 8 (NO_SUBSETTING).
+            
             When this bit is set, the font may not be subsetted prior to embedding. Other embedding
             restrictions specified in bits 0 to 3 and bit 9 also apply.
             """,
@@ -461,6 +555,8 @@ def bitmap_embed_only() -> t.Callable:
             default=None,
             is_flag=True,
             help="""
+            Sets or clears the ``OS/2.fsType`` bit 9 (BITMAP_EMBED_ONLY).
+            
             When this bit is set, only bitmaps contained in the font may be embedded. No outline
             data may be embedded. If there are no bitmaps available in the font, then the font is
             considered unembeddable and the embedding services will fail. Other embedding
@@ -499,6 +595,10 @@ def set_fs_selection_options() -> t.Callable:
     """
     _set_flags_options = [
         italic(),
+        underscore(),
+        negative(),
+        outline(),
+        strikeout(),
         bold(),
         regular(),
         use_typo_metrics(),
