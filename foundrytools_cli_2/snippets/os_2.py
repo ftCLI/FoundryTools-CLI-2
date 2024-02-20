@@ -5,9 +5,25 @@ from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font.tables import InvalidOS2VersionError, OS2Table
 
 
+def recalc_avg_char_width(font: Font) -> None:
+    """
+    Recalculates the ``OS/2.xAvgCharWidth`` value.
+
+    Parameters:
+        font (Font): The Font object representing the font file.
+
+    Returns:
+        None
+    """
+    os_2_table = OS2Table(font.ttfont)
+    avg_char_width = os_2_table.recalc_avg_char_width()
+    os_2_table.avg_char_width = avg_char_width
+    font.modified = os_2_table.modified
+
+
 def recalc_cap_height(font: Font) -> None:
     """
-    Recalculates the capHeight value of the OS/2 table of the given font.
+    Recalculates the ``OS/2.sCapHeight`` value.
 
     Parameters:
         font (Font): The Font object representing the font file.
@@ -23,7 +39,7 @@ def recalc_cap_height(font: Font) -> None:
 
 def recalc_x_height(font: Font) -> None:
     """
-    Recalculates the xHeight value of the OS/2 table of the given font.
+    Recalculates the ``OS/2.sXHeight`` value.
 
     Parameters:
         font (Font): The Font object representing the font file.
@@ -39,23 +55,21 @@ def recalc_x_height(font: Font) -> None:
 
 def set_attrs(
     font: Font,
-    avg_char_width: t.Optional[int] = None,
     weight_class: t.Optional[int] = None,
     width_class: t.Optional[int] = None,
-    x_height: t.Optional[int] = None,
-    cap_height: t.Optional[int] = None,
     typo_ascender: t.Optional[int] = None,
     typo_descender: t.Optional[int] = None,
     typo_line_gap: t.Optional[int] = None,
     win_ascent: t.Optional[int] = None,
     win_descent: t.Optional[int] = None,
+    x_height: t.Optional[int] = None,
+    cap_height: t.Optional[int] = None,
 ) -> None:
     """
     Sets the font's OS/2 table properties based on the provided parameters.
 
     Parameters:
         font: The Font object representing The font to modify.
-        avg_char_width (optional): The xAvgCharWidth value to set.
         weight_class (optional): The usWeightClass value to set.
         width_class (optional): The usWidthClass value to set.
         x_height (optional): The sXHeight value to set.
@@ -68,17 +82,21 @@ def set_attrs(
     """
     os_2_table = OS2Table(font.ttfont)
     attrs = {
-        "avg_char_width": avg_char_width,
         "weight_class": weight_class,
         "width_class": width_class,
-        "x_height": x_height,
-        "cap_height": cap_height,
         "typo_ascender": typo_ascender,
         "typo_descender": typo_descender,
         "typo_line_gap": typo_line_gap,
         "win_ascent": win_ascent,
         "win_descent": win_descent,
+        "x_height": x_height,
+        "cap_height": cap_height,
     }
+
+    if all(value is None for value in attrs.values()):
+        logger.warning("No attributes provided to set.")
+        return
+
     for attr, value in attrs.items():
         if value is not None:
             try:
@@ -88,7 +106,7 @@ def set_attrs(
     font.modified = os_2_table.modified
 
 
-def set_flags(
+def set_fs_selection(
     font: Font,
     italic: t.Optional[bool] = None,
     bold: t.Optional[bool] = None,
@@ -117,6 +135,13 @@ def set_flags(
     Returns:
         None
     """
+    if all(
+        value is None
+        for value in (italic, bold, regular, use_typo_metrics, wws_consistent, oblique)
+    ):
+        logger.warning("No flags provided to set.")
+        return
+
     os_2_table = OS2Table(font.ttfont)
     if italic is not None:
         font.set_italic(italic)
@@ -127,13 +152,13 @@ def set_flags(
     if use_typo_metrics is not None:
         os_2_table.use_typo_metrics = use_typo_metrics
     if wws_consistent is not None:
-        os_2_table.wws = wws_consistent
+        os_2_table.wws_consistent = wws_consistent
     if oblique is not None:
         os_2_table.is_oblique = oblique
     font.modified = os_2_table.modified or font.modified
 
 
-def set_permissions(
+def set_fs_type(
     font: Font,
     embed_level: t.Optional[int] = None,
     no_subsetting: t.Optional[bool] = None,
