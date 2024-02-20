@@ -52,6 +52,27 @@ def width_class() -> t.Callable:
     return add_options(_width_class)
 
 
+def vendor_id() -> t.Callable:
+    """
+    Add the vendorID option to a click command.
+
+    :return: the click command with the option added
+    """
+    _vendor_id = [
+        click.option(
+            "-vid",
+            "--vendor-id",
+            type=click.STRING,
+            help="""
+            The new ``achVendID`` value.
+
+            The four-character identifier for the vendor of the given type face.
+            """,
+        )
+    ]
+    return add_options(_vendor_id)
+
+
 def typo_ascender() -> t.Callable:
     """
     Add the typoAscender option to a click command.
@@ -576,6 +597,7 @@ def set_attrs_options() -> t.Callable:
     _set_attrs_options = [
         weight_class(),
         width_class(),
+        vendor_id(),
         typo_ascender(),
         typo_descender(),
         typo_line_gap(),

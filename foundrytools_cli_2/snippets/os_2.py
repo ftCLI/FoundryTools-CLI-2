@@ -73,6 +73,7 @@ def set_attrs(
     font: Font,
     weight_class: t.Optional[int] = None,
     width_class: t.Optional[int] = None,
+    vendor_id: t.Optional[str] = None,
     typo_ascender: t.Optional[int] = None,
     typo_descender: t.Optional[int] = None,
     typo_line_gap: t.Optional[int] = None,
@@ -100,6 +101,7 @@ def set_attrs(
     attrs = {
         "weight_class": weight_class,
         "width_class": width_class,
+        "vendor_id": vendor_id,
         "typo_ascender": typo_ascender,
         "typo_descender": typo_descender,
         "typo_line_gap": typo_line_gap,

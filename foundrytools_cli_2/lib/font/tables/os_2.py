@@ -13,6 +13,7 @@ from foundrytools_cli_2.lib.constants import (
 )
 from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
 from foundrytools_cli_2.lib.utils.bits_tools import is_nth_bit_set
+from foundrytools_cli_2.lib.utils.string_tools import adjust_string_length
 
 
 class InvalidOS2VersionError(Exception):
@@ -320,6 +321,20 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
                 "fsSelection bit 9 (OBLIQUE) is only defined in OS/2 table versions 4 and up."
             )
         self.set_bit(field_name="fsSelection", pos=9, value=value)
+
+    @property
+    def vendor_id(self) -> str:
+        """
+        Returns the ``OS/2.achVendID`` value.
+        """
+        return self.table.achVendID
+
+    @vendor_id.setter
+    def vendor_id(self, value: str) -> None:
+        """
+        Sets the ``OS/2.achVendID`` value.
+        """
+        self.table.achVendID = adjust_string_length(value, length=4, pad_char=" ")
 
     @property
     def typo_ascender(self) -> int:
