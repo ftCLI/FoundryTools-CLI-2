@@ -1,3 +1,6 @@
+import typing as t
+
+from fontTools.misc.roundTools import otRound
 from fontTools.misc.textTools import num2binary
 from fontTools.ttLib import TTFont
 
@@ -278,15 +281,15 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         self.set_bit(field_name="fsSelection", pos=7, value=value)
 
     @property
-    def wws(self) -> bool:
+    def wws_consistent(self) -> bool:
         """
         Returns True if the bit 8 (WWS) of the ``OS/2.fsSelection`` field is set, False
         otherwise.
         """
         return is_nth_bit_set(self.table.fsSelection, 8)
 
-    @wws.setter
-    def wws(self, value: bool) -> None:
+    @wws_consistent.setter
+    def wws_consistent(self, value: bool) -> None:
         """
         Sets the bit 8 (WWS) of the ``OS/2.fsSelection`` field.
         """
@@ -315,31 +318,43 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         self.set_bit(field_name="fsSelection", pos=9, value=value)
 
     @property
-    def x_height(self) -> float:
+    def x_height(self) -> t.Optional[int]:
         """
         Returns the sxHeight value of the ``OS/2`` table.
         """
-        return self.table.sxHeight
+        if self.table.version < 2:
+            return None
+        return otRound(self.table.sxHeight)
 
     @x_height.setter
-    def x_height(self, value: float) -> None:
+    def x_height(self, value: int) -> None:
         """
         Sets the sxHeight value of the ``OS/2`` table.
         """
+        if self.table.version < 2:
+            raise InvalidOS2VersionError(
+                "sxHeight is only defined in OS/2 table versions 2 and up."
+            )
         self.table.sxHeight = value
 
     @property
-    def cap_height(self) -> float:
+    def cap_height(self) -> t.Optional[int]:
         """
         Returns the sCapHeight value of the ``OS/2`` table.
         """
-        return self.table.sCapHeight
+        if self.table.version < 2:
+            return None
+        return otRound(self.table.sCapHeight)
 
     @cap_height.setter
-    def cap_height(self, value: float) -> None:
+    def cap_height(self, value: int) -> None:
         """
         Sets the sCapHeight value of the ``OS/2`` table.
         """
+        if self.table.version < 2:
+            raise InvalidOS2VersionError(
+                "sCapHeight is only defined in OS/2 table versions 2 and up."
+            )
         self.table.sCapHeight = value
 
     @property
@@ -412,8 +427,8 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         self.table.usWinDescent = value
 
-    def recalc_avg_char_width(self) -> None:
+    def recalc_avg_char_width(self) -> int:
         """
         Recalculates the xAvgCharWidth value of the ``OS/2`` table.
         """
-        self.table.recalcAvgCharWidth(ttFont=self.font)
+        return self.table.recalcAvgCharWidth(ttFont=self.font)
