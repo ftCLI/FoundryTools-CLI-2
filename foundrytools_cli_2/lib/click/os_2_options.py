@@ -21,7 +21,7 @@ def weight_class() -> t.Callable:
             type=click.IntRange(1, 1000),
             help="""
             The new usWeightClass value.
-            
+
             Indicates the visual weight (degree of blackness or thickness of strokes) of the
             characters in the font. Values from 1 to 1000 are valid.
             """,
@@ -43,7 +43,7 @@ def width_class() -> t.Callable:
             type=click.IntRange(1, 9),
             help="""
             The new usWidthClass value.
-            
+
             Indicates a relative change from the normal aspect ratio (width to height ratio) as
             specified by a font designer for the glyphs in a font.
             """,
@@ -65,7 +65,7 @@ def typo_ascender() -> t.Callable:
             type=click.INT,
             help="""
             The new sTypoAscender value.
-            
+
             The typographic ascender of the font. This field should be combined with the
             sTypoDescender and sTypoLineGap values to determine default line spacing.
             """,
@@ -87,7 +87,7 @@ def typo_descender() -> t.Callable:
             type=click.INT,
             help="""
             The new sTypoDescender value.
-            
+
             The typographic descender of the font. This field should be combined with the
             sTypoAscender and sTypoLineGap values to determine default line spacing.
             """,
@@ -109,7 +109,7 @@ def typo_line_gap() -> t.Callable:
             type=click.INT,
             help="""
             The new sTypoLineGap value.
-            
+
             The typographic line gap of the font. This field should be combined with the
             sTypoAscender and sTypoDescender values to determine default line spacing.
             """,
@@ -131,7 +131,7 @@ def win_ascent() -> t.Callable:
             type=click.INT,
             help="""
             The new usWinAscent value.
-            
+
             The “Windows ascender” metric. This should be used to specify the height above the
             baseline for a clipping region.
             """,
@@ -153,7 +153,7 @@ def win_descent() -> t.Callable:
             type=click.INT,
             help="""
             The new usWinDescent value.
-            
+
             The “Windows descender” metric. This should be used to specify the depth below the
             baseline for a clipping region.
             """,
@@ -241,7 +241,7 @@ def italic() -> t.Callable:
             is_flag=True,
             help="""
             Sets or clears the OS/2.fsSelection bit 0 (ITALIC).
-            
+
             The bit 1 of the macStyle field in the 'head' table will be set to the same value as
             bit 0 in the fsSelection field of the 'OS/2' table.
             """,
@@ -265,7 +265,7 @@ def bold() -> t.Callable:
             is_flag=True,
             help="""
             Sets or clears the OS/2.fsSelection bit 5 (BOLD).
-            
+
             The bit 0 of the macStyle field in the 'head' table will be set to the same value as
             bit 5 in the fsSelection field of the 'OS/2' table.
             """,
@@ -289,7 +289,7 @@ def regular() -> t.Callable:
             is_flag=True,
             help="""
             Sets or clears the OS/2.fsSelection bit 6 (REGULAR).
-            
+
             If bit 6 is set, then OS/2.fsSelection bits 0 and 5 will be cleared, as well as the
             macStyle bits 0 and 1 in the 'head' table.
             """,
@@ -313,10 +313,10 @@ def use_typo_metrics() -> t.Callable:
             is_flag=True,
             help="""
             Sets or clears the OS/2.fsSelection bit 7 (USE_TYPO_METRICS).
-            
-            If set, it is strongly recommended that applications use OS/2.sTypoAscender - 
+
+            If set, it is strongly recommended that applications use OS/2.sTypoAscender -
             OS/2.sTypoDescender + OS/2.sTypoLineGap as the default line spacing for this font.
-            
+
             Bit 7 was defined in version 4 of the OS/2 table.
             """,
         )
@@ -339,11 +339,11 @@ def wws_consistent() -> t.Callable:
             is_flag=True,
             help="""
             Sets or clears the OS/2.fsSelection bit 8 (WWS_CONSISTENT).
-            
+
             If bit 8 is set, then 'name' table strings for family and subfamily are provided that
             are consistent with a weight/width/slope family model without requiring the use of name
             IDs 21 or 22.
-            
+
             Bit 8 was defined in version 4 of the OS/2 table.
             """,
         )
@@ -366,17 +366,17 @@ def oblique() -> t.Callable:
             is_flag=True,
             help="""
             Sets or clears the OS/2.fsSelection bit 9 (OBLIQUE).
-            
+
             If bit 9 is set, then this font is to be considered an “oblique” style by processes
             which make a distinction between oblique and italic styles, such as Cascading Style
             Sheets font matching. For example, a font created by algorithmically slanting an upright
             face will set this bit.
-            
+
             This bit, unlike the ITALIC bit (bit 0), is not related to style-linking in applications
             that assume a four-member font-family model comprised of regular, italic, bold and bold
             italic. It may be set or unset independently of the ITALIC bit. In most cases, if
             OBLIQUE is set, then ITALIC will also be set, though this is not required.
-            
+
             Bit 9 was defined in version 4 of the OS/2 table.
             """,
         )
@@ -406,15 +406,15 @@ def embed_level() -> t.Callable:
             acquires the identical rights, obligations and licenses for that font as the original
             purchaser of the font, and is subject to the same end-user license agreement, copyright,
             design patent, and/or trademark as was the original purchaser.
-            
+
             2: Restricted License embedding: the font must not be modified, embedded or exchanged in
             any manner without first obtaining explicit permission of the legal owner.
-            
+
             4: Preview & Print embedding: the font may be embedded, and may be temporarily loaded on
             other systems for purposes of viewing or printing the document. Documents containing
             Preview & Print fonts must be opened “read-only”; no edits can be applied to the
             document.
-            
+
             8: Editable embedding: the font may be embedded, and may be temporarily loaded on other
             systems. As with Preview & Print embedding, documents containing Editable fonts may be
             opened for reading. In addition, editing is permitted, including ability to format new
