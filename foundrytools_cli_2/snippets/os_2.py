@@ -1,7 +1,8 @@
 import typing as t
 
+from foundrytools_cli_2.lib import logger
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font.tables import OS2Table
+from foundrytools_cli_2.lib.font.tables import InvalidOS2VersionError, OS2Table
 
 
 def recalc_cap_height(font: Font) -> None:
@@ -36,69 +37,58 @@ def recalc_x_height(font: Font) -> None:
     font.modified = os_2_table.modified
 
 
-def set_weight_class(font: Font, weight_class: int) -> None:
-    """
-    Sets the usWeightClass value of the OS/2 table of the given font.
-
-    Parameters:
-        font (Font): The Font object representing the font file.
-        weight_class (int): The new usWeightClass value.
-
-    Returns:
-        None
-    """
-    os_2_table = OS2Table(font.ttfont)
-    os_2_table.weight_class = weight_class
-    font.modified = os_2_table.modified
-
-
-def set_width_class(font: Font, width_class: int) -> None:
-    """
-    Sets the usWidthClass value of the OS/2 table of the given font.
-
-    Parameters:
-        font (Font): The Font object representing the font file.
-        width_class (int): The new usWidthClass value.
-
-    Returns:
-        None
-    """
-    os_2_table = OS2Table(font.ttfont)
-    os_2_table.width_class = width_class
-    font.modified = os_2_table.modified
-
-
-def set_fs_type(
+def set_attrs(
     font: Font,
-    embed_level: t.Optional[int] = None,
-    no_subsetting: t.Optional[bool] = None,
-    bitmap_embed_only: t.Optional[bool] = None,
+    avg_char_width: t.Optional[int] = None,
+    weight_class: t.Optional[int] = None,
+    width_class: t.Optional[int] = None,
+    x_height: t.Optional[int] = None,
+    cap_height: t.Optional[int] = None,
+    typo_ascender: t.Optional[int] = None,
+    typo_descender: t.Optional[int] = None,
+    typo_line_gap: t.Optional[int] = None,
+    win_ascent: t.Optional[int] = None,
+    win_descent: t.Optional[int] = None,
 ) -> None:
     """
-    Sets the font's OS/2 table properties related to font embedding.
+    Sets the font's OS/2 table properties based on the provided parameters.
 
-    :param font: The `Font` object to modify.
-    :param embed_level: (Optional) The embed level to set in the OS/2 table. If not provided,
-        the embed level will not be modified.
-    :param no_subsetting: (Optional) Whether subsetting is allowed in the font. If not provided,
-        the subsetting property will not be modified.
-    :param bitmap_embed_only: (Optional) Whether only bitmap embedding is allowed in the font. If
-        not provided, the bitmap embedding property will not be modified.
-    :return: None
+    Parameters:
+        font: The Font object representing The font to modify.
+        avg_char_width (optional): The xAvgCharWidth value to set.
+        weight_class (optional): The usWeightClass value to set.
+        width_class (optional): The usWidthClass value to set.
+        x_height (optional): The sXHeight value to set.
+        cap_height (optional): The sCapHeight value to set.
+        typo_ascender (optional): The sTypoAscender value to set.
+        typo_descender (optional): The sTypoDescender value to set.
+        typo_line_gap (optional): The sTypoLineGap value to set.
+        win_ascent (optional): The usWinAscent value to set.
+        win_descent (optional): The usWinDescent value to set.
     """
     os_2_table = OS2Table(font.ttfont)
     attrs = {
-        "embed_level": embed_level,
-        "no_subsetting": no_subsetting,
-        "bitmap_embed_only": bitmap_embed_only,
+        "avg_char_width": avg_char_width,
+        "weight_class": weight_class,
+        "width_class": width_class,
+        "x_height": x_height,
+        "cap_height": cap_height,
+        "typo_ascender": typo_ascender,
+        "typo_descender": typo_descender,
+        "typo_line_gap": typo_line_gap,
+        "win_ascent": win_ascent,
+        "win_descent": win_descent,
     }
     for attr, value in attrs.items():
         if value is not None:
-            setattr(os_2_table, attr, value)
+            try:
+                setattr(os_2_table, attr, value)
+            except (ValueError, InvalidOS2VersionError) as e:
+                logger.error(f"Error setting {attr} to {value}: {e}")
     font.modified = os_2_table.modified
 
 
-def set_fs_selection(
+def set_flags(
     font: Font,
     italic: t.Optional[bool] = None,
     bold: t.Optional[bool] = None,
@@ -141,3 +131,31 @@ def set_fs_selection(
     if oblique is not None:
         os_2_table.is_oblique = oblique
     font.modified = os_2_table.modified or font.modified
+
+
+def set_permissions(
+    font: Font,
+    embed_level: t.Optional[int] = None,
+    no_subsetting: t.Optional[bool] = None,
+    bitmap_embed_only: t.Optional[bool] = None,
+) -> None:
+    """
+    Sets the font's OS/2 table properties related to font embedding and subsetting.
+
+    Parameters:
+        font: The Font object representing the font to modify.
+        embed_level (optional): The embedding level to set. It can be 0, 2, or 4.
+        no_subsetting (optional): A boolean value indicating whether the font can be subsetted.
+        bitmap_embed_only (optional): A boolean value indicating whether only bitmaps should be
+            embedded.
+    """
+    os_2_table = OS2Table(font.ttfont)
+    attrs = {
+        "embed_level": embed_level,
+        "no_subsetting": no_subsetting,
+        "bitmap_embed_only": bitmap_embed_only,
+    }
+    for attr, value in attrs.items():
+        if value is not None:
+            setattr(os_2_table, attr, value)
+    font.modified = os_2_table.modified
