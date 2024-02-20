@@ -53,6 +53,22 @@ def recalc_x_height(font: Font) -> None:
     font.modified = os_2_table.modified
 
 
+def recalc_max_context(font: Font) -> None:
+    """
+    Recalculates the ``OS/2.usMaxContext`` value.
+
+    Parameters:
+        font (Font): The Font object representing the font file.
+
+    Returns:
+        None
+    """
+    os_2_table = OS2Table(font.ttfont)
+    max_context = os_2_table.recalc_max_context()
+    os_2_table.max_context = max_context
+    font.modified = os_2_table.modified
+
+
 def set_attrs(
     font: Font,
     weight_class: t.Optional[int] = None,

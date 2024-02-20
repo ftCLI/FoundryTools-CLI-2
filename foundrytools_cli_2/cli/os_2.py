@@ -51,6 +51,18 @@ def recalc_cap_height(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
+@cli.command("recalc-max-context")
+@common_options()
+def recalc_max_context(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Recalculates the usMaxContext value of the OS/2 table.
+    """
+    from foundrytools_cli_2.snippets.os_2 import recalc_max_context as main
+
+    runner = FontRunner(input_path=input_path, task=main, **options)
+    runner.run()
+
+
 @cli.command("set-attrs")
 @set_attrs_options()
 @common_options()
