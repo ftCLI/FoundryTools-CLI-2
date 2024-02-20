@@ -4,6 +4,7 @@ from pathlib import Path
 
 from dehinter.font import dehint
 from fontTools.misc.cliTools import makeOutputFileName
+from fontTools.misc.roundTools import otRound
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
@@ -450,17 +451,17 @@ class Font:  # pylint: disable=too-many-public-methods
 
         return bounds
 
-    def recalc_x_height(self) -> float:
+    def recalc_x_height(self) -> int:
         """
         Recalculate the x-height of the font.
         """
-        return self.get_glyph_bounds("x")["yMax"]
+        return otRound(self.get_glyph_bounds("x")["yMax"])
 
-    def recalc_cap_height(self) -> float:
+    def recalc_cap_height(self) -> int:
         """
         Recalculate the cap height of the font.
         """
-        return self.get_glyph_bounds("H")["yMax"]
+        return otRound(self.get_glyph_bounds("H")["yMax"])
 
     def to_woff(self) -> None:
         """
