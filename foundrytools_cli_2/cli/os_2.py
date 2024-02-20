@@ -19,7 +19,7 @@ cli = click.Group(help="Utilities for editing the OS/2 table.", chain=True)
 @common_options()
 def recalc_avg_char_width(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Recalculate the avgCharWidth value of the OS/2 table of the given font files.
+    Recalculates the xAvgCharWidth value of the OS/2 table.
     """
     from foundrytools_cli_2.snippets.os_2 import recalc_avg_char_width as main
 
@@ -31,7 +31,7 @@ def recalc_avg_char_width(input_path: Path, **options: t.Dict[str, t.Any]) -> No
 @common_options()
 def recalc_x_height(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Recalculate the xHeight value of the OS/2 table of the given font files.
+    Recalculates the sxHeight value of the OS/2 table.
     """
     from foundrytools_cli_2.snippets.os_2 import recalc_x_height as main
 
@@ -43,9 +43,21 @@ def recalc_x_height(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @common_options()
 def recalc_cap_height(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Recalculate the capHeight value of the OS/2 table of the given font files.
+    Recalculates the sCapHeight value of the OS/2 table.
     """
     from foundrytools_cli_2.snippets.os_2 import recalc_cap_height as main
+
+    runner = FontRunner(input_path=input_path, task=main, **options)
+    runner.run()
+
+
+@cli.command("recalc-max-context")
+@common_options()
+def recalc_max_context(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Recalculates the usMaxContext value of the OS/2 table.
+    """
+    from foundrytools_cli_2.snippets.os_2 import recalc_max_context as main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.run()
@@ -56,7 +68,7 @@ def recalc_cap_height(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @common_options()
 def set_attrs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Set the attributes of the OS/2 table of the given font files.
+    Sets miscellaneous attributes of the OS/2 table.
     """
     from foundrytools_cli_2.snippets.os_2 import set_attrs as main
 
@@ -69,7 +81,7 @@ def set_attrs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @common_options()
 def set_fs_selection(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Set the flags of the OS/2 table of the given font files.
+    Sets flags in the fsSelection field of the OS/2 table.
     """
     from foundrytools_cli_2.snippets.os_2 import set_fs_selection as main
 
@@ -82,7 +94,7 @@ def set_fs_selection(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @common_options()
 def set_fs_type(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Set font embedding licensing rights for the font.
+    Set font embedding licensing rights for the font, defined in the fsType field of the OS/2 table.
     """
     from foundrytools_cli_2.snippets.os_2 import set_fs_type as main
 

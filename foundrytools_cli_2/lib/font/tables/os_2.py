@@ -1,7 +1,7 @@
 import typing as t
 
-from fontTools.misc.roundTools import otRound
 from fontTools.misc.textTools import num2binary
+from fontTools.otlLib.maxContextCalc import maxCtxFont
 from fontTools.ttLib import TTFont
 
 from foundrytools_cli_2.lib.constants import (
@@ -13,6 +13,7 @@ from foundrytools_cli_2.lib.constants import (
 )
 from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
 from foundrytools_cli_2.lib.utils.bits_tools import is_nth_bit_set
+from foundrytools_cli_2.lib.utils.string_tools import adjust_string_length
 
 
 class InvalidOS2VersionError(Exception):
@@ -315,47 +316,25 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the bit 9 (OBLIQUE) of the ``OS/2.fsSelection`` field.
         """
+        if self.table.version < 4:
+            raise InvalidOS2VersionError(
+                "fsSelection bit 9 (OBLIQUE) is only defined in OS/2 table versions 4 and up."
+            )
         self.set_bit(field_name="fsSelection", pos=9, value=value)
 
     @property
-    def x_height(self) -> t.Optional[int]:
+    def vendor_id(self) -> str:
         """
-        Returns the sxHeight value of the ``OS/2`` table.
+        Returns the ``OS/2.achVendID`` value.
         """
-        if self.table.version < 2:
-            return None
-        return otRound(self.table.sxHeight)
+        return self.table.achVendID
 
-    @x_height.setter
-    def x_height(self, value: int) -> None:
+    @vendor_id.setter
+    def vendor_id(self, value: str) -> None:
         """
-        Sets the sxHeight value of the ``OS/2`` table.
+        Sets the ``OS/2.achVendID`` value.
         """
-        if self.table.version < 2:
-            raise InvalidOS2VersionError(
-                "sxHeight is only defined in OS/2 table versions 2 and up."
-            )
-        self.table.sxHeight = value
-
-    @property
-    def cap_height(self) -> t.Optional[int]:
-        """
-        Returns the sCapHeight value of the ``OS/2`` table.
-        """
-        if self.table.version < 2:
-            return None
-        return otRound(self.table.sCapHeight)
-
-    @cap_height.setter
-    def cap_height(self, value: int) -> None:
-        """
-        Sets the sCapHeight value of the ``OS/2`` table.
-        """
-        if self.table.version < 2:
-            raise InvalidOS2VersionError(
-                "sCapHeight is only defined in OS/2 table versions 2 and up."
-            )
-        self.table.sCapHeight = value
+        self.table.achVendID = adjust_string_length(value, length=4, pad_char=" ")
 
     @property
     def typo_ascender(self) -> int:
@@ -427,8 +406,74 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         self.table.usWinDescent = value
 
+    @property
+    def x_height(self) -> t.Optional[int]:
+        """
+        Returns the sxHeight value of the ``OS/2`` table.
+        """
+        if self.table.version < 2:
+            return None
+        return self.table.sxHeight
+
+    @x_height.setter
+    def x_height(self, value: int) -> None:
+        """
+        Sets the sxHeight value of the ``OS/2`` table.
+        """
+        if self.table.version < 2:
+            raise InvalidOS2VersionError(
+                "sxHeight is only defined in OS/2 table versions 2 and up."
+            )
+        self.table.sxHeight = value
+
+    @property
+    def cap_height(self) -> t.Optional[int]:
+        """
+        Returns the sCapHeight value of the ``OS/2`` table.
+        """
+        if self.table.version < 2:
+            return None
+        return self.table.sCapHeight
+
+    @cap_height.setter
+    def cap_height(self, value: int) -> None:
+        """
+        Sets the sCapHeight value of the ``OS/2`` table.
+        """
+        if self.table.version < 2:
+            raise InvalidOS2VersionError(
+                "sCapHeight is only defined in OS/2 table versions 2 and up."
+            )
+        self.table.sCapHeight = value
+
+    @property
+    def max_context(self) -> t.Optional[int]:
+        """
+        Returns the maximum profile's maxContext value.
+        """
+        if self.table.version < 2:
+            return None
+        return self.table.usMaxContext
+
+    @max_context.setter
+    def max_context(self, value: int) -> None:
+        """
+        Sets the maximum profile's maxContext value.
+        """
+        if self.table.version < 2:
+            raise InvalidOS2VersionError(
+                "usMaxContext is only defined in OS/2 table versions 2 and up."
+            )
+        self.table.usMaxContext = value
+
     def recalc_avg_char_width(self) -> int:
         """
         Recalculates the xAvgCharWidth value of the ``OS/2`` table.
         """
         return self.table.recalcAvgCharWidth(ttFont=self.font)
+
+    def recalc_max_context(self) -> int:
+        """
+        Recalculates the maxContext value of the ``OS/2`` table.
+        """
+        return maxCtxFont(self.font)
