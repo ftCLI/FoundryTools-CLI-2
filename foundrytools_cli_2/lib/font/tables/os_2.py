@@ -315,6 +315,10 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the bit 9 (OBLIQUE) of the ``OS/2.fsSelection`` field.
         """
+        if self.table.version < 4:
+            raise InvalidOS2VersionError(
+                "fsSelection bit 9 (OBLIQUE) is only defined in OS/2 table versions 4 and up."
+            )
         self.set_bit(field_name="fsSelection", pos=9, value=value)
 
     @property
