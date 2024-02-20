@@ -457,7 +457,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         return self.table.recalcAvgCharWidth(ttFont=self.font)
 
-    def recalc_max_context(self):
+    def recalc_max_context(self) -> int:
         """
         Recalculates the maxContext value of the ``OS/2`` table.
         """
