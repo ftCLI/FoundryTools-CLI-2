@@ -89,6 +89,7 @@ def set_attrs(
         font: The Font object representing The font to modify.
         weight_class (optional): The usWeightClass value to set.
         width_class (optional): The usWidthClass value to set.
+        vendor_id (optional): The achVendID value to set.
         x_height (optional): The sXHeight value to set.
         cap_height (optional): The sCapHeight value to set.
         typo_ascender (optional): The sTypoAscender value to set.

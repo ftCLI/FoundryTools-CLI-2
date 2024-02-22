@@ -39,7 +39,7 @@ def unset_nth_bit(x: int, n: int) -> int:
     return x & ~(1 << n)
 
 
-def update_bit(num: int, value: bool, pos: int) -> int:
+def update_bit(num: int, pos: int, value: bool) -> int:
     """
     Handle a bitwise operation on an integer.
 
