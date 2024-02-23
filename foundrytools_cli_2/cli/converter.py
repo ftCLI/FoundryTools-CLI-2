@@ -9,6 +9,7 @@ from foundrytools_cli_2.lib.click.options import (
     common_options,
     in_format_choice,
     out_format_choice,
+    reorder_tables_flag,
     subroutinize_flag,
     target_upm_option,
     tolerance_option,
@@ -63,6 +64,7 @@ def ttf_to_otf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 @cli.command("wf2ft")
 @in_format_choice()
+@reorder_tables_flag()
 @common_options()
 def web_to_sfnt(
     input_path: Path,
@@ -83,6 +85,7 @@ def web_to_sfnt(
 
 @cli.command("ft2wf")
 @out_format_choice()
+@reorder_tables_flag()
 @common_options()
 def sfnt_to_web(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
