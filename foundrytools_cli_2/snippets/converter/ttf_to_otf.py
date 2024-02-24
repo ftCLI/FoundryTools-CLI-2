@@ -40,7 +40,6 @@ def ttf2otf(
     out_file = font.make_out_file_name(
         output_dir=output_dir, overwrite=overwrite, extension=extension, suffix=suffix
     )
-    logger.warning(out_file)
 
     logger.info("Decomponentizing source font...")
     font.tt_decomponentize()
