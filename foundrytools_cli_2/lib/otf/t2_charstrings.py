@@ -34,13 +34,13 @@ def quadratics_to_cubics(font: TTFont, tolerance: float = 1.0) -> t.Dict:
         failed, charstrings = get_qu2cu_charstrings(font, tolerance=tolerance)
 
         if len(failed) > 0:
-            logger.debug(f"Retrying to get {len(failed)} charstrings...")
+            logger.info(f"Retrying to get {len(failed)} charstrings...")
             fallback_charstrings = get_fallback_charstrings(font, tolerance=tolerance)
 
             for c in failed:
                 try:
                     charstrings[c] = fallback_charstrings[c]
-                    logger.debug(f"Successfully got charstring for {c}")
+                    logger.info(f"Successfully got charstring for {c}")
                 except Exception as e:  # pylint: disable=broad-except
                     logger.error(f"Failed to get charstring for {c}: {e}")
 
