@@ -22,8 +22,25 @@ def ttf2otf(
 ) -> None:
     """
     Convert PostScript flavored fonts to TrueType flavored fonts.
+
+    Args:
+        font: The font to convert.
+        tolerance: The tolerance to use when converting to OTF.
+        target_upm: The UPM to scale the font to.
+        subroutinize: Whether to subroutinize the font.
+        output_dir: The directory to save the font to.
+        recalc_timestamp: Whether to recalculate the font's timestamp.
+        overwrite: Whether to overwrite the existing file.
     """
-    out_file = font.make_out_file_name(extension=".otf", output_dir=output_dir, overwrite=overwrite)
+
+    flavor = font.ttfont.flavor
+    font.ttfont.flavor = None
+    suffix = ".otf" if flavor is not None else ""
+    extension = ".otf" if flavor is None else f".{flavor}"
+    out_file = font.make_out_file_name(
+        output_dir=output_dir, overwrite=overwrite, extension=extension, suffix=suffix
+    )
+    logger.warning(out_file)
 
     logger.info("Decomponentizing source font...")
     font.tt_decomponentize()
@@ -31,8 +48,6 @@ def ttf2otf(
     if target_upm:
         logger.info(f"Scaling UPM to {target_upm}...")
         font.tt_scale_upem(new_upem=target_upm)
-
-    logger.info("Getting charstrings...")
 
     logger.info("Converting to OTF...")
     font.to_otf(tolerance=tolerance)
@@ -43,16 +58,17 @@ def ttf2otf(
     logger.info("Correcting contours...")
     font.ps_correct_contours()
 
-    logger.info("Getting hinting values...")
-    zones = otf.ps_recalc_zones()
-    stems = otf.ps_recalc_stems()
-    otf.ps_set_zones(zones[0], zones[1])
-    otf.ps_set_stems(stems[0], stems[1])
+    # logger.info("Getting hinting values...")
+    # zones = otf.ps_recalc_zones()
+    # stems = otf.ps_recalc_stems()
+    # otf.ps_set_zones(zones[0], zones[1])
+    # otf.ps_set_stems(stems[0], stems[1])
 
     if subroutinize:
         logger.info("Subroutinizing...")
         otf.ps_subroutinize()
 
+    otf.ttfont.flavor = flavor
     otf.save(out_file, reorder_tables=True)
     logger.success(f"File saved to {out_file}")
 
