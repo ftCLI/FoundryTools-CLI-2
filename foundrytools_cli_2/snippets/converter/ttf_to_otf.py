@@ -40,7 +40,6 @@ def ttf2otf(
     out_file = font.make_out_file_name(
         output_dir=output_dir, overwrite=overwrite, extension=extension, suffix=suffix
     )
-    logger.warning(out_file)
 
     logger.info("Decomponentizing source font...")
     font.tt_decomponentize()
@@ -56,13 +55,7 @@ def ttf2otf(
     otf = Font(out_file, recalc_timestamp=recalc_timestamp)
 
     logger.info("Correcting contours...")
-    font.ps_correct_contours()
-
-    # logger.info("Getting hinting values...")
-    # zones = otf.ps_recalc_zones()
-    # stems = otf.ps_recalc_stems()
-    # otf.ps_set_zones(zones[0], zones[1])
-    # otf.ps_set_stems(stems[0], stems[1])
+    otf.ps_correct_contours()
 
     if subroutinize:
         logger.info("Subroutinizing...")
@@ -111,13 +104,6 @@ def ttf2otf_with_tx(
     font = Font(out_file, recalc_timestamp=recalc_timestamp)
     font.ps_correct_contours()
     font.save(out_file, reorder_tables=None)
-
-    logger.info("Getting hinting values...")
-    zones = font.ps_recalc_zones()
-    stems = font.ps_recalc_stems()
-    font.ps_set_zones(zones[0], zones[1])
-    font.ps_set_stems(stems[0], stems[1])
-    font.save(out_file, reorder_tables=True)
 
     if subroutinize:
         logger.info("Subroutinizing...")
