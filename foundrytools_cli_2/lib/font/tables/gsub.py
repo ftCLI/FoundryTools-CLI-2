@@ -4,25 +4,11 @@ from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
 
 
 class GsubTable(DefaultTbl):  # pylint: disable=too-few-public-methods
-    def __init__(self, ttfont: TTFont):
+    """
+    This class extends the fontTools `GSUB` table to add some useful methods.
+    """
+    def __init__(self, ttfont: TTFont) -> None:
         super().__init__(ttfont, "GSUB")
-
-    @property
-    def features_list(self):
-        """
-        Get the list of GSUB features.
-        """
-        if hasattr(self.table, "FeatureList"):
-            return [feature_record.FeatureTag for feature_record in self.table.FeatureList.FeatureRecord]
-        return []
-
-    @features_list.setter
-    def features_list(self, value):
-        """
-        Set the list of GSUB features.
-        """
-        if hasattr(self.table, "FeatureList"):
-            self.table.FeatureList.FeatureRecord = value
 
     def rename_feature(self, feature_tag: str, new_feature_tag: str) -> None:
         """
