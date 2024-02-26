@@ -32,6 +32,7 @@ def otf_to_ttf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     from foundrytools_cli_2.snippets.converter.otf_to_ttf import main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
+    runner.auto_save = False
     runner.filter.filter_out_tt = True
     runner.filter.filter_out_variable = True
     runner.run()

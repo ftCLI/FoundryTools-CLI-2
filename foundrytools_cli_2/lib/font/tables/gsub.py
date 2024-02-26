@@ -7,6 +7,7 @@ class GsubTable(DefaultTbl):  # pylint: disable=too-few-public-methods
     """
     This class extends the fontTools `GSUB` table to add some useful methods.
     """
+
     def __init__(self, ttfont: TTFont) -> None:
         super().__init__(ttfont, "GSUB")
 

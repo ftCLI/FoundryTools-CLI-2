@@ -6,9 +6,24 @@ from afdko.fdkutils import run_shell_command
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
-from foundrytools_cli_2.lib.otf.t2_charstrings import (
-    get_t2_charstrings,
-)
+from foundrytools_cli_2.lib.otf.t2_charstrings import get_t2_charstrings
+
+
+def _build_out_file_name(font: Font, output_dir: t.Optional[Path], overwrite: bool = True) -> Path:
+    """
+    When converting a TrueType flavored web font to PS flavored web font, we need to add a suffix to
+    the output file name to avoid overwriting the input file. This function builds the output file
+    name.
+
+    A file named "font.ttf" will be converted to "font.otf", while a file named
+    "font.woff" will be converted to "font.otf.woff".
+    """
+    flavor = font.ttfont.flavor
+    suffix = ".otf" if flavor is not None else ""
+    extension = ".otf" if flavor is None else f".{flavor}"
+    return font.make_out_file_name(
+        output_dir=output_dir, overwrite=overwrite, extension=extension, suffix=suffix
+    )
 
 
 def ttf2otf(
@@ -32,14 +47,10 @@ def ttf2otf(
         recalc_timestamp: Whether to recalculate the font's timestamp.
         overwrite: Whether to overwrite the existing file.
     """
+    out_file = _build_out_file_name(font=font, output_dir=output_dir, overwrite=overwrite)
 
     flavor = font.ttfont.flavor
     font.ttfont.flavor = None
-    suffix = ".otf" if flavor is not None else ""
-    extension = ".otf" if flavor is None else f".{flavor}"
-    out_file = font.make_out_file_name(
-        output_dir=output_dir, overwrite=overwrite, extension=extension, suffix=suffix
-    )
 
     logger.info("Decomponentizing source font...")
     font.tt_decomponentize()
@@ -77,9 +88,14 @@ def ttf2otf_with_tx(
     """
     Convert PostScript flavored fonts to TrueType flavored fonts using tx.
     """
-
-    out_file = font.make_out_file_name(extension=".otf", output_dir=output_dir, overwrite=overwrite)
+    out_file = _build_out_file_name(font=font, output_dir=output_dir, overwrite=overwrite)
     cff_file = font.make_out_file_name(extension=".cff", output_dir=output_dir, overwrite=overwrite)
+
+    flavor = font.ttfont.flavor
+    if flavor is not None:
+        font.ttfont.flavor = None
+        font.save(out_file, reorder_tables=None)
+        font = Font(out_file, recalc_timestamp=recalc_timestamp)
 
     if target_upm:
         logger.info(f"Scaling UPM to {target_upm}...")
@@ -103,14 +119,13 @@ def ttf2otf_with_tx(
     logger.info("Correcting contours...")
     font = Font(out_file, recalc_timestamp=recalc_timestamp)
     font.ps_correct_contours()
-    font.save(out_file, reorder_tables=None)
 
     if subroutinize:
         logger.info("Subroutinizing...")
-        tx_command = ["tx", "-cff", "+S", "+V", "+b", str(out_file), str(cff_file)]
-        run_shell_command(tx_command, suppress_output=True)
-        run_shell_command(sfntedit_command)
+        font.ps_subroutinize()
 
+    font.ttfont.flavor = flavor
+
+    font.save(out_file, reorder_tables=None)
     cff_file.unlink(missing_ok=True)
-
     logger.success(f"File saved to {out_file}")
