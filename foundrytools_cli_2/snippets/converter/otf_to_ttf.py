@@ -22,7 +22,7 @@ def main(
         output_dir=output_dir, overwrite=overwrite, extension=extension, suffix=suffix
     )
 
-    logger.info("Convert to TTF...")
+    logger.info("Converting to TTF...")
     font.to_ttf(max_err=tolerance, reverse_direction=True)
 
     if target_upm:
