@@ -9,7 +9,7 @@ from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.otf.t2_charstrings import get_t2_charstrings
 
 
-def _build_out_file_name(font: Font, output_dir: t.Optional[Path], overwrite: bool) -> Path:
+def _build_out_file_name(font: Font, output_dir: t.Optional[Path], overwrite: bool = True) -> Path:
     """
     When converting a TrueType flavored web font to PS flavored web font, we need to add a suffix to
     the output file name to avoid overwriting the input file. This function builds the output file
