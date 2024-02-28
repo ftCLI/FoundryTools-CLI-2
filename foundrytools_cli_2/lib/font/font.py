@@ -26,7 +26,6 @@ from foundrytools_cli_2.lib.constants import (
 from foundrytools_cli_2.lib.font.tables import HeadTable, OS2Table
 from foundrytools_cli_2.lib.otf.afdko_tools import cff_desubr, cff_subr
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
-from foundrytools_cli_2.lib.otf.stems import recalc_stems
 from foundrytools_cli_2.lib.otf.t2_charstrings import fix_charstrings, quadratics_to_cubics
 from foundrytools_cli_2.lib.ttf.decomponentize import decomponentize
 from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
@@ -577,55 +576,6 @@ class Font:  # pylint: disable=too-many-public-methods
         build_otf(font=self.ttfont, charstrings_dict=charstrings)
 
         return modified_glyphs
-
-    def ps_recalc_stems(self) -> t.Tuple[int, int]:
-        """
-        Returns a tuple containing two integer values representing the hinting (StdHW and StdVW)
-        stems for the font.
-
-        Returns:
-            (tuple[int, int]): A tuple containing two integer values representing the hinting stems
-                for the font.
-        """
-        if not self.file:
-            raise NotImplementedError("Stem hints can only be extracted from a font file.")
-
-        if not self.is_ps:
-            raise NotImplementedError(
-                "Recalculation of stems is only supported for PostScript fonts."
-            )
-
-        return recalc_stems(self.file)
-
-    def ps_get_stems(self) -> t.Tuple[int, int]:
-        """
-        Get stems from a font.
-
-        :return: Stems.
-        """
-        if not self.is_ps:
-            raise NotImplementedError("Getting stems is only supported for PostScript fonts.")
-
-        try:
-            return (
-                self.ttfont["CFF "].cff.topDictIndex[0].Private.StdHW,
-                self.ttfont["CFF "].cff.topDictIndex[0].Private.StdVW,
-            )
-        except AttributeError:
-            return 0, 0
-
-    def ps_set_stems(self, std_h_w: int, std_v_w: int) -> None:
-        """
-        Set stems for a font.
-
-        :param std_h_w: StdHW.
-        :param std_v_w: StdVW.
-        """
-        if not self.is_ps:
-            raise NotImplementedError("Setting stems is only supported for PostScript fonts.")
-
-        self.ttfont["CFF "].cff.topDictIndex[0].Private.StdHW = std_h_w
-        self.ttfont["CFF "].cff.topDictIndex[0].Private.StdVW = std_v_w
 
     def ps_subroutinize(self) -> None:
         """
