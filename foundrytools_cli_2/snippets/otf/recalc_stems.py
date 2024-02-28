@@ -22,7 +22,7 @@ def main(font: Font) -> None:
     flavor = font.ttfont.flavor
     temp_file = get_temp_file_path()
     if flavor is not None:
-        font.to_sfnt()
+        font.ttfont.flavor = None
         font.save(temp_file)
         input_file = temp_file
     else:
