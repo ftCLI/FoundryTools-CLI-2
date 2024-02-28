@@ -5,14 +5,15 @@ from afdko.otfautohint.__main__ import ReportOptions, _validate_path, get_stemhi
 from afdko.otfautohint.autohint import FontInstance, fontWrapper, openFont
 from afdko.otfautohint.hinter import glyphHinter
 from afdko.otfautohint.report import Report
+from fontTools.ttLib import TTFont
 
 H_STEM_GLYPHS = ["A", "H", "T", "S", "C", "O"]
 V_STEM_GLYPHS = ["E", "H", "I", "K", "L", "M", "N", "T", "U"]
 
-__all__ = ["get_stems_data", "recalc_stems"]
+__all__ = ["get_current_stems", "recalc_stems", "set_font_stems"]
 
 
-def get_stems_data(
+def get_report(
     file_path: Path, glyph_list: t.List[str]
 ) -> t.Tuple[t.List[t.Tuple[int, int, t.List[str]]], t.List[t.Tuple[int, int, t.List[str]]]]:
     """
@@ -56,6 +57,44 @@ def get_stems_data(
     return h_stems, v_stems
 
 
+def get_current_stems(font: TTFont) -> t.Tuple[t.Optional[int], t.Optional[int]]:
+    """
+    Get the current stem values for a given TTFont object.
+
+    Parameters:
+        font: A `TTFont` object representing the font file.
+
+    Returns:
+        A tuple containing the current stem values for horizontal and vertical stems. The first
+        value in the tuple represents the horizontal stem value, and the second value represents the
+        vertical stem value.
+    """
+    private = font["CFF "].cff.topDictIndex[0].Private
+    try:
+        std_hw = private.StdHW
+    except AttributeError:
+        std_hw = None
+    try:
+        std_vw = private.StdVW
+    except AttributeError:
+        std_vw = None
+    return std_hw, std_vw
+
+
+def set_font_stems(font: TTFont, std_hw: int, std_vw: int) -> None:
+    """
+    Set the stem values for a given TTFont object.
+
+    Parameters:
+        font: A `TTFont` object representing the font file.
+        std_hw: The new value for the horizontal stem.
+        std_vw: The new value for the vertical stem.
+    """
+    private = font["CFF "].cff.topDictIndex[0].Private
+    private.StdHW = std_hw
+    private.StdVW = std_vw
+
+
 def recalc_stems(
     file_path: Path,
     h_stems_glyphs: t.Optional[t.List[str]] = None,
@@ -80,8 +119,8 @@ def recalc_stems(
     if v_stems_glyphs is None:
         v_stems_glyphs = V_STEM_GLYPHS
 
-    h_stems, _ = get_stems_data(file_path=file_path, glyph_list=h_stems_glyphs)
-    _, v_stems = get_stems_data(file_path=file_path, glyph_list=v_stems_glyphs)
+    h_stems, _ = get_report(file_path=file_path, glyph_list=h_stems_glyphs)
+    _, v_stems = get_report(file_path=file_path, glyph_list=v_stems_glyphs)
 
     if not h_stems:
         raise ValueError("No horizontal stems found")
