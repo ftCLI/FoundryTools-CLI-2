@@ -21,7 +21,7 @@ UPPERCASE_GLYPHS = UPPERCASE_LETTERS
 ASCENDER_GLYPHS = list(set(LOWERCASE_ASCENDERS) - {"t"})
 
 
-__all__ = ["recalc_zones", "GlyphBounds"]
+__all__ = ["recalc_zones", "get_current_zones", "set_font_zones"]
 
 
 class GlyphBounds(t.TypedDict):
@@ -202,7 +202,7 @@ def get_current_zones(font: TTFont) -> t.Tuple[t.Optional[t.List[int]], t.Option
     return other_blues, blue_values
 
 
-def set_zones(
+def set_font_zones(
     font: TTFont,
     other_blues: t.Optional[t.List[int]] = None,
     blue_values: t.Optional[t.List[int]] = None,

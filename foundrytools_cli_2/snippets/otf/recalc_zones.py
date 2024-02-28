@@ -1,6 +1,6 @@
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.logger import logger
-from foundrytools_cli_2.lib.otf.zones import get_current_zones, recalc_zones, set_zones
+from foundrytools_cli_2.lib.otf.zones import get_current_zones, recalc_zones, set_font_zones
 
 
 def main(font: Font) -> None:
@@ -28,5 +28,5 @@ def main(font: Font) -> None:
     if current_other_blues == other_blues and current_blue_values == blue_values:
         logger.info("Zones are already up-to-date")
     else:
-        set_zones(font.ttfont, other_blues, blue_values)
+        set_font_zones(font.ttfont, other_blues, blue_values)
         font.modified = True
