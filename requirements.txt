@@ -7,4 +7,4 @@ dehinter==4.0.0
 loguru==0.7.2
 pathvalidate==3.2.0
 psautohint==2.4.1a0
-rich==13.7.0
+rich==13.7.1
