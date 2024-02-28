@@ -9,10 +9,10 @@ from afdko.otfautohint.report import Report
 H_STEM_GLYPHS = ["A", "H", "T", "S", "C", "O"]
 V_STEM_GLYPHS = ["E", "H", "I", "K", "L", "M", "N", "T", "U"]
 
-__all__ = ["get_stems_data", "recalc_stems"]
+__all__ = ["get_report", "recalc_stems"]
 
 
-def get_stems_data(
+def get_report(
     file_path: Path, glyph_list: t.List[str]
 ) -> t.Tuple[t.List[t.Tuple[int, int, t.List[str]]], t.List[t.Tuple[int, int, t.List[str]]]]:
     """
@@ -80,8 +80,8 @@ def recalc_stems(
     if v_stems_glyphs is None:
         v_stems_glyphs = V_STEM_GLYPHS
 
-    h_stems, _ = get_stems_data(file_path=file_path, glyph_list=h_stems_glyphs)
-    _, v_stems = get_stems_data(file_path=file_path, glyph_list=v_stems_glyphs)
+    h_stems, _ = get_report(file_path=file_path, glyph_list=h_stems_glyphs)
+    _, v_stems = get_report(file_path=file_path, glyph_list=v_stems_glyphs)
 
     if not h_stems:
         raise ValueError("No horizontal stems found")
