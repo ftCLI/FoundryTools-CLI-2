@@ -178,6 +178,46 @@ def calculate_zone(
     return get_pair(counter)
 
 
+def get_current_zones(font: TTFont) -> t.Tuple[t.Optional[t.List[int]], t.Optional[t.List[int]]]:
+    """
+    Get the current zones for a given TTFont object.
+
+    Parameters:
+        font (TTFont): The TTFont object.
+
+    Returns:
+        Tuple[List[int], List[int]]: A tuple containing two lists. The first list contains the
+            values for the OtherBlues zones, and the second list contains the values for the
+            BlueValues zones.
+    """
+    private = font["CFF "].cff.topDictIndex[0].Private
+    try:
+        other_blues = private.OtherBlues
+    except AttributeError:
+        other_blues = None
+    try:
+        blue_values = private.BlueValues
+    except AttributeError:
+        blue_values = None
+    return other_blues, blue_values
+
+
+def set_zones(
+    font: TTFont,
+    other_blues: t.Optional[t.List[int]] = None,
+    blue_values: t.Optional[t.List[int]] = None,
+) -> None:
+    """
+    Set the zones for a given TTFont object.
+    """
+
+    private = font["CFF "].cff.topDictIndex[0].Private
+    if other_blues is not None:
+        private.OtherBlues = other_blues
+    if blue_values is not None:
+        private.BlueValues = blue_values
+
+
 def recalc_zones(
     font: TTFont,
     descender_glyphs: t.Optional[t.List[str]] = None,

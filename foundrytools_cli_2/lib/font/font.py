@@ -28,7 +28,6 @@ from foundrytools_cli_2.lib.otf.afdko_tools import cff_desubr, cff_subr
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.otf.stems import recalc_stems
 from foundrytools_cli_2.lib.otf.t2_charstrings import fix_charstrings, quadratics_to_cubics
-from foundrytools_cli_2.lib.otf.zones import recalc_zones
 from foundrytools_cli_2.lib.ttf.decomponentize import decomponentize
 from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
 
@@ -579,17 +578,6 @@ class Font:  # pylint: disable=too-many-public-methods
 
         return modified_glyphs
 
-    def ps_recalc_zones(self) -> t.Tuple[t.List[int], t.List[int]]:
-        """
-        Recalculates vertical alignment zones.
-        """
-        if not self.is_ps:
-            raise NotImplementedError(
-                "Recalculation of zones is only supported for PostScript fonts."
-            )
-
-        return recalc_zones(self.ttfont)
-
     def ps_recalc_stems(self) -> t.Tuple[int, int]:
         """
         Returns a tuple containing two integer values representing the hinting (StdHW and StdVW)
@@ -609,23 +597,6 @@ class Font:  # pylint: disable=too-many-public-methods
 
         return recalc_stems(self.file)
 
-    def ps_get_zones(self) -> t.Tuple[t.List[int], t.List[int]]:
-        """
-        Get zones from a font.
-
-        :return: Zones.
-        """
-        if not self.is_ps:
-            raise NotImplementedError("Getting zones is only supported for PostScript fonts.")
-
-        try:
-            return (
-                self.ttfont["CFF "].cff.topDictIndex[0].Private.OtherBlues,
-                self.ttfont["CFF "].cff.topDictIndex[0].Private.BlueValues,
-            )
-        except AttributeError:
-            return [], []
-
     def ps_get_stems(self) -> t.Tuple[int, int]:
         """
         Get stems from a font.
@@ -642,19 +613,6 @@ class Font:  # pylint: disable=too-many-public-methods
             )
         except AttributeError:
             return 0, 0
-
-    def ps_set_zones(self, other_blues: t.List[int], blue_values: t.List[int]) -> None:
-        """
-        Set zones for a font.
-
-        :param other_blues: Other blues.
-        :param blue_values: Blue values.
-        """
-        if not self.is_ps:
-            raise NotImplementedError("Setting zones is only supported for PostScript fonts.")
-
-        self.ttfont["CFF "].cff.topDictIndex[0].Private.OtherBlues = other_blues
-        self.ttfont["CFF "].cff.topDictIndex[0].Private.BlueValues = blue_values
 
     def ps_set_stems(self, std_h_w: int, std_v_w: int) -> None:
         """
