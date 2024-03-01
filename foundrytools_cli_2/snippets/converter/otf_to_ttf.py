@@ -17,7 +17,7 @@ def main(
     """
     flavor = font.ttfont.flavor
     suffix = ".ttf" if flavor is not None else ""
-    extension = ".ttf" if flavor is None else f".{flavor}"
+    extension = font.get_real_extension()
     out_file = font.make_out_file_name(
         output_dir=output_dir, overwrite=overwrite, extension=extension, suffix=suffix
     )
