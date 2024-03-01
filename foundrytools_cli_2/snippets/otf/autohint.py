@@ -6,8 +6,7 @@ from afdko.otfautohint.autohint import FontInstance, fontWrapper, openFont
 from fontTools.ttLib import TTFont
 
 from foundrytools_cli_2.lib.font import Font
-
-from . import get_file_to_process
+from foundrytools_cli_2.snippets.otf import get_file_to_process
 
 
 def hint_font(
