@@ -21,7 +21,7 @@ def get_file_to_process(
 
     flavor = font.ttfont.flavor
     if flavor is not None:
-        font.to_sfnt()
+        font.ttfont.flavor = None
 
     if in_file != out_file or flavor is not None:
         font.save(out_file)
