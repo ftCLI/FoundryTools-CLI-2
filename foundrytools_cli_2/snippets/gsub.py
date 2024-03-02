@@ -16,7 +16,7 @@ def rename_gsub_feature(font: Font, old_feature_name: str, new_feature_name: str
         None
     """
     if "GSUB" not in font.ttfont:
-        logger.warning("GSUB table not found")
+        logger.error("GSUB table not found")
         return
 
     gsub = GsubTable(font.ttfont)
