@@ -20,7 +20,7 @@ def _build_out_file_name(font: Font, output_dir: t.Optional[Path], overwrite: bo
     """
     flavor = font.ttfont.flavor
     suffix = ".otf" if flavor is not None else ""
-    extension = font.get_real_extension()
+    extension = font.get_real_extension() if flavor is not None else ".otf"
     return font.make_out_file_name(
         output_dir=output_dir, overwrite=overwrite, extension=extension, suffix=suffix
     )
