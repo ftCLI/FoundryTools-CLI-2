@@ -158,7 +158,7 @@ def set_fs_selection(
         value is None
         for value in (italic, bold, regular, use_typo_metrics, wws_consistent, oblique)
     ):
-        logger.warning("No flags provided to set.")
+        logger.error("No flags provided to set.")
         return
 
     os_2_table = OS2Table(font.ttfont)
