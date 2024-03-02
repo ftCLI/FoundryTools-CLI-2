@@ -30,6 +30,11 @@ def set_attrs(
         "underline_thickness": underline_thickness,
         "fixed_pitch": fixed_pitch,
     }
+
+    if all(value is None for value in attrs.values()):
+        logger.error("No parameter provided")
+        return
+
     for attr, value in attrs.items():
         if value is not None:
             old_value = getattr(post_table, attr)
