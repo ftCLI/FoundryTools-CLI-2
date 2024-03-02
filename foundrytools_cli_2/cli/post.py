@@ -25,7 +25,7 @@ from foundrytools_cli_2.lib.font_runner import FontRunner
 @click.option(
     "--ul-thickness",
     "underline_thickness",
-    type=int,
+    type=click.IntRange(min=0),
     help="""Sets the `underlineThickness` value.""",
 )
 @click.option(
