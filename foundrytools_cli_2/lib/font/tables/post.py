@@ -1,6 +1,6 @@
 from fontTools.ttLib import TTFont
 
-from foundrytools_cli_2.lib.font.tables import DefaultTbl
+from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
 
 
 class PostTable(DefaultTbl):
