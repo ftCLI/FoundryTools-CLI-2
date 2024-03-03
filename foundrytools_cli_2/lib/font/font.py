@@ -522,7 +522,6 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         Decomponentize a TrueType font.
         """
-
         if not self.is_tt:
             raise NotImplementedError("Decomponentization is only supported for TrueType fonts.")
 
@@ -533,7 +532,6 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         Remove hints from a TrueType font.
         """
-
         if not self.is_tt:
             raise NotImplementedError("Only TrueType fonts are supported.")
 
@@ -547,11 +545,10 @@ class Font:  # pylint: disable=too-many-public-methods
         Args:
             new_upem (int): The new unitsPerEm value.
         """
-
         if not self.is_tt:
             raise NotImplementedError("Scaling upem is only supported for TrueType fonts.")
 
-        if new_upem not in range(MIN_UPM, MAX_UPM + 1):
+        if new_upem < MIN_UPM or new_upem > MAX_UPM:
             raise ValueError(f"units_per_em must be in the range {MAX_UPM} to {MAX_UPM}.")
 
         if self.ttfont["head"].unitsPerEm == new_upem:
@@ -573,15 +570,20 @@ class Font:  # pylint: disable=too-many-public-methods
             )
 
         charstrings, modified_glyphs = fix_charstrings(font=self.ttfont, min_area=min_area)
+        if not modified_glyphs:
+            return []
         build_otf(font=self.ttfont, charstrings_dict=charstrings)
-
+        self.modified = True
         return modified_glyphs
 
     def ps_subroutinize(self) -> None:
         """
         Subroutinize a PostScript font.
         """
-
+        if not self.is_ps:
+            raise NotImplementedError(
+                "Subroutinization is only supported for PostScript flavored fonts."
+            )
         cff_subr(font=self.ttfont)
         self.modified = True
 
@@ -589,6 +591,9 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         Desubroutinize a PostScript font.
         """
-
+        if not self.is_ps:
+            raise NotImplementedError(
+                "Desubroutinization is only supported for PostScript flavored fonts."
+            )
         cff_desubr(font=self.ttfont)
         self.modified = True
