@@ -4,6 +4,7 @@ from pathlib import Path
 from afdko.fdkutils import run_shell_command
 
 from foundrytools_cli_2.lib.font import Font
+from foundrytools_cli_2.lib.font.tables import OS2Table
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.otf.t2_charstrings import get_t2_charstrings
@@ -67,6 +68,9 @@ def ttf2otf(
 
     logger.info("Correcting contours...")
     otf.ps_correct_contours()
+
+    os_2_table = OS2Table(otf.ttfont)
+    os_2_table.recalc_avg_char_width()
 
     if subroutinize:
         logger.info("Subroutinizing...")

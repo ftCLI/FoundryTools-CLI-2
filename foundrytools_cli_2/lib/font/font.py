@@ -263,13 +263,6 @@ class Font:  # pylint: disable=too-many-public-methods
             if not self.is_bold:
                 os_2.is_regular = True
 
-    def set_oblique(self, value: bool) -> None:
-        """
-        Set the oblique bit in the macStyle field of the 'head' table.
-        """
-        os_2 = OS2Table(self.ttfont)
-        os_2.is_oblique = value
-
     def set_bold(self, value: bool) -> None:
         """
         Set the bold bit in the macStyle field of the 'head' table.
@@ -303,6 +296,13 @@ class Font:  # pylint: disable=too-many-public-methods
         else:
             if self.is_bold or self.is_italic:
                 os_2.is_regular = False
+
+    def set_oblique(self, value: bool) -> None:
+        """
+        Set the oblique bit in the macStyle field of the 'head' table.
+        """
+        os_2 = OS2Table(self.ttfont)
+        os_2.is_oblique = value
 
     def save(
         self,
@@ -466,7 +466,7 @@ class Font:  # pylint: disable=too-many-public-methods
         Convert a font to WOFF.
         """
         if self.is_woff:
-            raise ValueError("Font is already a WOFF font.")
+            raise NotImplementedError("Font is already a WOFF font.")
 
         self.ttfont.flavor = WOFF_FLAVOR
         self.modified = True
@@ -476,7 +476,7 @@ class Font:  # pylint: disable=too-many-public-methods
         Convert a font to WOFF2.
         """
         if self.is_woff2:
-            raise ValueError("Font is already a WOFF2 font.")
+            raise NotImplementedError("Font is already a WOFF2 font.")
 
         self.ttfont.flavor = WOFF2_FLAVOR
         self.modified = True
@@ -513,7 +513,7 @@ class Font:  # pylint: disable=too-many-public-methods
         Convert a font to SFNT.
         """
         if self.is_sfnt:
-            raise ValueError("Font is already a SFNT font.")
+            raise NotImplementedError("Font is already a SFNT font.")
 
         self.ttfont.flavor = None
         self.modified = True
