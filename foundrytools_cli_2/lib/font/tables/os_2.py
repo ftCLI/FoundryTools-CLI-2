@@ -468,7 +468,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
 
     def recalc_avg_char_width(self) -> int:
         """
-        Recalculates the xAvgCharWidth value of the ``OS/2`` table.
+        Recalculates and sets the xAvgCharWidth value of the ``OS/2`` table.
         """
         return self.table.recalcAvgCharWidth(ttFont=self.font)
 
