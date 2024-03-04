@@ -64,20 +64,20 @@ def ttf2otf(
     font.to_otf(tolerance=tolerance)
 
     font.save(out_file, reorder_tables=None)
-    otf = Font(out_file, recalc_timestamp=recalc_timestamp)
+    font = Font(out_file, recalc_timestamp=recalc_timestamp)
 
     logger.info("Correcting contours...")
-    otf.ps_correct_contours()
+    font.ps_correct_contours()
 
-    os_2_table = OS2Table(otf.ttfont)
+    os_2_table = OS2Table(font.ttfont)
     os_2_table.recalc_avg_char_width()
 
     if subroutinize:
         logger.info("Subroutinizing...")
-        otf.ps_subroutinize()
+        font.ps_subroutinize()
 
-    otf.ttfont.flavor = flavor
-    otf.save(out_file, reorder_tables=True)
+    font.ttfont.flavor = flavor
+    font.save(out_file, reorder_tables=True)
     logger.success(f"File saved to {out_file}")
 
 
@@ -123,6 +123,9 @@ def ttf2otf_with_tx(
     logger.info("Correcting contours...")
     font = Font(out_file, recalc_timestamp=recalc_timestamp)
     font.ps_correct_contours()
+
+    os_2_table = OS2Table(font.ttfont)
+    os_2_table.recalc_avg_char_width()
 
     if subroutinize:
         logger.info("Subroutinizing...")
