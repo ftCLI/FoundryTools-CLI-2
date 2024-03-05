@@ -18,7 +18,7 @@ from foundrytools_cli_2.lib.pathops.skia_tools import (
 )
 from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
 
-__all__ = ["quadratics_to_cubics", "fix_charstrings", "from_beziers", "get_t2_charstrings"]
+__all__ = ["quadratics_to_cubics", "fix_charstrings", "add_extremes", "get_t2_charstrings"]
 
 
 def quadratics_to_cubics(font: TTFont, tolerance: float = 1.0) -> t.Dict:
@@ -137,7 +137,7 @@ def fix_charstrings(
     return charstrings, modified
 
 
-def handle_curve(pen: T2CharStringPen, nodes_list: list, i: int) -> int:
+def handle_curve_nodes(pen: T2CharStringPen, nodes_list: list, i: int) -> int:
     """
     Handles the curve nodes in a BezierPath.
 
@@ -191,7 +191,7 @@ def bezier_to_charstring(paths: t.List[BezierPath], font: TTFont, glyph_name: st
                 pen.lineTo((node.x, node.y))
                 i += 1
             elif node.type in {"offcurve", "curve"}:
-                i = handle_curve(pen, nodes_list, i)
+                i = handle_curve_nodes(pen, nodes_list, i)
             else:
                 raise ValueError(f"Unknown node type: {node.type}")
 
@@ -199,7 +199,7 @@ def bezier_to_charstring(paths: t.List[BezierPath], font: TTFont, glyph_name: st
     return charstring
 
 
-def from_beziers(font: TTFont) -> t.Dict[str, T2CharString]:
+def add_extremes(font: TTFont) -> t.Dict[str, T2CharString]:
     """
     Gets the charstrings of a font by converting the Bezier paths of each glyph to a T2CharString.
     """
