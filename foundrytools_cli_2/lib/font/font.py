@@ -29,6 +29,7 @@ from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.otf.t2_charstrings import fix_charstrings, quadratics_to_cubics
 from foundrytools_cli_2.lib.ttf.decomponentize import decomponentize
 from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
+from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path
 
 
 class Font:  # pylint: disable=too-many-public-methods
@@ -63,6 +64,7 @@ class Font:  # pylint: disable=too-many-public-methods
         self._file: t.Optional[Path] = None
         self._bytesio: t.Optional[BytesIO] = None
         self._ttfont: t.Optional[TTFont] = None
+        self._temp_file: Path = get_temp_file_path()
         self.modified = modified
 
         if isinstance(source, (str, Path)):
@@ -319,6 +321,17 @@ class Font:  # pylint: disable=too-many-public-methods
                 order. If None, reorder by table dependency (fastest).
         """
         self.ttfont.save(file, reorderTables=reorder_tables)
+
+    def save_to_temp_file(self, reorder_tables: t.Optional[bool] = True) -> None:
+        """
+        Save the font to a temporary file.
+
+        Args:
+            reorder_tables: If true (the default), reorder the tables, sorting them by tag
+                (recommended by the OpenType specification). If false, retain the original font
+                order. If None, reorder by table dependency (fastest).
+        """
+        self.save(self._temp_file, reorder_tables=reorder_tables)
 
     def close(self) -> None:
         """
