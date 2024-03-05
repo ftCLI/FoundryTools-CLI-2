@@ -76,7 +76,7 @@ def set_attrs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("set-fs-selection")
+@cli.command("fs-selection")
 @set_fs_selection_options()
 @common_options()
 def set_fs_selection(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
@@ -89,7 +89,7 @@ def set_fs_selection(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("set-fs-type")
+@cli.command("fs-type")
 @set_fs_type_options()
 @common_options()
 def set_fs_type(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
