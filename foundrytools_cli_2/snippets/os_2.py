@@ -16,8 +16,7 @@ def recalc_avg_char_width(font: Font) -> None:
         None
     """
     os_2_table = OS2Table(font.ttfont)
-    avg_char_width = os_2_table.recalc_avg_char_width()
-    os_2_table.avg_char_width = avg_char_width
+    os_2_table.recalc_avg_char_width()
     font.modified = os_2_table.modified
 
 
