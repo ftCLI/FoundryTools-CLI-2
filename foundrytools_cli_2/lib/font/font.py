@@ -338,6 +338,7 @@ class Font:  # pylint: disable=too-many-public-methods
         Close the underlying TTFont object.
         """
         self.ttfont.close()
+        self._temp_file.unlink(missing_ok=True)
 
     def get_real_extension(self) -> str:
         """
