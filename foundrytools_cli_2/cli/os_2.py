@@ -68,6 +68,8 @@ def recalc_max_context(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 def recalc_unicode_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Recalculates the ulUnicodeRange values of the OS/2 table.
+
+    The ulUnicodeRanges values are calculated using the fontTools library.
     """
     from foundrytools_cli_2.snippets.os_2 import recalc_unicode_ranges as main
 
@@ -80,8 +82,25 @@ def recalc_unicode_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> No
 def recalc_codepage_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Recalculates the ulCodePageRange values of the OS/2 table.
+
+    The ulCodePageRanges values are calculated using the fontTools library.
     """
     from foundrytools_cli_2.snippets.os_2 import recalc_codepage_ranges as main
+
+    runner = FontRunner(input_path=input_path, task=main, **options)
+    runner.run()
+
+
+@cli.command("recalc-ranges-afdko")
+@common_options()
+def recalc_ranges_afdko(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Recalculates the ulUnicodeRange and ulCodePageRange values of the OS/2 table using AFDKO.
+
+    The font is first converted to T1, then to OTF. The ulUnicodeRange and ulCodePageRange values
+    are then retrieved from the OS/2 table of the OTF font and written to the original font.
+    """
+    from foundrytools_cli_2.snippets.os_2 import recalc_ranges_afdko as main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.run()

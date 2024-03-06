@@ -1,8 +1,11 @@
 import typing as t
 
+from afdko.fdkutils import run_shell_command
+
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font.tables import InvalidOS2VersionError, OS2Table
 from foundrytools_cli_2.lib.logger import logger
+from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path
 
 
 def recalc_avg_char_width(font: Font) -> None:
@@ -81,6 +84,34 @@ def recalc_unicode_ranges(font: Font) -> None:
     os_2_table = OS2Table(font.ttfont)
     os_2_table.recalc_unicode_ranges()
     font.modified = os_2_table.modified
+
+
+def recalc_ranges_afdko(font: Font) -> None:
+    """
+    Recalculates the ``OS/2.ulUnicodeRange1`` through ``OS/2.ulUnicodeRange4`` values.
+
+    Parameters:
+        font (Font): The Font object representing the font file.
+
+    Returns:
+        None
+    """
+    os2_table = OS2Table(font.ttfont)
+    flavor = font.ttfont.flavor
+    font.ttfont.flavor = None
+    font.save_to_temp_file()
+    temp_t1_file = get_temp_file_path()
+    temp_otf_file = get_temp_file_path()
+    run_shell_command(["tx", "-t1", font.temp_file, temp_t1_file], suppress_output=True)
+    run_shell_command(["makeotf", "-f", temp_t1_file, "-o", temp_otf_file], suppress_output=True)
+    temp_font = Font(temp_otf_file)
+    temp_os2_table = OS2Table(temp_font.ttfont)
+    os2_table.unicode_ranges = temp_os2_table.unicode_ranges
+    os2_table.codepage_ranges = temp_os2_table.codepage_ranges
+    font.ttfont.flavor = flavor
+    font.modified = os2_table.modified
+    temp_t1_file.unlink()
+    temp_otf_file.unlink()
 
 
 def recalc_codepage_ranges(font: Font) -> None:
