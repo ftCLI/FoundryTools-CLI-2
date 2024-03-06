@@ -68,6 +68,36 @@ def recalc_max_context(font: Font) -> None:
     font.modified = os_2_table.modified
 
 
+def recalc_unicode_ranges(font: Font) -> None:
+    """
+    Recalculates the ``OS/2.ulUnicodeRange1`` through ``OS/2.ulUnicodeRange4`` values.
+
+    Parameters:
+        font (Font): The Font object representing the font file.
+
+    Returns:
+        None
+    """
+    os_2_table = OS2Table(font.ttfont)
+    os_2_table.recalc_unicode_ranges()
+    font.modified = os_2_table.modified
+
+
+def recalc_codepage_ranges(font: Font) -> None:
+    """
+    Recalculates the ``OS/2.ulCodePageRange1`` through ``OS/2.ulCodePageRange2`` values.
+
+    Parameters:
+        font (Font): The Font object representing the font file.
+
+    Returns:
+        None
+    """
+    os_2_table = OS2Table(font.ttfont)
+    os_2_table.recalc_code_page_ranges()
+    font.modified = os_2_table.modified
+
+
 def set_attrs(
     font: Font,
     weight_class: t.Optional[int] = None,
