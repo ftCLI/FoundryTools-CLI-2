@@ -144,6 +144,15 @@ class Font:  # pylint: disable=too-many-public-methods
         return self._ttfont
 
     @property
+    def temp_file(self) -> Path:
+        """
+        Get the temporary file path of the font.
+
+        :return: The temporary file path of the font.
+        """
+        return self._temp_file
+
+    @property
     def is_ps(self) -> bool:
         """
         Check if the font has PostScript outlines font.
