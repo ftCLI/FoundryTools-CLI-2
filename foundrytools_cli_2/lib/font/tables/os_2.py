@@ -466,6 +466,34 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
             )
         self.table.usMaxContext = value
 
+    @property
+    def unicode_ranges(self) -> list[int]:
+        """
+        Returns the Unicode ranges of the ``OS/2`` table.
+        """
+        return self.table.getUnicodeRanges()
+
+    @unicode_ranges.setter
+    def unicode_ranges(self, bits: list[int]) -> None:
+        """
+        Sets the Unicode ranges of the ``OS/2`` table.
+        """
+        self.table.setUnicodeRanges(bits)
+
+    @property
+    def codepage_ranges(self) -> list[int]:
+        """
+        Returns the code page ranges of the ``OS/2`` table.
+        """
+        return self.table.getCodePageRanges()
+
+    @codepage_ranges.setter
+    def codepage_ranges(self, bits: list[int]) -> None:
+        """
+        Sets the code page ranges of the ``OS/2`` table.
+        """
+        self.table.setCodePageRanges(bits)
+
     def recalc_avg_char_width(self) -> int:
         """
         Recalculates and sets the xAvgCharWidth value of the ``OS/2`` table.
