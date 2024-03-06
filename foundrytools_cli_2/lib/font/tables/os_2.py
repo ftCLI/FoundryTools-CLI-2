@@ -516,5 +516,4 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Recalculates the code page ranges of the ``OS/2`` table.
         """
-        code_page_ranges = self.table.recalcCodePageRanges(self.font)
-        self.table.setCodePageRanges(code_page_ranges)
+        self.table.recalcCodePageRanges(self.font)
