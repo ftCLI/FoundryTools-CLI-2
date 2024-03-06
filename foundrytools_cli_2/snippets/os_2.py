@@ -66,8 +66,7 @@ def recalc_max_context(font: Font) -> None:
         None
     """
     os_2_table = OS2Table(font.ttfont)
-    max_context = os_2_table.recalc_max_context()
-    os_2_table.max_context = max_context
+    os_2_table.recalc_max_context()
     font.modified = os_2_table.modified
 
 
