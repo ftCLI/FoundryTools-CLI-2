@@ -1,8 +1,8 @@
 import typing as t
 from pathlib import Path
 
-from foundrytools_cli_2.lib import logger
 from foundrytools_cli_2.lib.font import Font
+from foundrytools_cli_2.lib.logger import logger
 
 
 def main(

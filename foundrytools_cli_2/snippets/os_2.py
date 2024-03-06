@@ -1,8 +1,8 @@
 import typing as t
 
-from foundrytools_cli_2.lib import logger
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font.tables import InvalidOS2VersionError, OS2Table
+from foundrytools_cli_2.lib.logger import logger
 
 
 def recalc_avg_char_width(font: Font) -> None:
@@ -16,8 +16,7 @@ def recalc_avg_char_width(font: Font) -> None:
         None
     """
     os_2_table = OS2Table(font.ttfont)
-    avg_char_width = os_2_table.recalc_avg_char_width()
-    os_2_table.avg_char_width = avg_char_width
+    os_2_table.recalc_avg_char_width()
     font.modified = os_2_table.modified
 
 

@@ -12,10 +12,10 @@ from foundrytools_cli_2.lib.click.os_2_options import (
 )
 from foundrytools_cli_2.lib.font_runner import FontRunner
 
-cli = click.Group(help="Utilities for editing the OS/2 table.", chain=True)
+cli = click.Group(help="Utilities for editing the OS/2 table.")
 
 
-@cli.command("recalc-avg-char-width")
+@cli.command("recalc-avg-width")
 @common_options()
 def recalc_avg_char_width(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
@@ -76,7 +76,7 @@ def set_attrs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("set-fs-selection")
+@cli.command("fs-selection")
 @set_fs_selection_options()
 @common_options()
 def set_fs_selection(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
@@ -89,7 +89,7 @@ def set_fs_selection(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("set-fs-type")
+@cli.command("fs-type")
 @set_fs_type_options()
 @common_options()
 def set_fs_type(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
