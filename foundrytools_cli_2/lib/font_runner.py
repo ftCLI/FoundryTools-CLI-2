@@ -67,7 +67,8 @@ class FontRunner:  # pylint: disable=too-few-public-methods
                     self.task(font, **self._callable_options)
                 except Exception as e:  # pylint: disable=broad-except
                     timer.stop()
-                    logger.exception(f"{type(e).__name__}: {e}")
+                    logger.error(f"{type(e).__name__}: {e}")
+                    print()
                     continue
 
                 if not self.auto_save:
@@ -87,7 +88,8 @@ class FontRunner:  # pylint: disable=too-few-public-methods
                     logger.success(f"File saved to {out_file}")
                 except Exception as e:  # pylint: disable=broad-except
                     timer.stop()
-                    logger.exception(f"{type(e).__name__}: {e}")
+                    logger.error(f"{type(e).__name__}: {e}")
+                    print()
 
                 timer.stop()
                 print()  # Add a newline after each font
