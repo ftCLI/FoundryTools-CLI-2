@@ -500,11 +500,11 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         return self.table.recalcAvgCharWidth(ttFont=self.font)
 
-    def recalc_max_context(self) -> int:
+    def recalc_max_context(self) -> None:
         """
         Recalculates the maxContext value of the ``OS/2`` table.
         """
-        return maxCtxFont(self.font)
+        self.max_context = maxCtxFont(self.font)
 
     def recalc_unicode_ranges(self) -> None:
         """
@@ -516,5 +516,4 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Recalculates the code page ranges of the ``OS/2`` table.
         """
-        code_page_ranges = self.table.recalcCodePageRanges(self.font)
-        self.table.setCodePageRanges(code_page_ranges)
+        self.table.recalcCodePageRanges(self.font)

@@ -66,8 +66,7 @@ def recalc_max_context(font: Font) -> None:
         None
     """
     os_2_table = OS2Table(font.ttfont)
-    max_context = os_2_table.recalc_max_context()
-    os_2_table.max_context = max_context
+    os_2_table.recalc_max_context()
     font.modified = os_2_table.modified
 
 
@@ -110,6 +109,7 @@ def recalc_ranges_afdko(font: Font) -> None:
     os2_table.codepage_ranges = temp_os2_table.codepage_ranges
     font.ttfont.flavor = flavor
     font.modified = os2_table.modified
+    temp_font.close()
     temp_t1_file.unlink()
     temp_otf_file.unlink()
 
