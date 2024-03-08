@@ -1,10 +1,12 @@
+# pylint: disable=import-outside-toplevel
 import typing as t
 from collections import Counter
 
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.ttLib import TTFont
 
-from foundrytools_cli_2.lib.constants import HMTX_TABLE_TAG, GDEF_TABLE_TAG
+from foundrytools_cli_2.lib.constants import GDEF_TABLE_TAG, HMTX_TABLE_TAG
+
 
 def get_glyph_bounds(font: TTFont, glyph_name: str) -> t.Dict[str, float]:
     """
@@ -45,9 +47,7 @@ def get_glyph_metrics_stats(font: TTFont) -> t.Dict[str, t.Union[bool, int]]:
     # NOTE: `range(a, b)` includes `a` and does not include `b`.
     #       Here we don't include 0-31 as well as 127
     #       because these are control characters.
-    ascii_glyph_names = [
-        font.getBestCmap()[c] for c in range(32, 127) if c in font.getBestCmap()
-    ]
+    ascii_glyph_names = [font.getBestCmap()[c] for c in range(32, 127) if c in font.getBestCmap()]
 
     if len(ascii_glyph_names) > 0.8 * (127 - 32):
         ascii_widths = [
@@ -85,9 +85,9 @@ def get_glyph_metrics_stats(font: TTFont) -> t.Dict[str, t.Union[bool, int]]:
         seems_monospaced = len(widths) <= 2
 
     width_max = max(adv for k, (adv, lsb) in glyph_metrics.items())
-    most_common_width = Counter([g for g in glyph_metrics.values() if g[0] != 0]).most_common(
-        1
-    )[0][0][0]
+    most_common_width = Counter([g for g in glyph_metrics.values() if g[0] != 0]).most_common(1)[0][
+        0
+    ][0]
     return {
         "seems_monospaced": seems_monospaced,
         "width_max": width_max,
