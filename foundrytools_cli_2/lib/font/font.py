@@ -356,6 +356,9 @@ class Font:  # pylint: disable=too-many-public-methods
         Returns:
             The extension of the font.
         """
+
+        # Order of the if statements is important. WOFF and WOFF2 must be checked before OTF and
+        # TTF.
         if self.is_woff:
             return WOFF_EXTENSION
         if self.is_woff2:
