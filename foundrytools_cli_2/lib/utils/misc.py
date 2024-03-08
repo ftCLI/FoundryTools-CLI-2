@@ -8,6 +8,7 @@ def get_glyph_bounds(font: TTFont, glyph_name: str) -> t.Dict[str, float]:
     """
     Get the bounds of a glyph.
 
+    :param font: The TTFont object.
     :param glyph_name: The name of the glyph.
     :return: The bounds of the glyph.
     """
