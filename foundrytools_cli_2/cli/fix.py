@@ -16,7 +16,7 @@ def fix_empty_notdef(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Fixes the empty .notdef glyph by adding a simple rectangle.
     """
-    from foundrytools_cli_2.snippets.fix_empty_notdef import fix_empty_notdef as main
+    from foundrytools_cli_2.snippets.fix.empty_notdef import fix_empty_notdef as main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.run()
