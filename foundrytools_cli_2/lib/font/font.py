@@ -10,6 +10,7 @@ from fontTools.ttLib.tables._f_v_a_r import Axis, NamedInstance
 
 from foundrytools_cli_2.lib.constants import (
     FVAR_TABLE_TAG,
+    HEAD_TABLE_TAG,
     MAX_UPM,
     MIN_UPM,
     OTF_EXTENSION,
@@ -540,7 +541,7 @@ class Font:  # pylint: disable=too-many-public-methods
         if new_upem < MIN_UPM or new_upem > MAX_UPM:
             raise ValueError(f"units_per_em must be in the range {MAX_UPM} to {MAX_UPM}.")
 
-        if self.ttfont["head"].unitsPerEm == new_upem:
+        if self.ttfont[HEAD_TABLE_TAG].unitsPerEm == new_upem:
             raise ValueError(f"Font already has {new_upem} units per em. No need to scale upem.")
 
         scale_upem(self.ttfont, new_upem=new_upem)
