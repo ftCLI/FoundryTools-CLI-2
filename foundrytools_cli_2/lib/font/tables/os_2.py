@@ -500,6 +500,10 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Recalculates and sets the ``OS/2.sxHeight`` value.
         """
+        if not self.table.version >= 2:
+            raise InvalidOS2VersionError(
+                "sxHeight is only defined in OS/2 table versions 2 and up."
+            )
         try:
             x_height = otRound(get_glyph_bounds(font=self.font, glyph_name=glyph_name)["yMax"])
         except KeyError:
@@ -511,6 +515,10 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Recalculates and sets the ``OS/2.sCapHeight`` value.
         """
+        if not self.table.version >= 2:
+            raise InvalidOS2VersionError(
+                "sCapHeight is only defined in OS/2 table versions 2 and up."
+            )
         try:
             cap_height = otRound(get_glyph_bounds(font=self.font, glyph_name=glyph_name)["yMax"])
         except KeyError:
