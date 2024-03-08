@@ -1,5 +1,6 @@
 import typing as t
 
+from fontTools.misc.roundTools import otRound
 from fontTools.misc.textTools import num2binary
 from fontTools.otlLib.maxContextCalc import maxCtxFont
 from fontTools.ttLib import TTFont
@@ -13,6 +14,7 @@ from foundrytools_cli_2.lib.constants import (
 )
 from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
 from foundrytools_cli_2.lib.utils.bits_tools import is_nth_bit_set
+from foundrytools_cli_2.lib.utils.misc import get_glyph_bounds
 from foundrytools_cli_2.lib.utils.string_tools import adjust_string_length
 
 
@@ -493,6 +495,28 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Sets the code page ranges of the ``OS/2`` table.
         """
         self.table.setCodePageRanges(bits)
+
+    def recalc_x_height(self, glyph_name: str = "x") -> int:
+        """
+        Recalculates and sets the ``OS/2.sxHeight`` value.
+        """
+        try:
+            x_height = otRound(get_glyph_bounds(font=self.font, glyph_name=glyph_name)["yMax"])
+        except KeyError:
+            x_height = 0
+        self.x_height = x_height
+        return x_height
+
+    def recalc_cap_height(self, glyph_name: str = "H") -> int:
+        """
+        Recalculates and sets the ``OS/2.sCapHeight`` value.
+        """
+        try:
+            cap_height = otRound(get_glyph_bounds(font=self.font, glyph_name=glyph_name)["yMax"])
+        except KeyError:
+            cap_height = 0
+        self.cap_height = cap_height
+        return cap_height
 
     def recalc_avg_char_width(self) -> int:
         """

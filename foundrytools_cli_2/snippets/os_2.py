@@ -34,8 +34,7 @@ def recalc_cap_height(font: Font) -> None:
         None
     """
     os_2_table = OS2Table(font.ttfont)
-    cap_height = font.recalc_cap_height()
-    os_2_table.cap_height = cap_height
+    os_2_table.recalc_cap_height()
     font.modified = os_2_table.modified
 
 
@@ -50,8 +49,7 @@ def recalc_x_height(font: Font) -> None:
         None
     """
     os_2_table = OS2Table(font.ttfont)
-    x_height = font.recalc_x_height()
-    os_2_table.x_height = x_height
+    os_2_table.recalc_x_height()
     font.modified = os_2_table.modified
 
 

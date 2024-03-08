@@ -4,8 +4,6 @@ from pathlib import Path
 
 from dehinter.font import dehint
 from fontTools.misc.cliTools import makeOutputFileName
-from fontTools.misc.roundTools import otRound
-from fontTools.pens.boundsPen import BoundsPen
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import Axis, NamedInstance
@@ -448,41 +446,6 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError("Not a variable font.")
 
         return self.ttfont[FVAR_TABLE_TAG].instances
-
-    def get_glyph_bounds(self, glyph_name: str) -> t.Dict[str, float]:
-        """
-        Get the bounds of a glyph.
-
-        :param glyph_name: The name of the glyph.
-        :return: The bounds of the glyph.
-        """
-        glyph_set = self.ttfont.getGlyphSet()
-        if glyph_name not in glyph_set:
-            raise ValueError(f"Glyph '{glyph_name}' does not exist in the font.")
-
-        bounds_pen = BoundsPen(glyphSet=glyph_set)
-
-        glyph_set[glyph_name].draw(bounds_pen)
-        bounds = {
-            "xMin": bounds_pen.bounds[0],
-            "yMin": bounds_pen.bounds[1],
-            "xMax": bounds_pen.bounds[2],
-            "yMax": bounds_pen.bounds[3],
-        }
-
-        return bounds
-
-    def recalc_x_height(self) -> int:
-        """
-        Recalculate the x-height of the font.
-        """
-        return otRound(self.get_glyph_bounds("x")["yMax"])
-
-    def recalc_cap_height(self) -> int:
-        """
-        Recalculate the cap height of the font.
-        """
-        return otRound(self.get_glyph_bounds("H")["yMax"])
 
     def to_woff(self) -> None:
         """
