@@ -8,6 +8,7 @@ from fontTools.pens.t2CharStringPen import T2CharStringPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import ttFont
 from fontTools.ttLib.tables import _g_l_y_f
+from fontTools.ttLib.ttGlyphSet import _TTGlyphSet
 
 from foundrytools_cli_2.lib.logger import logger
 
@@ -188,3 +189,19 @@ def remove_tiny_paths(path: pathops.Path, glyph_name: str, min_area: int = 25) -
         else:
             logger.debug(f"Tiny path removed from glyph '{glyph_name}'")
     return cleaned_path
+
+
+def is_empty_glyph(glyph_set: _TTGlyphSet, glyph_name: str) -> bool:
+    """
+    Returns True if the glyph is empty.
+
+    Parameters:
+        glyph_set (_TTGlyphSet): The glyph set.
+        glyph_name (str): The name of the glyph.
+
+    Returns:
+        bool: True if the glyph is empty.
+    """
+
+    path = skia_path_from_glyph(glyph_name=glyph_name, glyph_set=glyph_set)
+    return path.area == 0

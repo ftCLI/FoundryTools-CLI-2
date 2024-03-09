@@ -1,5 +1,6 @@
 import typing as t
 
+from fontTools.misc.roundTools import otRound
 from fontTools.misc.textTools import num2binary
 from fontTools.otlLib.maxContextCalc import maxCtxFont
 from fontTools.ttLib import TTFont
@@ -13,6 +14,7 @@ from foundrytools_cli_2.lib.constants import (
 )
 from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
 from foundrytools_cli_2.lib.utils.bits_tools import is_nth_bit_set
+from foundrytools_cli_2.lib.utils.misc import get_glyph_bounds
 from foundrytools_cli_2.lib.utils.string_tools import adjust_string_length
 
 
@@ -33,6 +35,20 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Initializes the OS/2 table handler.
         """
         super().__init__(font=font, table_tag=OS_2_TABLE_TAG)
+
+    @property
+    def version(self) -> int:
+        """
+        Returns the ``OS/2.version`` value.
+        """
+        return self.table.version
+
+    @version.setter
+    def version(self, value: int) -> None:
+        """
+        Sets the ``OS/2.version`` value.
+        """
+        self.table.version = value
 
     @property
     def avg_char_width(self) -> int:
@@ -274,7 +290,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the bit 7 (USE_TYPO_METRICS) of the ``OS/2.fsSelection`` field.
         """
-        if self.table.version < 4:
+        if self.version < 4:
             raise InvalidOS2VersionError(
                 "fsSelection bit 7 (USE_TYPO_METRICS) is only defined in OS/2 table versions 4 and "
                 "up."
@@ -294,7 +310,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the bit 8 (WWS) of the ``OS/2.fsSelection`` field.
         """
-        if self.table.version < 4:
+        if self.version < 4:
             raise InvalidOS2VersionError(
                 "fsSelection bit 8 (WWS) is only defined in OS/2 table versions 4 and up."
             )
@@ -305,7 +321,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Returns True if the bit 9 (OBLIQUE) of the ``OS/2.fsSelection`` field is set, False
         """
-        if self.table.version < 4:
+        if self.version < 4:
             raise InvalidOS2VersionError(
                 "fsSelection bit 9 (OBLIQUE) is only defined in OS/2 table versions 4 and up."
             )
@@ -316,7 +332,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the bit 9 (OBLIQUE) of the ``OS/2.fsSelection`` field.
         """
-        if self.table.version < 4:
+        if self.version < 4:
             raise InvalidOS2VersionError(
                 "fsSelection bit 9 (OBLIQUE) is only defined in OS/2 table versions 4 and up."
             )
@@ -411,7 +427,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Returns the sxHeight value of the ``OS/2`` table.
         """
-        if self.table.version < 2:
+        if self.version < 2:
             return None
         return self.table.sxHeight
 
@@ -420,7 +436,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the sxHeight value of the ``OS/2`` table.
         """
-        if self.table.version < 2:
+        if self.version < 2:
             raise InvalidOS2VersionError(
                 "sxHeight is only defined in OS/2 table versions 2 and up."
             )
@@ -431,7 +447,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Returns the sCapHeight value of the ``OS/2`` table.
         """
-        if self.table.version < 2:
+        if self.version < 2:
             return None
         return self.table.sCapHeight
 
@@ -440,7 +456,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the sCapHeight value of the ``OS/2`` table.
         """
-        if self.table.version < 2:
+        if self.version < 2:
             raise InvalidOS2VersionError(
                 "sCapHeight is only defined in OS/2 table versions 2 and up."
             )
@@ -451,7 +467,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Returns the maximum profile's maxContext value.
         """
-        if self.table.version < 2:
+        if self.version < 2:
             return None
         return self.table.usMaxContext
 
@@ -460,7 +476,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Sets the maximum profile's maxContext value.
         """
-        if self.table.version < 2:
+        if self.version < 2:
             raise InvalidOS2VersionError(
                 "usMaxContext is only defined in OS/2 table versions 2 and up."
             )
@@ -493,6 +509,36 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Sets the code page ranges of the ``OS/2`` table.
         """
         self.table.setCodePageRanges(bits)
+
+    def recalc_x_height(self, glyph_name: str = "x") -> int:
+        """
+        Recalculates and sets the ``OS/2.sxHeight`` value.
+        """
+        if not self.version >= 2:
+            raise InvalidOS2VersionError(
+                "sxHeight is only defined in OS/2 table versions 2 and up."
+            )
+        try:
+            x_height = otRound(get_glyph_bounds(font=self.font, glyph_name=glyph_name)["yMax"])
+        except KeyError:
+            x_height = 0
+        self.x_height = x_height
+        return x_height
+
+    def recalc_cap_height(self, glyph_name: str = "H") -> int:
+        """
+        Recalculates and sets the ``OS/2.sCapHeight`` value.
+        """
+        if not self.version >= 2:
+            raise InvalidOS2VersionError(
+                "sCapHeight is only defined in OS/2 table versions 2 and up."
+            )
+        try:
+            cap_height = otRound(get_glyph_bounds(font=self.font, glyph_name=glyph_name)["yMax"])
+        except KeyError:
+            cap_height = 0
+        self.cap_height = cap_height
+        return cap_height
 
     def recalc_avg_char_width(self) -> int:
         """

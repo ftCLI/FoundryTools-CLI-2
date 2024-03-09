@@ -4,14 +4,13 @@ from pathlib import Path
 
 from dehinter.font import dehint
 from fontTools.misc.cliTools import makeOutputFileName
-from fontTools.misc.roundTools import otRound
-from fontTools.pens.boundsPen import BoundsPen
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import Axis, NamedInstance
 
 from foundrytools_cli_2.lib.constants import (
     FVAR_TABLE_TAG,
+    HEAD_TABLE_TAG,
     MAX_UPM,
     MIN_UPM,
     OTF_EXTENSION,
@@ -358,6 +357,9 @@ class Font:  # pylint: disable=too-many-public-methods
         Returns:
             The extension of the font.
         """
+
+        # Order of the if statements is important. WOFF and WOFF2 must be checked before OTF and
+        # TTF.
         if self.is_woff:
             return WOFF_EXTENSION
         if self.is_woff2:
@@ -449,41 +451,6 @@ class Font:  # pylint: disable=too-many-public-methods
 
         return self.ttfont[FVAR_TABLE_TAG].instances
 
-    def get_glyph_bounds(self, glyph_name: str) -> t.Dict[str, float]:
-        """
-        Get the bounds of a glyph.
-
-        :param glyph_name: The name of the glyph.
-        :return: The bounds of the glyph.
-        """
-        glyph_set = self.ttfont.getGlyphSet()
-        if glyph_name not in glyph_set:
-            raise ValueError(f"Glyph '{glyph_name}' does not exist in the font.")
-
-        bounds_pen = BoundsPen(glyphSet=glyph_set)
-
-        glyph_set[glyph_name].draw(bounds_pen)
-        bounds = {
-            "xMin": bounds_pen.bounds[0],
-            "yMin": bounds_pen.bounds[1],
-            "xMax": bounds_pen.bounds[2],
-            "yMax": bounds_pen.bounds[3],
-        }
-
-        return bounds
-
-    def recalc_x_height(self) -> int:
-        """
-        Recalculate the x-height of the font.
-        """
-        return otRound(self.get_glyph_bounds("x")["yMax"])
-
-    def recalc_cap_height(self) -> int:
-        """
-        Recalculate the cap height of the font.
-        """
-        return otRound(self.get_glyph_bounds("H")["yMax"])
-
     def to_woff(self) -> None:
         """
         Convert a font to WOFF.
@@ -574,7 +541,7 @@ class Font:  # pylint: disable=too-many-public-methods
         if new_upem < MIN_UPM or new_upem > MAX_UPM:
             raise ValueError(f"units_per_em must be in the range {MAX_UPM} to {MAX_UPM}.")
 
-        if self.ttfont["head"].unitsPerEm == new_upem:
+        if self.ttfont[HEAD_TABLE_TAG].unitsPerEm == new_upem:
             raise ValueError(f"Font already has {new_upem} units per em. No need to scale upem.")
 
         scale_upem(self.ttfont, new_upem=new_upem)
