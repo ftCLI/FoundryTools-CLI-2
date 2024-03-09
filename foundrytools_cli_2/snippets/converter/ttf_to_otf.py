@@ -39,7 +39,7 @@ def ttf2otf(
     """
     Convert PostScript flavored fonts to TrueType flavored fonts.
 
-    Args:
+    Parameters:
         font: The font to convert.
         tolerance: The tolerance to use when converting to OTF.
         target_upm: The UPM to scale the font to.
@@ -91,6 +91,14 @@ def ttf2otf_with_tx(
 ) -> None:
     """
     Convert PostScript flavored fonts to TrueType flavored fonts using tx.
+
+    Parameters:
+        font: The font to convert.
+        target_upm: The UPM to scale the font to.
+        subroutinize: Whether to subroutinize the font.
+        output_dir: The directory to save the font to.
+        recalc_timestamp: Whether to recalculate the font's timestamp.
+        overwrite: Whether to overwrite the existing file.
     """
     out_file = _build_out_file_name(font=font, output_dir=output_dir, overwrite=overwrite)
     cff_file = font.make_out_file_name(extension=".cff", output_dir=output_dir, overwrite=overwrite)
