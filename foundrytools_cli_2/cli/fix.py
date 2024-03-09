@@ -10,7 +10,7 @@ from foundrytools_cli_2.lib.font_runner import FontRunner
 cli = click.Group(help="Fix font errors.")
 
 
-@cli.command("empty-notdef")
+@cli.command("notdef-empty")
 @common_options()
 def fix_empty_notdef(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
@@ -21,7 +21,7 @@ def fix_empty_notdef(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     an outline as the user will only see what looks like a space if a glyph is missing and not be
     aware of the active font’s limitation.
     """
-    from foundrytools_cli_2.snippets.fix.empty_notdef import fix_empty_notdef as main
+    from foundrytools_cli_2.snippets.fix.empty_notdef import fix_notdef_empty as main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.run()
