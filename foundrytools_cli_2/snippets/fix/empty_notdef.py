@@ -119,7 +119,7 @@ def fix_notdef_empty(font: Font) -> None:
     # The sCapHeight attribute is defined in the OS/2 version 2 and later. If the attribute is not
     # present, the height is calculated as a percentage of the width.
     try:
-        height = font.ttfont[OS_2_TABLE_TAG].sCapHeight * HEIGHT_CONSTANT
+        height = font.ttfont[OS_2_TABLE_TAG].sCapHeight
     except AttributeError:
         height = round(width * HEIGHT_CONSTANT)
     thickness = round(width / THICKNESS_CONSTANT)
@@ -132,10 +132,10 @@ def fix_notdef_empty(font: Font) -> None:
         charstrings[NOTDEF].bytecode = charstring.bytecode
 
     if isinstance(glyph_set, _TTGlyphSetGlyf):
-        draw_empty_notdef_glyf(glyph_set=glyph_set, width=width, height=height, thickness=thickness)
-        font.ttfont[GLYF_TABLE_TAG][NOTDEF] = draw_empty_notdef_glyf(
+        glyf_glyph = draw_empty_notdef_glyf(
             glyph_set=glyph_set, width=width, height=height, thickness=thickness
         )
+        font.ttfont[GLYF_TABLE_TAG][NOTDEF] = glyf_glyph
 
     font.ttfont[HMTX_TABLE_TAG][NOTDEF] = (width, 0)
     font.modified = True
