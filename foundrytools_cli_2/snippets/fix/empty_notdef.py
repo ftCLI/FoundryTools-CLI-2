@@ -17,6 +17,9 @@ from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.pathops.skia_tools import is_empty_glyph
 
 NOTDEF = ".notdef"
+WIDTH_CONSTANT = 600
+HEIGHT_CONSTANT = 1.25
+THICKNESS_CONSTANT = 10
 
 
 def draw_empty_notdef_cff(
@@ -94,7 +97,7 @@ def draw_empty_notdef_glyf(
     return pen.glyph()
 
 
-def fix_empty_notdef(font: Font) -> None:
+def fix_notdef_empty(font: Font) -> None:
     """
     Fixes the empty .notdef glyph by adding a simple rectangle.
 
@@ -112,9 +115,14 @@ def fix_empty_notdef(font: Font) -> None:
     if not is_empty_glyph(glyph_set=glyph_set, glyph_name=NOTDEF):
         return
 
-    width = round(font.ttfont[HEAD_TABLE_TAG].unitsPerEm / 1000 * 600)
-    height = font.ttfont[OS_2_TABLE_TAG].sCapHeight or round(width * 1.25)
-    thickness = round(width / 10)
+    width = round(font.ttfont[HEAD_TABLE_TAG].unitsPerEm / 1000 * WIDTH_CONSTANT)
+    # The sCapHeight attribute is defined in the OS/2 version 2 and later. If the attribute is not
+    # present, the height is calculated as a percentage of the width.
+    try:
+        height = font.ttfont[OS_2_TABLE_TAG].sCapHeight * HEIGHT_CONSTANT
+    except AttributeError:
+        height = round(width * HEIGHT_CONSTANT)
+    thickness = round(width / THICKNESS_CONSTANT)
 
     if isinstance(glyph_set, _TTGlyphSetCFF):
         charstring = draw_empty_notdef_cff(
