@@ -4,10 +4,10 @@ from pathlib import Path
 
 import click
 
-from foundrytools_cli_2.cli.options.options import (
-    autohint_options,
-    common_options,
+from foundrytools_cli_2.cli.options.common_options import base_options
+from foundrytools_cli_2.cli.options.otf import (
     min_area_option,
+    otf_autohint_options,
     subroutinize_flag,
 )
 from foundrytools_cli_2.lib.font import Font
@@ -17,8 +17,8 @@ cli = click.Group(help="Utilities for editing OpenType-PS fonts.")
 
 
 @cli.command("autohint")
-@autohint_options()
-@common_options()
+@otf_autohint_options()
+@base_options()
 def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Autohint OpenType-PS fonts with ``afdko.otfautohint``.
@@ -31,7 +31,7 @@ def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("recalc-stems")
-@common_options()
+@base_options()
 def recalc_stems(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Recalculates hinting stems for the given font files.
@@ -44,7 +44,7 @@ def recalc_stems(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("recalc-zones")
-@common_options()
+@base_options()
 def recalc_zones(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Recalculates hinting zones for the given font files.
@@ -57,7 +57,7 @@ def recalc_zones(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("subr")
-@common_options()
+@base_options()
 def subr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Subroutinize OpenType-PS fonts with ``cffsubr``.
@@ -69,7 +69,7 @@ def subr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("desubr")
-@common_options()
+@base_options()
 def desubr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Desubroutinize OpenType-PS fonts with ``cffsubr``.
@@ -83,7 +83,7 @@ def desubr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @cli.command("fix-contours")
 @min_area_option()
 @subroutinize_flag()
-@common_options()
+@base_options()
 def fix_contours(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Fix the contours of OpenType-PS fonts by removing overlaps, correcting contours direction, and
@@ -99,7 +99,7 @@ def fix_contours(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("check-outlines")
-@common_options()
+@base_options()
 def check_outlines(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Check the outlines of OpenType-PS fonts with ``afdko.checkoutlinesufo``.
@@ -114,7 +114,7 @@ def check_outlines(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("add-extremes")
-@common_options()
+@base_options()
 @subroutinize_flag()
 def add_extremes(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """

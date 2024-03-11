@@ -5,7 +5,7 @@ from pathlib import Path
 
 import click
 
-from foundrytools_cli_2.cli.options.options import common_options
+from foundrytools_cli_2.cli.options.common_options import base_options
 from foundrytools_cli_2.lib.font_runner import FontRunner
 
 
@@ -35,7 +35,7 @@ from foundrytools_cli_2.lib.font_runner import FontRunner
     default=None,
     help="""Sets or clears the `isFixedPitch` value.""",
 )
-@common_options()
+@base_options()
 def cli(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     A command line tool to manipulate the 'post' table.

@@ -4,8 +4,8 @@ from pathlib import Path
 
 import click
 
-from foundrytools_cli_2.cli.options.options import (
-    common_options,
+from foundrytools_cli_2.cli.options.common_options import base_options
+from foundrytools_cli_2.cli.options.name import (
     delete_all,
     language_string,
     name_id,
@@ -26,7 +26,7 @@ cli = click.Group(help="Utilities for editing the name table.")
 @name_ids(required=True)
 @platform_id()
 @language_string()
-@common_options()
+@base_options()
 def del_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Delete names from the name table of the given font files.
@@ -38,7 +38,7 @@ def del_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("del-empty-names")
-@common_options()
+@base_options()
 def del_empty_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Deletes empty names from the name table of the given font files.
@@ -51,7 +51,7 @@ def del_empty_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 @cli.command("del-mac-names")
 @delete_all()
-@common_options()
+@base_options()
 def del_mac_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Delete Macintosh names from the name table of the given font files.
@@ -63,7 +63,7 @@ def del_mac_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("del-unused-names")
-@common_options()
+@base_options()
 def del_unused_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Delete unused names from the name table of the given font files.
@@ -80,7 +80,7 @@ def del_unused_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @name_ids(required=False)
 @skip_name_ids()
 @platform_id()
-@common_options()
+@base_options()
 def find_replace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Find and replace text in the name table of the given font files.
@@ -95,7 +95,7 @@ def find_replace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @name_string()
 @name_id()
 @win_or_mac_platform_id()
-@common_options()
+@base_options()
 def set_name(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Set the name table of the given font files.
@@ -108,7 +108,7 @@ def set_name(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("strip-names")
-@common_options()
+@base_options()
 def strip_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Strip the name table of the given font files.

@@ -4,14 +4,14 @@ from pathlib import Path
 
 import click
 
-from foundrytools_cli_2.cli.options.options import common_options
+from foundrytools_cli_2.cli.options.common_options import base_options
 from foundrytools_cli_2.lib.font_runner import FontRunner
 
 cli = click.Group(help="Fix font errors.")
 
 
 @cli.command("notdef-empty")
-@common_options()
+@base_options()
 def fix_empty_notdef(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Fixes the empty .notdef glyph by drawing a simple rectangle.

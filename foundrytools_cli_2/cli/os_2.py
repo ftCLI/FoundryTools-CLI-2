@@ -4,7 +4,7 @@ from pathlib import Path
 
 import click
 
-from foundrytools_cli_2.cli.options.options import common_options
+from foundrytools_cli_2.cli.options.common_options import base_options
 from foundrytools_cli_2.cli.options.os2 import (
     set_attrs_options,
     set_fs_selection_options,
@@ -16,7 +16,7 @@ cli = click.Group(help="Utilities for editing the OS/2 table.")
 
 
 @cli.command("recalc-avg-width")
-@common_options()
+@base_options()
 def recalc_avg_char_width(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Recalculates the xAvgCharWidth value of the OS/2 table.
@@ -28,7 +28,7 @@ def recalc_avg_char_width(input_path: Path, **options: t.Dict[str, t.Any]) -> No
 
 
 @cli.command("recalc-x-height")
-@common_options()
+@base_options()
 def recalc_x_height(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Recalculates the sxHeight value of the OS/2 table.
@@ -40,7 +40,7 @@ def recalc_x_height(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("recalc-cap-height")
-@common_options()
+@base_options()
 def recalc_cap_height(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Recalculates the sCapHeight value of the OS/2 table.
@@ -52,7 +52,7 @@ def recalc_cap_height(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("recalc-max-context")
-@common_options()
+@base_options()
 def recalc_max_context(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Recalculates the usMaxContext value of the OS/2 table.
@@ -64,7 +64,7 @@ def recalc_max_context(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("recalc-unicode-ranges")
-@common_options()
+@base_options()
 def recalc_unicode_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Recalculates the ulUnicodeRange values of the OS/2 table.
@@ -78,7 +78,7 @@ def recalc_unicode_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> No
 
 
 @cli.command("recalc-codepage-ranges")
-@common_options()
+@base_options()
 def recalc_codepage_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Recalculates the ulCodePageRange values of the OS/2 table.
@@ -92,7 +92,7 @@ def recalc_codepage_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> N
 
 
 @cli.command("recalc-ranges-afdko")
-@common_options()
+@base_options()
 def recalc_ranges_afdko(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Recalculates the ulUnicodeRange and ulCodePageRange values of the OS/2 table using AFDKO.
@@ -108,7 +108,7 @@ def recalc_ranges_afdko(input_path: Path, **options: t.Dict[str, t.Any]) -> None
 
 @cli.command("set-attrs")
 @set_attrs_options()
-@common_options()
+@base_options()
 def set_attrs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Sets miscellaneous attributes of the OS/2 table.
@@ -121,7 +121,7 @@ def set_attrs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 @cli.command("fs-selection")
 @set_fs_selection_options()
-@common_options()
+@base_options()
 def set_fs_selection(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Sets flags in the fsSelection field of the OS/2 table.
@@ -134,7 +134,7 @@ def set_fs_selection(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 @cli.command("fs-type")
 @set_fs_type_options()
-@common_options()
+@base_options()
 def set_fs_type(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Set font embedding licensing rights for the font, defined in the fsType field of the OS/2 table.
