@@ -4,7 +4,7 @@ from pathlib import Path
 
 import click
 
-from foundrytools_cli_2.lib.click.options import (
+from foundrytools_cli_2.cli.options.options import (
     autohint_options,
     common_options,
     min_area_option,

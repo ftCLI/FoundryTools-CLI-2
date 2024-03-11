@@ -4,8 +4,8 @@ from pathlib import Path
 
 import click
 
-from foundrytools_cli_2.lib.click.options import common_options
-from foundrytools_cli_2.lib.click.os_2_options import (
+from foundrytools_cli_2.cli.options.options import common_options
+from foundrytools_cli_2.cli.options.os2 import (
     set_attrs_options,
     set_fs_selection_options,
     set_fs_type_options,

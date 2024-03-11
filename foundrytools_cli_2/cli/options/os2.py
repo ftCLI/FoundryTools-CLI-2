@@ -2,8 +2,8 @@ import typing as t
 
 import click
 
-from foundrytools_cli_2.lib.click import add_options
-from foundrytools_cli_2.lib.click.callbacks import choice_to_int_callback
+from foundrytools_cli_2.cli.options import add_options
+from foundrytools_cli_2.cli.options.callbacks import choice_to_int_callback
 
 __all__ = ["set_attrs_options", "set_fs_selection_options", "set_fs_type_options"]
 

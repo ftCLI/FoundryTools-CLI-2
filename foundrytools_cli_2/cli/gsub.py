@@ -5,7 +5,7 @@ from pathlib import Path
 
 import click
 
-from foundrytools_cli_2.lib.click.options import common_options
+from foundrytools_cli_2.cli.options.options import common_options
 from foundrytools_cli_2.lib.font_runner import FontRunner
 
 cli = click.Group(help="Utilities for editing the GSUB table.")
