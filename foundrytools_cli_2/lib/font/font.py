@@ -23,7 +23,7 @@ from foundrytools_cli_2.lib.constants import (
     WOFF_FLAVOR,
 )
 from foundrytools_cli_2.lib.font.tables import HeadTable, OS2Table
-from foundrytools_cli_2.lib.otf.afdko_tools import cff_desubr, cff_subr
+from foundrytools_cli_2.lib.otf.cffsubr import cff_desubr, cff_subr
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.otf.t2_charstrings import fix_charstrings, quadratics_to_cubics
 from foundrytools_cli_2.lib.ttf.decomponentize import decomponentize
