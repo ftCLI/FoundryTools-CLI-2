@@ -16,7 +16,7 @@ def get_instance_file_name(font: Font, instance: NamedInstance) -> str:
     Returns the file name of an instance of a font.
 
     Parameters:
-        font (Font): The font object.
+        font (Font): The Font object.
         instance (NamedInstance): The instance object.
 
     Returns:
@@ -53,10 +53,13 @@ def get_instances(
     provided instances as is. Otherwise, it calls the `get_instances()` method on the `font` object
     and returns the obtained instances.
 
-    Args:
-        font (Font): The font object.
+    Parameters:
+        font (Font): The Font object.
         instances (Optional[List[NamedInstance]]): Optional. A list of font instances.
             Defaults to None.
+
+    Returns:
+        List[NamedInstance]: A list of font instances.
     """
     return instances if instances else font.get_instances()
 
@@ -67,15 +70,14 @@ def create_static_instance(
     """
     Creates a static instance of a variable font.
 
-    Args:
-        font (Font): The variable font.
+    Parameters:
+        font (Font): The variable Font object.
         instance (NamedInstance): The instance definition.
         update_name_table (bool, optional): Specifies whether to update the font names table.
             Defaults to True.
 
     Returns:
-        Font.ttfont.__class__: The static instance font.
-
+        TTFont: The static instance.
     """
     return instantiateVariableFont(
         varfont=font.ttfont,
@@ -91,12 +93,12 @@ def get_output_dir(font: Font, output_dir: t.Optional[Path] = None) -> Path:
     """
     Get the output directory for the static font instances.
 
-    :param font: The font object.
-    :type font: Font
-    :param output_dir: The directory where the static instances will be saved. Default is None.
-    :type output_dir: Path
-    :return: The output directory.
-    :rtype: Path
+    Parameters:
+        font (Font): The Font object.
+        output_dir (Optional[Path], optional): The output directory. Defaults to None.
+
+    Returns:
+        Path: The output directory.
     """
     if output_dir:
         return output_dir
@@ -111,8 +113,8 @@ def get_output_file(
     """
     Get the output file path for a given font instance.
 
-    Args:
-        font (Font): The font object.
+    Parameters:
+        font (Font): The Font object.
         instance (NamedInstance): The instance object.
         output_dir (Path): The output directory.
         overwrite (bool, optional): Whether to overwrite existing files in the output directory.
@@ -130,6 +132,13 @@ def get_output_file(
 def save_static_instance(out_file: Path, static_instance: TTFont) -> None:
     """
     Save the static instance to the specified output file.
+
+    Parameters:
+        out_file (Path): The output file path.
+        static_instance (TTFont): The static instance.
+
+    Returns:
+        None
     """
     static_instance.save(file=out_file)
 
@@ -138,6 +147,12 @@ def log_success(out_file: Path) -> None:
     """
     Log a success message indicating that a static instance has been saved to the specified output
     file.
+
+    Parameters:
+        out_file (Path): The output file path.
+
+    Returns:
+        None
     """
     logger.success(f"Static instance saved to {out_file}")
 
@@ -152,12 +167,15 @@ def main(
     """
     Generate static font instances based on given parameters.
 
-    Args:
-        font: The font object.
-        instances: Optional. A list of NamedInstance objects representing the instances to process.
-        output_dir: Optional. The directory where the static instances will be saved.
-        update_name_table: Optional. Whether to update the name table of the font instances.
-        overwrite: Optional. Whether to overwrite existing files in the output directory.
+    Parameters:
+        font (Font): The Font object.
+        instances (Optional[List[NamedInstance]], optional): A list of font instances.
+            Defaults to None.
+        output_dir (Optional[Path], optional): The output directory. Defaults to None.
+        update_name_table (bool, optional): Specifies whether to update the font names table.
+            Defaults to True.
+        overwrite (bool, optional): Whether to overwrite existing files in the output directory.
+            Defaults to True.
 
     Returns:
         None
