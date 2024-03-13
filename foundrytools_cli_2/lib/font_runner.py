@@ -133,8 +133,18 @@ class FontRunner:  # pylint: disable=too-few-public-methods
         for k, v in options.items():
             _set_opts_attr(finder_options, k, v)
             _set_opts_attr(save_options, k, v)
-            if k != "return" and k in self.task.__annotations__:  # type: ignore
-                callable_options[k] = v
+            if "kwargs" in self.task.__annotations__:  # type: ignore
+                callable_options.update(
+                    {
+                        k: v
+                        for k, v in options.items()
+                        if k not in finder_options.__dict__.items()
+                        and k not in save_options.__dict__.items()
+                    }
+                )
+            else:
+                if k != "return" and k in self.task.__annotations__:  # type: ignore
+                    callable_options[k] = v
 
         return finder_options, save_options, callable_options
 

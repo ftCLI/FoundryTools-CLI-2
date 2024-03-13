@@ -3,7 +3,7 @@ import typing as t
 from afdko.fdkutils import run_shell_command
 
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font.tables import InvalidOS2VersionError, OS2Table
+from foundrytools_cli_2.lib.font.tables import OS2Table
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path
 
@@ -178,7 +178,7 @@ def set_attrs(
         if value is not None:
             try:
                 setattr(os_2_table, attr, value)
-            except (ValueError, InvalidOS2VersionError) as e:
+            except (ValueError, os_2_table.InvalidOS2VersionError) as e:
                 logger.error(f"Error setting {attr} to {value}: {e}")
     font.modified = os_2_table.modified
 
