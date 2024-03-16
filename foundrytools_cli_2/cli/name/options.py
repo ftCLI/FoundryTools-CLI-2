@@ -2,8 +2,8 @@ import typing as t
 
 import click
 
-from foundrytools_cli_2.cli.options import add_options
-from foundrytools_cli_2.cli.options.callbacks import choice_to_int_callback
+from foundrytools_cli_2.cli.shared_callbacks import choice_to_int_callback
+from foundrytools_cli_2.cli.shared_options import add_options
 
 
 def name_id(required: bool = True) -> t.Callable:

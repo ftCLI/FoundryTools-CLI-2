@@ -2,7 +2,7 @@ import typing as t
 
 import click
 
-from foundrytools_cli_2.cli.options import add_options
+from foundrytools_cli_2.cli.shared_options import add_options
 
 
 def tolerance_option() -> t.Callable:
