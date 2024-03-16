@@ -4,12 +4,12 @@ from pathlib import Path
 
 import click
 
-from foundrytools_cli_2.cli.options.common_options import base_options
-from foundrytools_cli_2.cli.options.os2 import (
+from foundrytools_cli_2.cli.os_2.options import (
     set_attrs_options,
     set_fs_selection_options,
     set_fs_type_options,
 )
+from foundrytools_cli_2.cli.shared_options import base_options
 from foundrytools_cli_2.lib.font_runner import FontRunner
 
 cli = click.Group(help="Utilities for editing the OS/2 table.")
@@ -21,7 +21,7 @@ def recalc_avg_char_width(input_path: Path, **options: t.Dict[str, t.Any]) -> No
     """
     Recalculates the xAvgCharWidth value of the OS/2 table.
     """
-    from foundrytools_cli_2.snippets.os_2 import recalc_avg_char_width as main
+    from foundrytools_cli_2.cli.os_2.snippets import recalc_avg_char_width as main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.run()
@@ -33,7 +33,7 @@ def recalc_x_height(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Recalculates the sxHeight value of the OS/2 table.
     """
-    from foundrytools_cli_2.snippets.os_2 import recalc_x_height as main
+    from foundrytools_cli_2.cli.os_2.snippets import recalc_x_height as main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.run()
@@ -45,7 +45,7 @@ def recalc_cap_height(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Recalculates the sCapHeight value of the OS/2 table.
     """
-    from foundrytools_cli_2.snippets.os_2 import recalc_cap_height as main
+    from foundrytools_cli_2.cli.os_2.snippets import recalc_cap_height as main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.run()
@@ -57,7 +57,7 @@ def recalc_max_context(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Recalculates the usMaxContext value of the OS/2 table.
     """
-    from foundrytools_cli_2.snippets.os_2 import recalc_max_context as main
+    from foundrytools_cli_2.cli.os_2.snippets import recalc_max_context as main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.run()
@@ -71,7 +71,7 @@ def recalc_unicode_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> No
 
     The ulUnicodeRanges values are calculated using the fontTools library.
     """
-    from foundrytools_cli_2.snippets.os_2 import recalc_unicode_ranges as main
+    from foundrytools_cli_2.cli.os_2.snippets import recalc_unicode_ranges as main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.run()
@@ -85,7 +85,7 @@ def recalc_codepage_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> N
 
     The ulCodePageRanges values are calculated using the fontTools library.
     """
-    from foundrytools_cli_2.snippets.os_2 import recalc_codepage_ranges as main
+    from foundrytools_cli_2.cli.os_2.snippets import recalc_codepage_ranges as main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.run()
@@ -100,7 +100,7 @@ def recalc_ranges_afdko(input_path: Path, **options: t.Dict[str, t.Any]) -> None
     The font is first converted to T1, then to OTF. The ulUnicodeRange and ulCodePageRange values
     are then retrieved from the OS/2 table of the OTF font and written to the original font.
     """
-    from foundrytools_cli_2.snippets.os_2 import recalc_ranges_afdko as main
+    from foundrytools_cli_2.cli.os_2.snippets import recalc_ranges_afdko as main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.run()
@@ -113,7 +113,7 @@ def set_attrs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Sets miscellaneous attributes of the OS/2 table.
     """
-    from foundrytools_cli_2.snippets.os_2 import set_attrs as main
+    from foundrytools_cli_2.cli.os_2.snippets import set_attrs as main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.run()
@@ -126,7 +126,7 @@ def set_fs_selection(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Sets flags in the fsSelection field of the OS/2 table.
     """
-    from foundrytools_cli_2.snippets.os_2 import set_fs_selection as main
+    from foundrytools_cli_2.cli.os_2.snippets import set_fs_selection as main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.run()
@@ -139,7 +139,7 @@ def set_fs_type(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Set font embedding licensing rights for the font, defined in the fsType field of the OS/2 table.
     """
-    from foundrytools_cli_2.snippets.os_2 import set_fs_type as main
+    from foundrytools_cli_2.cli.os_2.snippets import set_fs_type as main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.run()

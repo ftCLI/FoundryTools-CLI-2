@@ -5,7 +5,7 @@ from pathlib import Path
 
 import click
 
-from foundrytools_cli_2.cli.options.common_options import base_options
+from foundrytools_cli_2.cli.shared_options import base_options
 from foundrytools_cli_2.lib.font_runner import FontRunner
 
 
@@ -40,7 +40,7 @@ def cli(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     A command line tool to manipulate the 'post' table.
     """
-    from foundrytools_cli_2.snippets.post import set_attrs as main
+    from foundrytools_cli_2.cli.post.snipptes import set_attrs as main
 
     runner = FontRunner(input_path=input_path, task=main, **options)
     runner.run()

@@ -3,7 +3,7 @@ from foundrytools_cli_2.lib.font.tables import GsubTable
 from foundrytools_cli_2.lib.logger import logger
 
 
-def rename_gsub_feature(font: Font, old_feature_name: str, new_feature_name: str) -> None:
+def main(font: Font, old_feature_name: str, new_feature_name: str) -> None:
     """
     Remap GSUB features.
 

@@ -5,8 +5,8 @@ from afdko.otfautohint.__main__ import ACOptions, _validate_path
 from afdko.otfautohint.autohint import FontInstance, fontWrapper, openFont
 from fontTools.ttLib import TTFont
 
+from foundrytools_cli_2.cli.otf.snippets import get_file_to_process
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.snippets.otf import get_file_to_process
 
 
 def hint_font(

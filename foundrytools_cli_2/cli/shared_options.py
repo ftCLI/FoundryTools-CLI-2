@@ -3,8 +3,23 @@ from pathlib import Path
 
 import click
 
-from foundrytools_cli_2.cli.options import add_options
-from foundrytools_cli_2.cli.options.callbacks import output_dir_callback
+from foundrytools_cli_2.cli.shared_callbacks import output_dir_callback
+
+
+def add_options(options: t.List[t.Callable]) -> t.Callable:
+    """
+    Add options to a click command.
+
+    :param options: a list of click options
+    :return: a decorator that adds the options to a click command
+    """
+
+    def _add_options(func: t.Callable) -> t.Callable:
+        for option in reversed(options):
+            func = option(func)
+        return func
+
+    return _add_options
 
 
 def base_options() -> t.Callable:
@@ -237,3 +252,19 @@ def target_upm_option(
         )
     ]
     return add_options(_target_upm_option)
+
+
+def subroutinize_flag() -> t.Callable:
+    """
+    Add the subroutinize option to a click command.
+
+    :return: a decorator that adds the subroutinize option to a click command
+    """
+    _subroutinize_flag = [
+        click.option(
+            "--subroutinize/--no-subroutinize",
+            default=True,
+            help="Subroutinize the font.",
+        )
+    ]
+    return add_options(_subroutinize_flag)

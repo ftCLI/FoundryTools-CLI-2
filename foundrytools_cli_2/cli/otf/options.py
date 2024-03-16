@@ -2,23 +2,7 @@ import typing as t
 
 import click
 
-from foundrytools_cli_2.cli.options import add_options
-
-
-def subroutinize_flag() -> t.Callable:
-    """
-    Add the subroutinize option to a click command.
-
-    :return: a decorator that adds the subroutinize option to a click command
-    """
-    _subroutinize_flag = [
-        click.option(
-            "--subroutinize/--no-subroutinize",
-            default=True,
-            help="Subroutinize the font.",
-        )
-    ]
-    return add_options(_subroutinize_flag)
+from foundrytools_cli_2.cli.shared_options import add_options
 
 
 def min_area_option() -> t.Callable:

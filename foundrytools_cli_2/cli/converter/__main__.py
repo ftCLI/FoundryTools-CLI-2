@@ -5,18 +5,18 @@ from pathlib import Path
 
 import click
 
-from foundrytools_cli_2.cli.options.common_options import (
-    base_options,
-    reorder_tables_flag,
-    target_upm_option,
-)
-from foundrytools_cli_2.cli.options.converter import (
+from foundrytools_cli_2.cli.converter.options import (
     in_format_choice,
     out_format_choice,
     tolerance_option,
     ttf2otf_mode_choice,
 )
-from foundrytools_cli_2.cli.options.otf import subroutinize_flag
+from foundrytools_cli_2.cli.shared_options import (
+    base_options,
+    reorder_tables_flag,
+    subroutinize_flag,
+    target_upm_option,
+)
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font_runner import FontRunner
 
@@ -31,9 +31,9 @@ def otf_to_ttf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Convert PostScript flavored fonts to TrueType flavored fonts.
     """
-    from foundrytools_cli_2.snippets.converter.otf_to_ttf import main
+    from foundrytools_cli_2.cli.converter.snippets import otf_to_ttf as task
 
-    runner = FontRunner(input_path=input_path, task=main, **options)
+    runner = FontRunner(input_path=input_path, task=task, **options)
     runner.auto_save = False
     runner.filter.filter_out_tt = True
     runner.filter.filter_out_variable = True
@@ -50,7 +50,7 @@ def ttf_to_otf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Convert TrueType flavored fonts to PostScript flavored fonts.
     """
-    from foundrytools_cli_2.snippets.converter.ttf_to_otf import ttf2otf, ttf2otf_with_tx
+    from foundrytools_cli_2.cli.converter.snippets import ttf2otf, ttf2otf_with_tx
 
     if options["mode"] == "tx":
         options.pop("tolerance")
@@ -94,9 +94,9 @@ def sfnt_to_web(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Convert SFNT fonts to WOFF and/or WOFF2 fonts.
     """
-    from foundrytools_cli_2.snippets.converter.sfnt_to_web import main
+    from foundrytools_cli_2.cli.converter.snippets import sfnt_to_web as task
 
-    runner = FontRunner(input_path=input_path, task=main, **options)
+    runner = FontRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_woff = True
     runner.filter.filter_out_woff2 = True
     runner.auto_save = False
@@ -110,9 +110,9 @@ def variable_to_static(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Convert variable fonts to static fonts.
     """
 
-    from foundrytools_cli_2.snippets.converter.variable_to_static import main
+    from foundrytools_cli_2.cli.converter.snippets import variable_to_static as task
 
-    runner = FontRunner(input_path=input_path, task=main, **options)
+    runner = FontRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_static = True
     runner.filter.filter_out_ps = True
     runner.auto_save = False
