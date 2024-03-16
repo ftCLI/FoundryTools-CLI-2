@@ -31,7 +31,7 @@ def rename_feature(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Remaps the feature tags in the GSUB table.
     """
-    from foundrytools_cli_2.cli.gsub.snippets import rename_feature as task
+    from foundrytools_cli_2.cli.gsub.snippets.rename_feature import main as task
 
     runner = FontRunner(input_path=input_path, task=task, **options)
     runner.run()

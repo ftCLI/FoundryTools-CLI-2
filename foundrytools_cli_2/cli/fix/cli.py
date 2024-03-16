@@ -21,7 +21,7 @@ def fix_empty_notdef(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     an outline as the user will only see what looks like a space if a glyph is missing and not be
     aware of the active font’s limitation.
     """
-    from foundrytools_cli_2.cli.fix.snippets import fix_notdef_empty as task
+    from foundrytools_cli_2.cli.fix.snippets.empty_notdef import fix_notdef_empty as task
 
     runner = FontRunner(input_path=input_path, task=task, **options)
     runner.run()

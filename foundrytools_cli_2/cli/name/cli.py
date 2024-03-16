@@ -31,9 +31,9 @@ def del_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Delete names from the name table of the given font files.
     """
-    from foundrytools_cli_2.cli.name.snippets import del_names as main
+    from foundrytools_cli_2.cli.name.snippets import del_names as task
 
-    runner = FontRunner(input_path=input_path, task=main, **options)
+    runner = FontRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -43,9 +43,9 @@ def del_empty_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Deletes empty names from the name table of the given font files.
     """
-    from foundrytools_cli_2.cli.name.snippets import del_empty_names as main
+    from foundrytools_cli_2.cli.name.snippets import del_empty_names as task
 
-    runner = FontRunner(input_path=input_path, task=main, **options)
+    runner = FontRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -56,9 +56,9 @@ def del_mac_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Delete Macintosh names from the name table of the given font files.
     """
-    from foundrytools_cli_2.cli.name.snippets import del_mac_names as main
+    from foundrytools_cli_2.cli.name.snippets import del_mac_names as task
 
-    runner = FontRunner(input_path=input_path, task=main, **options)
+    runner = FontRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -68,9 +68,9 @@ def del_unused_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Delete unused names from the name table of the given font files.
     """
-    from foundrytools_cli_2.cli.name.snippets import del_unused_names as main
+    from foundrytools_cli_2.cli.name.snippets import del_unused_names as task
 
-    runner = FontRunner(input_path=input_path, task=main, **options)
+    runner = FontRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -85,9 +85,9 @@ def find_replace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Find and replace text in the name table of the given font files.
     """
-    from foundrytools_cli_2.cli.name.snippets import find_replace as main
+    from foundrytools_cli_2.cli.name.snippets import find_replace as task
 
-    runner = FontRunner(input_path=input_path, task=main, **options)
+    runner = FontRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -100,9 +100,9 @@ def set_name(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Set the name table of the given font files.
     """
-    from foundrytools_cli_2.cli.name.snippets import set_name as main
+    from foundrytools_cli_2.cli.name.snippets import set_name as task
 
-    runner = FontRunner(input_path=input_path, task=main, **options)
+    runner = FontRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -112,7 +112,7 @@ def strip_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Strip the name table of the given font files.
     """
-    from foundrytools_cli_2.cli.name.snippets import strip_names as main
+    from foundrytools_cli_2.cli.name.snippets import strip_names as task
 
-    runner = FontRunner(input_path=input_path, task=main, **options)
+    runner = FontRunner(input_path=input_path, task=task, **options)
     runner.run()
