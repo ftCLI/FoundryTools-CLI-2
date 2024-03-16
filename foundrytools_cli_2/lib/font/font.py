@@ -30,11 +30,14 @@ from foundrytools_cli_2.lib.ttf.decomponentize import decomponentize
 from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
 from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path
 
+__all__ = ["Font"]
+
 
 class Font:  # pylint: disable=too-many-public-methods
     """
-    The ``Font`` class adds additional properties and methods to the ``fontTools.ttLib.TTFont``
-    class.
+    The ``Font`` class is a wrapper around the ``TTFont`` class from ``fontTools``.
+
+    It provides a high-level interface for working with the underlying TTFont object.
     """
 
     def __init__(

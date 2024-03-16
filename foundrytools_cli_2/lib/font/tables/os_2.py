@@ -18,13 +18,6 @@ from foundrytools_cli_2.lib.utils.misc import get_glyph_bounds
 from foundrytools_cli_2.lib.utils.string_tools import adjust_string_length
 
 
-class InvalidOS2VersionError(Exception):
-    """
-    Exception raised when trying to access a field that is not defined in the current OS/2 table
-    version.
-    """
-
-
 class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
     """
     This class extends the fontTools `OS/2` table to add some useful methods and properties.
@@ -35,6 +28,12 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Initializes the OS/2 table handler.
         """
         super().__init__(font=font, table_tag=OS_2_TABLE_TAG)
+
+    class InvalidOS2VersionError(Exception):
+        """
+        Exception raised when trying to access a field that is not defined in the current OS/2 table
+        version.
+        """
 
     @property
     def version(self) -> int:
@@ -291,7 +290,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Sets the bit 7 (USE_TYPO_METRICS) of the ``OS/2.fsSelection`` field.
         """
         if self.version < 4:
-            raise InvalidOS2VersionError(
+            raise self.InvalidOS2VersionError(
                 "fsSelection bit 7 (USE_TYPO_METRICS) is only defined in OS/2 table versions 4 and "
                 "up."
             )
@@ -311,7 +310,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Sets the bit 8 (WWS) of the ``OS/2.fsSelection`` field.
         """
         if self.version < 4:
-            raise InvalidOS2VersionError(
+            raise self.InvalidOS2VersionError(
                 "fsSelection bit 8 (WWS) is only defined in OS/2 table versions 4 and up."
             )
         self.set_bit(field_name="fsSelection", pos=8, value=value)
@@ -322,7 +321,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Returns True if the bit 9 (OBLIQUE) of the ``OS/2.fsSelection`` field is set, False
         """
         if self.version < 4:
-            raise InvalidOS2VersionError(
+            raise self.InvalidOS2VersionError(
                 "fsSelection bit 9 (OBLIQUE) is only defined in OS/2 table versions 4 and up."
             )
         return is_nth_bit_set(self.table.fsSelection, 9)
@@ -333,7 +332,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Sets the bit 9 (OBLIQUE) of the ``OS/2.fsSelection`` field.
         """
         if self.version < 4:
-            raise InvalidOS2VersionError(
+            raise self.InvalidOS2VersionError(
                 "fsSelection bit 9 (OBLIQUE) is only defined in OS/2 table versions 4 and up."
             )
         self.set_bit(field_name="fsSelection", pos=9, value=value)
@@ -437,7 +436,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Sets the sxHeight value of the ``OS/2`` table.
         """
         if self.version < 2:
-            raise InvalidOS2VersionError(
+            raise self.InvalidOS2VersionError(
                 "sxHeight is only defined in OS/2 table versions 2 and up."
             )
         self.table.sxHeight = value
@@ -457,7 +456,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Sets the sCapHeight value of the ``OS/2`` table.
         """
         if self.version < 2:
-            raise InvalidOS2VersionError(
+            raise self.InvalidOS2VersionError(
                 "sCapHeight is only defined in OS/2 table versions 2 and up."
             )
         self.table.sCapHeight = value
@@ -477,7 +476,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Sets the maximum profile's maxContext value.
         """
         if self.version < 2:
-            raise InvalidOS2VersionError(
+            raise self.InvalidOS2VersionError(
                 "usMaxContext is only defined in OS/2 table versions 2 and up."
             )
         self.table.usMaxContext = value
@@ -515,7 +514,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Recalculates and sets the ``OS/2.sxHeight`` value.
         """
         if not self.version >= 2:
-            raise InvalidOS2VersionError(
+            raise self.InvalidOS2VersionError(
                 "sxHeight is only defined in OS/2 table versions 2 and up."
             )
         try:
@@ -530,7 +529,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Recalculates and sets the ``OS/2.sCapHeight`` value.
         """
         if not self.version >= 2:
-            raise InvalidOS2VersionError(
+            raise self.InvalidOS2VersionError(
                 "sCapHeight is only defined in OS/2 table versions 2 and up."
             )
         try:
