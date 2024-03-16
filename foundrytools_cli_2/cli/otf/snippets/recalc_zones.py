@@ -294,10 +294,6 @@ def main(font: Font) -> None:
         logger.error("Font is not a PostScript font")
         return
 
-    if font.is_woff or font.is_woff2:
-        logger.error("Font is a web font")
-        return
-
     logger.info("Getting zones...")
     current_other_blues, current_blue_values = get_current_zones(font.ttfont)
     other_blues, blue_values = recalc_zones(font.ttfont)
