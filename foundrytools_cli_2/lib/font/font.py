@@ -5,12 +5,15 @@ from pathlib import Path
 from cffsubr import desubroutinize, subroutinize
 from dehinter.font import dehint
 from fontTools.misc.cliTools import makeOutputFileName
+from fontTools.pens.recordingPen import DecomposingRecordingPen
+from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import Axis, NamedInstance
 
 from foundrytools_cli_2.lib.constants import (
     FVAR_TABLE_TAG,
+    GLYF_TABLE_TAG,
     HEAD_TABLE_TAG,
     MAX_UPM,
     MIN_UPM,
@@ -26,7 +29,6 @@ from foundrytools_cli_2.lib.constants import (
 from foundrytools_cli_2.lib.font.tables import HeadTable, OS2Table
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.otf.t2_charstrings import fix_charstrings, quadratics_to_cubics
-from foundrytools_cli_2.lib.ttf.decomponentize import decomponentize
 from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
 from foundrytools_cli_2.lib.utils.misc import restore_flavor
 from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path
@@ -514,12 +516,29 @@ class Font:  # pylint: disable=too-many-public-methods
 
     def tt_decomponentize(self) -> None:
         """
-        Decomponentize a TrueType font.
+        This method takes a TrueType font as input and decomposes all composite glyphs in the font.
+
+        Returns:
+            None
         """
         if not self.is_tt:
             raise NotImplementedError("Decomponentization is only supported for TrueType fonts.")
 
-        decomponentize(self.ttfont)
+        glyph_set = self.ttfont.getGlyphSet()
+        glyf_table = self.ttfont[GLYF_TABLE_TAG]
+        dr_pen = DecomposingRecordingPen(glyph_set)
+        tt_pen = TTGlyphPen(None)
+
+        for glyph_name in self.ttfont.glyphOrder:
+            glyph = glyf_table[glyph_name]
+            if not glyph.isComposite():
+                continue
+            dr_pen.value = []
+            tt_pen.init()
+            glyph.draw(dr_pen, glyf_table)
+            dr_pen.replay(tt_pen)
+            glyf_table[glyph_name] = tt_pen.glyph()
+
         self.modified = True
 
     def tt_remove_hints(self) -> None:
