@@ -1,11 +1,27 @@
 # pylint: disable=import-outside-toplevel
 import typing as t
 from collections import Counter
+from contextlib import contextmanager
 
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.ttLib import TTFont
 
 from foundrytools_cli_2.lib.constants import GDEF_TABLE_TAG, HMTX_TABLE_TAG
+
+
+@contextmanager
+def restore_flavor(font: TTFont) -> t.Iterator[None]:
+    """
+    This is a workaround to support subroutinization and desubroutinization for WOFF and WOFF2
+    fonts with cffsubr without raising an exception. This context manager is used to temporarily
+    set the font flavor to None and restore it after subroutinization or desubroutinization.
+    """
+    original_flavor = font.flavor
+    font.flavor = None
+    try:
+        yield
+    finally:
+        font.flavor = original_flavor
 
 
 def get_glyph_bounds(font: TTFont, glyph_name: str) -> t.Dict[str, float]:

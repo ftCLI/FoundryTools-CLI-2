@@ -2,6 +2,7 @@ import typing as t
 from io import BytesIO
 from pathlib import Path
 
+from cffsubr import desubroutinize, subroutinize
 from dehinter.font import dehint
 from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.ttLib import TTFont
@@ -23,11 +24,11 @@ from foundrytools_cli_2.lib.constants import (
     WOFF_FLAVOR,
 )
 from foundrytools_cli_2.lib.font.tables import HeadTable, OS2Table
-from foundrytools_cli_2.lib.otf.cffsubr import cff_desubr, cff_subr
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.otf.t2_charstrings import fix_charstrings, quadratics_to_cubics
 from foundrytools_cli_2.lib.ttf.decomponentize import decomponentize
 from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
+from foundrytools_cli_2.lib.utils.misc import restore_flavor
 from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path
 
 __all__ = ["Font"]
@@ -577,7 +578,8 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError(
                 "Subroutinization is only supported for PostScript flavored fonts."
             )
-        cff_subr(font=self.ttfont)
+        with restore_flavor(self.ttfont):
+            subroutinize(self.ttfont)
         self.modified = True
 
     def ps_desubroutinize(self) -> None:
@@ -588,5 +590,6 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError(
                 "Desubroutinization is only supported for PostScript flavored fonts."
             )
-        cff_desubr(font=self.ttfont)
+        with restore_flavor(self.ttfont):
+            desubroutinize(self.ttfont)
         self.modified = True
