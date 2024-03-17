@@ -68,7 +68,7 @@ def get_qu2cu_charstrings(font: TTFont, tolerance: float = 1.0) -> t.Tuple[t.Lis
             glyph_set[k].draw(qu2cu_pen)
             qu2cu_charstrings[k] = t2_pen.getCharString()
         except NotImplementedError as e:
-            logger.debug(f"Failed to get charstring for {k}: {e}")
+            logger.error(f"Failed to get charstring for {k}: {e}")
             failed.append(k)
 
     return failed, qu2cu_charstrings
