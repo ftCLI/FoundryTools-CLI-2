@@ -9,10 +9,7 @@ from foundrytools_cli_2.cli.otf.snippets import get_file_to_process
 from foundrytools_cli_2.lib.font import Font
 
 
-def hint_font(
-    in_file: Path,
-    options: ACOptions,
-) -> TTFont:
+def hint_font(in_file: Path, options: ACOptions) -> TTFont:
     """
     Applies hinting to an OpenType-PS font file and returns the hinted TTFont object.
 
