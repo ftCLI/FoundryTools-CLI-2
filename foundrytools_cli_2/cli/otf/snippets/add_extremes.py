@@ -1,7 +1,7 @@
+from foundrytools_cli_2.lib.beziers import add_extremes
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
-from foundrytools_cli_2.lib.otf.t2_charstrings import add_extremes
 
 
 def main(font: Font, subroutinize: bool = True) -> None:
@@ -16,7 +16,6 @@ def main(font: Font, subroutinize: bool = True) -> None:
     charstrings = add_extremes(font.ttfont)
     logger.info("Rebuilding OTF")
     build_otf(font=font.ttfont, charstrings_dict=charstrings)
-    logger.info("Fixing charstrings")
     font.ps_correct_contours()
     if subroutinize:
         logger.info("Subroutinizing")
