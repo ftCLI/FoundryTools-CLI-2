@@ -7,6 +7,7 @@ from fontTools.ttLib.tables._g_l_y_f import (
     Glyph,
     table__g_l_y_f,
 )
+from fontTools.ttLib.ttGlyphSet import _TTGlyphCFF
 
 T_CFF = "CFF "
 T_LOCA = "loca"
@@ -38,7 +39,7 @@ def build_ttf(
     font[T_GLYF] = glyf = newTable(T_GLYF)
     glyf.glyphOrder = glyph_order
     glyf.glyphs = glyphs_to_quadratic(
-        glyphs=font.getGlyphSet(), max_err=max_err, reverse_direction=reverse_direction
+        glyph_set=font.getGlyphSet(), max_err=max_err, reverse_direction=reverse_direction
     )
     del font[T_CFF]
     if T_VORG in font:
@@ -90,14 +91,14 @@ def update_hmtx(font: TTFont, glyf: table__g_l_y_f) -> None:
 
 
 def glyphs_to_quadratic(
-    glyphs: t.Dict, max_err: float = 1.0, reverse_direction: bool = False
+    glyph_set: t.Dict[str, _TTGlyphCFF], max_err: float = 1.0, reverse_direction: bool = False
 ) -> t.Dict[str, Glyph]:
     """
     Convert the glyphs of a font to quadratic.
 
     Args:
 
-        glyphs: The glyphs to convert.
+        glyph_set: The glyphs to convert.
         max_err (float, optional): The maximum approximation error, measured in UPEM. Defaults to
             1.0.
         reverse_direction (bool, optional): Whether to reverse the direction of the contours.
@@ -107,9 +108,9 @@ def glyphs_to_quadratic(
     """
 
     quad_glyphs = {}
-    for gname in glyphs:
-        glyph = glyphs[gname]
-        tt_pen = TTGlyphPen(glyphs)
+    for gname in glyph_set:
+        glyph = glyph_set[gname]
+        tt_pen = TTGlyphPen(glyph_set)
         cu2qu_pen = Cu2QuPen(tt_pen, max_err=max_err, reverse_direction=reverse_direction)
         glyph.draw(cu2qu_pen)
         quad_glyphs[gname] = tt_pen.glyph()

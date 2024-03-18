@@ -6,13 +6,12 @@ from fontTools.misc.psCharStrings import T2CharString
 from fontTools.misc.roundTools import otRound
 from fontTools.pens.t2CharStringPen import T2CharStringPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
-from fontTools.ttLib import ttFont
 from fontTools.ttLib.tables import _g_l_y_f
-from fontTools.ttLib.ttGlyphSet import _TTGlyphSet
+from fontTools.ttLib.ttGlyphSet import _TTGlyph, _TTGlyphSet
 
 from foundrytools_cli_2.lib.logger import logger
 
-_TTGlyphMapping = Mapping[str, ttFont._TTGlyph]
+_TTGlyphMapping = Mapping[str, _TTGlyph]
 
 
 def skia_path_from_glyph(glyph_name: str, glyph_set: _TTGlyphMapping) -> pathops.Path:

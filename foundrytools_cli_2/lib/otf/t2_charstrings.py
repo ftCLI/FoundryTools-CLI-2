@@ -21,7 +21,7 @@ from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
 __all__ = ["quadratics_to_cubics", "fix_charstrings", "add_extremes", "get_t2_charstrings"]
 
 
-def quadratics_to_cubics(font: TTFont, tolerance: float = 1.0) -> t.Dict:
+def quadratics_to_cubics(font: TTFont, tolerance: float = 1.0) -> t.Dict[str, T2CharString]:
     """
     Get CFF charstrings using Qu2CuPen, falling back to T2CharStringPen if Qu2CuPen fails.
 
@@ -50,7 +50,9 @@ def quadratics_to_cubics(font: TTFont, tolerance: float = 1.0) -> t.Dict:
     return charstrings
 
 
-def get_qu2cu_charstrings(font: TTFont, tolerance: float = 1.0) -> t.Tuple[t.List, t.Dict]:
+def get_qu2cu_charstrings(
+    font: TTFont, tolerance: float = 1.0
+) -> t.Tuple[t.List[str], t.Dict[str, T2CharString]]:
     """
     Get CFF charstrings using Qu2CuPen
 
@@ -68,13 +70,13 @@ def get_qu2cu_charstrings(font: TTFont, tolerance: float = 1.0) -> t.Tuple[t.Lis
             glyph_set[k].draw(qu2cu_pen)
             qu2cu_charstrings[k] = t2_pen.getCharString()
         except NotImplementedError as e:
-            logger.debug(f"Failed to get charstring for {k}: {e}")
+            logger.error(f"Failed to get charstring for {k}: {e}")
             failed.append(k)
 
     return failed, qu2cu_charstrings
 
 
-def get_t2_charstrings(font: TTFont) -> dict:
+def get_t2_charstrings(font: TTFont) -> t.Dict[str, T2CharString]:
     """
     Get CFF charstrings using T2CharStringPen
 
@@ -92,7 +94,7 @@ def get_t2_charstrings(font: TTFont) -> dict:
     return t2_charstrings
 
 
-def get_fallback_charstrings(font: TTFont, tolerance: float = 1.0) -> dict:
+def get_fallback_charstrings(font: TTFont, tolerance: float = 1.0) -> t.Dict[str, T2CharString]:
     """
     Get the charstrings from a fallback OTF font.
     """
@@ -204,12 +206,12 @@ def add_extremes(font: TTFont) -> t.Dict[str, T2CharString]:
     Gets the charstrings of a font by converting the Bezier paths of each glyph to a T2CharString.
     """
     glyph_set = font.getGlyphSet()
-    charstrings_dict = {}
+    charstrings = {}
     for k in glyph_set:
         bezier_paths: t.List[BezierPath] = BezierPath.fromFonttoolsGlyph(font, glyphname=k)
         for bp in bezier_paths:
             bp.addExtremes()
         charstring: T2CharString = bezier_to_charstring(bezier_paths, font, glyph_name=k)
-        charstrings_dict[k] = charstring
+        charstrings[k] = charstring
 
-    return charstrings_dict
+    return charstrings
