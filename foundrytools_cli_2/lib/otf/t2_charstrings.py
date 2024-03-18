@@ -2,6 +2,7 @@ import typing as t
 from copy import deepcopy
 
 from beziers.path import BezierPath
+from beziers.path.representations import Nodelist
 from fontTools.misc.psCharStrings import T2CharString
 from fontTools.pens.qu2cuPen import Qu2CuPen
 from fontTools.pens.t2CharStringPen import T2CharStringPen
@@ -139,7 +140,7 @@ def fix_charstrings(
     return charstrings, modified
 
 
-def handle_curve_nodes(pen: T2CharStringPen, nodes_list: list, i: int) -> int:
+def handle_curve_nodes(pen: T2CharStringPen, nodes_list: Nodelist, i: int) -> int:
     """
     Handles the curve nodes in a BezierPath.
 
