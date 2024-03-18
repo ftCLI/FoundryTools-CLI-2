@@ -7,7 +7,7 @@ from fontTools.misc.roundTools import otRound
 from fontTools.pens.t2CharStringPen import T2CharStringPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib.tables import _g_l_y_f
-from fontTools.ttLib.ttGlyphSet import _TTGlyphSet, _TTGlyph
+from fontTools.ttLib.ttGlyphSet import _TTGlyph, _TTGlyphSet
 
 from foundrytools_cli_2.lib.logger import logger
 
