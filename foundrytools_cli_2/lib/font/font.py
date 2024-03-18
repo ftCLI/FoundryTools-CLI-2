@@ -28,7 +28,8 @@ from foundrytools_cli_2.lib.constants import (
 )
 from foundrytools_cli_2.lib.font.tables import HeadTable, OS2Table
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
-from foundrytools_cli_2.lib.otf.t2_charstrings import fix_charstrings, quadratics_to_cubics
+from foundrytools_cli_2.lib.otf.t2_charstrings import quadratics_to_cubics
+from foundrytools_cli_2.lib.pathops.skia_tools import correct_contours_cff
 from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
 from foundrytools_cli_2.lib.utils.misc import restore_flavor
 from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path
@@ -582,11 +583,15 @@ class Font:  # pylint: disable=too-many-public-methods
                 "PS Contour correction is only supported for PostScript flavored fonts."
             )
 
-        charstrings, modified_glyphs = fix_charstrings(font=self.ttfont, min_area=min_area)
+        if self.is_variable:
+            raise NotImplementedError(
+                "PS Contour correction is not supported for variable fonts."
+            )
+
+        charstrings, modified_glyphs = correct_contours_cff(font=self.ttfont, min_area=min_area)
         if not modified_glyphs:
             return []
         build_otf(font=self.ttfont, charstrings_dict=charstrings)
-        self.modified = True
         return modified_glyphs
 
     def ps_subroutinize(self) -> None:

@@ -19,11 +19,14 @@ def main(font: Font, min_area: int = 25, subroutinize: bool = True) -> None:
     """
     logger.info("Correcting contours...")
     modified = font.ps_correct_contours(min_area=min_area)
+
     if not modified:
         logger.info("No contours were modified")
         return
 
+    font.modified = True
     logger.info(f"{len(modified)} contours were modified")
+
     if subroutinize:
         logger.info("Subroutinizing...")
         font.ps_subroutinize()

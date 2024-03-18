@@ -1,17 +1,18 @@
 import itertools
-from typing import Callable, Mapping
+import typing as t
 
 import pathops
 from fontTools.misc.psCharStrings import T2CharString
 from fontTools.misc.roundTools import otRound
 from fontTools.pens.t2CharStringPen import T2CharStringPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
+from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables import _g_l_y_f
 from fontTools.ttLib.ttGlyphSet import _TTGlyph, _TTGlyphSet
 
 from foundrytools_cli_2.lib.logger import logger
 
-_TTGlyphMapping = Mapping[str, _TTGlyph]
+_TTGlyphMapping = t.Mapping[str, _TTGlyph]
 
 
 def skia_path_from_glyph(glyph_name: str, glyph_set: _TTGlyphMapping) -> pathops.Path:
@@ -106,7 +107,7 @@ def t2_charstring_from_skia_path(path: pathops.Path, width: int) -> T2CharString
     return charstring
 
 
-def round_path(path: pathops.Path, rounder: Callable[[float], float] = otRound) -> pathops.Path:
+def round_path(path: pathops.Path, rounder: t.Callable[[float], float] = otRound) -> pathops.Path:
     """
     Rounds the points coordinate of a pathops.Path
 
@@ -188,6 +189,46 @@ def remove_tiny_paths(path: pathops.Path, glyph_name: str, min_area: int = 25) -
         else:
             logger.debug(f"Tiny path removed from glyph '{glyph_name}'")
     return cleaned_path
+
+
+def correct_contours_cff(
+    font: TTFont, min_area: int = 25
+) -> t.Tuple[t.Dict[str, T2CharString], t.List[str]]:
+    """
+    Corrects the contours of the given OpenType-PS font by removing overlaps, correcting the
+    direction of the contours, and removing tiny paths.
+
+    Parameters:
+        font (TTFont): The font object to be corrected.
+        min_area (int, optional): The minimum area of a contour to be considered. Defaults to 25.
+
+    Returns:
+        Tuple[Dict[str, T2CharString], List[str]]: The corrected charstrings dict and the list of
+            modified glyphs.
+    """
+
+    glyph_set = font.getGlyphSet()
+    charstrings = {}
+    modified_glyphs = []
+
+    for k, v in glyph_set.items():
+        t2_pen = T2CharStringPen(width=v.width, glyphSet=glyph_set)
+        glyph_set[k].draw(t2_pen)
+        charstrings[k] = t2_pen.getCharString()
+
+        path_1 = skia_path_from_glyph(glyph_name=k, glyph_set=glyph_set)
+        path_2 = skia_path_from_glyph(glyph_name=k, glyph_set=glyph_set)
+        path_2 = simplify_path(path=path_2, glyph_name=k, clockwise=False)
+
+        if min_area > 0:
+            path_2 = remove_tiny_paths(path=path_2, glyph_name=k, min_area=min_area)
+
+        if not same_path(path_1=path_1, path_2=path_2):
+            cs = t2_charstring_from_skia_path(path=path_2, width=v.width)
+            charstrings[k] = cs
+            modified_glyphs.append(k)
+
+    return charstrings, modified_glyphs
 
 
 def is_empty_glyph(glyph_set: _TTGlyphSet, glyph_name: str) -> bool:

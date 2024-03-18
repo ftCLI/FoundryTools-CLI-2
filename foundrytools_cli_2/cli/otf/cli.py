@@ -4,8 +4,8 @@ from pathlib import Path
 
 import click
 
-from foundrytools_cli_2.cli.otf.options import min_area_option, otf_autohint_options
-from foundrytools_cli_2.cli.shared_options import base_options, subroutinize_flag
+from foundrytools_cli_2.cli.otf.options import otf_autohint_options
+from foundrytools_cli_2.cli.shared_options import base_options, min_area_option, subroutinize_flag
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font_runner import FontRunner
 

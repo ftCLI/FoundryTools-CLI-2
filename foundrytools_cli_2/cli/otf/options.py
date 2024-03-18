@@ -5,24 +5,6 @@ import click
 from foundrytools_cli_2.cli.shared_options import add_options
 
 
-def min_area_option() -> t.Callable:
-    """
-    Add the min_area option to a click command.
-
-    :return: a decorator that adds the min_area option to a click command
-    """
-    _min_area_option = [
-        click.option(
-            "-ma",
-            "--min-area",
-            type=click.IntRange(min=0),
-            default=25,
-            help="Remove tiny paths with area less than the specified value.",
-        )
-    ]
-    return add_options(_min_area_option)
-
-
 def otf_autohint_options() -> t.Callable:
     """
     Add the autohint options to a click command.
