@@ -206,12 +206,12 @@ def add_extremes(font: TTFont) -> t.Dict[str, T2CharString]:
     Gets the charstrings of a font by converting the Bezier paths of each glyph to a T2CharString.
     """
     glyph_set = font.getGlyphSet()
-    charstrings_dict = {}
+    charstrings = {}
     for k in glyph_set:
         bezier_paths: t.List[BezierPath] = BezierPath.fromFonttoolsGlyph(font, glyphname=k)
         for bp in bezier_paths:
             bp.addExtremes()
         charstring: T2CharString = bezier_to_charstring(bezier_paths, font, glyph_name=k)
-        charstrings_dict[k] = charstring
+        charstrings[k] = charstring
 
-    return charstrings_dict
+    return charstrings
