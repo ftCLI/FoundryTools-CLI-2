@@ -4,6 +4,13 @@ from fontTools.fontBuilder import FontBuilder
 from fontTools.misc.psCharStrings import T2CharString
 from fontTools.ttLib import TTFont
 
+from foundrytools_cli_2.lib.constants import (
+    CFF_TABLE_TAG,
+    HEAD_TABLE_TAG,
+    NAME_TABLE_TAG,
+    POST_TABLE_TAG,
+)
+
 
 def build_otf(
     font: TTFont,
@@ -68,10 +75,10 @@ def get_ps_name(font: TTFont) -> str:
     Returns:
         str: The PostScript name of the font.
     """
-    if "CFF " not in font:
-        return font["name"].getDebugName(6)
+    if CFF_TABLE_TAG not in font:
+        return font[NAME_TABLE_TAG].getDebugName(6)
 
-    cff_table = font["CFF "]
+    cff_table = font[CFF_TABLE_TAG]
     return cff_table.cff.fontNames[0]
 
 
@@ -87,10 +94,10 @@ def get_font_info_dict(font: TTFont) -> t.Dict[str, t.Any]:
 
     """
 
-    if "CFF " not in font:
+    if CFF_TABLE_TAG not in font:
         return build_font_info_dict(font)
 
-    cff_table = font["CFF "]
+    cff_table = font[CFF_TABLE_TAG]
     return {
         key: value
         for key, value in cff_table.cff.topDictIndex[0].rawDict.items()
@@ -103,18 +110,20 @@ def build_font_info_dict(font: TTFont) -> t.Dict[str, t.Any]:
     Builds CFF topDict from a TTFont object.
     """
 
-    font_revision = str(round(font["head"].fontRevision, 3)).split(".")
+    font_revision = str(round(font[HEAD_TABLE_TAG].fontRevision, 3)).split(".")
     major_version = str(font_revision[0])
     minor_version = str(font_revision[1]).ljust(3, "0")
 
+    name_table = font[NAME_TABLE_TAG]
+    post_table = font[POST_TABLE_TAG]
     cff_font_info = {
         "version": ".".join([major_version, str(int(minor_version))]),
-        "FullName": font["name"].getBestFullName(),
-        "FamilyName": font["name"].getBestFamilyName(),
-        "ItalicAngle": font["post"].italicAngle,
-        "UnderlinePosition": font["post"].underlinePosition,
-        "UnderlineThickness": font["post"].underlineThickness,
-        "isFixedPitch": bool(font["post"].isFixedPitch),
+        "FullName": name_table.getBestFullName(),
+        "FamilyName": name_table.getBestFamilyName(),
+        "ItalicAngle": post_table.italicAngle,
+        "UnderlinePosition": post_table.underlinePosition,
+        "UnderlineThickness": post_table.underlineThickness,
+        "isFixedPitch": bool(post_table.isFixedPitch),
     }
 
     return cff_font_info
@@ -131,10 +140,10 @@ def get_private_dict(font: TTFont) -> t.Dict[str, t.Any]:
         dict: The private dict.
 
     """
-    if "CFF " not in font:
+    if CFF_TABLE_TAG not in font:
         return {}
 
-    cff_table = font["CFF "]
+    cff_table = font[CFF_TABLE_TAG]
     return {
         key: value
         for key, value in cff_table.cff.topDictIndex[0].Private.rawDict.items()
@@ -163,14 +172,15 @@ def get_post_values(font: TTFont) -> dict:
     """
     Setup CFF post table values
     """
+    post_table = font[POST_TABLE_TAG]
     post_info = {
-        "italicAngle": round(font["post"].italicAngle),
-        "underlinePosition": font["post"].underlinePosition,
-        "underlineThickness": font["post"].underlineThickness,
-        "isFixedPitch": font["post"].isFixedPitch,
-        "minMemType42": font["post"].minMemType42,
-        "maxMemType42": font["post"].maxMemType42,
-        "minMemType1": font["post"].minMemType1,
-        "maxMemType1": font["post"].maxMemType1,
+        "italicAngle": round(post_table.italicAngle),
+        "underlinePosition": post_table.underlinePosition,
+        "underlineThickness": post_table.underlineThickness,
+        "isFixedPitch": post_table.isFixedPitch,
+        "minMemType42": post_table.minMemType42,
+        "maxMemType42": post_table.maxMemType42,
+        "minMemType1": post_table.minMemType1,
+        "maxMemType1": post_table.maxMemType1,
     }
     return post_info
