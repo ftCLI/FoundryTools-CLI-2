@@ -8,16 +8,9 @@ from fontTools.ttLib import TTFont
 
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
-from foundrytools_cli_2.lib.pathops.skia_tools import (
-    remove_tiny_paths,
-    same_path,
-    simplify_path,
-    skia_path_from_glyph,
-    t2_charstring_from_skia_path,
-)
 from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
 
-__all__ = ["quadratics_to_cubics", "fix_charstrings", "get_t2_charstrings"]
+__all__ = ["quadratics_to_cubics", "get_t2_charstrings"]
 
 
 def quadratics_to_cubics(font: TTFont, tolerance: float = 1.0) -> t.Dict[str, T2CharString]:
@@ -103,36 +96,3 @@ def get_fallback_charstrings(font: TTFont, tolerance: float = 1.0) -> t.Dict[str
     build_ttf(font=temp_font, max_err=tolerance, reverse_direction=False)
     _, fallback_charstrings = get_qu2cu_charstrings(temp_font, tolerance=tolerance)
     return fallback_charstrings
-
-
-def fix_charstrings(
-    font: TTFont, min_area: int = 25
-) -> t.Tuple[t.Dict[str, T2CharString], t.List[str]]:
-    """
-    Get CFF charstrings using T2CharStringPen
-
-    :return: CFF charstrings.
-    """
-
-    glyph_set = font.getGlyphSet()
-    charstrings = {}
-    modified = []
-
-    for k, v in glyph_set.items():
-        t2_pen = T2CharStringPen(width=v.width, glyphSet=glyph_set)
-        glyph_set[k].draw(t2_pen)
-        charstrings[k] = t2_pen.getCharString()
-
-        path_1 = skia_path_from_glyph(glyph_name=k, glyph_set=glyph_set)
-        path_2 = skia_path_from_glyph(glyph_name=k, glyph_set=glyph_set)
-        path_2 = simplify_path(path=path_2, glyph_name=k, clockwise=False)
-
-        if min_area > 0:
-            path_2 = remove_tiny_paths(path=path_2, glyph_name=k, min_area=min_area)
-
-        if not same_path(path_1=path_1, path_2=path_2):
-            cs = t2_charstring_from_skia_path(path=path_2, width=v.width)
-            charstrings[k] = cs
-            modified.append(k)
-
-    return charstrings, modified
