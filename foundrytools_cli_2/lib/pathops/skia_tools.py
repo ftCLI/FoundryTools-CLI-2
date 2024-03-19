@@ -7,22 +7,28 @@ from fontTools.misc.roundTools import otRound
 from fontTools.pens.t2CharStringPen import T2CharStringPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
-from fontTools.ttLib.tables import _g_l_y_f
+from fontTools.ttLib.tables import _g_l_y_f, _h_m_t_x
 from fontTools.ttLib.ttGlyphSet import _TTGlyph, _TTGlyphSet
-
-from foundrytools_cli_2.lib.logger import logger
 
 _TTGlyphMapping = t.Mapping[str, _TTGlyph]
 
 
+class CorrectTTFContoursError(Exception):
+    """Raised when an error occurs while correcting the contours of a TrueType font."""
+
+
 def skia_path_from_glyph(glyph_name: str, glyph_set: _TTGlyphMapping) -> pathops.Path:
     """
-    Returns a pathops.Path from a glyph
+    Returns a pathops.Path from a glyph.
 
-    :param glyph_name: the glyph name
-    :param glyph_set: the glyphSet to which the glyph belongs
-    :return: a pathops.Path object
+    Args:
+        glyph_name (str): The glyph name.
+        glyph_set (_TTGlyphMapping): The glyph set to which the glyph belongs.
+
+    Returns:
+        pathops.Path: The pathops.Path object.
     """
+
     path = pathops.Path()
     pen = path.getPen(glyphSet=glyph_set)
     glyph_set[glyph_name].draw(pen)
@@ -33,12 +39,16 @@ def skia_path_from_glyph_component(
     component: _g_l_y_f.GlyphComponent, glyph_set: _TTGlyphMapping
 ) -> pathops.Path:
     """
-    Returns a pathops.Path from a glyph component
+    Returns a ``pathops.Path`` from a glyph component.
 
-    :param component: the glyph component
-    :param glyph_set: the glyphSet to which the glyph belongs
-    :return: a pathops.Path object
+    Args:
+        component (_g_l_y_f.GlyphComponent): The glyph component.
+        glyph_set (_TTGlyphMapping): The glyph set to which the glyph belongs.
+
+    Returns:
+        pathops.Path: The ``pathops.Path`` object.
     """
+
     base_glyph_name, transformation = component.getComponentInfo()
     path = skia_path_from_glyph(glyph_name=base_glyph_name, glyph_set=glyph_set)
     return path.transform(*transformation)
@@ -48,10 +58,14 @@ def ttf_components_overlap(glyph: _g_l_y_f.Glyph, glyph_set: _TTGlyphMapping) ->
     """
     Checks if a TrueType composite glyph has overlapping components.
 
-    :param glyph: the glyph
-    :param glyph_set: the glyphSet to which the glyph belongs
-    :return: True if the glyph has overlapping components, False otherwise
+    Args:
+        glyph (_g_l_y_f.Glyph): The glyph to check.
+        glyph_set (_TTGlyphMapping): The glyph set to which the glyph belongs.
+
+    Returns:
+        bool: ``True`` if the glyph has overlapping components, ``False`` otherwise.
     """
+
     if not glyph.isComposite():
         raise ValueError("This method only works with TrueType composite glyphs")
     if len(glyph.components) < 2:
@@ -79,13 +93,17 @@ def ttf_components_overlap(glyph: _g_l_y_f.Glyph, glyph_set: _TTGlyphMapping) ->
     )
 
 
-def ttf_glyph_from_skia_path(path: pathops.Path) -> _g_l_y_f.Glyph:
+def tt_glyph_from_skia_path(path: pathops.Path) -> _g_l_y_f.Glyph:
     """
-    Returns a TrueType glyph from a pathops.Path
+    Returns a TrueType glyph from a ``pathops.Path``
 
-    :param path: the pathops.Path
-    :return: a TrueType glyph
+    Args:
+        path (pathops.Path): The ``pathops.Path``
+
+    Returns:
+        _g_l_y_f.Glyph: The TrueType glyph
     """
+
     tt_pen = TTGlyphPen(glyphSet=None)
     path.draw(tt_pen)
     glyph = tt_pen.glyph()
@@ -95,12 +113,16 @@ def ttf_glyph_from_skia_path(path: pathops.Path) -> _g_l_y_f.Glyph:
 
 def t2_charstring_from_skia_path(path: pathops.Path, width: int) -> T2CharString:
     """
-    Returns a T2CharString from a pathops.Path
+    Returns a ``T2CharString`` from a ``pathops.Path``
 
-    :param path: the pathops.Path
-    :param width: the glyph width
-    :return: a T2CharString
+    Args:
+        path (pathops.Path): The ``pathops.Path``
+        width (int): The width of the charstring
+
+    Returns:
+        T2CharString: The ``T2CharString`` object
     """
+
     t2_pen = T2CharStringPen(width, glyphSet=None)
     path.draw(t2_pen)
     charstring = t2_pen.getCharString()
@@ -109,12 +131,16 @@ def t2_charstring_from_skia_path(path: pathops.Path, width: int) -> T2CharString
 
 def round_path(path: pathops.Path, rounder: t.Callable[[float], float] = otRound) -> pathops.Path:
     """
-    Rounds the points coordinate of a pathops.Path
+    Rounds the points coordinate of a ``pathops.Path``
 
-    :param path: the path to round
-    :param rounder: the function to call
-    :return: the path with rounded points
+    Args:
+        path (pathops.Path): The ``pathops.Path``
+        rounder (Callable[[float], float], optional): The rounding function. Defaults to otRound.
+
+    Returns:
+        pathops.Path: The rounded path
     """
+
     rounded_path = pathops.Path()
     for verb, points in path:
         rounded_path.add(verb, *((rounder(p[0]), rounder(p[1])) for p in points))
@@ -123,13 +149,17 @@ def round_path(path: pathops.Path, rounder: t.Callable[[float], float] = otRound
 
 def simplify_path(path: pathops.Path, glyph_name: str, clockwise: bool) -> pathops.Path:
     """
-    Simplify a pathops.Path by removing overlaps, fixing contours direction and, optionally,
+    Simplify a ``pathops.Path by`` removing overlaps, fixing contours direction and, optionally,
     removing tiny paths
 
-    :param path: the pathops.Path to simplify
-    :param glyph_name: the glyph name
-    :param clockwise: must be True for TTF fonts, False for OTF fonts
-    :return: the simplified path
+    Args:
+        path (pathops.Path): The ``pathops.Path`` to simplify
+        glyph_name (str): The glyph name
+        clockwise (bool): The winding direction. Must be ``True`` for TrueType glyphs and ``False``
+            for OpenType-PS fonts.
+
+    Returns:
+        pathops.Path: The simplified path
     """
 
     # skia-pathops has a bug where it sometimes fails to simplify paths when there
@@ -149,46 +179,136 @@ def simplify_path(path: pathops.Path, glyph_name: str, clockwise: bool) -> patho
     path = round_path(path)
     try:
         path = pathops.simplify(path, fix_winding=True, clockwise=clockwise)
-        logger.info(
-            f"skia-pathops failed to simplify glyph '{glyph_name}' with float coordinates, but "
-            f"succeeded using rounded integer coordinates"
-        )
         return path
     except pathops.PathOpsError as e:
-        logger.error(f"skia-pathops failed to simplify glyph '{glyph_name}': {e}")
-
-    raise AssertionError("Unreachable")
+        raise CorrectTTFContoursError(f"Failed to remove overlaps from glyph {glyph_name!r}") from e
 
 
 def same_path(path_1: pathops.Path, path_2: pathops.Path) -> bool:
     """
     Checks if two pathops paths are the same
 
-    :param path_1: the first path
-    :param path_2: the second path
-    :return: True if the paths are the same, False if the paths are different
+    Args:
+        path_1 (pathops.Path): The first path
+        path_2 (pathops.Path): The second path
+
+    Returns:
+        bool: ``True`` if the paths are the same, ``False`` if the paths are different
     """
+
     if {tuple(c) for c in path_1.contours} != {tuple(c) for c in path_2.contours}:
         return False
     return True
 
 
-def remove_tiny_paths(path: pathops.Path, glyph_name: str, min_area: int = 25) -> pathops.Path:
+def remove_tiny_paths(path: pathops.Path, min_area: int = 25) -> pathops.Path:
     """
-    Removes tiny paths from a pathops.Path.
+    Removes tiny paths from a ``pathops.Path``.
 
-    :param path: the path from which to remove the tiny paths
-    :param glyph_name: the glyph name
-    :param min_area: the minimum are of a path to keep it
-    :return: the cleaned path
+    Args:
+        path (pathops.Path): The ``pathops.Path``
+        min_area (int, optional): The minimum area of a contour to be retained. Defaults to 25.
     """
+
     cleaned_path = pathops.Path()
     for contour in path.contours:
         if contour.area >= min_area:
             cleaned_path.addPath(contour)
-        else:
-            logger.debug(f"Tiny path removed from glyph '{glyph_name}'")
     return cleaned_path
+
+
+def correct_tt_glyph_contours(
+    glyph_name: str,
+    glyph_set: _TTGlyphMapping,
+    glyf_table: _g_l_y_f.table__g_l_y_f,
+    hmtx_table: _h_m_t_x.table__h_m_t_x,
+    min_area: int = 25,
+) -> bool:
+    """
+    Corrects the contours of a TrueType glyph by removing overlaps, correcting the direction of the
+    contours, and removing tiny paths.
+
+    Args:
+        glyph_name (str): The name of the glyph.
+        glyph_set (_TTGlyphMapping): The glyph set to which the glyph belongs.
+        glyf_table (_g_l_y_f.table__g_l_y_f): The glyf table of the font.
+        hmtx_table (_h_m_t_x.table__h_m_t_x): The hmtx table of the font.
+        min_area (int, optional): The minimum area of a contour to be considered. Defaults to 25.
+
+    Returns:
+        bool: True if the glyph was modified, False otherwise.
+    """
+
+    glyph: _g_l_y_f.Glyph = glyf_table[glyph_name]
+
+    if (
+        glyph.numberOfContours > 0
+        or glyph.isComposite()
+        and ttf_components_overlap(glyph=glyph, glyph_set=glyph_set)
+    ):
+        path_1 = skia_path_from_glyph(glyph_name, glyph_set)
+        path_2 = skia_path_from_glyph(glyph_name, glyph_set)
+        path_2 = simplify_path(path_2, glyph_name, clockwise=True)
+        if min_area > 0:
+            path_2 = remove_tiny_paths(path_2, min_area=min_area)
+
+        if not same_path(path_1=path_1, path_2=path_2):
+            glyf_table[glyph_name] = glyph = tt_glyph_from_skia_path(path_2)
+            assert not glyph.program
+            width, lsb = hmtx_table[glyph_name]
+            if lsb != glyph.xMin:
+                hmtx_table[glyph_name] = (width, glyph.xMin)
+            return True
+
+    return False
+
+
+def correct_contours_glyf(font: TTFont, min_area: int = 25) -> t.List[str]:
+    """
+    Corrects the contours of the given TrueType font by removing overlaps, correcting the direction
+    of the contours, and removing tiny paths.
+
+    Args:
+        font (TTFont): The font object to be corrected.
+        min_area (int, optional): The minimum area of a contour to be considered. Defaults to 25.
+
+    Returns:
+        List[str]: The list of modified glyphs.
+    """
+
+    try:
+        glyf_table = font["glyf"]
+    except KeyError as e:
+        raise NotImplementedError("Not a TTF font") from e
+
+    glyph_set = font.getGlyphSet()
+    hmtx_table = font["hmtx"]
+    glyph_names = font.getGlyphOrder()
+
+    # process all simple glyphs first, then composites with increasing component depth,
+    # so that by the time we test for component intersections the respective base glyphs
+    # have already been simplified
+    glyph_names = sorted(
+        glyph_names,
+        key=lambda name: (
+            glyf_table[name].getCompositeMaxpValues(glyf_table).maxComponentDepth
+            if glyf_table[name].isComposite()
+            else 0,
+            name,
+        ),
+    )
+    modified_glyphs = []
+    for glyph_name in glyph_names:
+        if correct_tt_glyph_contours(
+            glyph_name=glyph_name,
+            glyph_set=glyph_set,
+            glyf_table=glyf_table,
+            hmtx_table=hmtx_table,
+            min_area=min_area,
+        ):
+            modified_glyphs.append(glyph_name)
+
+    return modified_glyphs
 
 
 def correct_contours_cff(
@@ -221,7 +341,7 @@ def correct_contours_cff(
         path_2 = simplify_path(path=path_2, glyph_name=k, clockwise=False)
 
         if min_area > 0:
-            path_2 = remove_tiny_paths(path=path_2, glyph_name=k, min_area=min_area)
+            path_2 = remove_tiny_paths(path=path_2, min_area=min_area)
 
         if not same_path(path_1=path_1, path_2=path_2):
             cs = t2_charstring_from_skia_path(path=path_2, width=v.width)
@@ -240,7 +360,7 @@ def is_empty_glyph(glyph_set: _TTGlyphSet, glyph_name: str) -> bool:
         glyph_name (str): The name of the glyph.
 
     Returns:
-        bool: True if the glyph is empty.
+        bool: ``True`` if the glyph is empty, ``False`` otherwise.
     """
 
     path = skia_path_from_glyph(glyph_name=glyph_name, glyph_set=glyph_set)
