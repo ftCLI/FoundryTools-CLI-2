@@ -56,15 +56,16 @@ class Font:  # pylint: disable=too-many-public-methods
         Initialize a Font object.
 
         Args:
-            source: A path to a font file, a BytesIO object or a TTFont object.
-            lazy (bool): If lazy is set to True, many data structures are loaded lazily, upon access
-                only. If it is set to False, many data structures are loaded immediately. The
-                default is ``lazy=None`` which is somewhere in between.
-            recalc_bboxes (bool): If true (the default), recalculates ``glyf``, ``CFF ``, ``head``
+            source: A path to a font file (``str`` or ``Path`` object), a ``BytesIO`` object or
+                a ``TTFont`` object.
+            lazy: If ``True``, many data structures are loaded lazily, upon access only. If
+                ``False``, many data structures are loaded immediately. The default is ``None``
+                which is somewhere in between.
+            recalc_bboxes: If ``True`` (the default), recalculates ``glyf``, ``CFF ``, ``head``
                 bounding box values and ``hhea``/``vhea`` min/max values on save. Also compiles the
                 glyphs on importing, which saves memory consumption and time.
-            recalc_timestamp (bool): If true, sets the ``modified`` timestamp in the ``head`` table
-                on save. Default is False.
+            recalc_timestamp: If ``True``, sets the ``modified`` timestamp in the ``head`` table
+                on save. Defaults to ``False``.
         """
 
         self._file: t.Optional[Path] = None
@@ -127,25 +128,30 @@ class Font:  # pylint: disable=too-many-public-methods
     @property
     def file(self) -> t.Optional[Path]:
         """
-        Get the file path of the font.
+        Get the file path (if any) of the font.
 
-        :return: The file path of the font.
+        Returns:
+            The file path of the font.
         """
         return self._file
 
     @property
     def bytesio(self) -> t.Optional[BytesIO]:
         """
-        Get the BytesIO object of the font.
+        Get the ``BytesIO`` object (if any) of the font.
 
-        :return: The BytesIO object of the font.
+        Returns:
+            The ``BytesIO`` object of the font.
         """
         return self._bytesio
 
     @property
     def ttfont(self) -> TTFont:
         """
-        Get the underlying TTFont object.
+        Get the underlying ``TTFont`` object of the font.
+
+        Returns:
+            The ``TTFont`` object of the font.
         """
         return self._ttfont
 
@@ -154,16 +160,18 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         Get the temporary file path of the font.
 
-        :return: The temporary file path of the font.
+        Returns:
+            The temporary file path of the font.
         """
         return self._temp_file
 
     @property
     def is_ps(self) -> bool:
         """
-        Check if the font has PostScript outlines font.
+        Check if the font has PostScript outlines.
 
-        :return: True if the font is a PostScript font, False otherwise.
+        Returns:
+            ``True`` if the font is a PostScript font, ``False`` otherwise.
         """
         return self.ttfont.sfntVersion == PS_SFNT_VERSION
 
@@ -172,7 +180,8 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         Check if the font has TrueType outlines.
 
-        :return: True if the font is a TrueType font, False otherwise.
+        Returns:
+            ``True`` if the font is a TrueType font, ``False`` otherwise.
         """
         return self.ttfont.sfntVersion == TT_SFNT_VERSION
 
@@ -181,7 +190,8 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         Check if the font is a WOFF font.
 
-        :return: True if the font is a WOFF font, False otherwise.
+        Returns:
+            ``True`` if the font is a WOFF font, ``False`` otherwise.
         """
         return self.ttfont.flavor == WOFF_FLAVOR
 
@@ -190,16 +200,18 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         Check if the font is a WOFF2 font.
 
-        :return: True if the font is a WOFF2 font, False otherwise.
+        Returns:
+            ``True`` if the font is a WOFF2 font, ``False`` otherwise.
         """
         return self.ttfont.flavor == WOFF2_FLAVOR
 
     @property
     def is_sfnt(self) -> bool:
         """
-        Check if the font is a SFNT font.
+        Check if the font is a SFNT font (i.e. not a WOFF or WOFF2 font).
 
-        :return: True if the font is a SFNT font, False otherwise.
+        Returns:
+            ``True`` if the font is a SFNT font, ``False`` otherwise.
         """
         return self.ttfont.flavor is None
 
@@ -208,7 +220,8 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         Check if the font is a static font.
 
-        :return: True if the font is a static font, False otherwise.
+        Returns:
+            ``True`` if the font is a static font, ``False`` otherwise.
         """
         return self.ttfont.get(FVAR_TABLE_TAG) is None
 
@@ -217,7 +230,8 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         Check if the font is a variable font.
 
-        :return: True if the font is a variable font, False otherwise.
+        Returns:
+            ``True`` if the font is a variable font, ``False`` otherwise.
         """
         return self.ttfont.get(FVAR_TABLE_TAG) is not None
 
@@ -226,7 +240,8 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         Check if the font is italic.
 
-        :return: True if the font is italic, False otherwise.
+        Returns:
+            ``True`` if the font is italic, ``False`` otherwise.
         """
         os_2 = OS2Table(self.ttfont)
         head = HeadTable(self.ttfont)
@@ -237,7 +252,8 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         Check if the font is oblique.
 
-        :return: True if the font is oblique, False otherwise.
+        Returns:
+            ``True`` if the font is oblique, ``False`` otherwise.
         """
         os_2 = OS2Table(self.ttfont)
         return os_2.is_oblique
@@ -247,7 +263,8 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         Check if the font is bold.
 
-        :return: True if the font is bold, False otherwise.
+        Returns:
+            ``True`` if the font is bold, ``False`` otherwise.
         """
         os_2 = OS2Table(self.ttfont)
         head = HeadTable(self.ttfont)
@@ -258,14 +275,19 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         Check if the font is regular.
 
-        :return: True if the font is regular, False otherwise.
+        Returns:
+            ``True`` if the font is regular, ``False`` otherwise.
         """
         os_2 = OS2Table(self.ttfont)
         return os_2.is_regular
 
     def set_italic(self, value: bool) -> None:
         """
-        Set the italic bit in the macStyle field of the 'head' table.
+        Set the italic bit in the ``macStyle`` field of the ``head`` table anf in the
+        ``fsSelection`` field of the ``OS/2`` table.
+
+        Args:
+            value: A boolean indicating whether to set the italic bits or to clear them.
         """
         os_2 = OS2Table(self.ttfont)
         head = HeadTable(self.ttfont)
@@ -282,7 +304,11 @@ class Font:  # pylint: disable=too-many-public-methods
 
     def set_bold(self, value: bool) -> None:
         """
-        Set the bold bit in the macStyle field of the 'head' table.
+        Set the bold bit in the ``macStyle`` field of the ``head`` table and in the ``fsSelection``
+        field of the ``OS/2`` table.
+
+        Args:
+            value: A boolean indicating whether to set the bold bits or to clear them.
         """
         os_2 = OS2Table(self.ttfont)
         head = HeadTable(self.ttfont)
@@ -299,7 +325,12 @@ class Font:  # pylint: disable=too-many-public-methods
 
     def set_regular(self, value: bool) -> None:
         """
-        Set the regular bit in the macStyle field of the 'head' table.
+        Set the regular bit in the ``macStyle`` field of the ``head`` table and clear the bold and
+        italic bits in the ``fsSelection`` field of the ``OS/2`` table and ind the ``macStyle``
+        field of the ``head`` table.
+
+        Args:
+            value: A boolean indicating whether to set the regular bit or to clear it.
         """
         os_2 = OS2Table(self.ttfont)
         head = HeadTable(self.ttfont)
@@ -316,7 +347,10 @@ class Font:  # pylint: disable=too-many-public-methods
 
     def set_oblique(self, value: bool) -> None:
         """
-        Set the oblique bit in the macStyle field of the 'head' table.
+        Set the oblique bit in the ``macStyle`` field of the ``head`` table.
+
+        Args:
+            value: A boolean indicating whether to set the oblique bit or to clear it.
         """
         os_2 = OS2Table(self.ttfont)
         os_2.is_oblique = value
@@ -330,10 +364,10 @@ class Font:  # pylint: disable=too-many-public-methods
         Save the font to a file.
 
         Args:
-            file: The file path to save the font to.
-            reorder_tables: If true (the default), reorder the tables, sorting them by tag
-                (recommended by the OpenType specification). If false, retain the original font
-                order. If None, reorder by table dependency (fastest).
+            file: The file name to use for the output file.
+            reorder_tables: If ``True`` (the default), reorder the tables, sorting them by tag
+                (recommended by the OpenType specification). If ``False``, retain the original
+                order. If ``None``, reorder by table dependency (fastest).
         """
         self.ttfont.save(file, reorderTables=reorder_tables)
 
@@ -342,15 +376,15 @@ class Font:  # pylint: disable=too-many-public-methods
         Save the font to a temporary file.
 
         Args:
-            reorder_tables: If true (the default), reorder the tables, sorting them by tag
-                (recommended by the OpenType specification). If false, retain the original font
-                order. If None, reorder by table dependency (fastest).
+            reorder_tables: If ``True`` (the default), reorder the tables, sorting them by tag
+                (recommended by the OpenType specification). If ``False``, retain the original
+                order. If ``None``, reorder by table dependency (fastest).
         """
         self.save(self._temp_file, reorder_tables=reorder_tables)
 
     def close(self) -> None:
         """
-        Close the underlying TTFont object.
+        Close the font and delete the temporary file.
         """
         self.ttfont.close()
         self._temp_file.unlink(missing_ok=True)
@@ -362,7 +396,7 @@ class Font:  # pylint: disable=too-many-public-methods
         by the sfntVersion attribute.
 
         Returns:
-            The extension of the font.
+            The real extension of the font (e.g. '.woff', '.woff2', '.otf', '.ttf').
         """
 
         # Order of the if statements is important. WOFF and WOFF2 must be checked before OTF and
@@ -375,7 +409,7 @@ class Font:  # pylint: disable=too-many-public-methods
             return OTF_EXTENSION
         if self.is_tt:
             return TTF_EXTENSION
-        return self.ttfont.sfntVersion
+        raise ValueError("Unknown font type.")
 
     def make_out_file_name(
         self,
@@ -386,24 +420,24 @@ class Font:  # pylint: disable=too-many-public-methods
         suffix: str = "",
     ) -> Path:
         """
-        Get output file for a Font object. If ``output_dir`` is not specified, the output file will
-        be saved in the same directory as the input file. It the output file already exists and
-        ``overwrite`` is False, file name will be incremented by adding a number preceded by '#'
+        Get output file for a ``Font`` object. If ``output_dir`` is not specified, the output file
+        will be saved in the same directory as the input file. It the output file already exists and
+        ``overwrite`` is ``False``, file name will be incremented by adding a number preceded by '#'
         before the extension until a non-existing file name is found. If ``suffix`` is specified,
         it will be appended to the file name. If the suffix is already present, it will be removed
         before adding it again.
 
         Args:
-            file: The file name to use for the output file. If not specified, the file name will be
-                determined by the input file.
-            output_dir: Path to the output directory.
-            overwrite: A boolean indicating whether to overwrite existing files.
-            extension: An optional extension to use for the output file. If not specified, the
-                extension will be determined by the font type.
-            suffix: An optional suffix to append to the file name.
+            file: The input file.
+            output_dir: The output directory.
+            overwrite: If ``True``, overwrite the output file if it already exists. If ``False``,
+                increment the file name until a non-existing file name is found.
+            extension: The extension of the output file. If not specified, the extension will be
+                determined by the font type.
+            suffix: A suffix to append to the file name.
 
         Returns:
-            A Path object pointing to the output file.
+            A ``Path`` object pointing to the output file.
         """
 
         if file is None and self.file is None:
@@ -420,7 +454,9 @@ class Font:  # pylint: disable=too-many-public-methods
         file_name = file.stem + extension
 
         # Clean up the file name by removing the extensions used as file name suffix as added by
-        # possible previous conversions.
+        # possible previous conversions. This is necessary to avoid adding the suffix multiple
+        # times, like in the case of a file name like 'font.woff2.ttf.woff2'. It may happen when
+        # converting a WOFF2 font to TTF and then to WOFF2 again.
         if suffix != "":
             for ext in [OTF_EXTENSION, TTF_EXTENSION, WOFF2_EXTENSION, WOFF_EXTENSION]:
                 file_name = file_name.replace(ext, "")
@@ -440,7 +476,8 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         Get axes from a variable font.
 
-        :return: Axes.
+        Returns:
+            A list of ``Axis`` objects.
         """
         if not self.is_variable:
             raise NotImplementedError("Not a variable font.")
@@ -451,7 +488,8 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         Get named instances from a variable font.
 
-        :return: Named instances.
+        Returns:
+            A list of ``NamedInstance`` objects.
         """
         if not self.is_variable:
             raise NotImplementedError("Not a variable font.")
@@ -483,7 +521,7 @@ class Font:  # pylint: disable=too-many-public-methods
         Convert a font to TrueType.
         """
         if self.is_tt:
-            raise ValueError("Font is already a TrueType font.")
+            raise NotImplementedError("Font is already a TrueType font.")
         if self.is_variable:
             raise NotImplementedError("Conversion to TrueType is not supported for variable fonts.")
 
@@ -495,7 +533,7 @@ class Font:  # pylint: disable=too-many-public-methods
         Convert a font to PostScript.
         """
         if self.is_ps:
-            raise ValueError("Font is already a PostScript font.")
+            raise NotImplementedError("Font is already a PostScript font.")
         if self.is_variable:
             raise NotImplementedError(
                 "Conversion to PostScript is not supported for variable fonts."
@@ -517,10 +555,7 @@ class Font:  # pylint: disable=too-many-public-methods
 
     def tt_decomponentize(self) -> None:
         """
-        This method takes a TrueType font as input and decomposes all composite glyphs in the font.
-
-        Returns:
-            None
+        Decomposes all composite glyphs of a TrueType font.
         """
         if not self.is_tt:
             raise NotImplementedError("Decomponentization is only supported for TrueType fonts.")
@@ -554,10 +589,10 @@ class Font:  # pylint: disable=too-many-public-methods
 
     def tt_scale_upem(self, new_upem: int) -> None:
         """
-        Scale the font's unitsPerEm value to the given value.
+        Scale the font's Units Per Em (UPM).
 
         Args:
-            new_upem (int): The new unitsPerEm value.
+            new_upem (int): The new units per em value. Must be in the range 16 to 16384.
         """
         if not self.is_tt:
             raise NotImplementedError("Scaling upem is only supported for TrueType fonts.")
@@ -573,10 +608,18 @@ class Font:  # pylint: disable=too-many-public-methods
 
     def ps_correct_contours(self, min_area: int = 25) -> t.List[str]:
         """
-        Correct the contours of a PostScript font by removing tiny paths and correcting the
-        direction of paths.
+        Correct the contours of a PostScript font by removing overlaps and tiny paths and correcting
+        the direction of paths.
+        If one or more contours are modified, the CFF table will be rebuilt.
+        If no contours are modified, the font will remain unchanged and the method will return an
+        empty list.
 
-        :param min_area: The minimum area of a path to be retained.
+        Args:
+            min_area (int, optional): The minimum area of a contour to be considered. Defaults to
+            25.
+
+        Returns:
+            A list of modified glyphs.
         """
         if not self.is_ps:
             raise NotImplementedError(
@@ -584,9 +627,7 @@ class Font:  # pylint: disable=too-many-public-methods
             )
 
         if self.is_variable:
-            raise NotImplementedError(
-                "PS Contour correction is not supported for variable fonts."
-            )
+            raise NotImplementedError("PS Contour correction is not supported for variable fonts.")
 
         charstrings, modified_glyphs = correct_contours_cff(font=self.ttfont, min_area=min_area)
         if not modified_glyphs:
