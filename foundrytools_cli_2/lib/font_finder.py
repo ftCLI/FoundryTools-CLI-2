@@ -97,7 +97,7 @@ class FontFinder:
                 )
                 if not any(condition and func(font) for condition, func in self._filter_conditions):
                     yield font
-            except TTLibError:
+            except (TTLibError, PermissionError):
                 pass
 
     def _generate_files(self) -> t.Generator[Path, None, None]:
