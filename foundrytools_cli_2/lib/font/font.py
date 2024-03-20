@@ -29,7 +29,7 @@ from foundrytools_cli_2.lib.constants import (
 from foundrytools_cli_2.lib.font.tables import HeadTable, OS2Table
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.otf.t2_charstrings import quadratics_to_cubics
-from foundrytools_cli_2.lib.pathops.skia_tools import correct_contours_cff, correct_contours_glyf
+from foundrytools_cli_2.lib.skia.skia_tools import correct_contours_cff, correct_contours_glyf
 from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
 from foundrytools_cli_2.lib.utils.misc import restore_flavor
 from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path

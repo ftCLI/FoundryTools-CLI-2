@@ -95,6 +95,12 @@ class FontRunner:  # pylint: disable=too-few-public-methods
                 print()  # Add a newline after each font
 
     def _find_fonts(self) -> t.List[Font]:
+        """
+        Finds fonts in the input path.
+
+        Returns:
+            List[Font]: A list of ``Font`` objects.
+        """
         finder = FontFinder(
             input_path=self.input_path, options=self._finder_options, filter_=self.filter
         )
@@ -110,7 +116,7 @@ class FontRunner:  # pylint: disable=too-few-public-methods
         Parses options provided as a dictionary and returns three objects: FinderOptions,
         SaveOptions, and a dictionary of callable options.
 
-        Parameters:
+        Args:
             options (Dict[str, Any]): A dictionary containing various options.
 
         Returns:
@@ -153,8 +159,8 @@ class FontRunner:  # pylint: disable=too-few-public-methods
         """
         Logs the current font information.
 
-        Parameters:
-            font (Font): The font to log.
+        Args
+            font (Font): The font  file to log.
         """
         if font.file is None:
             raise ValueError("Font file is None")
@@ -164,11 +170,11 @@ class FontRunner:  # pylint: disable=too-few-public-methods
         """
         Returns the output file name for a given font.
 
-        Parameters:
+        Args:
             font (Font): The font to get the output file name for.
 
         Returns:
-            str: The output file name.
+            Path: The output file name.
         """
         return font.make_out_file_name(
             output_dir=self._save_options.output_dir,

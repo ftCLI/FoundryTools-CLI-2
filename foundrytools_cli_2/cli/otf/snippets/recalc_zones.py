@@ -39,7 +39,7 @@ def get_glyph_bounds(font: TTFont, glyph_name: str) -> GlyphBounds:
     """
     Get the bounds of a glyph.
 
-    Parameters:
+    Args:
         font (TTFont): The TTFont object.
         glyph_name (str): The name of the glyph.
 
@@ -49,6 +49,7 @@ def get_glyph_bounds(font: TTFont, glyph_name: str) -> GlyphBounds:
     Raises:
         ValueError: If the glyph does not exist in the font.
     """
+
     glyph_set = font.getGlyphSet()
     if glyph_name not in glyph_set:
         raise ValueError(f"Glyph '{glyph_name}' does not exist in the font.")
@@ -70,13 +71,15 @@ def get_glyph_bounds_many(font: TTFont, glyph_names: t.List[str]) -> t.Dict[str,
     """
     Get the bounds of multiple glyphs in a given font.
 
-    Parameters:
+    Args:
         font (TTFont): The TTFont object.
         glyph_names (List[str]): A list of glyph names.
 
     Returns:
-        dict: A dictionary containing glyph names as keys and GlyphBounds objects as values.
+        Dict[str, GlyphBounds]: A dictionary containing glyph names as keys and GlyphBounds objects
+            as values.
     """
+
     glyphs_bounds = {}
     for glyph_name in glyph_names:
         try:
@@ -92,12 +95,13 @@ def get_pair(counter: Counter) -> t.List[float]:
     """
     Get the two most common elements from the given counter.
 
-    Parameters:
+    Args:
         counter (Counter): The counter object containing elements and their counts.
 
     Returns:
         List[float]: List containing the pair of most common elements.
     """
+
     most_common = counter.most_common(2)
     if len(counter) == 1:
         return [most_common[0][0], most_common[0][0]]
@@ -114,6 +118,7 @@ def lists_overlaps(lists: t.List[t.List[float]]) -> bool:
     Returns:
         bool: True if there are overlapping intervals, False otherwise.
     """
+
     return any(lists[i][1] > lists[i + 1][0] for i in range(len(lists) - 1))
 
 
@@ -145,6 +150,7 @@ def fix_min_separation_limits(lists: t.List[t.List[float]], limit: int) -> t.Lis
     Returns:
         List[List[float]]: The input list with the minimum separation between zones fixed.
     """
+
     for i in range(len(lists) - 1):
         if lists[i + 1][0] - lists[i][1] < limit:
             # If the difference between the two values is less than 3, then
@@ -163,16 +169,16 @@ def calculate_zone(
     """
     Calculates the minimum and maximum vertical values for a given zone.
 
-    Parameters:
+    Args:
         font: TTFont object representing the font.
         glyph_names: List of glyph names to process.
         min_or_max: Literal specifying whether to process the minimum ('yMin') or maximum ('yMax')
             values.
 
     Returns:
-        List of float values representing the minimum or maximum vertical values for each glyph.
-
+        List[float]: A list containing the minimum and maximum values for the given zone.
     """
+
     data = get_glyph_bounds_many(font=font, glyph_names=glyph_names)
     counter = Counter([v[min_or_max] for v in data.values()])
     return get_pair(counter)
@@ -182,13 +188,13 @@ def get_current_zones(font: TTFont) -> t.Tuple[t.Optional[t.List[int]], t.Option
     """
     Get the current zones for a given TTFont object.
 
-    Parameters:
+    Args:
         font (TTFont): The TTFont object.
 
     Returns:
         Tuple[List[int], List[int]]: A tuple containing two lists. The first list contains the
-            values for the OtherBlues zones, and the second list contains the values for the
-            BlueValues zones.
+            values for the ``OtherBlues`` zones, and the second list contains the values for the
+            ``BlueValues`` zones.
     """
     private = font["CFF "].cff.topDictIndex[0].Private
     try:
@@ -209,6 +215,13 @@ def set_font_zones(
 ) -> None:
     """
     Set the zones for a given TTFont object.
+
+    Args:
+        font (TTFont): The TTFont object.
+        other_blues (List[int], optional): A list of values for the ``OtherBlues`` zones. Default is
+            None.
+        blue_values (List[int], optional): A list of values for the ``BlueValues`` zones. Default is
+            None.
     """
 
     private = font["CFF "].cff.topDictIndex[0].Private
@@ -227,11 +240,9 @@ def recalc_zones(
     ascender_glyphs: t.Optional[t.List[str]] = None,
 ) -> t.Tuple[t.List[int], t.List[int]]:
     """
-    Recalc Zones
-
     Recalculates the zones for a given TTFont object.
 
-    Parameters:
+    Args:
         font (TTFont): The TTFont object.
         descender_glyphs (List[str]): A list of glyph names to use for calculating the descender
             zone.
@@ -246,8 +257,8 @@ def recalc_zones(
 
     Returns:
         Tuple[List[int], List[int]]: A tuple containing two lists. The first list contains the
-            values for the OtherBlues zones, and the second list contains the values for the
-            BlueValues zones.
+            values for the ``OtherBlues`` zones, and the second list contains the values for the
+            ``BlueValues`` zones.
     """
 
     if descender_glyphs is None:
@@ -287,8 +298,8 @@ def main(font: Font) -> None:
     """
     Recalculates the hinting zones of an OTF font.
 
-    :param font: the Font object
-    :return: None
+    Args:
+        font (Font): The font object to recalculate the hinting zones for.
     """
     if not font.is_ps:
         logger.error("Font is not a PostScript font")

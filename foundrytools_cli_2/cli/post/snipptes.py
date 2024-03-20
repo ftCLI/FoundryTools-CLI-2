@@ -13,15 +13,14 @@ def set_attrs(
     fixed_pitch: t.Optional[bool] = None,
 ) -> None:
     """
-    Sets the attributes of the 'post' table.
-    Parameters:
+    Sets the specified attributes of the ``post`` table.
+
+    Args:
         font (Font): The Font object representing the font file.
-        italic_angle (float): The `italicAngle` value.
-        underline_position (int): The `underlinePosition` value.
-        underline_thickness (int): The `underlineThickness` value.
-        fixed_pitch (bool): The `isFixedPitch` value.
-    Returns:
-        None
+        italic_angle (float): The ``italicAngle`` value.
+        underline_position (int): The ``underlinePosition`` value.
+        underline_thickness (int): The ``underlineThickness`` value.
+        fixed_pitch (bool): The ``isFixedPitch`` value.
     """
     post_table = PostTable(font.ttfont)
     attrs = {

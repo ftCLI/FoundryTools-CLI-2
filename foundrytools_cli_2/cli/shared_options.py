@@ -10,8 +10,11 @@ def add_options(options: t.List[t.Callable]) -> t.Callable:
     """
     Add options to a click command.
 
-    :param options: a list of click options
-    :return: a decorator that adds the options to a click command
+    Args:
+        options (t.List[t.Callable]): The options to add
+
+    Returns:
+        t.Callable: A decorator that adds the options to a click command
     """
 
     def _add_options(func: t.Callable) -> t.Callable:
@@ -26,7 +29,9 @@ def base_options() -> t.Callable:
     """
     Add the common options to a click command.
 
-    :return: a decorator that adds the common options to a click command
+    Returns:
+        t.Callable: A decorator that adds the common options (``input_path``, ``recursive``,
+        ``output_dir``, ``overwrite``, ``recalc_timestamp``) to a click command
     """
 
     return add_options(
@@ -49,9 +54,12 @@ def input_path_argument(dir_okay: bool = True, file_okay: bool = True) -> t.Call
     criteria, will be processed. If ``input_path`` is a file, only that file will be processed.
     Users can specify whether the argument can be a directory or a file.
 
-    :param dir_okay: if False, the argument can't be a file
-    :param file_okay: if False, the argument can be a directory
-    :return: a decorator that adds the input_path argument to a click command
+    Args:
+        dir_okay (bool, optional): Whether the argument can be a directory. Defaults to ``True``.
+        file_okay (bool, optional): Whether the argument can be a file. Defaults to ``True``.
+
+    Returns:
+        t.Callable: A decorator that adds the ``input_path argument`` to a click command
     """
     _file_or_path_argument = [
         click.argument(
@@ -70,9 +78,10 @@ def input_path_argument(dir_okay: bool = True, file_okay: bool = True) -> t.Call
 
 def recursive_flag() -> t.Callable:
     """
-    Add the recursive option to a click command.
+    Add the ``recursive`` option to a click command.
 
-    :return: a decorator that adds the recursive flag to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``recursive`` option to a click command
     """
     _recursive_flag = [
         click.option(
@@ -81,7 +90,7 @@ def recursive_flag() -> t.Callable:
             is_flag=True,
             default=False,
             help="""
-            When ``input_path`` is a directory, the font finder will search for fonts recursively in
+            If ``input_path`` is a directory, the font finder will search for fonts recursively in
             subdirectories.
             """,
         )
@@ -91,9 +100,10 @@ def recursive_flag() -> t.Callable:
 
 def lazy_flag() -> t.Callable:
     """
-    Add the lazy option to a click command.
+    Add the ``lazy`` option to a click command.
 
-    :return: a decorator that adds the lazy flag to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``lazy`` option to a click command
     """
     _lazy_flag = [
         click.option(
@@ -111,9 +121,10 @@ def lazy_flag() -> t.Callable:
 
 def output_dir_option() -> t.Callable:
     """
-    Add the output_dir option to a click command.
+    Add the ``output_dir`` option to a click command.
 
-    :return: a decorator that adds the output_dir option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``output_dir`` option to a click command
     """
     _output_dir_option = [
         click.option(
@@ -134,9 +145,10 @@ def output_dir_option() -> t.Callable:
 
 def overwrite_flag() -> t.Callable:
     """
-    Add the overwrite option to a click command.
+    Add the ``overwrite`` option to a click command.
 
-    :return: a decorator that adds the overwrite option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``overwrite`` option to a click command
     """
     _overwrite_flag = [
         click.option(
@@ -155,9 +167,10 @@ def overwrite_flag() -> t.Callable:
 
 def recalc_timestamp_flag() -> t.Callable:
     """
-    Add the recalc_timestamp option to a click command.
+    Add the ``recalc_timestamp`` option to a click command.
 
-    :return: a decorator that adds the recalc_timestamp option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``recalc_timestamp`` option to a click command
     """
     _recalc_timestamp_flag = [
         click.option(
@@ -175,9 +188,10 @@ def recalc_timestamp_flag() -> t.Callable:
 
 def recalc_bboxes_flag() -> t.Callable:
     """
-    Add the recalc_bboxes option to a click command.
+    Add the ``recalc_bboxes`` option to a click command.
 
-    :return: a decorator that adds the recalc_bboxes option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``recalc_bboxes`` option to a click command
     """
     _recalc_bboxes_flag = [
         click.option(
@@ -196,9 +210,10 @@ def recalc_bboxes_flag() -> t.Callable:
 
 def reorder_tables_flag() -> t.Callable:
     """
-    Add the reorder_tables option to a click command.
+    Add the ``reorder_tables`` option to a click command.
 
-    :return: a decorator that adds the reorder_tables option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``reorder_tables`` option to a click command
     """
     _reorder_tables_flag = [
         click.option(
@@ -216,9 +231,10 @@ def reorder_tables_flag() -> t.Callable:
 
 def debug_flag() -> t.Callable:
     """
-    Add the debug option to a click command.
+    Add the ``debug`` option to a click command.
 
-    :return: a decorator that adds the debug option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``debug`` option to a click command
     """
     _debug_flag = [
         click.option(
@@ -237,9 +253,10 @@ def target_upm_option(
     help_msg: str = "Scale the font to the specified UPM.",
 ) -> t.Callable:
     """
-    Add the scale_upm option to a click command.
+    Add the ``scale_upm`` option to a click command.
 
-    :return: a decorator that adds the scale_upm option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``scale_upm`` option to a click command
     """
     _target_upm_option = [
         click.option(
@@ -256,9 +273,10 @@ def target_upm_option(
 
 def subroutinize_flag() -> t.Callable:
     """
-    Add the subroutinize option to a click command.
+    Add the ``subroutinize`` option to a click command.
 
-    :return: a decorator that adds the subroutinize option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``subroutinize`` option to a click command
     """
     _subroutinize_flag = [
         click.option(
@@ -272,9 +290,10 @@ def subroutinize_flag() -> t.Callable:
 
 def min_area_option() -> t.Callable:
     """
-    Add the min_area option to a click command.
+    Add the ``min_area`` option to a click command.
 
-    :return: a decorator that adds the min_area option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``min_area`` option to a click command
     """
     _min_area_option = [
         click.option(

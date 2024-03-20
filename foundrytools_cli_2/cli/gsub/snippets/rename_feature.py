@@ -7,13 +7,10 @@ def main(font: Font, old_feature_name: str, new_feature_name: str) -> None:
     """
     Remap GSUB features.
 
-    Parameters:
+    Args:
         font (Font): The Font object representing the font file.
         old_feature_name (str): The old feature name.
         new_feature_name (str): The new feature name.
-
-    Returns:
-        None
     """
     if "GSUB" not in font.ttfont:
         logger.error("GSUB table not found")

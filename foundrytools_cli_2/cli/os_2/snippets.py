@@ -12,12 +12,10 @@ def recalc_avg_char_width(font: Font) -> None:
     """
     Recalculates the ``OS/2.xAvgCharWidth`` value.
 
-    Parameters:
+    Args:
         font (Font): The Font object representing the font file.
-
-    Returns:
-        None
     """
+
     os_2_table = OS2Table(font.ttfont)
     os_2_table.recalc_avg_char_width()
     font.modified = os_2_table.modified
@@ -27,12 +25,10 @@ def recalc_cap_height(font: Font) -> None:
     """
     Recalculates the ``OS/2.sCapHeight`` value.
 
-    Parameters:
+    Args:
         font (Font): The Font object representing the font file.
-
-    Returns:
-        None
     """
+
     os_2_table = OS2Table(font.ttfont)
     os_2_table.recalc_cap_height()
     font.modified = os_2_table.modified
@@ -42,12 +38,10 @@ def recalc_x_height(font: Font) -> None:
     """
     Recalculates the ``OS/2.sXHeight`` value.
 
-    Parameters:
+    Args:
         font (Font): The Font object representing the font file.
-
-    Returns:
-        None
     """
+
     os_2_table = OS2Table(font.ttfont)
     os_2_table.recalc_x_height()
     font.modified = os_2_table.modified
@@ -57,12 +51,10 @@ def recalc_max_context(font: Font) -> None:
     """
     Recalculates the ``OS/2.usMaxContext`` value.
 
-    Parameters:
+    Args:
         font (Font): The Font object representing the font file.
-
-    Returns:
-        None
     """
+
     os_2_table = OS2Table(font.ttfont)
     os_2_table.recalc_max_context()
     font.modified = os_2_table.modified
@@ -72,12 +64,10 @@ def recalc_unicode_ranges(font: Font) -> None:
     """
     Recalculates the ``OS/2.ulUnicodeRange1`` through ``OS/2.ulUnicodeRange4`` values.
 
-    Parameters:
+    Args:
         font (Font): The Font object representing the font file.
-
-    Returns:
-        None
     """
+
     os_2_table = OS2Table(font.ttfont)
     os_2_table.recalc_unicode_ranges()
     font.modified = os_2_table.modified
@@ -87,12 +77,10 @@ def recalc_ranges_afdko(font: Font) -> None:
     """
     Recalculates the ``OS/2.ulUnicodeRange1`` through ``OS/2.ulUnicodeRange4`` values.
 
-    Parameters:
+    Args:
         font (Font): The Font object representing the font file.
-
-    Returns:
-        None
     """
+
     os2_table = OS2Table(font.ttfont)
     flavor = font.ttfont.flavor
     font.ttfont.flavor = None
@@ -116,12 +104,10 @@ def recalc_codepage_ranges(font: Font) -> None:
     """
     Recalculates the ``OS/2.ulCodePageRange1`` through ``OS/2.ulCodePageRange2`` values.
 
-    Parameters:
+    Args:
         font (Font): The Font object representing the font file.
-
-    Returns:
-        None
     """
+
     os_2_table = OS2Table(font.ttfont)
     os_2_table.recalc_code_page_ranges()
     font.modified = os_2_table.modified
@@ -143,7 +129,7 @@ def set_attrs(
     """
     Sets the font's OS/2 table properties based on the provided parameters.
 
-    Parameters:
+    Args:
         font: The Font object representing The font to modify.
         weight_class (optional): The usWeightClass value to set.
         width_class (optional): The usWidthClass value to set.
@@ -156,6 +142,7 @@ def set_attrs(
         win_ascent (optional): The usWinAscent value to set.
         win_descent (optional): The usWinDescent value to set.
     """
+
     os_2_table = OS2Table(font.ttfont)
     attrs = {
         "weight_class": weight_class,
@@ -193,11 +180,11 @@ def set_fs_selection(
     oblique: t.Optional[bool] = None,
 ) -> None:
     """
-    set_fs_selection method modifies the font's attributes based on the provided parameters. It
-    updates the font's italic, bold, regular, use_typo_metrics, wws_consistent, and oblique
-    attributes based on the provided parameters.
+    Modifies the font's ``OS/2.fsSelection`` attributes based on the provided parameters. Updates
+    the font's italic, bold, regular, use_typo_metrics, wws_consistent, and oblique attributes based
+    on the provided parameters.
 
-    Parameters:
+    Args:
         font: The Font object representing the font to modify.
         italic (optional): A boolean value indicating whether the font should be italic.
         bold (optional): A boolean value indicating whether the font should be bold.
@@ -208,10 +195,8 @@ def set_fs_selection(
             in the OS/2 table.
         oblique (optional): A boolean value indicating whether to set the oblique bit in the OS/2
             table.
-
-    Returns:
-        None
     """
+
     if all(
         value is None
         for value in (italic, bold, regular, use_typo_metrics, wws_consistent, oblique)
@@ -244,13 +229,18 @@ def set_fs_type(
     """
     Sets the font's OS/2 table properties related to font embedding and subsetting.
 
-    Parameters:
+    Args:
         font: The Font object representing the font to modify.
         embed_level (optional): The embedding level to set. It can be 0, 2, or 4.
         no_subsetting (optional): A boolean value indicating whether the font can be subsetted.
         bitmap_embed_only (optional): A boolean value indicating whether only bitmaps should be
             embedded.
     """
+
+    if all(value is None for value in (embed_level, no_subsetting, bitmap_embed_only)):
+        logger.warning("No attributes provided to set.")
+        return
+
     os_2_table = OS2Table(font.ttfont)
     attrs = {
         "embed_level": embed_level,

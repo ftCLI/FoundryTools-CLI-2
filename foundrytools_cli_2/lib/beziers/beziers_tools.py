@@ -11,15 +11,15 @@ def handle_curve_nodes(pen: T2CharStringPen, nodes_list: Nodelist, i: int) -> in
     """
     Handles the curve nodes in a BezierPath.
 
-    Parameters:
+    Args:
         pen (T2CharStringPen): The T2CharString pen to draw the curve.
         nodes_list (list): The list of nodes in the BezierPath.
         i (int): The starting index of the curve nodes.
 
     Returns:
         int: The index of the next node after the curve.
-
     """
+
     curve_points = []
     while i < len(nodes_list) and nodes_list[i].type in {"offcurve", "curve"}:
         curve_points.append((nodes_list[i].x, nodes_list[i].y))
@@ -34,7 +34,7 @@ def draw_bez(paths: t.List[BezierPath], pen: T2CharStringPen) -> None:
     """
     Draws a list of Bezier paths using a T2CharStringPen.
 
-    Parameters:
+    Args:
         paths (list): The list of BezierPaths.
         pen (T2CharStringPen): The T2CharString pen to draw the paths.
     """
@@ -60,16 +60,13 @@ def bez_to_charstring(paths: t.List[BezierPath], font: TTFont, glyph_name: str) 
     """
     Converts a list of Bezier paths to a T2CharString.
 
-    Parameters:
+    Args:
         paths (list): The list of Bezier paths.
         font (TTFont): The font.
         glyph_name (str): The name of the glyph.
 
     Returns:
         T2CharString: The T2CharString.
-
-    Raises:
-        ValueError: If an unknown node type is encountered.
     """
     glyph_set = font.getGlyphSet()
     pen = T2CharStringPen(width=glyph_set[glyph_name].width, glyphSet=glyph_set)
@@ -81,6 +78,12 @@ def bez_to_charstring(paths: t.List[BezierPath], font: TTFont, glyph_name: str) 
 def add_extremes(font: TTFont) -> t.Dict[str, T2CharString]:
     """
     Gets the charstrings of a font by converting the Bezier paths of each glyph to a T2CharString.
+
+    Args:
+        font (TTFont): The font.
+
+    Returns:
+        dict: A dictionary of the charstrings of each glyph.
     """
     glyph_set = font.getGlyphSet()
     charstrings = {}

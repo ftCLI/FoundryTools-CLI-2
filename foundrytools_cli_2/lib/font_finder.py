@@ -49,7 +49,7 @@ class FontFinder:
     ) -> None:
         """Initialize the FontFinder class.
 
-        Parameters:
+        Args:
             options (FinderOptions): An instance of FinderOptions class that contains the options
                 for font finding.
             filter_ (FontFinderFilter, optional): An instance of FontFinderFilter class that
@@ -72,10 +72,10 @@ class FontFinder:
 
     def find_fonts(self) -> t.List[Font]:
         """
-        Returns a list of TTFont objects found in the input path.
+        Returns a list of ``Font`` objects found in the input path.
 
         Returns:
-            A list of TTFont objects.
+            A list of ``Font`` objects.
         """
         return list(self.generate_fonts())
 
@@ -84,7 +84,7 @@ class FontFinder:
         Generates a collection of fonts.
 
         Returns:
-            A generator that yields instances of Font.
+            Generator[Font, None, None]: A generator that yields ``Font`` objects.
         """
         files = self._generate_files()
         for file in files:
@@ -144,8 +144,8 @@ class FontFinder:
         """
         Generate filter conditions based on the provided FontFinderFilter object.
 
-        Parameters:
-            filter_: A FontFinderFilter object.
+        Args:
+            filter_: A ``FontFinderFilter`` object.
 
         Returns:
             List[t.Tuple[bool, t.Callable]]: A list of tuples containing a boolean and a callable.

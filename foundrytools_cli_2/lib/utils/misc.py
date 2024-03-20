@@ -15,6 +15,12 @@ def restore_flavor(font: TTFont) -> t.Iterator[None]:
     This is a workaround to support subroutinization and desubroutinization for WOFF and WOFF2
     fonts with cffsubr without raising an exception. This context manager is used to temporarily
     set the font flavor to None and restore it after subroutinization or desubroutinization.
+
+    Args:
+        font (TTFont): The TTFont object.
+
+    Yields:
+        None: The context manager.
     """
     original_flavor = font.flavor
     font.flavor = None
@@ -28,9 +34,12 @@ def get_glyph_bounds(font: TTFont, glyph_name: str) -> t.Dict[str, float]:
     """
     Get the bounds of a glyph.
 
-    :param font: The TTFont object.
-    :param glyph_name: The name of the glyph.
-    :return: The bounds of the glyph.
+    Args:
+        font (TTFont): The TTFont object.
+        glyph_name (str): The name of the glyph.
+
+    Returns:
+        dict: The bounds of the glyph.
     """
     glyph_set = font.getGlyphSet()
     if glyph_name not in glyph_set:

@@ -17,7 +17,12 @@ def quadratics_to_cubics(font: TTFont, tolerance: float = 1.0) -> t.Dict[str, T2
     """
     Get CFF charstrings using Qu2CuPen, falling back to T2CharStringPen if Qu2CuPen fails.
 
-    :return: CFF charstrings.
+    Args:
+        font (TTFont): The TTFont object.
+        tolerance (float, optional): The tolerance for the conversion. Defaults to 1.0.
+
+    Returns:
+        dict: The T2 charstrings.
     """
 
     charstrings: t.Dict = {}
@@ -48,7 +53,12 @@ def get_qu2cu_charstrings(
     """
     Get CFF charstrings using Qu2CuPen
 
-    :return: CFF charstrings.
+    Args:
+        font (TTFont): The TTFont object.
+        tolerance (float, optional): The tolerance for the conversion. Defaults to 1.0.
+
+    Returns:
+        tuple: A tuple containing the list of failed glyphs and the T2 charstrings.
     """
 
     qu2cu_charstrings = {}
@@ -72,7 +82,11 @@ def get_t2_charstrings(font: TTFont) -> t.Dict[str, T2CharString]:
     """
     Get CFF charstrings using T2CharStringPen
 
-    :return: CFF charstrings.
+    Args:
+        font (TTFont): The TTFont object.
+
+    Returns:
+        dict: The T2 charstrings.
     """
     t2_charstrings = {}
     glyph_set = font.getGlyphSet()
@@ -89,6 +103,13 @@ def get_t2_charstrings(font: TTFont) -> t.Dict[str, T2CharString]:
 def get_fallback_charstrings(font: TTFont, tolerance: float = 1.0) -> t.Dict[str, T2CharString]:
     """
     Get the charstrings from a fallback OTF font.
+
+    Args:
+        font (TTFont): The TTFont object.
+        tolerance (float, optional): The tolerance for the conversion. Defaults to 1.0.
+
+    Returns:
+        dict: The fallback charstrings.
     """
     temp_font = deepcopy(font)
     t2_charstrings = get_t2_charstrings(font=temp_font)

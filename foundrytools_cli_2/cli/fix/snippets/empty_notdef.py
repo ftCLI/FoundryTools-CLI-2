@@ -14,7 +14,7 @@ from foundrytools_cli_2.lib.constants import (
     OS_2_TABLE_TAG,
 )
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.pathops.skia_tools import is_empty_glyph
+from foundrytools_cli_2.lib.skia.skia_tools import is_empty_glyph
 
 NOTDEF = ".notdef"
 WIDTH_CONSTANT = 600
@@ -28,14 +28,14 @@ def draw_empty_notdef_cff(
     """
     Draws an empty .notdef glyph in a CFF font.
 
-    Parameters:
+    Args:
         glyph_set (_TTGlyphSetCFF): The glyph set to which the .notdef glyph belongs.
         width (int): The width of the .notdef glyph.
         height (int): The height of the .notdef glyph.
         thickness (int): The thickness of the .notdef glyph.
 
     Returns:
-        None
+        T2CharString: The .notdef glyph charstring.
     """
 
     pen = T2CharStringPen(width=width, glyphSet=glyph_set)
@@ -65,16 +65,16 @@ def draw_empty_notdef_glyf(
     glyph_set: t.Union[t.Dict[str, t.Any], _TTGlyphSetGlyf], width: int, height: int, thickness: int
 ) -> Glyph:
     """
-    Draws an empty .notdef glyph in a glyf font.
+    Draws an empty .notdef glyph in a TTF font.
 
-    Parameters:
+    Args:
         glyph_set (_TTGlyphSetGlyf): The glyph set to which the .notdef glyph belongs.
         width (int): The width of the .notdef glyph.
         height (int): The height of the .notdef glyph.
         thickness (int): The thickness of the .notdef glyph.
 
     Returns:
-        None
+        Glyph: The .notdef glyph.
     """
     pen = TTGlyphPen(glyphSet=glyph_set)
     notdef_glyph = glyph_set[NOTDEF]
@@ -101,11 +101,8 @@ def fix_notdef_empty(font: Font) -> None:
     """
     Fixes the empty .notdef glyph by adding a simple rectangle.
 
-    Parameters:
+    Args:
         font (Font): The Font object representing the font file.
-
-    Returns:
-        None
     """
     glyph_set = font.ttfont.getGlyphSet()
 

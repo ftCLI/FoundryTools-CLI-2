@@ -13,7 +13,7 @@ def del_names(
     """
     Updates the name table of a font file by deleting NameRecords.
 
-    Parameters:
+    Args:
         font (Font): The Font object representing the font file.
         name_ids_to_process (tuple[int]): A tuple of name IDs to delete.
         platform_id (Optional[int]): The platform ID of the name records to delete. Defaults to
@@ -21,6 +21,7 @@ def del_names(
         language_string (Optional[str]): The language of the name records to delete. Defaults to
             None.
     """
+
     name_table = NameTable(font=font.ttfont)
     name_table.remove_names(
         name_ids=name_ids_to_process, platform_id=platform_id, language_string=language_string
@@ -32,12 +33,10 @@ def del_empty_names(font: Font) -> None:
     """
     Deletes empty names from the given font.
 
-    Parameters:
+    Args:
         font (Font): The font object to delete the empty names from.
-
-    Returns:
-        None
     """
+
     name_table = NameTable(font=font.ttfont)
     name_table.remove_empty_names()
     font.modified = name_table.modified
@@ -52,13 +51,11 @@ def del_mac_names(
     kept: 1 (Font Family Name), 2 (Font Subfamily Name), 4 (Full Font Name), 5 (Version String),
     6 (PostScript Name).
 
-    Parameters:
-        font (Font): The font object to delete the Macintosh-specific names from.
-        delete_all (bool): Optional. If True, all Macintosh-specific names will be deleted.
-
-    Returns:
-        None
+    Args:
+        font (Font): The font object to delete the Macintosh names from.
+        delete_all (bool, optional): Whether to delete all Macintosh names. Defaults to False.
     """
+
     name_table = NameTable(font=font.ttfont)
     name_ids_to_delete = {name.nameID for name in name_table.table.names if name.platformID == 1}
     if not delete_all:
@@ -71,9 +68,10 @@ def del_unused_names(font: Font) -> None:
     """
     Removes unused NameRecords from the name table.
 
-    Parameters:
-        font (Font): The Font object.
+    Args:
+        font (Font): The font object to remove the unused names from.
     """
+
     name_table = NameTable(font=font.ttfont)
     name_table.table.removeUnusedNames(font.ttfont)
     font.modified = name_table.modified
@@ -89,7 +87,7 @@ def find_replace(
     """
     Updates the name table of a font file by replacing occurrences of one string with another.
 
-    Parameters:
+    Args:
         font (Font): The Font object representing the font file.
         old_string (str): The string to be replaced.
         new_string (str): The string to replace the old_string with.
@@ -98,6 +96,7 @@ def find_replace(
         name_ids_to_skip (tuple[int], optional): A tuple of name IDs to skip. Default is an empty
             tuple.
     """
+
     name_table = NameTable(font=font.ttfont)
     name_table.find_replace(
         old_string=old_string,
@@ -118,13 +117,14 @@ def set_name(
     """
     Updates the name table of a font file by setting the string value of a NameRecord.
 
-    Parameters:
+    Args:
         font (Font): The Font object representing the font file.
         name_id (int): The ID of the name to be set.
         name_string (str): The string value of the name to be set.
         platform_id (Optional[int]): The platform ID of the name record. Defaults to None.
         language_string (str): The language code of the name record. Defaults to "en".
     """
+
     name_table = NameTable(font=font.ttfont)
     name_table.set_name(
         name_id=name_id,
