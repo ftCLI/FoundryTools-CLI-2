@@ -612,13 +612,12 @@ class Font:  # pylint: disable=too-many-public-methods
         if not self.is_tt:
             raise NotImplementedError("TTF auto-hinting is only supported for TrueType fonts.")
 
-        modified_timestamp = self.ttfont[HEAD_TABLE_TAG].modified
         buf = BytesIO()
         self.save(buf, reorder_tables=None)
         data = ttfautohint(in_buffer=buf.getvalue(), no_info=True)
         hinted_font = TTFont(BytesIO(data), recalcTimestamp=recalc_timestamp)
         if not recalc_timestamp:
-            hinted_font[HEAD_TABLE_TAG].modified = modified_timestamp
+            hinted_font[HEAD_TABLE_TAG].modified = self.ttfont[HEAD_TABLE_TAG].modified
         self.ttfont = hinted_font
         self.modified = True
         buf.close()
