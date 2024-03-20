@@ -19,7 +19,7 @@ from foundrytools_cli_2.cli.name.options import (
 from foundrytools_cli_2.cli.shared_options import base_options
 from foundrytools_cli_2.lib.font_runner import FontRunner
 
-cli = click.Group(help="Utilities for editing the name table.")
+cli = click.Group(help="Utilities for editing the ``name`` table.")
 
 
 @cli.command("del-names")

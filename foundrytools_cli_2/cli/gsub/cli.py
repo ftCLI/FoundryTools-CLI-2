@@ -8,7 +8,7 @@ import click
 from foundrytools_cli_2.cli.shared_options import base_options
 from foundrytools_cli_2.lib.font_runner import FontRunner
 
-cli = click.Group(help="Utilities for editing the GSUB table.")
+cli = click.Group(help="Utilities for editing the ``GSUB`` table.")
 
 
 @cli.command("rename-feature")
