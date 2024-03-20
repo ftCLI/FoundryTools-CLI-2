@@ -38,7 +38,7 @@ from foundrytools_cli_2.lib.font_runner import FontRunner
 @base_options()
 def cli(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    A command line tool to manipulate the 'post' table.
+    A command line tool to manipulate the ``post`` table.
     """
     from foundrytools_cli_2.cli.post.snipptes import set_attrs as task
 

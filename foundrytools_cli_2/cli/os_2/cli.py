@@ -12,7 +12,7 @@ from foundrytools_cli_2.cli.os_2.options import (
 from foundrytools_cli_2.cli.shared_options import base_options
 from foundrytools_cli_2.lib.font_runner import FontRunner
 
-cli = click.Group(help="Utilities for editing the OS/2 table.")
+cli = click.Group(help="Utilities for editing the ``OS/2`` table.")
 
 
 @cli.command("recalc-avg-width")
