@@ -254,7 +254,6 @@ def correct_tt_glyph_contours(
 
         if not same_path(path_1=path_1, path_2=path_2):
             glyf_table[glyph_name] = glyph = tt_glyph_from_skia_path(path_2)
-            assert not glyph.program
             width, lsb = hmtx_table[glyph_name]
             if lsb != glyph.xMin:
                 hmtx_table[glyph_name] = (width, glyph.xMin)
