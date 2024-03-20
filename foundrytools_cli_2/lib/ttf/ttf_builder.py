@@ -79,7 +79,6 @@ def update_hmtx(font: TTFont, glyf: table__g_l_y_f) -> None:
     Update the 'hmtx' table of a font.
 
     Args:
-
         font (TTFont): The font to update.
         glyf: The 'glyf' table.
     """
@@ -97,7 +96,6 @@ def glyphs_to_quadratic(
     Convert the glyphs of a font to quadratic.
 
     Args:
-
         glyph_set: The glyphs to convert.
         max_err (float, optional): The maximum approximation error, measured in UPEM. Defaults to
             1.0.

@@ -24,10 +24,10 @@ def build_otf(
 
     Args:
         font (TTFont): The TTFont object.
-        ps_name (str): The PostScript name of the font.
         charstrings_dict (dict): The charstrings dictionary.
-        font_info (dict): The font info.
-        private_dict (dict): The private dict.
+        ps_name (str, optional): The PostScript name of the font. Defaults to None.
+        font_info (dict, optional): The font info dictionary. Defaults to None.
+        private_dict (dict, optional): The private dictionary. Defaults to None.
     """
 
     if not ps_name:
@@ -58,6 +58,9 @@ def build_otf(
 def delete_ttf_tables(font: TTFont) -> None:
     """
     Deletes TTF specific tables from a font.
+
+    Args:
+        font (TTFont): The TTFont object.
     """
     ttf_tables = ["glyf", "cvt ", "loca", "fpgm", "prep", "gasp", "LTSH", "hdmx"]
     for table in ttf_tables:
@@ -69,7 +72,7 @@ def get_ps_name(font: TTFont) -> str:
     """
     Gets the PostScript name of a font from a CFF table.
 
-    Parameters:
+    Args:
         font (TTFont): The TTFont object.
 
     Returns:
@@ -86,12 +89,11 @@ def get_font_info_dict(font: TTFont) -> t.Dict[str, t.Any]:
     """
     Gets the font info from a CFF table.
 
-    Parameters:
+    Args:
         font (TTFont): The TTFont object.
 
     Returns:
         dict: The font info.
-
     """
 
     if CFF_TABLE_TAG not in font:
@@ -108,6 +110,12 @@ def get_font_info_dict(font: TTFont) -> t.Dict[str, t.Any]:
 def build_font_info_dict(font: TTFont) -> t.Dict[str, t.Any]:
     """
     Builds CFF topDict from a TTFont object.
+
+    Args:
+        font (TTFont): The TTFont object.
+
+    Returns:
+        dict: The CFF topDict.
     """
 
     font_revision = str(round(font[HEAD_TABLE_TAG].fontRevision, 3)).split(".")
@@ -133,12 +141,11 @@ def get_private_dict(font: TTFont) -> t.Dict[str, t.Any]:
     """
     Gets the private dict from a CFF table.
 
-    Parameters:
+    Args:
         font (TTFont): The TTFont object.
 
     Returns:
         dict: The private dict.
-
     """
     if CFF_TABLE_TAG not in font:
         return {}
@@ -156,6 +163,13 @@ def get_hmtx_values(
 ) -> t.Dict[str, t.Tuple[int, int]]:
     """
     Get the horizontal metrics for a font.
+
+    Args:
+        font (TTFont): The TTFont object.
+        charstrings (dict): The charstrings dictionary.
+
+    Returns:
+        dict: The horizontal metrics.
     """
     glyph_set = font.getGlyphSet()
     advance_widths = {k: v.width for k, v in glyph_set.items()}
@@ -168,9 +182,15 @@ def get_hmtx_values(
     return metrics
 
 
-def get_post_values(font: TTFont) -> dict:
+def get_post_values(font: TTFont) -> t.Dict[str, t.Any]:
     """
     Setup CFF post table values
+
+    Args:
+        font (TTFont): The TTFont object.
+
+    Returns:
+        dict: The post table values.
     """
     post_table = font[POST_TABLE_TAG]
     post_info = {
