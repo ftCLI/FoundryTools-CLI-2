@@ -656,23 +656,23 @@ class Font:  # pylint: disable=too-many-public-methods
 
         self.modified = True
 
-    def tt_scale_upem(self, new_upem: int) -> None:
+    def tt_scale_upem(self, target_upm: int) -> None:
         """
         Scale the font's Units Per Em (UPM).
 
         Args:
-            new_upem (int): The new units per em value. Must be in the range 16 to 16384.
+            target_upm (int): The new units per em value. Must be in the range 16 to 16384.
         """
         if not self.is_tt:
             raise NotImplementedError("Scaling upem is only supported for TrueType fonts.")
 
-        if new_upem < MIN_UPM or new_upem > MAX_UPM:
+        if target_upm < MIN_UPM or target_upm > MAX_UPM:
             raise ValueError(f"units_per_em must be in the range {MAX_UPM} to {MAX_UPM}.")
 
-        if self.ttfont[HEAD_TABLE_TAG].unitsPerEm == new_upem:
-            raise ValueError(f"Font already has {new_upem} units per em. No need to scale upem.")
+        if self.ttfont[HEAD_TABLE_TAG].unitsPerEm == target_upm:
+            raise ValueError(f"Font already has {target_upm} units per em. No need to scale upem.")
 
-        scale_upem(self.ttfont, new_upem=new_upem)
+        scale_upem(self.ttfont, new_upem=target_upm)
         self.modified = True
 
     def tt_correct_contours(self, min_area: int = 25) -> t.List[str]:

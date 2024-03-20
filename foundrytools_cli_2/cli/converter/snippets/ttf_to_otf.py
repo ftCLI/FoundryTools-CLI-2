@@ -72,7 +72,7 @@ def ttf2otf(
 
     if target_upm:
         logger.info(f"Scaling UPM to {target_upm}...")
-        font.tt_scale_upem(new_upem=target_upm)
+        font.tt_scale_upem(target_upm=target_upm)
 
     logger.info("Converting to OTF...")
     font.to_otf(tolerance=tolerance)
@@ -129,7 +129,7 @@ def ttf2otf_with_tx(
 
     if target_upm:
         logger.info(f"Scaling UPM to {target_upm}...")
-        font.tt_scale_upem(new_upem=target_upm)
+        font.tt_scale_upem(target_upm=target_upm)
         font.ttfont.save(out_file, reorderTables=None)
         font = Font(out_file, recalc_timestamp=recalc_timestamp)
         tx_command = ["tx", "-cff", "-S", "+V", "+b", str(out_file), str(cff_file)]

@@ -38,7 +38,7 @@ def main(
 
     if target_upm:
         logger.info(f"Scaling UPM to {target_upm}...")
-        font.tt_scale_upem(new_upem=target_upm)
+        font.tt_scale_upem(target_upm=target_upm)
 
     font.save(out_file)
     logger.success(f"File saved to {out_file}")
