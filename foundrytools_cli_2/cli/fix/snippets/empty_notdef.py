@@ -14,7 +14,7 @@ from foundrytools_cli_2.lib.constants import (
     OS_2_TABLE_TAG,
 )
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.pathops.skia_tools import is_empty_glyph
+from foundrytools_cli_2.lib.skia.skia_tools import is_empty_glyph
 
 NOTDEF = ".notdef"
 WIDTH_CONSTANT = 600
