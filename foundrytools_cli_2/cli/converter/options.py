@@ -7,9 +7,10 @@ from foundrytools_cli_2.cli.shared_options import add_options
 
 def tolerance_option() -> t.Callable:
     """
-    Add the tolerance option to a click command.
+    Add the ``tolerance`` option to a click command.
 
-    :return: a decorator that adds the tolerance option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``tolerance`` option to a click command
     """
     _tolerance_option = [
         click.option(
@@ -28,9 +29,10 @@ def tolerance_option() -> t.Callable:
 
 def in_format_choice() -> t.Callable:
     """
-    Add the flavor option to a click command.
+    Add the ``flavor`` option to a click command.
 
-    :return: a decorator that adds the flavor option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``flavor`` option to a click command
     """
     _in_format_choice = [
         click.option(
@@ -51,9 +53,10 @@ def in_format_choice() -> t.Callable:
 
 def out_format_choice() -> t.Callable:
     """
-    Add the flavor option to a click command.
+    Add the ``format`` option to a click command.
 
-    :return: a decorator that adds the flavor option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``format`` option to a click command
     """
     _out_format_choice = [
         click.option(
@@ -73,9 +76,10 @@ def out_format_choice() -> t.Callable:
 
 def ttf2otf_mode_choice() -> t.Callable:
     """
-    Add the ttf2otf_mode option to a click command.
+    Add the ``mode`` option to a click command.
 
-    :return: a decorator that adds the ttf2otf_mode option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``mode`` option to a click command
     """
     _ttf2otf_mode_choice = [
         click.option(

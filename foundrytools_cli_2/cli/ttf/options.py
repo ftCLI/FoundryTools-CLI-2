@@ -7,9 +7,11 @@ from foundrytools_cli_2.cli.shared_options import add_options
 
 def remove_hinting_flag() -> t.Callable:
     """
-    Add the remove_hinting option to a click command.
+    Returns a decorator that adds the --no-remove-hinting option to a click command. The option is
+    a flag that can be used to keep the hinting of a TrueType font when the contours are modified.
 
-    :return: a decorator that adds the remove_hinting option to a click command
+    Returns:
+        t.Callable: The decorator to add the option to a click command
     """
     _remove_hinting_flag = [
         click.option(

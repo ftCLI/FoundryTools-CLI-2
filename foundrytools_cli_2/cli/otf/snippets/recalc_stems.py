@@ -21,7 +21,7 @@ def get_report(
     """
     Retrieves stem data from a font file for a given list of glyphs.
 
-    Parameters:
+    Args:
         file_path`: The path to the font file.
         glyph_list`: A list of glyph names for which stem data will be
         retrieved.
@@ -63,13 +63,13 @@ def get_current_stems(font: TTFont) -> t.Tuple[t.Optional[int], t.Optional[int]]
     """
     Get the current stem values for a given TTFont object.
 
-    Parameters:
+    Args:
         font: A `TTFont` object representing the font file.
 
     Returns:
-        A tuple containing the current stem values for horizontal and vertical stems. The first
-        value in the tuple represents the horizontal stem value, and the second value represents the
-        vertical stem value.
+        Tuple: a tuple containing the current stem values for horizontal and vertical stems. The
+        first value in the tuple represents the horizontal stem value, and the second value
+        represents the vertical stem value.
     """
     private = font["CFF "].cff.topDictIndex[0].Private
     try:
@@ -87,7 +87,7 @@ def set_font_stems(font: TTFont, std_hw: int, std_vw: int) -> None:
     """
     Set the stem values for a given TTFont object.
 
-    Parameters:
+    Args:
         font: A `TTFont` object representing the font file.
         std_hw: The new value for the horizontal stem.
         std_vw: The new value for the vertical stem.
@@ -105,15 +105,15 @@ def recalc_stems(
     """
     Recalculates the StdHW and StdVW values for a given font file.
 
-    Parameters:
+    Args:
         file_path: A `Path` object representing the path to the file.
         h_stems_glyphs: A list of glyph names to use for calculating the horizontal stems.
         v_stems_glyphs: A list of glyph names to use for calculating the vertical stems.
 
     Returns:
-        A tuple containing the recalculated stem values for horizontal and vertical stems. The first
-        value in the tuple represents the horizontal stem value, and the second value represents the
-        vertical stem value.
+        Tuple: a tuple containing the new StdHW and StdVW values. The first value in the tuple
+        represents the new horizontal stem value, and the second value represents the new vertical
+        stem value.
     """
 
     if h_stems_glyphs is None:
@@ -136,8 +136,8 @@ def main(font: Font) -> None:
     """
     Recalculates the hinting stems of an OTF font.
 
-    :param font: the Font object
-    :return: None
+    Args:
+        font (Font): The font object to recalculate the hinting stems for.
     """
     if not font.is_ps:
         logger.error("Font is not a PostScript font")

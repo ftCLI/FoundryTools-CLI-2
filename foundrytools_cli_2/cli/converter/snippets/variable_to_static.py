@@ -15,7 +15,7 @@ def get_instance_file_name(font: Font, instance: NamedInstance) -> str:
     """
     Returns the file name of an instance of a font.
 
-    Parameters:
+    Args:
         font (Font): The Font object.
         instance (NamedInstance): The instance object.
 
@@ -53,7 +53,7 @@ def get_instances(
     provided instances as is. Otherwise, it calls the `get_instances()` method on the `font` object
     and returns the obtained instances.
 
-    Parameters:
+    Args:
         font (Font): The Font object.
         instances (Optional[List[NamedInstance]]): Optional. A list of font instances.
             Defaults to None.
@@ -70,7 +70,7 @@ def create_static_instance(
     """
     Creates a static instance of a variable font.
 
-    Parameters:
+    Args:
         font (Font): The variable Font object.
         instance (NamedInstance): The instance definition.
         update_name_table (bool, optional): Specifies whether to update the font names table.
@@ -93,7 +93,7 @@ def get_output_dir(font: Font, output_dir: t.Optional[Path] = None) -> Path:
     """
     Get the output directory for the static font instances.
 
-    Parameters:
+    Args:
         font (Font): The Font object.
         output_dir (Optional[Path], optional): The output directory. Defaults to None.
 
@@ -113,7 +113,7 @@ def get_output_file(
     """
     Get the output file path for a given font instance.
 
-    Parameters:
+    Args:
         font (Font): The Font object.
         instance (NamedInstance): The instance object.
         output_dir (Path): The output directory.
@@ -133,12 +133,9 @@ def save_static_instance(out_file: Path, static_instance: TTFont) -> None:
     """
     Save the static instance to the specified output file.
 
-    Parameters:
+    Args:
         out_file (Path): The output file path.
         static_instance (TTFont): The static instance.
-
-    Returns:
-        None
     """
     static_instance.save(file=out_file)
 
@@ -148,11 +145,8 @@ def log_success(out_file: Path) -> None:
     Log a success message indicating that a static instance has been saved to the specified output
     file.
 
-    Parameters:
+    Args:
         out_file (Path): The output file path.
-
-    Returns:
-        None
     """
     logger.success(f"Static instance saved to {out_file}")
 
@@ -167,7 +161,7 @@ def main(
     """
     Generate static font instances based on given parameters.
 
-    Parameters:
+    Args:
         font (Font): The Font object.
         instances (Optional[List[NamedInstance]], optional): A list of font instances.
             Defaults to None.

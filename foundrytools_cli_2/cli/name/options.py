@@ -8,9 +8,10 @@ from foundrytools_cli_2.cli.shared_options import add_options
 
 def name_id(required: bool = True) -> t.Callable:
     """
-    Add the name_id option to a click command.
+    Add the ``name_id`` option to a click command.
 
-    :return: a decorator that adds the name_id option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``name_id`` option to a click command
     """
     _name_id_option = [
         click.option(
@@ -31,9 +32,10 @@ def name_id(required: bool = True) -> t.Callable:
 
 def name_ids(required: bool = True) -> t.Callable:
     """
-    Add the name_ids option to a click command.
+    Add the ``name_ids`` option to a click command.
 
-    :return: a decorator that adds the name_ids option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``name_ids`` option to a click command
     """
     _name_ids_option = [
         click.option(
@@ -56,9 +58,10 @@ def name_ids(required: bool = True) -> t.Callable:
 
 def skip_name_ids() -> t.Callable:
     """
-    Add the exclude_name_ids option to a click command.
+    Add the ``exclude_name_ids`` option to a click command.
 
-    :return: a decorator that adds the exclude_name_ids option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``exclude_name_ids`` option to a click command
     """
     _exclude_name_ids_option = [
         click.option(
@@ -80,9 +83,10 @@ def skip_name_ids() -> t.Callable:
 
 def platform_id() -> t.Callable:
     """
-    Add the platform_id option to a click command.
+    Add the ``platform_id`` option to a click command.
 
-    :return: a decorator that adds the platform_id option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``platform_id`` option to a click command
     """
     _platform_id_option = [
         click.option(
@@ -109,9 +113,10 @@ def platform_id() -> t.Callable:
 
 def win_or_mac_platform_id() -> t.Callable:
     """
-    Add the win_or_mac_platform_id option to a click command.
+    Add the ``win_or_mac_platform_id`` option to a click command.
 
-    :return: a decorator that adds the win_or_mac_platform_id option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``win_or_mac_platform_id`` option to a click command
     """
     _win_or_mac_platform_id_option = [
         click.option(
@@ -136,9 +141,10 @@ def win_or_mac_platform_id() -> t.Callable:
 
 def language_string() -> t.Callable:
     """
-    Add the language_string option to a click command.
+    Add the ``language_string`` option to a click command.
 
-    :return: a decorator that adds the language_string option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``language_string`` option to a click command
     """
     _language_string_option = [
         click.option(
@@ -158,9 +164,10 @@ def language_string() -> t.Callable:
 
 def name_string() -> t.Callable:
     """
-    Add the string option to a click command.
+    Add the ``name_string`` option to a click command.
 
-    :return: a decorator that adds the string option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``name_string`` option to a click command
     """
     _string_option = [
         click.option(
@@ -179,9 +186,10 @@ def name_string() -> t.Callable:
 
 def old_string() -> t.Callable:
     """
-    Add the old_string option to a click command.
+    Add the ``old_string`` option to a click command.
 
-    :return: a decorator that adds the old_string option to a click command
+    Returns:
+        t.Callable: A decorator that adds the old_string option to a click command
     """
     _old_string_option = [
         click.option(
@@ -199,9 +207,10 @@ def old_string() -> t.Callable:
 
 def new_string() -> t.Callable:
     """
-    Add the new_string option to a click command.
+    Add the ``new_string`` option to a click command.
 
-    :return: a decorator that adds the new_string option to a click command
+    Returns:
+        t.Callable: A decorator that adds the new_string option to a click command
     """
     _new_string_option = [
         click.option(
@@ -219,9 +228,10 @@ def new_string() -> t.Callable:
 
 def delete_all() -> t.Callable:
     """
-    Add the delete_all_mac_names option to a click command.
+    Add the ``delete_all`` option to a click command.
 
-    :return: a decorator that adds the delete_all_mac_names option to a click command
+    Returns:
+        t.Callable: A decorator that adds the delete_all option to a click command
     """
     _delete_all_mac_names_flag = [
         click.option(

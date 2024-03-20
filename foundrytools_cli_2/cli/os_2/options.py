@@ -10,9 +10,10 @@ __all__ = ["set_attrs_options", "set_fs_selection_options", "set_fs_type_options
 
 def weight_class() -> t.Callable:
     """
-    Add the weightClass option to a click command.
+    Add the ``weight_class`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``weight_class`` option to a click command
     """
     _weight_class = [
         click.option(
@@ -32,9 +33,10 @@ def weight_class() -> t.Callable:
 
 def width_class() -> t.Callable:
     """
-    Add the widthClass option to a click command.
+    Add the ``width_class`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``width_class`` option to a click command
     """
     _width_class = [
         click.option(
@@ -54,9 +56,10 @@ def width_class() -> t.Callable:
 
 def vendor_id() -> t.Callable:
     """
-    Add the vendorID option to a click command.
+    Add the ``vendor_id`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``vendor_id`` option to a click command
     """
     _vendor_id = [
         click.option(
@@ -75,9 +78,10 @@ def vendor_id() -> t.Callable:
 
 def typo_ascender() -> t.Callable:
     """
-    Add the typoAscender option to a click command.
+    Add the ``typo_ascender`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``typo_ascender`` option to a click command
     """
     _typo_ascender = [
         click.option(
@@ -97,9 +101,10 @@ def typo_ascender() -> t.Callable:
 
 def typo_descender() -> t.Callable:
     """
-    Add the typoDescender option to a click command.
+    Add the ``typo_descender`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``typo_descender`` option to a click command
     """
     _typo_descender = [
         click.option(
@@ -119,9 +124,10 @@ def typo_descender() -> t.Callable:
 
 def typo_line_gap() -> t.Callable:
     """
-    Add the typoLineGap option to a click command.
+    Add the ``typo_line_gap`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``typo_line_gap`` option to a click command
     """
     _typo_line_gap = [
         click.option(
@@ -141,9 +147,10 @@ def typo_line_gap() -> t.Callable:
 
 def win_ascent() -> t.Callable:
     """
-    Add the winAscent option to a click command.
+    Add the ``win_ascent`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``win_ascent`` option to a click command
     """
     _win_ascent = [
         click.option(
@@ -163,9 +170,10 @@ def win_ascent() -> t.Callable:
 
 def win_descent() -> t.Callable:
     """
-    Add the winDescent option to a click command.
+    Add the ``win_descent`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``win_descent`` option to a click command
     """
     _win_descent = [
         click.option(
@@ -185,9 +193,10 @@ def win_descent() -> t.Callable:
 
 def x_height() -> t.Callable:
     """
-    Add the xHeight option to a click command.
+    Add the ``x_height`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``x_height`` option to a click command
     """
     _x_height = [
         click.option(
@@ -216,9 +225,10 @@ def x_height() -> t.Callable:
 
 def cap_height() -> t.Callable:
     """
-    Add the capHeight option to a click command.
+    Add the ``cap_height`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``cap_height`` option to a click command
     """
     _cap_height = [
         click.option(
@@ -249,9 +259,10 @@ def cap_height() -> t.Callable:
 
 def italic() -> t.Callable:
     """
-    Add the italic option to a click command.
+    Add the ``italic`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``italic`` option to a click command
     """
     _italic = [
         click.option(
@@ -273,9 +284,10 @@ def italic() -> t.Callable:
 
 def underscore() -> t.Callable:
     """
-    Add the underscore option to a click command.
+    Add the ``underscore`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``underscore`` option to a click command
     """
     _underscore = [
         click.option(
@@ -296,9 +308,10 @@ def underscore() -> t.Callable:
 
 def negative() -> t.Callable:
     """
-    Add the negative option to a click command.
+    Add the ``negative`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``negative`` option to a click command
     """
     _negative = [
         click.option(
@@ -319,9 +332,10 @@ def negative() -> t.Callable:
 
 def outline() -> t.Callable:
     """
-    Add the outline option to a click command.
+    Add the ``outline`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``outline`` option to a click command
     """
     _outline = [
         click.option(
@@ -342,9 +356,10 @@ def outline() -> t.Callable:
 
 def strikeout() -> t.Callable:
     """
-    Add the strikeout option to a click command.
+    Add the ``strikeout`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``strikeout`` option to a click command
     """
     _strikeout = [
         click.option(
@@ -365,9 +380,10 @@ def strikeout() -> t.Callable:
 
 def bold() -> t.Callable:
     """
-    Add the bold option to a click command.
+    Add the ``bold`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``bold`` option to a click command
     """
     _bold = [
         click.option(
@@ -389,9 +405,10 @@ def bold() -> t.Callable:
 
 def regular() -> t.Callable:
     """
-    Add the regular option to a click command.
+    Add the ``regular`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``regular`` option to a click command
     """
     _regular = [
         click.option(
@@ -413,9 +430,10 @@ def regular() -> t.Callable:
 
 def use_typo_metrics() -> t.Callable:
     """
-    Add the useTypoMetrics option to a click command.
+    Add the ``use_typo_metrics`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``use_typo_metrics`` option to a click command
     """
     _use_typo_metrics = [
         click.option(
@@ -439,9 +457,10 @@ def use_typo_metrics() -> t.Callable:
 
 def wws_consistent() -> t.Callable:
     """
-    Add the wwsConsistent option to a click command.
+    Add the ``wws_consistent`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``wws_consistent`` option to a click command
     """
     _wws_consistent = [
         click.option(
@@ -466,9 +485,10 @@ def wws_consistent() -> t.Callable:
 
 def oblique() -> t.Callable:
     """
-    Add the oblique option to a click command.
+    Add the ``oblique`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``oblique`` option to a click command
     """
     _oblique = [
         click.option(
@@ -499,9 +519,10 @@ def oblique() -> t.Callable:
 
 def embed_level() -> t.Callable:
     """
-    Add the embedLevel option to a click command.
+    Add the ``embed_level`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``embed_level`` option to a click command
     """
     _embed_level = [
         click.option(
@@ -540,9 +561,10 @@ def embed_level() -> t.Callable:
 
 def no_subsetting() -> t.Callable:
     """
-    Add the noSubsetting option to a click command.
+    Add the ``no_subsetting`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``no_subsetting`` option to a click command
     """
     _no_subsetting = [
         click.option(
@@ -564,9 +586,10 @@ def no_subsetting() -> t.Callable:
 
 def bitmap_embed_only() -> t.Callable:
     """
-    Add the bitmapEmbedOnly option to a click command.
+    Add the ``bitmap_embed_only`` option to a click command.
 
-    :return: the click command with the option added
+    Returns:
+        t.Callable: A decorator that adds the ``bitmap_embed_only`` option to a click command
     """
     _bitmap_embed_only = [
         click.option(
@@ -590,9 +613,10 @@ def bitmap_embed_only() -> t.Callable:
 
 def set_attrs_options() -> t.Callable:
     """
-    Add the options for setting the attributes of the OS/2 table to a click command.
+    Add the options for setting the attributes of the ``OS/2`` table to a click command.
 
-    :return: the click command with the options added
+    Returns:
+        t.Callable: A decorator that adds the options to a click command
     """
     _set_attrs_options = [
         weight_class(),
@@ -611,9 +635,10 @@ def set_attrs_options() -> t.Callable:
 
 def set_fs_selection_options() -> t.Callable:
     """
-    Add the options for setting the flags of the OS/2 table to a click command.
+    Add the options for setting the flags of the ``OS/2.fsSelection`` field to a click command.
 
-    :return: the click command with the options added
+    Returns:
+        t.Callable: A decorator that adds the options to a click command
     """
     _set_flags_options = [
         italic(),
@@ -632,9 +657,10 @@ def set_fs_selection_options() -> t.Callable:
 
 def set_fs_type_options() -> t.Callable:
     """
-    Add the options for setting the permissions of the OS/2 table to a click command.
+    Add the options for setting the flags of the ``OS/2.fsType`` field to a click command.
 
-    :return: the click command with the options added
+    Returns:
+        t.Callable: A decorator that adds the options to a click command
     """
     _set_permissions_options = [
         embed_level(),

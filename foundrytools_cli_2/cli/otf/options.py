@@ -9,7 +9,8 @@ def otf_autohint_options() -> t.Callable:
     """
     Add the autohint options to a click command.
 
-    :return: a decorator that adds the autohint options to a click command
+    Returns:
+        t.Callable: A decorator that adds the autohint options to a click command
     """
     _autohint_options = [
         allow_changes_flag(),
@@ -23,9 +24,10 @@ def otf_autohint_options() -> t.Callable:
 
 def allow_changes_flag() -> t.Callable:
     """
-    Add the allow_changes option to a click command.
+    Add the ``allow_changes`` option to a click command.
 
-    :return: a decorator that adds the allow_changes option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``allow_changes`` option to a click command
     """
     _allow_changes_flag = [
         click.option(
@@ -42,9 +44,10 @@ def allow_changes_flag() -> t.Callable:
 
 def allow_no_blues_flag() -> t.Callable:
     """
-    Add the allow_no_blues option to a click command.
+    Add the ``allow_no_blues`` option to a click command.
 
-    :return: a decorator that adds the allow_no_blues option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``allow_no_blues`` option to a click command
     """
     _allow_no_blues_flag = [
         click.option(
@@ -61,9 +64,10 @@ def allow_no_blues_flag() -> t.Callable:
 
 def decimal_flag() -> t.Callable:
     """
-    Add the decimal option to a click command.
+    Add the ``decimal`` option to a click command.
 
-    :return: a decorator that adds the decimal option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``decimal`` option to a click command
     """
     _decimal_flag = [
         click.option(
@@ -80,9 +84,10 @@ def decimal_flag() -> t.Callable:
 
 def no_flex_flag() -> t.Callable:
     """
-    Add the no_flex option to a click command.
+    Add the ``no_flex`` option to a click command.
 
-    :return: a decorator that adds the no_flex option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``no_flex`` option to a click command
     """
     _no_flex_flag = [
         click.option(
@@ -99,9 +104,10 @@ def no_flex_flag() -> t.Callable:
 
 def no_hint_sub_flag() -> t.Callable:
     """
-    Add the no_hint_sub option to a click command.
+    Add the ``no_hint_sub`` option to a click command.
 
-    :return: a decorator that adds the no_hint_sub option to a click command
+    Returns:
+        t.Callable: A decorator that adds the ``no_hint_sub`` option to a click command
     """
     _no_hint_sub_flag = [
         click.option(

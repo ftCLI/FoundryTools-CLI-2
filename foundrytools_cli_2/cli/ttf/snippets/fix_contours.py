@@ -8,6 +8,11 @@ def main(font: Font, min_area: int = 25, remove_hinting: bool = True) -> None:
     """
     Corrects contours of the given TrueType font by removing overlaps, correcting the direction of
     the contours, and removing tiny paths.
+
+    Args:
+        font (Font): The font to correct
+        min_area (int, optional): The minimum area of a contour to be considered. Defaults to 25.
+        remove_hinting (bool, optional): Whether to remove hinting from the font. Defaults to True.
     """
     logger.info("Correcting contours...")
     modified_glyphs = font.tt_correct_contours(min_area=min_area)

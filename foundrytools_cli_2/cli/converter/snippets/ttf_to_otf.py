@@ -18,6 +18,15 @@ def _build_out_file_name(font: Font, output_dir: t.Optional[Path], overwrite: bo
 
     A file named "font.ttf" will be converted to "font.otf", while a file named
     "font.woff" will be converted to "font.otf.woff".
+
+    Args:
+        font (Font): The font to convert
+        output_dir (t.Optional[Path]): The output directory
+        overwrite (bool, optional): Whether to overwrite the output file if it already exists.
+            Defaults to ``True``.
+
+    Returns:
+        Path: The output file name
     """
     flavor = font.ttfont.flavor
     suffix = ".otf" if flavor is not None else ""
@@ -39,14 +48,19 @@ def ttf2otf(
     """
     Convert PostScript flavored fonts to TrueType flavored fonts.
 
-    Parameters:
-        font: The font to convert.
-        tolerance: The tolerance to use when converting to OTF.
-        target_upm: The UPM to scale the font to.
-        subroutinize: Whether to subroutinize the font.
-        output_dir: The directory to save the font to.
-        recalc_timestamp: Whether to recalculate the font's timestamp.
-        overwrite: Whether to overwrite the existing file.
+    Args:
+        font (Font): The font to convert
+        tolerance (float, optional): The maximum error allowed when converting the font to TrueType.
+            Defaults to 1.0.
+        target_upm (t.Optional[int], optional): The target UPM to scale the font to. Defaults to
+            ``None``.
+        subroutinize (bool, optional): Whether to subroutinize the font. Defaults to ``True``.
+        output_dir (t.Optional[Path], optional): The output directory. If ``None``, the output file
+            will be saved in the same directory as the input file. Defaults to ``None``.
+        recalc_timestamp (bool, optional): Whether to recalculate the font's timestamp. Defaults to
+            ``False``.
+        overwrite (bool, optional): Whether to overwrite the output file if it already exists.
+            Defaults to ``True``.
     """
     out_file = _build_out_file_name(font=font, output_dir=output_dir, overwrite=overwrite)
 
@@ -92,13 +106,17 @@ def ttf2otf_with_tx(
     """
     Convert PostScript flavored fonts to TrueType flavored fonts using tx.
 
-    Parameters:
-        font: The font to convert.
-        target_upm: The UPM to scale the font to.
-        subroutinize: Whether to subroutinize the font.
-        output_dir: The directory to save the font to.
-        recalc_timestamp: Whether to recalculate the font's timestamp.
-        overwrite: Whether to overwrite the existing file.
+    Args:
+        font (Font): The font to convert
+        target_upm (t.Optional[int], optional): The target UPM to scale the font to. Defaults to
+            ``None``, which means that the font will not be scaled.
+        subroutinize (bool, optional): Whether to subroutinize the font. Defaults to ``True``.
+        output_dir (t.Optional[Path], optional): The output directory. If ``None``, the output file
+            will be saved in the same directory as the input file. Defaults to ``None``.
+        recalc_timestamp (bool, optional): Whether to recalculate the font's timestamp. Defaults to
+            ``False``.
+        overwrite (bool, optional): Whether to overwrite the output file if it already exists.
+            Defaults to ``True``.
     """
     out_file = _build_out_file_name(font=font, output_dir=output_dir, overwrite=overwrite)
     cff_file = font.make_out_file_name(extension=".cff", output_dir=output_dir, overwrite=overwrite)

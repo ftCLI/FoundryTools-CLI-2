@@ -15,6 +15,17 @@ def main(
 ) -> None:
     """
     Convert SFNT fonts to WOFF and/or WOFF2 fonts.
+
+    Args:
+        font (Font): The font to convert
+        output_dir (t.Optional[Path], optional): The output directory. If ``None``, the output file
+            will be saved in the same directory as the input file. Defaults to ``None``.
+        out_format (t.Optional[t.Literal["woff", "woff2"]], optional): The output format. If ``None``,
+            both WOFF and WOFF2 files will be generated. Defaults to ``None``.
+        overwrite (bool, optional): Whether to overwrite the output file if it already exists.
+            Defaults to ``True``.
+        reorder_tables (bool, optional): Whether to reorder the tables of the font. Defaults to
+            ``False``.
     """
 
     # Get the extension of the input file to reuse it later as suffix.

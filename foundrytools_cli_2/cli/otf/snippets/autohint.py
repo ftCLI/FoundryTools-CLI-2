@@ -13,7 +13,7 @@ def hint_font(in_file: Path, options: ACOptions) -> TTFont:
     """
     Applies hinting to an OpenType-PS font file and returns the hinted TTFont object.
 
-    Parameters:
+    Args:
         in_file: Path to the font file.
         options: An ACOptions object containing the options to use for hinting.
 

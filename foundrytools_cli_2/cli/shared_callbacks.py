@@ -14,10 +14,13 @@ def output_dir_callback(
     Tries to create the output directory if it doesn't exist. Checks if the output directory is
     writable. Returns a Path object. If the callback fails, raises a click.BadParameter exception.
 
-    :param ctx: click Context
-    :param _: click Parameter. Not used
-    :param value: a Path object or None
-    :return: a Path object representing the output directory
+    Args:
+        ctx (click.Context): click Context
+        _: click Parameter
+        value (t.Optional[Path]): The value to convert
+
+    Returns:
+        t.Optional[Path]: The converted value
     """
 
     # if the value is None or the click context is resilient, return None
@@ -44,10 +47,14 @@ def choice_to_int_callback(
     If the value is None or the click context is resilient, returns None. If the parameter is
     multiple, converts a click choice tuple of strings to a tuple of integers. Otherwise, converts
     a click choice string to an integer.
-    :param ctx: click Context
-    :param _: click Parameter
-    :param value: string or tuple of strings to convert
-    :return: an integer or a tuple of integers
+
+    Args:
+        ctx (click.Context): click Context
+        _: click Parameter
+        value (t.Union[str, t.Tuple[str, ...]]): The value to convert
+
+    Returns:
+        t.Optional[t.Union[int, t.Tuple[int, ...]]]: The converted value
     """
 
     # we do not check if the values can be converted to integers here because the click.Choice
@@ -61,25 +68,3 @@ def choice_to_int_callback(
     if isinstance(value, tuple):
         return tuple(_to_int(v) for v in value)
     return _to_int(value)
-
-
-#
-# def str_to_tuple_callback(
-#     ctx: click.Context, _: click.Parameter, value: t.Optional[str]
-# ) -> t.Optional[t.Tuple[str, ...]]:
-#     """
-#     Callback for click options that accept a tuple of strings. Converts a string to a tuple of
-#     strings.
-#
-#     If the value is None or the click context is resilient, returns None. Otherwise, converts a
-#     string to a tuple of strings.
-#
-#     :param ctx: click Context
-#     :param _: click Parameter. Not used
-#     :param value: string to convert
-#     :return: a tuple of strings
-#     """
-#
-#     if not value or ctx.resilient_parsing:
-#         return None
-#     return tuple(value.split(","))
