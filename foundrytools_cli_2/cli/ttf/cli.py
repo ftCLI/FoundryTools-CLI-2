@@ -36,6 +36,18 @@ def dehint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
+@cli.command("decompose")
+@base_options()
+def decompose(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Decomposes the composite glyphs of the given TrueType fonts.
+    """
+
+    runner = FontRunner(input_path=input_path, task=Font.tt_decomponentize, **options)
+    runner.filter.filter_out_ps = True
+    runner.run()
+
+
 @cli.command("fix-contours")
 @min_area_option()
 @remove_hinting_flag()
