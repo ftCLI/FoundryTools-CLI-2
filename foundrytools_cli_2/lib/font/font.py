@@ -134,6 +134,16 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         return self._file
 
+    @file.setter
+    def file(self, value: Path) -> None:
+        """
+        Set the file path of the font.
+
+        Args:
+            value: The file path of the font.
+        """
+        self._file = value
+
     @property
     def bytesio(self) -> t.Optional[BytesIO]:
         """
@@ -144,6 +154,16 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         return self._bytesio
 
+    @bytesio.setter
+    def bytesio(self, value: BytesIO) -> None:
+        """
+        Set the ``BytesIO`` object of the font.
+
+        Args:
+            value: The ``BytesIO`` object of the font.
+        """
+        self._bytesio = value
+
     @property
     def ttfont(self) -> TTFont:
         """
@@ -153,6 +173,16 @@ class Font:  # pylint: disable=too-many-public-methods
             The ``TTFont`` object of the font.
         """
         return self._ttfont
+
+    @ttfont.setter
+    def ttfont(self, value: TTFont) -> None:
+        """
+        Set the underlying ``TTFont`` object of the font.
+
+        Args:
+            value: The ``TTFont`` object of the font.
+        """
+        self._ttfont = value
 
     @property
     def temp_file(self) -> Path:
@@ -407,6 +437,8 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         self.ttfont.close()
         self._temp_file.unlink(missing_ok=True)
+        if self.bytesio:
+            self.bytesio.close()
 
     def get_real_extension(self) -> str:
         """
