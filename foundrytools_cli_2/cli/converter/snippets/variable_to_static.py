@@ -9,9 +9,9 @@ from pathvalidate import sanitize_filename
 
 from foundrytools_cli_2.lib.constants import (
     CVAR_TABLE_TAG,
+    GSUB_TABLE_TAG,
     NAME_TABLE_TAG,
     STAT_TABLE_TAG,
-    GSUB_TABLE_TAG,
 )
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font.tables import NameTable
@@ -173,9 +173,8 @@ def reorder_ui_name_ids(font: TTFont) -> None:
             if n.nameID == value:
                 n.nameID = count
         for record in font[GSUB_TABLE_TAG].table.FeatureList.FeatureRecord:
-            if record.Feature.FeatureParams:
-                if record.Feature.FeatureParams.UINameID == value:
-                    record.Feature.FeatureParams.UINameID = count
+            if record.Feature.FeatureParams and record.Feature.FeatureParams.UINameID == value:
+                record.Feature.FeatureParams.UINameID = count
 
 
 def post_process_static_instance(static_instance: TTFont) -> None:
