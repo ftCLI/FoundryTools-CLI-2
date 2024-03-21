@@ -53,26 +53,6 @@ def get_instance_file_name(font: Font, instance: NamedInstance) -> str:
     return sanitize_filename(instance_file_name)
 
 
-def get_instances(
-    variable_font: Font, instances: t.Optional[t.List[NamedInstance]] = None
-) -> t.List[NamedInstance]:
-    """
-    Returns a list of font instances. If the `instances` parameter is not empty, it returns the
-    provided instances as is. Otherwise, it calls the `get_instances()` method on the `font` object
-    and returns the obtained instances.
-
-    Args:
-        variable_font (Font): The Font object.
-        instances (Optional[List[NamedInstance]]): Optional. A list of font instances.
-            Defaults to None.
-
-    Returns:
-        List[NamedInstance]: A list of font instances.
-    """
-
-    return instances if instances else variable_font.get_instances()
-
-
 def check_update_name_table(variable_font: Font) -> bool:
     """
     Checks whether the name table can be updated.
@@ -179,8 +159,8 @@ def reorder_ui_name_ids(font: TTFont) -> None:
 
 def post_process_static_instance(static_instance: TTFont) -> None:
     """
-    Post-processes a static instance. Removes the ``STAT`` and ``CVAR`` tables and deletes unused
-    names from the ``name`` table.
+    Post-processes a static instance. Removes the ``STAT`` and ``CVAR`` tables, deletes unused
+    names from the ``name`` table and reorders the UI name IDs.
 
     Args:
         static_instance (TTFont): The static instance.
@@ -277,15 +257,17 @@ def main(
     Args:
         variable_font (Font): The variable ``Font`` object.
         requested_instances (Optional[List[NamedInstance]], optional): A list of font instances.
-            Defaults to None.
-        output_dir (Optional[Path], optional): The output directory. Defaults to None.
+            Defaults to ``None``.
+        output_dir (Optional[Path], optional): The output directory. Defaults to ``None``.
         update_name_table (bool, optional): Specifies whether to update the font names table.
-            Defaults to True.
+            Defaults to ``True``.
         overwrite (bool, optional): Whether to overwrite existing files in the output directory.
-            Defaults to True.
+            Defaults to ``True``.
     """
 
-    requested_instances = get_instances(variable_font, requested_instances)
+    if not requested_instances:
+        requested_instances = variable_font.get_instances()
+
     output_dir = get_output_dir(variable_font, output_dir)
 
     if update_name_table:
