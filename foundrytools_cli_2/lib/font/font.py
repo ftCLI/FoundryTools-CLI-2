@@ -1,3 +1,4 @@
+import math
 import typing as t
 from io import BytesIO
 from pathlib import Path
@@ -6,6 +7,7 @@ from cffsubr import desubroutinize, subroutinize
 from dehinter.font import dehint
 from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.recordingPen import DecomposingRecordingPen
+from fontTools.pens.statisticsPen import StatisticsPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
@@ -604,6 +606,33 @@ class Font:  # pylint: disable=too-many-public-methods
 
         self.ttfont.flavor = None
         self.modified = True
+
+    def calculate_italic_angle(self, min_slant: float = 2.0) -> float:
+        """
+        Calculates the italic angle of a font by measuring the slant of the glyph 'H' or 'uni0048'.
+
+        Args:
+            min_slant (float, optional): The minimum slant value to consider a font italic. If the
+                slant is less than the minimum slant, the method will return 0.0. Defaults to 2.0.
+
+        Returns:
+            The italic angle of the font in degrees, rounded to three decimal places.
+
+        Raises:
+            ValueError: If the font does not contain the glyph 'H' or 'uni0048'.
+        """
+        glyph_set = self.ttfont.getGlyphSet()
+        pen = StatisticsPen(glyphset=glyph_set)
+        for g in ("H", "uni0048"):
+            try:
+                glyph_set[g].draw(pen)
+                italic_angle = -1 * math.degrees(math.atan(pen.slant))
+                if abs(italic_angle) >= abs(min_slant):
+                    return italic_angle
+                return 0.0
+            except KeyError:
+                continue
+        raise ValueError("The font does not contain the glyph 'H' or 'uni0048'.")
 
     def tt_autohint(self, recalc_timestamp: bool = False) -> None:
         """
