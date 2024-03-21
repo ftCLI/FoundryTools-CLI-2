@@ -163,11 +163,11 @@ def reorder_ui_name_ids(font: TTFont) -> None:
     if GSUB_TABLE_TAG not in font:
         return
 
-    name_table = font[NAME_TABLE_TAG]
     ui_name_ids = get_ui_name_ids(font=font)
     if not ui_name_ids:
         return
 
+    name_table = font[NAME_TABLE_TAG]
     for count, value in enumerate(ui_name_ids, start=256):
         for n in name_table.names:
             if n.nameID == value:
