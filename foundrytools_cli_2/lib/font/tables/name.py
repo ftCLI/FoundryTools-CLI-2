@@ -12,8 +12,11 @@ class NameTable(DefaultTbl):
     This class extends the fontTools ``name`` table to add some useful methods.
     """
 
-    def __init__(self, font: TTFont):
-        super().__init__(font=font, table_tag=NAME_TABLE_TAG)
+    def __init__(self, ttfont: TTFont):
+        """
+        Initializes the ``name`` table handler.
+        """
+        super().__init__(ttfont=ttfont, table_tag=NAME_TABLE_TAG)
 
     def set_name(
         self,
@@ -47,7 +50,7 @@ class NameTable(DefaultTbl):
 
         names = {language_string: name_string}
         self.table.addMultilingualName(
-            names, ttFont=self.font, nameID=name_id, windows=windows, mac=mac
+            names, ttFont=self.ttfont, nameID=name_id, windows=windows, mac=mac
         )
 
     def remove_names(
@@ -79,7 +82,7 @@ class NameTable(DefaultTbl):
         """
         Removes unused NameRecords from the ``name`` table.
         """
-        self.table.removeUnusedNames(self.font)
+        self.table.removeUnusedNames(self.ttfont)
 
     def find_replace(
         self,

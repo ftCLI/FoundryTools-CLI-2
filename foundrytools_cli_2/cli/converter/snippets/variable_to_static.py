@@ -171,7 +171,7 @@ def post_process_static_instance(static_instance: TTFont) -> None:
     if CVAR_TABLE_TAG in static_instance:
         del static_instance[CVAR_TABLE_TAG]
 
-    name_table = NameTable(font=static_instance)
+    name_table = NameTable(ttfont=static_instance)
     name_table.remove_unused_names()
     name_table.remove_names(name_ids=[25])
 
