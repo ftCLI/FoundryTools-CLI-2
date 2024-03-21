@@ -12,7 +12,7 @@ class PostTable(DefaultTbl):
         """
         Initializes the 'post' table.
 
-        Parameters:
+        Args:
             ttfont (TTFont): The font file.
         """
         super().__init__(ttfont, "post")

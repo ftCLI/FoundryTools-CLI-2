@@ -139,7 +139,7 @@ def strip_names(font: Font) -> None:
     """
     Removes leading and trailing whitespace from NameRecords in the name table.
 
-    Parameters:
+    Args:
         font (Font): The Font object.
     """
     name_table = NameTable(font=font.ttfont)
