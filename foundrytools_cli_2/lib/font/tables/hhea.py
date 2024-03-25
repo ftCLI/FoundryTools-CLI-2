@@ -157,7 +157,6 @@ class HheaTable(DefaultTbl):
         run_rise_angle = math.degrees(math.atan(-run / rise))
         return run_rise_angle
 
-
     def calculate_caret_slope_rise(self) -> int:
         """
         Calculate the caret ``hhea.caretSlopeRise`` of the font.
