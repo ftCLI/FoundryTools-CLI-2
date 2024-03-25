@@ -1,3 +1,4 @@
+from fontTools.cffLib import TopDict
 from fontTools.ttLib import TTFont
 
 from foundrytools_cli_2.lib.constants import CFF_TABLE_TAG
@@ -14,3 +15,10 @@ class CFFTable(DefaultTbl):  # pylint: disable=too-few-public-methods
         Initializes the ``CFF `` table handler.
         """
         super().__init__(ttfont=ttfont, table_tag=CFF_TABLE_TAG)
+
+    @property
+    def top_dict(self) -> TopDict:
+        """
+        Returns the topDictIndex field of the 'CFF ' table.
+        """
+        return self.table.cff.topDictIndex[0]
