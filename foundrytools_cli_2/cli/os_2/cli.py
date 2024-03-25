@@ -106,7 +106,7 @@ def recalc_ranges_afdko(input_path: Path, **options: t.Dict[str, t.Any]) -> None
     runner.run()
 
 
-@cli.command("set-attrs")
+@cli.command("set-attrs", no_args_is_help=True)
 @set_attrs_options()
 @base_options()
 def set_attrs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
@@ -119,7 +119,7 @@ def set_attrs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("fs-selection")
+@cli.command("fs-selection", no_args_is_help=True)
 @set_fs_selection_options()
 @base_options()
 def set_fs_selection(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
@@ -132,7 +132,7 @@ def set_fs_selection(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("fs-type")
+@cli.command("fs-type", no_args_is_help=True)
 @set_fs_type_options()
 @base_options()
 def set_fs_type(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
