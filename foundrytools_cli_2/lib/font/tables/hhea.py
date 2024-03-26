@@ -1,4 +1,5 @@
 import math
+import typing as t
 
 from fontTools.misc.roundTools import otRound
 from fontTools.ttLib import TTFont
@@ -157,26 +158,45 @@ class HheaTable(DefaultTbl):
         run_rise_angle = math.degrees(math.atan(-run / rise))
         return run_rise_angle
 
-    def calculate_caret_slope_rise(self) -> int:
+    def calculate_caret_slope_rise(
+        self, italic_angle: t.Optional[t.Union[int, float]] = None
+    ) -> int:
         """
         Calculate the caret ``hhea.caretSlopeRise`` of the font.
+
+        Args:
+            italic_angle (t.Optional[t.Union[int, float]]): The italic to use for the calculation.
+                If ``None``, the italic angle from the ``post`` table will be used.
 
         Returns:
             int: The caret slope rise value.
         """
 
-        if self.ttfont[POST_TABLE_TAG].italicAngle == 0:
+        if italic_angle is None:
+            italic_angle = self.ttfont[POST_TABLE_TAG].italicAngle
+
+        if italic_angle == 0:
             return 1
         return self.ttfont[HEAD_TABLE_TAG].unitsPerEm
 
-    def calculate_caret_slope_run(self) -> int:
+    def calculate_caret_slope_run(
+        self, italic_angle: t.Optional[t.Union[int, float]] = None
+    ) -> int:
         """
         Calculate the caret ``hhea.caretSlopeRun`` of the font.
+
+        Args:
+            italic_angle (t.Optional[t.Union[int, float]]): The italic to use for the calculation.
+                If ``None``, the italic angle from the ``post`` table will be used.
 
         Returns:
             int: The caret slope run value.
         """
-        if self.ttfont[POST_TABLE_TAG].italicAngle == 0:
+
+        if italic_angle is None:
+            italic_angle = self.ttfont[POST_TABLE_TAG].italicAngle
+
+        if italic_angle == 0:
             return 0
         return otRound(
             math.tan(math.radians(-self.ttfont[POST_TABLE_TAG].italicAngle))
