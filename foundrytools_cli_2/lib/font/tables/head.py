@@ -1,19 +1,20 @@
 from fontTools.ttLib import TTFont
 
+from foundrytools_cli_2.lib.constants import HEAD_TABLE_TAG
 from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
 from foundrytools_cli_2.lib.utils.bits_tools import is_nth_bit_set
 
 
 class HeadTable(DefaultTbl):
     """
-    This class extends the fontTools `head` table to add some useful methods.
+    This class extends the fontTools ``head`` table to add some useful methods.
     """
 
-    def __init__(self, font: TTFont) -> None:
+    def __init__(self, ttfont: TTFont) -> None:
         """
-        Initializes the head table handler.
+        Initializes the ``head`` table handler.
         """
-        super().__init__(font=font, table_tag="head")
+        super().__init__(ttfont=ttfont, table_tag=HEAD_TABLE_TAG)
 
     @property
     def is_bold(self) -> bool:

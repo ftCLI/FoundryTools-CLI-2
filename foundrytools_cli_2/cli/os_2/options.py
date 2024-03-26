@@ -267,7 +267,7 @@ def italic() -> t.Callable:
     _italic = [
         click.option(
             "-it/-no-it",
-            "--italic, --no-italic",
+            "--italic/--no-italic",
             "italic",
             default=None,
             is_flag=True,
@@ -292,7 +292,7 @@ def underscore() -> t.Callable:
     _underscore = [
         click.option(
             "-us/-no-us",
-            "--underscore, --no-underscore",
+            "--underscore/--no-underscore",
             "underscore",
             default=None,
             is_flag=True,
@@ -316,7 +316,7 @@ def negative() -> t.Callable:
     _negative = [
         click.option(
             "-ng/-no-ng",
-            "--negative, --no-negative",
+            "--negative/--no-negative",
             "negative",
             default=None,
             is_flag=True,
@@ -340,7 +340,7 @@ def outline() -> t.Callable:
     _outline = [
         click.option(
             "-ol/-no-ol",
-            "--outline, --no-outline",
+            "--outline/--no-outline",
             "outline",
             default=None,
             is_flag=True,
@@ -364,7 +364,7 @@ def strikeout() -> t.Callable:
     _strikeout = [
         click.option(
             "-so/-no-so",
-            "--strikeout, --no-strikeout",
+            "--strikeout/--no-strikeout",
             "strikeout",
             default=None,
             is_flag=True,
@@ -388,7 +388,7 @@ def bold() -> t.Callable:
     _bold = [
         click.option(
             "-bd/-no-bd",
-            "--bold, --no-bold",
+            "--bold/--no-bold",
             "bold",
             default=None,
             is_flag=True,
@@ -413,7 +413,7 @@ def regular() -> t.Callable:
     _regular = [
         click.option(
             "-rg/-no-rg",
-            "--regular, --no-regular",
+            "--regular/--no-regular",
             "regular",
             default=None,
             is_flag=True,
@@ -438,7 +438,7 @@ def use_typo_metrics() -> t.Callable:
     _use_typo_metrics = [
         click.option(
             "-utm/-no-utm",
-            "--use-typo-metrics, --no-use-typo-metrics",
+            "--use-typo-metrics/--no-use-typo-metrics",
             "use_typo_metrics",
             default=None,
             is_flag=True,
@@ -465,7 +465,7 @@ def wws_consistent() -> t.Callable:
     _wws_consistent = [
         click.option(
             "-wws/-no-wws",
-            "--wws-consistent, --no-wws-consistent",
+            "--wws-consistent/--no-wws-consistent",
             "wws_consistent",
             default=None,
             is_flag=True,
@@ -493,7 +493,7 @@ def oblique() -> t.Callable:
     _oblique = [
         click.option(
             "-obl/-no-obl",
-            "--oblique, --no-oblique",
+            "--oblique/--no-oblique",
             "oblique",
             default=None,
             is_flag=True,
@@ -569,7 +569,7 @@ def no_subsetting() -> t.Callable:
     _no_subsetting = [
         click.option(
             "-ns/-no-ns",
-            "--no-subsetting, --subsetting",
+            "--no-subsetting/--subsetting",
             "no_subsetting",
             default=None,
             is_flag=True,
@@ -594,7 +594,7 @@ def bitmap_embed_only() -> t.Callable:
     _bitmap_embed_only = [
         click.option(
             "-beo/-no-beo",
-            "--bitmap-embed-only, --no-bitmap-embed-only",
+            "--bitmap-embed-only/--no-bitmap-embed-only",
             "bitmap_embed_only",
             default=None,
             is_flag=True,

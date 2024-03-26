@@ -1,21 +1,19 @@
 from fontTools.ttLib import TTFont
 
+from foundrytools_cli_2.lib.constants import POST_TABLE_TAG
 from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
 
 
 class PostTable(DefaultTbl):
     """
-    A wrapper class for the 'post' table.
+    This class extends the fontTools ``post`` table to add some useful methods.
     """
 
     def __init__(self, ttfont: TTFont) -> None:
         """
-        Initializes the 'post' table.
-
-        Parameters:
-            ttfont (TTFont): The font file.
+        Initializes the ``post`` table handler.
         """
-        super().__init__(ttfont, "post")
+        super().__init__(ttfont=ttfont, table_tag=POST_TABLE_TAG)
 
     @property
     def italic_angle(self) -> float:

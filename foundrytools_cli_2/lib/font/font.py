@@ -1,3 +1,4 @@
+import math
 import typing as t
 from io import BytesIO
 from pathlib import Path
@@ -6,6 +7,7 @@ from cffsubr import desubroutinize, subroutinize
 from dehinter.font import dehint
 from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.recordingPen import DecomposingRecordingPen
+from fontTools.pens.statisticsPen import StatisticsPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
@@ -297,41 +299,8 @@ class Font:  # pylint: disable=too-many-public-methods
         head = HeadTable(self.ttfont)
         return os_2.is_italic and head.is_italic
 
-    @property
-    def is_oblique(self) -> bool:
-        """
-        Check if the font is oblique.
-
-        Returns:
-            ``True`` if the font is oblique, ``False`` otherwise.
-        """
-        os_2 = OS2Table(self.ttfont)
-        return os_2.is_oblique
-
-    @property
-    def is_bold(self) -> bool:
-        """
-        Check if the font is bold.
-
-        Returns:
-            ``True`` if the font is bold, ``False`` otherwise.
-        """
-        os_2 = OS2Table(self.ttfont)
-        head = HeadTable(self.ttfont)
-        return os_2.is_bold and head.is_bold
-
-    @property
-    def is_regular(self) -> bool:
-        """
-        Check if the font is regular.
-
-        Returns:
-            ``True`` if the font is regular, ``False`` otherwise.
-        """
-        os_2 = OS2Table(self.ttfont)
-        return os_2.is_regular
-
-    def set_italic(self, value: bool) -> None:
+    @is_italic.setter
+    def is_italic(self, value: bool) -> None:
         """
         Set the italic bit in the ``macStyle`` field of the ``head`` table anf in the
         ``fsSelection`` field of the ``OS/2`` table.
@@ -352,7 +321,42 @@ class Font:  # pylint: disable=too-many-public-methods
             if not self.is_bold:
                 os_2.is_regular = True
 
-    def set_bold(self, value: bool) -> None:
+    @property
+    def is_oblique(self) -> bool:
+        """
+        Check if the font is oblique.
+
+        Returns:
+            ``True`` if the font is oblique, ``False`` otherwise.
+        """
+        os_2 = OS2Table(self.ttfont)
+        return os_2.is_oblique
+
+    @is_oblique.setter
+    def is_oblique(self, value: bool) -> None:
+        """
+        Set the oblique bit in the ``macStyle`` field of the ``head`` table.
+
+        Args:
+            value: A boolean indicating whether to set the oblique bit or to clear it.
+        """
+        os_2 = OS2Table(self.ttfont)
+        os_2.is_oblique = value
+
+    @property
+    def is_bold(self) -> bool:
+        """
+        Check if the font is bold.
+
+        Returns:
+            ``True`` if the font is bold, ``False`` otherwise.
+        """
+        os_2 = OS2Table(self.ttfont)
+        head = HeadTable(self.ttfont)
+        return os_2.is_bold and head.is_bold
+
+    @is_bold.setter
+    def is_bold(self, value: bool) -> None:
         """
         Set the bold bit in the ``macStyle`` field of the ``head`` table and in the ``fsSelection``
         field of the ``OS/2`` table.
@@ -373,7 +377,19 @@ class Font:  # pylint: disable=too-many-public-methods
             if not self.is_italic:
                 os_2.is_regular = True
 
-    def set_regular(self, value: bool) -> None:
+    @property
+    def is_regular(self) -> bool:
+        """
+        Check if the font is regular.
+
+        Returns:
+            ``True`` if the font is regular, ``False`` otherwise.
+        """
+        os_2 = OS2Table(self.ttfont)
+        return os_2.is_regular
+
+    @is_regular.setter
+    def is_regular(self, value: bool) -> None:
         """
         Set the regular bit in the ``macStyle`` field of the ``head`` table and clear the bold and
         italic bits in the ``fsSelection`` field of the ``OS/2`` table and ind the ``macStyle``
@@ -394,16 +410,6 @@ class Font:  # pylint: disable=too-many-public-methods
         else:
             if self.is_bold or self.is_italic:
                 os_2.is_regular = False
-
-    def set_oblique(self, value: bool) -> None:
-        """
-        Set the oblique bit in the ``macStyle`` field of the ``head`` table.
-
-        Args:
-            value: A boolean indicating whether to set the oblique bit or to clear it.
-        """
-        os_2 = OS2Table(self.ttfont)
-        os_2.is_oblique = value
 
     def save(
         self,
@@ -604,6 +610,33 @@ class Font:  # pylint: disable=too-many-public-methods
 
         self.ttfont.flavor = None
         self.modified = True
+
+    def calculate_italic_angle(self, min_slant: float = 2.0) -> float:
+        """
+        Calculates the italic angle of a font by measuring the slant of the glyph 'H' or 'uni0048'.
+
+        Args:
+            min_slant (float, optional): The minimum slant value to consider a font italic. If the
+                slant is less than the minimum slant, the method will return 0.0. Defaults to 2.0.
+
+        Returns:
+            The italic angle of the font in degrees, rounded to three decimal places.
+
+        Raises:
+            ValueError: If the font does not contain the glyph 'H' or 'uni0048'.
+        """
+        glyph_set = self.ttfont.getGlyphSet()
+        pen = StatisticsPen(glyphset=glyph_set)
+        for g in ("H", "uni0048"):
+            try:
+                glyph_set[g].draw(pen)
+                italic_angle = -1 * math.degrees(math.atan(pen.slant))
+                if abs(italic_angle) >= abs(min_slant):
+                    return italic_angle
+                return 0.0
+            except KeyError:
+                continue
+        raise ValueError("The font does not contain the glyph 'H' or 'uni0048'.")
 
     def tt_autohint(self, recalc_timestamp: bool = False) -> None:
         """

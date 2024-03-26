@@ -22,7 +22,7 @@ def del_names(
             None.
     """
 
-    name_table = NameTable(font=font.ttfont)
+    name_table = NameTable(ttfont=font.ttfont)
     name_table.remove_names(
         name_ids=name_ids_to_process, platform_id=platform_id, language_string=language_string
     )
@@ -37,7 +37,7 @@ def del_empty_names(font: Font) -> None:
         font (Font): The font object to delete the empty names from.
     """
 
-    name_table = NameTable(font=font.ttfont)
+    name_table = NameTable(ttfont=font.ttfont)
     name_table.remove_empty_names()
     font.modified = name_table.modified
 
@@ -56,7 +56,7 @@ def del_mac_names(
         delete_all (bool, optional): Whether to delete all Macintosh names. Defaults to False.
     """
 
-    name_table = NameTable(font=font.ttfont)
+    name_table = NameTable(ttfont=font.ttfont)
     name_ids_to_delete = {name.nameID for name in name_table.table.names if name.platformID == 1}
     if not delete_all:
         name_ids_to_delete.difference_update({1, 2, 4, 5, 6})
@@ -72,7 +72,7 @@ def del_unused_names(font: Font) -> None:
         font (Font): The font object to remove the unused names from.
     """
 
-    name_table = NameTable(font=font.ttfont)
+    name_table = NameTable(ttfont=font.ttfont)
     name_table.table.removeUnusedNames(font.ttfont)
     font.modified = name_table.modified
 
@@ -97,7 +97,7 @@ def find_replace(
             tuple.
     """
 
-    name_table = NameTable(font=font.ttfont)
+    name_table = NameTable(ttfont=font.ttfont)
     name_table.find_replace(
         old_string=old_string,
         new_string=new_string,
@@ -125,7 +125,7 @@ def set_name(
         language_string (str): The language code of the name record. Defaults to "en".
     """
 
-    name_table = NameTable(font=font.ttfont)
+    name_table = NameTable(ttfont=font.ttfont)
     name_table.set_name(
         name_id=name_id,
         name_string=name_string,
@@ -139,9 +139,9 @@ def strip_names(font: Font) -> None:
     """
     Removes leading and trailing whitespace from NameRecords in the name table.
 
-    Parameters:
+    Args:
         font (Font): The Font object.
     """
-    name_table = NameTable(font=font.ttfont)
+    name_table = NameTable(ttfont=font.ttfont)
     name_table.strip_names()
     font.modified = name_table.modified

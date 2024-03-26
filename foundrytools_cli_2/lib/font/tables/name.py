@@ -12,8 +12,11 @@ class NameTable(DefaultTbl):
     This class extends the fontTools ``name`` table to add some useful methods.
     """
 
-    def __init__(self, font: TTFont):
-        super().__init__(font=font, table_tag=NAME_TABLE_TAG)
+    def __init__(self, ttfont: TTFont):
+        """
+        Initializes the ``name`` table handler.
+        """
+        super().__init__(ttfont=ttfont, table_tag=NAME_TABLE_TAG)
 
     def set_name(
         self,
@@ -25,7 +28,7 @@ class NameTable(DefaultTbl):
         """
         Adds a NameRecord to the ``name`` table of a font.
 
-        Parameters:
+        Args:
             name_id (int): The NameID of the NameRecord to be set.
             name_string (str): The string to write to the NameRecord.
             platform_id (Optional[int]): The platformID of the NameRecord to be added. Defaults to
@@ -47,7 +50,7 @@ class NameTable(DefaultTbl):
 
         names = {language_string: name_string}
         self.table.addMultilingualName(
-            names, ttFont=self.font, nameID=name_id, windows=windows, mac=mac
+            names, ttFont=self.ttfont, nameID=name_id, windows=windows, mac=mac
         )
 
     def remove_names(
@@ -59,7 +62,7 @@ class NameTable(DefaultTbl):
         """
         Deletes the specified NameRecords from the ``name`` table of a font.
 
-        Parameters:
+        Args:
             name_ids (Iterable[int]): A list of name IDs to delete.
             platform_id (Optional[int]): The platform ID of the name records to delete. Defaults to
                 None. If None, both NameRecords with platformID 1 (Macintosh) and 3 (Windows) are
@@ -79,7 +82,7 @@ class NameTable(DefaultTbl):
         """
         Removes unused NameRecords from the ``name`` table.
         """
-        self.table.removeUnusedNames(self.font)
+        self.table.removeUnusedNames(self.ttfont)
 
     def find_replace(
         self,
@@ -93,7 +96,7 @@ class NameTable(DefaultTbl):
         Finds and replaces occurrences of a string in the specified NameRecords of the ``name``
         table of a font.
 
-        Parameters:
+        Args:
             old_string (str): The string to be replaced.
             new_string (str): The string to replace the ``old_string`` with.
             name_ids_to_process (tuple[int], optional): A tuple of name IDs to process. Default is
@@ -133,7 +136,7 @@ class NameTable(DefaultTbl):
         Appends a prefix, a suffix, or both to the NameRecords that match the nameID, platformID,
         and language string.
 
-        Parameters:
+        Args:
             name_ids (Tuple[int]): A tuple of name IDs to process.
             platform_id (Optional[int]): The platform ID of the name records to process. Defaults to
                 None, which means that NameRecords from all platforms are processed. If 1, only
@@ -216,7 +219,7 @@ class NameTable(DefaultTbl):
         """
         Filters NameRecords based on the given parameters.
 
-        Parameters:
+        Args:
             name_ids (Optional[List[int]]): A list of nameIDs to filter the name records. If None,
                 all name records are considered.
             platform_id (Optional[int]): A platformID to filter the name records. If None, all

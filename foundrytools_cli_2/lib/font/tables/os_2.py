@@ -20,14 +20,14 @@ from foundrytools_cli_2.lib.utils.string_tools import adjust_string_length
 
 class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
     """
-    This class extends the fontTools `OS/2` table to add some useful methods and properties.
+    This class extends the fontTools ``OS/2`` table to add some useful methods and properties.
     """
 
-    def __init__(self, font: TTFont):
+    def __init__(self, ttfont: TTFont):
         """
-        Initializes the OS/2 table handler.
+        Initializes the ``OS/2`` table handler.
         """
-        super().__init__(font=font, table_tag=OS_2_TABLE_TAG)
+        super().__init__(ttfont=ttfont, table_tag=OS_2_TABLE_TAG)
 
     class InvalidOS2VersionError(Exception):
         """
@@ -518,7 +518,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
                 "sxHeight is only defined in OS/2 table versions 2 and up."
             )
         try:
-            x_height = otRound(get_glyph_bounds(font=self.font, glyph_name=glyph_name)["yMax"])
+            x_height = otRound(get_glyph_bounds(font=self.ttfont, glyph_name=glyph_name)["yMax"])
         except KeyError:
             x_height = 0
         self.x_height = x_height
@@ -533,7 +533,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
                 "sCapHeight is only defined in OS/2 table versions 2 and up."
             )
         try:
-            cap_height = otRound(get_glyph_bounds(font=self.font, glyph_name=glyph_name)["yMax"])
+            cap_height = otRound(get_glyph_bounds(font=self.ttfont, glyph_name=glyph_name)["yMax"])
         except KeyError:
             cap_height = 0
         self.cap_height = cap_height
@@ -543,22 +543,22 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Recalculates and sets the xAvgCharWidth value of the ``OS/2`` table.
         """
-        return self.table.recalcAvgCharWidth(ttFont=self.font)
+        return self.table.recalcAvgCharWidth(ttFont=self.ttfont)
 
     def recalc_max_context(self) -> None:
         """
         Recalculates the maxContext value of the ``OS/2`` table.
         """
-        self.max_context = maxCtxFont(self.font)
+        self.max_context = maxCtxFont(self.ttfont)
 
     def recalc_unicode_ranges(self) -> None:
         """
         Recalculates the Unicode ranges of the ``OS/2`` table.
         """
-        self.table.recalcUnicodeRanges(self.font)
+        self.table.recalcUnicodeRanges(self.ttfont)
 
     def recalc_code_page_ranges(self) -> None:
         """
         Recalculates the code page ranges of the ``OS/2`` table.
         """
-        self.table.recalcCodePageRanges(self.font)
+        self.table.recalcCodePageRanges(self.ttfont)

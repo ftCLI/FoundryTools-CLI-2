@@ -206,11 +206,11 @@ def set_fs_selection(
 
     os_2_table = OS2Table(font.ttfont)
     if italic is not None:
-        font.set_italic(italic)
+        font.is_italic = italic
     if bold is not None:
-        font.set_bold(bold)
+        font.is_bold = bold
     if regular is not None:
-        font.set_regular(regular)
+        font.is_regular = regular
     if use_typo_metrics is not None:
         os_2_table.use_typo_metrics = use_typo_metrics
     if wws_consistent is not None:

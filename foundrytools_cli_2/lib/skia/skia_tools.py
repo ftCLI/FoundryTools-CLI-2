@@ -317,7 +317,7 @@ def correct_contours_cff(
     Corrects the contours of the given OpenType-PS font by removing overlaps, correcting the
     direction of the contours, and removing tiny paths.
 
-    Parameters:
+    Args:
         font (TTFont): The font object to be corrected.
         min_area (int, optional): The minimum area of a contour to be considered. Defaults to 25.
 
@@ -354,7 +354,7 @@ def is_empty_glyph(glyph_set: _TTGlyphSet, glyph_name: str) -> bool:
     """
     Returns True if the glyph is empty.
 
-    Parameters:
+    Args:
         glyph_set (_TTGlyphSet): The glyph set.
         glyph_name (str): The name of the glyph.
 
