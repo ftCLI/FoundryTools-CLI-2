@@ -3,7 +3,7 @@ import typing as t
 from afdko.fdkutils import run_shell_command
 
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font.tables import OS2Table
+from foundrytools_cli_2.lib.font.tables import HeadTable, OS2Table
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path
 
@@ -205,6 +205,7 @@ def set_fs_selection(
         return
 
     os_2_table = OS2Table(font.ttfont)
+    head_table = HeadTable(font.ttfont)
     if italic is not None:
         font.is_italic = italic
     if bold is not None:
@@ -217,7 +218,9 @@ def set_fs_selection(
         os_2_table.wws_consistent = wws_consistent
     if oblique is not None:
         os_2_table.is_oblique = oblique
-    font.modified = os_2_table.modified or font.modified
+    # IMPORTANT: head_table.modified must be evaluated before os_2_table.modified to suppress
+    # fontTools warning about non-matching bits.
+    font.modified = head_table.modified or os_2_table.modified
 
 
 def set_fs_type(
