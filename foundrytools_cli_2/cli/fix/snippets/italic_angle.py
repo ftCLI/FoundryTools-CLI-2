@@ -3,9 +3,9 @@ import typing as t
 from fontTools.misc.roundTools import otRound
 
 from foundrytools_cli_2.lib import logger
+from foundrytools_cli_2.lib.constants import OS_2_TABLE_TAG
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font.tables import CFFTable, HheaTable, PostTable
-from foundrytools_cli_2.lib.constants import OS_2_TABLE_TAG
 
 
 def log_check_results(check_passed: bool, old: t.Any, new: t.Any, attr_name: str) -> None:
