@@ -297,7 +297,7 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         os_2 = OS2Table(self.ttfont)
         head = HeadTable(self.ttfont)
-        return os_2.is_italic and head.is_italic
+        return os_2.fs_selection.italic and head.mac_style.italic
 
     @is_italic.setter
     def is_italic(self, value: bool) -> None:
@@ -312,14 +312,14 @@ class Font:  # pylint: disable=too-many-public-methods
         head = HeadTable(self.ttfont)
 
         if value:
-            os_2.is_italic = True
-            head.is_italic = True
-            os_2.is_regular = False
+            os_2.fs_selection.italic = True
+            head.mac_style.italic = True
+            os_2.fs_selection.regular = False
         else:
-            os_2.is_italic = False
-            head.is_italic = False
-            if not self.is_bold:
-                os_2.is_regular = True
+            os_2.fs_selection.italic = False
+            head.mac_style.italic = False
+            if not os_2.fs_selection.bold:
+                os_2.fs_selection.regular = True
 
     @property
     def is_oblique(self) -> bool:
@@ -330,7 +330,7 @@ class Font:  # pylint: disable=too-many-public-methods
             ``True`` if the font is oblique, ``False`` otherwise.
         """
         os_2 = OS2Table(self.ttfont)
-        return os_2.is_oblique
+        return os_2.fs_selection.oblique
 
     @is_oblique.setter
     def is_oblique(self, value: bool) -> None:
@@ -341,7 +341,7 @@ class Font:  # pylint: disable=too-many-public-methods
             value: A boolean indicating whether to set the oblique bit or to clear it.
         """
         os_2 = OS2Table(self.ttfont)
-        os_2.is_oblique = value
+        os_2.fs_selection.oblique = value
 
     @property
     def is_bold(self) -> bool:
@@ -353,7 +353,7 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         os_2 = OS2Table(self.ttfont)
         head = HeadTable(self.ttfont)
-        return os_2.is_bold and head.is_bold
+        return os_2.fs_selection.bold and head.mac_style.bold
 
     @is_bold.setter
     def is_bold(self, value: bool) -> None:
@@ -368,14 +368,14 @@ class Font:  # pylint: disable=too-many-public-methods
         head = HeadTable(self.ttfont)
 
         if value:
-            os_2.is_bold = True
-            head.is_bold = True
-            os_2.is_regular = False
+            os_2.fs_selection.bold = True
+            head.mac_style.bold = True
+            os_2.fs_selection.regular = False
         else:
-            os_2.is_bold = False
-            head.is_bold = False
-            if not self.is_italic:
-                os_2.is_regular = True
+            os_2.fs_selection.bold = False
+            head.mac_style.bold = False
+            if not os_2.fs_selection.italic:
+                os_2.fs_selection.regular = True
 
     @property
     def is_regular(self) -> bool:
@@ -386,7 +386,7 @@ class Font:  # pylint: disable=too-many-public-methods
             ``True`` if the font is regular, ``False`` otherwise.
         """
         os_2 = OS2Table(self.ttfont)
-        return os_2.is_regular
+        return os_2.fs_selection.regular
 
     @is_regular.setter
     def is_regular(self, value: bool) -> None:
@@ -402,14 +402,14 @@ class Font:  # pylint: disable=too-many-public-methods
         head = HeadTable(self.ttfont)
 
         if value:
-            os_2.is_bold = False
-            os_2.is_italic = False
-            head.is_bold = False
-            head.is_italic = False
-            os_2.is_regular = True
+            os_2.fs_selection.bold = False
+            os_2.fs_selection.italic = False
+            head.mac_style.bold = False
+            head.mac_style.italic = False
+            os_2.fs_selection.regular = True
         else:
             if self.is_bold or self.is_italic:
-                os_2.is_regular = False
+                os_2.fs_selection.regular = False
 
     def save(
         self,

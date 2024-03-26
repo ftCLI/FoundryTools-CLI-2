@@ -213,11 +213,11 @@ def set_fs_selection(
     if regular is not None:
         font.is_regular = regular
     if use_typo_metrics is not None:
-        os_2_table.use_typo_metrics = use_typo_metrics
+        os_2_table.fs_selection.use_typo_metrics = use_typo_metrics
     if wws_consistent is not None:
-        os_2_table.wws_consistent = wws_consistent
+        os_2_table.fs_selection.wws_consistent = wws_consistent
     if oblique is not None:
-        os_2_table.is_oblique = oblique
+        os_2_table.fs_selection.oblique = oblique
     # IMPORTANT: head_table.modified must be evaluated before os_2_table.modified to suppress
     # fontTools warning about non-matching bits.
     font.modified = head_table.modified or os_2_table.modified

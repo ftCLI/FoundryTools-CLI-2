@@ -31,6 +31,168 @@ NO_SUBSETTING_BIT = 8
 BITMAP_EMBED_ONLY_BIT = 9
 
 
+class FsSelection:
+    """
+    A wrapper class for the ``fsSelection`` field of the ``OS/2`` table.
+    """
+
+    def __init__(self, os_2_table: "OS2Table"):
+        self.os_2_table = os_2_table
+
+    def __repr__(self) -> str:
+        return f"fsSelection({num2binary(self.os_2_table.table.fsSelection)})"
+
+    @property
+    def italic(self) -> bool:
+        """
+        Returns True if the bit 0 (ITALIC) of the ``OS/2.fsSelection`` field is set, False
+        otherwise.
+        """
+        return is_nth_bit_set(self.os_2_table.table.fsSelection, ITALIC_BIT)
+
+    @italic.setter
+    def italic(self, value: bool) -> None:
+        """
+        Sets the bit 0 (ITALIC) of the ``OS/2.fsSelection`` field.
+        """
+        self.os_2_table.set_bit(field_name="fsSelection", pos=ITALIC_BIT, value=value)
+
+    @property
+    def underscore(self) -> bool:
+        """
+        Returns True if the bit 1 (UNDERSCORE) of the ``OS/2.fsSelection`` field is set, False
+        otherwise.
+        """
+        return is_nth_bit_set(self.os_2_table.table.fsSelection, UNDERSCORE_BIT)
+
+    @underscore.setter
+    def underscore(self, value: bool) -> None:
+        """
+        Sets the bit 1 (UNDERSCORE) of the ``OS/2.fsSelection`` field.
+        """
+        self.os_2_table.set_bit(field_name="fsSelection", pos=UNDERSCORE_BIT, value=value)
+
+    @property
+    def negative(self) -> bool:
+        """
+        Returns True if the bit 2 (NEGATIVE) of the ``OS/2.fsSelection`` field is set, False
+        otherwise.
+        """
+        return is_nth_bit_set(self.os_2_table.table.fsSelection, NEGATIVE_BIT)
+
+    @negative.setter
+    def negative(self, value: bool) -> None:
+        """
+        Sets the bit 2 (NEGATIVE) of the ``OS/2.fsSelection`` field.
+        """
+        self.os_2_table.set_bit(field_name="fsSelection", pos=NEGATIVE_BIT, value=value)
+
+    @property
+    def outlined(self) -> bool:
+        """
+        Returns True if the bit 3 (OUTLINED) of the ``OS/2.fsSelection`` field is set, False
+        otherwise.
+        """
+        return is_nth_bit_set(self.os_2_table.table.fsSelection, OUTLINED_BIT)
+
+    @outlined.setter
+    def outlined(self, value: bool) -> None:
+        """
+        Sets the bit 3 (OUTLINED) of the ``OS/2.fsSelection`` field.
+        """
+        self.os_2_table.set_bit(field_name="fsSelection", pos=OUTLINED_BIT, value=value)
+
+    @property
+    def strikeout(self) -> bool:
+        """
+        Returns True if the bit 4 (STRIKEOUT) of the ``OS/2.fsSelection`` field is set, False
+        otherwise.
+        """
+        return is_nth_bit_set(self.os_2_table.table.fsSelection, STRIKEOUT_BIT)
+
+    @strikeout.setter
+    def strikeout(self, value: bool) -> None:
+        """
+        Sets the bit 4 (STRIKEOUT) of the ``OS/2.fsSelection`` field.
+        """
+        self.os_2_table.set_bit(field_name="fsSelection", pos=STRIKEOUT_BIT, value=value)
+
+    @property
+    def bold(self) -> bool:
+        """
+        Returns True if the bit 5 (BOLD) of the ``OS/2.fsSelection`` field is set, False
+        otherwise.
+        """
+        return is_nth_bit_set(self.os_2_table.table.fsSelection, BOLD_BIT)
+
+    @bold.setter
+    def bold(self, value: bool) -> None:
+        """
+        Sets the bit 5 (BOLD) of the ``OS/2.fsSelection`` field.
+        """
+        self.os_2_table.set_bit(field_name="fsSelection", pos=BOLD_BIT, value=value)
+
+    @property
+    def regular(self) -> bool:
+        """
+        Returns True if the bit 6 (REGULAR) of the ``OS/2.fsSelection`` field is set, False
+        otherwise.
+        """
+        return is_nth_bit_set(self.os_2_table.table.fsSelection, REGULAR_BIT)
+
+    @regular.setter
+    def regular(self, value: bool) -> None:
+        """
+        Sets the bit 6 (REGULAR) of the ``OS/2.fsSelection`` field.
+        """
+        self.os_2_table.set_bit(field_name="fsSelection", pos=REGULAR_BIT, value=value)
+
+    @property
+    def use_typo_metrics(self) -> bool:
+        """
+        Returns True if the bit 7 (USE_TYPO_METRICS) of the ``OS/2.fsSelection`` field is set, False
+        otherwise.
+        """
+        return is_nth_bit_set(self.os_2_table.table.fsSelection, USE_TYPO_METRICS_BIT)
+
+    @use_typo_metrics.setter
+    def use_typo_metrics(self, value: bool) -> None:
+        """
+        Sets the bit 7 (USE_TYPO_METRICS) of the ``OS/2.fsSelection`` field.
+        """
+        self.os_2_table.set_bit(field_name="fsSelection", pos=USE_TYPO_METRICS_BIT, value=value)
+
+    @property
+    def wws_consistent(self) -> bool:
+        """
+        Returns True if the bit 8 (WWWS) of the ``OS/2.fsSelection`` field is set, False
+        otherwise.
+        """
+        return is_nth_bit_set(self.os_2_table.table.fsSelection, WWWS_BIT)
+
+    @wws_consistent.setter
+    def wws_consistent(self, value: bool) -> None:
+        """
+        Sets the bit 8 (WWWS) of the ``OS/2.fsSelection`` field.
+        """
+        self.os_2_table.set_bit(field_name="fsSelection", pos=WWWS_BIT, value=value)
+
+    @property
+    def oblique(self) -> bool:
+        """
+        Returns True if the bit 9 (OBLIQUE) of the ``OS/2.fsSelection`` field is set, False
+        otherwise.
+        """
+        return is_nth_bit_set(self.os_2_table.table.fsSelection, OBLIQUE_BIT)
+
+    @oblique.setter
+    def oblique(self, value: bool) -> None:
+        """
+        Sets the bit 9 (OBLIQUE) of the ``OS/2.fsSelection`` field.
+        """
+        self.os_2_table.set_bit(field_name="fsSelection", pos=OBLIQUE_BIT, value=value)
+
+
 class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
     """
     This class extends the fontTools ``OS/2`` table to add some useful methods and properties.
@@ -41,6 +203,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Initializes the ``OS/2`` table handler.
         """
         super().__init__(ttfont=ttfont, table_tag=OS_2_TABLE_TAG)
+        self.fs_selection = FsSelection(os_2_table=self)
 
     class InvalidOS2VersionError(Exception):
         """
@@ -183,168 +346,6 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Sets the bit 9 (BITMAP_EMBED_ONLY) of the ``OS/2.fsType`` field.
         """
         self.set_bit(field_name="fsType", pos=BITMAP_EMBED_ONLY_BIT, value=value)
-
-    @property
-    def is_italic(self) -> bool:
-        """
-        Returns True if the bit 0 (ITALIC) of the ``OS/2.fsSelection`` field is set, False
-        otherwise.
-        """
-        return is_nth_bit_set(self.table.fsSelection, ITALIC_BIT)
-
-    @is_italic.setter
-    def is_italic(self, value: bool) -> None:
-        """
-        Sets the bit 0 (ITALIC) of the ``OS/2.fsSelection`` field.
-        """
-        self.set_bit(field_name="fsSelection", pos=ITALIC_BIT, value=value)
-
-    @property
-    def is_underscore(self) -> bool:
-        """
-        Returns True if the bit 1 (UNDERSCORE) of the ``OS/2.fsSelection`` field is set, False
-        otherwise.
-        """
-        return is_nth_bit_set(self.table.fsSelection, UNDERSCORE_BIT)
-
-    @is_underscore.setter
-    def is_underscore(self, value: bool) -> None:
-        """
-        Sets the bit 1 (UNDERSCORE) of the ``OS/2.fsSelection`` field.
-        """
-        self.set_bit(field_name="fsSelection", pos=UNDERSCORE_BIT, value=value)
-
-    @property
-    def is_negative(self) -> bool:
-        """
-        Returns True if the bit 2 (NEGATIVE) of the ``OS/2.fsSelection`` field is set, False
-        otherwise.
-        """
-        return is_nth_bit_set(self.table.fsSelection, NEGATIVE_BIT)
-
-    @is_negative.setter
-    def is_negative(self, value: bool) -> None:
-        """
-        Sets the bit 2 (NEGATIVE) of the ``OS/2.fsSelection`` field.
-        """
-        self.set_bit(field_name="fsSelection", pos=NEGATIVE_BIT, value=value)
-
-    @property
-    def is_outlined(self) -> bool:
-        """
-        Returns True if the bit 3 (OUTLINED) of the ``OS/2.fsSelection`` field is set, False
-        otherwise.
-        """
-        return is_nth_bit_set(self.table.fsSelection, OUTLINED_BIT)
-
-    @is_outlined.setter
-    def is_outlined(self, value: bool) -> None:
-        """
-        Sets the bit 3 (OUTLINED) of the ``OS/2.fsSelection`` field.
-        """
-        self.set_bit(field_name="fsSelection", pos=OUTLINED_BIT, value=value)
-
-    @property
-    def is_strikeout(self) -> bool:
-        """
-        Returns True if the bit 4 (STRIKEOUT) of the ``OS/2.fsSelection`` field is set, False
-        otherwise.
-        """
-        return is_nth_bit_set(self.table.fsSelection, STRIKEOUT_BIT)
-
-    @is_strikeout.setter
-    def is_strikeout(self, value: bool) -> None:
-        """
-        Sets the bit 4 (STRIKEOUT) of the ``OS/2.fsSelection`` field.
-        """
-        self.set_bit(field_name="fsSelection", pos=STRIKEOUT_BIT, value=value)
-
-    @property
-    def is_bold(self) -> bool:
-        """
-        Returns True if the bit 5 (BOLD) of the ``OS/2.fsSelection`` field is set, False
-        otherwise.
-        """
-        return is_nth_bit_set(self.table.fsSelection, BOLD_BIT)
-
-    @is_bold.setter
-    def is_bold(self, value: bool) -> None:
-        """
-        Sets the bit 5 (BOLD) of the ``OS/2.fsSelection`` field.
-        """
-        self.set_bit(field_name="fsSelection", pos=BOLD_BIT, value=value)
-
-    @property
-    def is_regular(self) -> bool:
-        """
-        Returns True if the bit 6 (REGULAR) of the ``OS/2.fsSelection`` field is set, False
-        otherwise.
-        """
-        return is_nth_bit_set(self.table.fsSelection, REGULAR_BIT)
-
-    @is_regular.setter
-    def is_regular(self, value: bool) -> None:
-        """
-        Sets the bit 6 (REGULAR) of the ``OS/2.fsSelection`` field.
-        """
-        self.set_bit(field_name="fsSelection", pos=REGULAR_BIT, value=value)
-
-    @property
-    def use_typo_metrics(self) -> bool:
-        """
-        Returns True if the bit 7 (USE_TYPO_METRICS) of the ``OS/2.fsSelection`` field is set, False
-        otherwise.
-        """
-        return is_nth_bit_set(self.table.fsSelection, USE_TYPO_METRICS_BIT)
-
-    @use_typo_metrics.setter
-    def use_typo_metrics(self, value: bool) -> None:
-        """
-        Sets the bit 7 (USE_TYPO_METRICS) of the ``OS/2.fsSelection`` field.
-        """
-        if self.version < 4 and value is True:
-            raise self.InvalidOS2VersionError(
-                "fsSelection bit 7 (USE_TYPO_METRICS) is only defined in OS/2 table versions 4 and "
-                "up."
-            )
-        self.set_bit(field_name="fsSelection", pos=USE_TYPO_METRICS_BIT, value=value)
-
-    @property
-    def wws_consistent(self) -> bool:
-        """
-        Returns True if the bit 8 (WWS) of the ``OS/2.fsSelection`` field is set, False
-        otherwise.
-        """
-        return is_nth_bit_set(self.table.fsSelection, WWWS_BIT)
-
-    @wws_consistent.setter
-    def wws_consistent(self, value: bool) -> None:
-        """
-        Sets the bit 8 (WWS) of the ``OS/2.fsSelection`` field.
-        """
-        if self.version < 4 and value is True:
-            raise self.InvalidOS2VersionError(
-                "fsSelection bit 8 (WWS) is only defined in OS/2 table versions 4 and up."
-            )
-        self.set_bit(field_name="fsSelection", pos=WWWS_BIT, value=value)
-
-    @property
-    def is_oblique(self) -> bool:
-        """
-        Returns True if the bit 9 (OBLIQUE) of the ``OS/2.fsSelection`` field is set, False
-        """
-        return is_nth_bit_set(self.table.fsSelection, OBLIQUE_BIT)
-
-    @is_oblique.setter
-    def is_oblique(self, value: bool) -> None:
-        """
-        Sets the bit 9 (OBLIQUE) of the ``OS/2.fsSelection`` field.
-        """
-        if self.version < 4 and value is True:
-            raise self.InvalidOS2VersionError(
-                "fsSelection bit 9 (OBLIQUE) is only defined in OS/2 table versions 4 and up."
-            )
-        self.set_bit(field_name="fsSelection", pos=OBLIQUE_BIT, value=value)
 
     @property
     def vendor_id(self) -> str:
