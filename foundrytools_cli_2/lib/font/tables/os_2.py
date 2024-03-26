@@ -17,6 +17,19 @@ from foundrytools_cli_2.lib.utils.bits_tools import is_nth_bit_set
 from foundrytools_cli_2.lib.utils.misc import get_glyph_bounds
 from foundrytools_cli_2.lib.utils.string_tools import adjust_string_length
 
+ITALIC_BIT = 0
+UNDERSCORE_BIT = 1
+NEGATIVE_BIT = 2
+OUTLINED_BIT = 3
+STRIKEOUT_BIT = 4
+BOLD_BIT = 5
+REGULAR_BIT = 6
+USE_TYPO_METRICS_BIT = 7
+WWWS_BIT = 8
+OBLIQUE_BIT = 9
+NO_SUBSETTING_BIT = 8
+BITMAP_EMBED_ONLY_BIT = 9
+
 
 class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
     """
@@ -147,14 +160,14 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Returns True if the bit 8 (NO_SUBSETTING) of the ``OS/2.fsType`` field is set, False
         otherwise.
         """
-        return is_nth_bit_set(self.table.fsType, 8)
+        return is_nth_bit_set(self.table.fsType, NO_SUBSETTING_BIT)
 
     @no_subsetting.setter
     def no_subsetting(self, value: bool) -> None:
         """
         Sets the bit 8 (NO_SUBSETTING) of the ``OS/2.fsType`` field.
         """
-        self.set_bit(field_name="fsType", pos=8, value=value)
+        self.set_bit(field_name="fsType", pos=NO_SUBSETTING_BIT, value=value)
 
     @property
     def bitmap_embed_only(self) -> bool:
@@ -162,14 +175,14 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Returns True if the bit 9 (BITMAP_EMBED_ONLY) of the ``OS/2.fsType`` field is set, False
         otherwise.
         """
-        return is_nth_bit_set(self.table.fsType, 9)
+        return is_nth_bit_set(self.table.fsType, BITMAP_EMBED_ONLY_BIT)
 
     @bitmap_embed_only.setter
     def bitmap_embed_only(self, value: bool) -> None:
         """
         Sets the bit 9 (BITMAP_EMBED_ONLY) of the ``OS/2.fsType`` field.
         """
-        self.set_bit(field_name="fsType", pos=9, value=value)
+        self.set_bit(field_name="fsType", pos=BITMAP_EMBED_ONLY_BIT, value=value)
 
     @property
     def is_italic(self) -> bool:
@@ -177,14 +190,14 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Returns True if the bit 0 (ITALIC) of the ``OS/2.fsSelection`` field is set, False
         otherwise.
         """
-        return is_nth_bit_set(self.table.fsSelection, 0)
+        return is_nth_bit_set(self.table.fsSelection, ITALIC_BIT)
 
     @is_italic.setter
     def is_italic(self, value: bool) -> None:
         """
         Sets the bit 0 (ITALIC) of the ``OS/2.fsSelection`` field.
         """
-        self.set_bit(field_name="fsSelection", pos=0, value=value)
+        self.set_bit(field_name="fsSelection", pos=ITALIC_BIT, value=value)
 
     @property
     def is_underscore(self) -> bool:
@@ -192,14 +205,14 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Returns True if the bit 1 (UNDERSCORE) of the ``OS/2.fsSelection`` field is set, False
         otherwise.
         """
-        return is_nth_bit_set(self.table.fsSelection, 1)
+        return is_nth_bit_set(self.table.fsSelection, UNDERSCORE_BIT)
 
     @is_underscore.setter
     def is_underscore(self, value: bool) -> None:
         """
         Sets the bit 1 (UNDERSCORE) of the ``OS/2.fsSelection`` field.
         """
-        self.set_bit(field_name="fsSelection", pos=1, value=value)
+        self.set_bit(field_name="fsSelection", pos=UNDERSCORE_BIT, value=value)
 
     @property
     def is_negative(self) -> bool:
@@ -207,14 +220,14 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Returns True if the bit 2 (NEGATIVE) of the ``OS/2.fsSelection`` field is set, False
         otherwise.
         """
-        return is_nth_bit_set(self.table.fsSelection, 2)
+        return is_nth_bit_set(self.table.fsSelection, NEGATIVE_BIT)
 
     @is_negative.setter
     def is_negative(self, value: bool) -> None:
         """
         Sets the bit 2 (NEGATIVE) of the ``OS/2.fsSelection`` field.
         """
-        self.set_bit(field_name="fsSelection", pos=2, value=value)
+        self.set_bit(field_name="fsSelection", pos=NEGATIVE_BIT, value=value)
 
     @property
     def is_outlined(self) -> bool:
@@ -222,14 +235,14 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Returns True if the bit 3 (OUTLINED) of the ``OS/2.fsSelection`` field is set, False
         otherwise.
         """
-        return is_nth_bit_set(self.table.fsSelection, 3)
+        return is_nth_bit_set(self.table.fsSelection, OUTLINED_BIT)
 
     @is_outlined.setter
     def is_outlined(self, value: bool) -> None:
         """
         Sets the bit 3 (OUTLINED) of the ``OS/2.fsSelection`` field.
         """
-        self.set_bit(field_name="fsSelection", pos=3, value=value)
+        self.set_bit(field_name="fsSelection", pos=OUTLINED_BIT, value=value)
 
     @property
     def is_strikeout(self) -> bool:
@@ -237,14 +250,14 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Returns True if the bit 4 (STRIKEOUT) of the ``OS/2.fsSelection`` field is set, False
         otherwise.
         """
-        return is_nth_bit_set(self.table.fsSelection, 4)
+        return is_nth_bit_set(self.table.fsSelection, STRIKEOUT_BIT)
 
     @is_strikeout.setter
     def is_strikeout(self, value: bool) -> None:
         """
         Sets the bit 4 (STRIKEOUT) of the ``OS/2.fsSelection`` field.
         """
-        self.set_bit(field_name="fsSelection", pos=4, value=value)
+        self.set_bit(field_name="fsSelection", pos=STRIKEOUT_BIT, value=value)
 
     @property
     def is_bold(self) -> bool:
@@ -252,14 +265,14 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Returns True if the bit 5 (BOLD) of the ``OS/2.fsSelection`` field is set, False
         otherwise.
         """
-        return is_nth_bit_set(self.table.fsSelection, 5)
+        return is_nth_bit_set(self.table.fsSelection, BOLD_BIT)
 
     @is_bold.setter
     def is_bold(self, value: bool) -> None:
         """
         Sets the bit 5 (BOLD) of the ``OS/2.fsSelection`` field.
         """
-        self.set_bit(field_name="fsSelection", pos=5, value=value)
+        self.set_bit(field_name="fsSelection", pos=BOLD_BIT, value=value)
 
     @property
     def is_regular(self) -> bool:
@@ -267,14 +280,14 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Returns True if the bit 6 (REGULAR) of the ``OS/2.fsSelection`` field is set, False
         otherwise.
         """
-        return is_nth_bit_set(self.table.fsSelection, 6)
+        return is_nth_bit_set(self.table.fsSelection, REGULAR_BIT)
 
     @is_regular.setter
     def is_regular(self, value: bool) -> None:
         """
         Sets the bit 6 (REGULAR) of the ``OS/2.fsSelection`` field.
         """
-        self.set_bit(field_name="fsSelection", pos=6, value=value)
+        self.set_bit(field_name="fsSelection", pos=REGULAR_BIT, value=value)
 
     @property
     def use_typo_metrics(self) -> bool:
@@ -282,7 +295,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Returns True if the bit 7 (USE_TYPO_METRICS) of the ``OS/2.fsSelection`` field is set, False
         otherwise.
         """
-        return is_nth_bit_set(self.table.fsSelection, 7)
+        return is_nth_bit_set(self.table.fsSelection, USE_TYPO_METRICS_BIT)
 
     @use_typo_metrics.setter
     def use_typo_metrics(self, value: bool) -> None:
@@ -294,7 +307,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
                 "fsSelection bit 7 (USE_TYPO_METRICS) is only defined in OS/2 table versions 4 and "
                 "up."
             )
-        self.set_bit(field_name="fsSelection", pos=7, value=value)
+        self.set_bit(field_name="fsSelection", pos=USE_TYPO_METRICS_BIT, value=value)
 
     @property
     def wws_consistent(self) -> bool:
@@ -302,7 +315,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Returns True if the bit 8 (WWS) of the ``OS/2.fsSelection`` field is set, False
         otherwise.
         """
-        return is_nth_bit_set(self.table.fsSelection, 8)
+        return is_nth_bit_set(self.table.fsSelection, WWWS_BIT)
 
     @wws_consistent.setter
     def wws_consistent(self, value: bool) -> None:
@@ -313,7 +326,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
             raise self.InvalidOS2VersionError(
                 "fsSelection bit 8 (WWS) is only defined in OS/2 table versions 4 and up."
             )
-        self.set_bit(field_name="fsSelection", pos=8, value=value)
+        self.set_bit(field_name="fsSelection", pos=WWWS_BIT, value=value)
 
     @property
     def is_oblique(self) -> bool:
@@ -324,7 +337,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
             raise self.InvalidOS2VersionError(
                 "fsSelection bit 9 (OBLIQUE) is only defined in OS/2 table versions 4 and up."
             )
-        return is_nth_bit_set(self.table.fsSelection, 9)
+        return is_nth_bit_set(self.table.fsSelection, OBLIQUE_BIT)
 
     @is_oblique.setter
     def is_oblique(self, value: bool) -> None:
@@ -335,7 +348,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
             raise self.InvalidOS2VersionError(
                 "fsSelection bit 9 (OBLIQUE) is only defined in OS/2 table versions 4 and up."
             )
-        self.set_bit(field_name="fsSelection", pos=9, value=value)
+        self.set_bit(field_name="fsSelection", pos=OBLIQUE_BIT, value=value)
 
     @property
     def vendor_id(self) -> str:
