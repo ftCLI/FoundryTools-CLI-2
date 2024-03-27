@@ -160,6 +160,11 @@ class FsSelection:
         """
         Sets the bit 7 (USE_TYPO_METRICS) of the ``OS/2.fsSelection`` field.
         """
+        if self.os_2_table.version < 4 and value is True:
+            raise self.os_2_table.InvalidOS2VersionError(
+                "fsSelection bit 7 (USE_TYPO_METRICS) is only defined in OS/2 table versions 4 and "
+                "up."
+            )
         self.os_2_table.set_bit(field_name="fsSelection", pos=USE_TYPO_METRICS_BIT, value=value)
 
     @property
@@ -175,6 +180,10 @@ class FsSelection:
         """
         Sets the bit 8 (WWWS) of the ``OS/2.fsSelection`` field.
         """
+        if self.os_2_table.version < 4 and value is True:
+            raise self.os_2_table.InvalidOS2VersionError(
+                "fsSelection bit 8 (WWWS) is only defined in OS/2 table versions 4 and up."
+            )
         self.os_2_table.set_bit(field_name="fsSelection", pos=WWWS_BIT, value=value)
 
     @property
@@ -183,6 +192,10 @@ class FsSelection:
         Returns True if the bit 9 (OBLIQUE) of the ``OS/2.fsSelection`` field is set, False
         otherwise.
         """
+        if self.os_2_table.version < 4:
+            raise self.os_2_table.InvalidOS2VersionError(
+                "fsSelection bit 9 (OBLIQUE) is only defined in OS/2 table versions 4 and up."
+            )
         return is_nth_bit_set(self.os_2_table.table.fsSelection, OBLIQUE_BIT)
 
     @oblique.setter
