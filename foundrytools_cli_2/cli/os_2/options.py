@@ -5,7 +5,13 @@ import click
 from foundrytools_cli_2.cli.shared_callbacks import choice_to_int_callback
 from foundrytools_cli_2.cli.shared_options import add_options
 
-__all__ = ["set_attrs_options", "set_fs_selection_options", "set_fs_type_options", "target_version"]
+__all__ = [
+    "set_attrs_options",
+    "set_fs_selection_options",
+    "set_fs_type_options",
+    "target_version",
+    "panose_options",
+]
 
 
 def weight_class() -> t.Callable:
@@ -644,7 +650,7 @@ def set_attrs_options() -> t.Callable:
         typo_line_gap(),
         win_ascent(),
         win_descent(),
-        x_height(),
+        panose_x_height(),
         cap_height(),
     ]
     return add_options(_set_attrs_options)
@@ -685,3 +691,205 @@ def set_fs_type_options() -> t.Callable:
         bitmap_embed_only(),
     ]
     return add_options(_set_permissions_options)
+
+
+def family_type() -> t.Callable:
+    """
+    Add the ``family_type`` option to a click command.
+
+    Returns:
+        t.Callable: A decorator that adds the ``family_type`` option to a click command
+    """
+    _family_type = [
+        click.option(
+            "-ft",
+            "--family-type",
+            "bFamilyType",
+            type=click.IntRange(0, 5),
+            help="""
+            Sets the 'bFamilyType' value.
+            """,
+        )
+    ]
+    return add_options(_family_type)
+
+
+def serif_style() -> t.Callable:
+    """
+    Add the ``serif_style`` option to a click command.
+    """
+    _serif_style = [
+        click.option(
+            "-ss",
+            "--serif-style",
+            "bSerifStyle",
+            type=click.IntRange(0, 15),
+            help="""
+            Sets the 'bSerifStyle' value.
+            """,
+        )
+    ]
+    return add_options(_serif_style)
+
+
+def weight() -> t.Callable:
+    """
+    Add the ``weight`` option to a click command.
+    """
+    _weight = [
+        click.option(
+            "-wt",
+            "--weight",
+            "bWeight",
+            type=click.IntRange(0, 11),
+            help="""
+            Sets the 'bWeight' value.
+            """,
+        )
+    ]
+    return add_options(_weight)
+
+
+def proportion() -> t.Callable:
+    """
+    Add the ``proportion`` option to a click command.
+    """
+    _proportion = [
+        click.option(
+            "-pr",
+            "--proportion",
+            "bProportion",
+            type=click.IntRange(0, 9),
+            help="""
+            Sets the 'bProportion' value.
+            """,
+        )
+    ]
+    return add_options(_proportion)
+
+
+def contrast() -> t.Callable:
+    """
+    Add the ``contrast`` option to a click command.
+    """
+    _contrast = [
+        click.option(
+            "-ct",
+            "--contrast",
+            "bContrast",
+            type=click.IntRange(0, 9),
+            help="""
+            Sets the 'bContrast' value.
+            """,
+        )
+    ]
+    return add_options(_contrast)
+
+
+def stroke_variation() -> t.Callable:
+    """
+    Add the ``stroke_variation`` option to a click command.
+    """
+    _stroke_variation = [
+        click.option(
+            "-sv",
+            "--stroke-variation",
+            "bStrokeVariation",
+            type=click.IntRange(0, 9),
+            help="""
+            Sets the 'bStrokeVariation' value.
+            """,
+        )
+    ]
+    return add_options(_stroke_variation)
+
+
+def arm_style() -> t.Callable:
+    """
+    Add the ``arm_style`` option to a click command.
+    """
+    _arm_style = [
+        click.option(
+            "-as",
+            "--arm-style",
+            "bArmStyle",
+            type=click.IntRange(0, 11),
+            help="""
+            Sets the 'bArmStyle' value.
+            """,
+        )
+    ]
+    return add_options(_arm_style)
+
+
+def letter_form() -> t.Callable:
+    """
+    Add the ``letter_form`` option to a click command.
+    """
+    _letter_form = [
+        click.option(
+            "-lf",
+            "--letter-form",
+            "bLetterForm",
+            type=click.IntRange(0, 15),
+            help="""
+            Sets the 'bLetterForm' value.
+            """,
+        )
+    ]
+    return add_options(_letter_form)
+
+
+def midline() -> t.Callable:
+    """
+    Add the ``midline`` option to a click command.
+    """
+    _midline = [
+        click.option(
+            "-ml",
+            "--midline",
+            "bMidline",
+            type=click.IntRange(0, 13),
+            help="""
+            Sets the 'bMidline' value.
+            """,
+        )
+    ]
+    return add_options(_midline)
+
+
+def panose_x_height() -> t.Callable:
+    """
+    Add the ``panose_x_height`` option to a click command.
+    """
+    _x_height = [
+        click.option(
+            "-xh",
+            "--x-height",
+            "bXHeight",
+            type=click.IntRange(0, 7),
+            help="""
+            Sets the 'bXHeight' value.
+            """,
+        )
+    ]
+    return add_options(_x_height)
+
+
+def panose_options() -> t.Callable:
+    """
+    Add the Panose options to a click command.
+    """
+    _panose_options = [
+        family_type(),
+        serif_style(),
+        weight(),
+        proportion(),
+        contrast(),
+        stroke_variation(),
+        arm_style(),
+        letter_form(),
+        midline(),
+        panose_x_height(),
+    ]
+    return add_options(_panose_options)
