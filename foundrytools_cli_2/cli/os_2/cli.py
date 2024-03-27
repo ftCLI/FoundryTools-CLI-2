@@ -2,7 +2,7 @@
 import typing as t
 from pathlib import Path
 
-import rich_click as click
+import click
 
 from foundrytools_cli_2.cli.os_2.options import (
     set_attrs_options,
