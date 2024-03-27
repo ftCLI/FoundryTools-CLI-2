@@ -5,7 +5,7 @@ import click
 from foundrytools_cli_2.cli.shared_callbacks import choice_to_int_callback
 from foundrytools_cli_2.cli.shared_options import add_options
 
-__all__ = ["set_attrs_options", "set_fs_selection_options", "set_fs_type_options"]
+__all__ = ["set_attrs_options", "set_fs_selection_options", "set_fs_type_options", "target_version"]
 
 
 def weight_class() -> t.Callable:
@@ -609,6 +609,23 @@ def bitmap_embed_only() -> t.Callable:
         )
     ]
     return add_options(_bitmap_embed_only)
+
+
+def target_version() -> t.Callable:
+    """
+    Add the ``target_version`` option to a click command.
+    """
+    _target_version = [
+        click.option(
+            "-v",
+            "--target-version",
+            type=click.IntRange(1, 5),
+            help="""
+            The version of the OS/2 table to set.
+            """,
+        )
+    ]
+    return add_options(_target_version)
 
 
 def set_attrs_options() -> t.Callable:
