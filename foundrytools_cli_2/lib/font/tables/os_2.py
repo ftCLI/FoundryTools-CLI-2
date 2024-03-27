@@ -585,3 +585,37 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         Recalculates the code page ranges of the ``OS/2`` table.
         """
         self.table.recalcCodePageRanges(self.ttfont)
+
+    def upgrade(self, target_version: int) -> None:
+        """
+        Upgrades the ``OS/2`` table to the latest version.
+        """
+        current_version = self.version
+        if target_version <= current_version:
+            raise self.InvalidOS2VersionError(
+                f"The target version must be greater than the current version ({current_version})."
+            )
+
+        self.table.version = target_version
+
+        if current_version < 1:
+            self.recalc_code_page_ranges()
+
+        if target_version == 1:
+            return
+
+        if current_version < 2:
+            self.recalc_x_height()
+            self.recalc_cap_height()
+            self.table.usDefaultChar = 0
+            self.table.usBreakChar = 32
+            self.recalc_max_context()
+
+        if target_version == 5:
+            self.table.usLowerOpticalPointSize = 0
+            self.table.usUpperOpticalPointSize = 65535 / 20
+
+        if target_version < 4:
+            self.fs_selection.use_typo_metrics = False
+            self.fs_selection.wws_consistent = False
+            self.fs_selection.oblique = False

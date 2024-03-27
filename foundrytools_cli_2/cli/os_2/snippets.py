@@ -254,3 +254,17 @@ def set_fs_type(
         if value is not None:
             setattr(os_2_table, attr, value)
     font.modified = os_2_table.modified
+
+
+def upgrade_version(font: Font, target_version: int) -> None:
+    """
+    Upgrades the OS/2 table version to the specified version.
+
+    Args:
+        font: The Font object representing the font to modify.
+        target_version: The version to upgrade to.
+    """
+
+    os_2_table = OS2Table(font.ttfont)
+    os_2_table.upgrade(target_version)
+    font.modified = os_2_table.modified

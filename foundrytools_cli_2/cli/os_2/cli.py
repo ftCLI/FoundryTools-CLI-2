@@ -8,6 +8,7 @@ from foundrytools_cli_2.cli.os_2.options import (
     set_attrs_options,
     set_fs_selection_options,
     set_fs_type_options,
+    target_version,
 )
 from foundrytools_cli_2.cli.shared_options import base_options
 from foundrytools_cli_2.lib.font_runner import FontRunner
@@ -140,6 +141,21 @@ def set_fs_type(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Set font embedding licensing rights for the font, defined in the fsType field of the OS/2 table.
     """
     from foundrytools_cli_2.cli.os_2.snippets import set_fs_type as task
+
+    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner.run()
+
+
+@cli.command("upgrade", no_args_is_help=True)
+@target_version()
+@base_options()
+def upgrade(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Upgrades the OS/2 table version.
+
+    If the target version is less or equal to the current version, the table is not modified.
+    """
+    from foundrytools_cli_2.cli.os_2.snippets import upgrade_version as task
 
     runner = FontRunner(input_path=input_path, task=task, **options)
     runner.run()
