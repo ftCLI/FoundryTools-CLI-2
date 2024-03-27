@@ -5,6 +5,7 @@ from pathlib import Path
 import click
 
 from foundrytools_cli_2.cli.os_2.options import (
+    panose_options,
     set_attrs_options,
     set_fs_selection_options,
     set_fs_type_options,
@@ -156,6 +157,19 @@ def upgrade(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     If the target version is less or equal to the current version, the table is not modified.
     """
     from foundrytools_cli_2.cli.os_2.snippets import upgrade_version as task
+
+    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner.run()
+
+
+@cli.command("panose", no_args_is_help=True)
+@panose_options()
+@base_options()
+def set_panose(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Sets the PANOSE classification in the OS/2 table.
+    """
+    from foundrytools_cli_2.cli.os_2.snippets import set_panose as task
 
     runner = FontRunner(input_path=input_path, task=task, **options)
     runner.run()

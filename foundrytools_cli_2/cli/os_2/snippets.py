@@ -268,3 +268,19 @@ def upgrade_version(font: Font, target_version: int) -> None:
     os_2_table = OS2Table(font.ttfont)
     os_2_table.upgrade(target_version)
     font.modified = os_2_table.modified
+
+
+def set_panose(font: Font, **kwargs: t.Dict[str, int]) -> None:
+    """
+    Sets the PANOSE classification in the OS/2 table.
+
+    Args:
+        font: The Font object representing the font to modify.
+        panose: The PANOSE classification string.
+    """
+
+    os_2_table = OS2Table(font.ttfont)
+    for key, value in kwargs.items():
+        if value is not None:
+            setattr(os_2_table.table.panose, key, value)
+    font.modified = os_2_table.modified
