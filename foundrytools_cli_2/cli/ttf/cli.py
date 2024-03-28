@@ -33,7 +33,9 @@ def dehint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Removes hinting from the given TrueType fonts.
     """
 
-    runner = FontRunner(input_path=input_path, task=Font.tt_remove_hints, **options)
+    from foundrytools_cli_2.cli.ttf.snippets.dehint import ttf_dehint as task
+
+    runner = FontRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_ps = True
     runner.run()
 

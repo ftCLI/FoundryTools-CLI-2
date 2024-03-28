@@ -4,7 +4,6 @@ from io import BytesIO
 from pathlib import Path
 
 from cffsubr import desubroutinize, subroutinize
-from dehinter.font import dehint
 from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.pens.statisticsPen import StatisticsPen
@@ -636,16 +635,6 @@ class Font:  # pylint: disable=too-many-public-methods
             except KeyError:
                 continue
         raise ValueError("The font does not contain the glyph 'H' or 'uni0048'.")
-
-    def tt_remove_hints(self) -> None:
-        """
-        Remove hints from a TrueType font.
-        """
-        if not self.is_tt:
-            raise NotImplementedError("Only TrueType fonts are supported.")
-
-        dehint(self.ttfont, verbose=False)
-        self.modified = True
 
     def tt_decomponentize(self) -> None:
         """
