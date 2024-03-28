@@ -111,5 +111,5 @@ def get_fallback_charstrings(font: TTFont, tolerance: float = 1.0) -> t.Dict[str
     t2_charstrings = get_t2_charstrings(font=temp_font)
     build_otf(font=temp_font, charstrings_dict=t2_charstrings)
     build_ttf(font=temp_font, max_err=tolerance, reverse_direction=False)
-    _, fallback_charstrings = quadratics_to_cubics(temp_font, tolerance=tolerance)
+    fallback_charstrings = quadratics_to_cubics(temp_font, tolerance=tolerance)
     return fallback_charstrings
