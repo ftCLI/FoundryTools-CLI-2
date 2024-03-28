@@ -16,10 +16,12 @@ cli = click.Group(help="Utilities for editing OpenType-TT fonts.")
 @base_options()
 def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Autohints the given TrueType fonts.
+    Auto-hints the given TrueType fonts using ttfautohint-py.
     """
 
-    runner = FontRunner(input_path=input_path, task=Font.tt_autohint, **options)
+    from foundrytools_cli_2.cli.ttf.snippets.autohint import ttf_autohint as task
+
+    runner = FontRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_ps = True
     runner.run()
 
