@@ -65,37 +65,9 @@ def recalc_max_context(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("recalc-unicode-ranges")
+@cli.command("recalc-ranges")
 @base_options()
-def recalc_unicode_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
-    """
-    Recalculates the ulUnicodeRange values of the OS/2 table.
-
-    The ulUnicodeRanges values are calculated using the fontTools library.
-    """
-    from foundrytools_cli_2.cli.os_2.snippets import recalc_unicode_ranges as task
-
-    runner = FontRunner(input_path=input_path, task=task, **options)
-    runner.run()
-
-
-@cli.command("recalc-codepage-ranges")
-@base_options()
-def recalc_codepage_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
-    """
-    Recalculates the ulCodePageRange values of the OS/2 table.
-
-    The ulCodePageRanges values are calculated using the fontTools library.
-    """
-    from foundrytools_cli_2.cli.os_2.snippets import recalc_codepage_ranges as task
-
-    runner = FontRunner(input_path=input_path, task=task, **options)
-    runner.run()
-
-
-@cli.command("recalc-ranges-afdko")
-@base_options()
-def recalc_ranges_afdko(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def recalc_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Recalculates the ulUnicodeRange and ulCodePageRange values of the OS/2 table using AFDKO.
 

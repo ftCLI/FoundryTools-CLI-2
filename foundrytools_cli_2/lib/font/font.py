@@ -4,7 +4,6 @@ from io import BytesIO
 from pathlib import Path
 
 from cffsubr import desubroutinize, subroutinize
-from dehinter.font import dehint
 from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.pens.statisticsPen import StatisticsPen
@@ -12,7 +11,6 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import Axis, NamedInstance
-from ttfautohint import ttfautohint
 
 from foundrytools_cli_2.lib.constants import (
     FVAR_TABLE_TAG,
@@ -637,33 +635,6 @@ class Font:  # pylint: disable=too-many-public-methods
             except KeyError:
                 continue
         raise ValueError("The font does not contain the glyph 'H' or 'uni0048'.")
-
-    def tt_autohint(self, recalc_timestamp: bool = False) -> None:
-        """
-        Autohint a TrueType font using ttfautohint-py.
-        """
-        if not self.is_tt:
-            raise NotImplementedError("TTF auto-hinting is only supported for TrueType fonts.")
-
-        buf = BytesIO()
-        self.save(buf, reorder_tables=None)
-        data = ttfautohint(in_buffer=buf.getvalue(), no_info=True)
-        hinted_font = TTFont(BytesIO(data), recalcTimestamp=recalc_timestamp)
-        if not recalc_timestamp:
-            hinted_font[HEAD_TABLE_TAG].modified = self.ttfont[HEAD_TABLE_TAG].modified
-        self.ttfont = hinted_font
-        self.modified = True
-        buf.close()
-
-    def tt_remove_hints(self) -> None:
-        """
-        Remove hints from a TrueType font.
-        """
-        if not self.is_tt:
-            raise NotImplementedError("Only TrueType fonts are supported.")
-
-        dehint(self.ttfont, verbose=False)
-        self.modified = True
 
     def tt_decomponentize(self) -> None:
         """
