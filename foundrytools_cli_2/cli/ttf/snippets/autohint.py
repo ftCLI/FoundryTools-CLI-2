@@ -16,7 +16,7 @@ def ttf_autohint(font: Font) -> None:
     """
 
     if not font.is_tt:
-        raise ValueError("TTF auto-hinting is only supported for TrueType fonts.")
+        raise NotImplementedError("TTF auto-hinting is only supported for TrueType fonts.")
 
     with BytesIO() as buffer:
         flavor = font.ttfont.flavor

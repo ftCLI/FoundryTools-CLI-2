@@ -12,7 +12,7 @@ def ttf_dehint(font: Font) -> None:
     """
 
     if not font.is_tt:
-        raise ValueError("TTF de-hinting is only supported for TrueType fonts.")
+        raise NotImplementedError("TTF de-hinting is only supported for TrueType fonts.")
 
     dehint(font.ttfont, verbose=False)
     font.modified = True
