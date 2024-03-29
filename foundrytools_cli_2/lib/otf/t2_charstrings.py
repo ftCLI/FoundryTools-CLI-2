@@ -32,39 +32,28 @@ def quadratics_to_cubics(font: TTFont, tolerance: float = 1.0) -> t.Dict[str, T2
     glyph_set = font.getGlyphSet()
 
     for k, v in glyph_set.items():
-        t2_pen = T2CharStringPen(v.width, glyphSet=glyph_set)
-        qu2cu_pen = Qu2CuPen(t2_pen, max_err=tolerance, all_cubic=True, reverse_direction=True)
+        width = v.width
+
         try:
+            t2_pen = T2CharStringPen(width=width, glyphSet={k: v})
+            qu2cu_pen = Qu2CuPen(t2_pen, max_err=tolerance, all_cubic=True, reverse_direction=True)
             glyph_set[k].draw(qu2cu_pen)
-            # qu2cu_charstrings[k] = t2_pen.getCharString()
+            qu2cu_charstrings[k] = t2_pen.getCharString()
+
         except NotImplementedError as e:
-            # Draw the glyph with the T2CharStringPen as first step
+            t2_pen = T2CharStringPen(width=width, glyphSet={k: v})
             glyph_set[k].draw(t2_pen)
+            t2_charstring = t2_pen.getCharString()
+            t2_charstring.private = PrivateDict()
 
-            # We have to initialize a PrivateDict object to pass it to the T2CharString,
-            # otherwise it will raise an exception when drawing the charstring with the Cu2QuPen
-            private = PrivateDict()
-            t2_charstring = t2_pen.getCharString(private=private)
-
-            # Initialize a TTGlyphPen object with the T2CharString object
-            tt_pen = TTGlyphPen(glyphSet={k: t2_charstring})
-
-            # Initialize a Cu2QuPen object with the TTGlyphPen object, the max error and the
-            # reverse_direction=False to keep the original direction of the contours.
-            # Since the T2CharStringPen doesn't reverse the direction of the contours, we're still
-            # keeping the original direction of the contours.
-            cu2qu_pen = Cu2QuPen(tt_pen, max_err=tolerance, reverse_direction=False)
-
-            # Draw the T2CharString object with the Cu2QuPen, converting the contours to quadratic
+            tt_pen = TTGlyphPen(glyphSet=None)
+            cu2qu_pen = Cu2QuPen(other_pen=tt_pen, max_err=tolerance, reverse_direction=False)
             t2_charstring.draw(cu2qu_pen)
             tt_glyph = tt_pen.glyph()
-            # At this point, whe have a new quadratic glyph (a fontTools.ttLib.tables._g_l_y_f.Glyph
-            # object) that we have to convert back to cubic with the Qu2CuPen
 
-            # Draw the quadratic glyph with the Qu2CuPen
-            t2_pen = T2CharStringPen(v.width, glyphSet={k: tt_glyph})
+            t2_pen = T2CharStringPen(width=width, glyphSet=None)
             qu2cu_pen = Qu2CuPen(t2_pen, max_err=tolerance, all_cubic=True, reverse_direction=True)
-            tt_glyph.draw(qu2cu_pen, None)
+            tt_glyph.draw(pen=qu2cu_pen, glyfTable=None)
             logger.info(f"{e}. Successfully got charstring for {k} at second attempt")
 
         qu2cu_charstrings[k] = t2_pen.getCharString()
