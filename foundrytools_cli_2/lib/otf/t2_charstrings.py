@@ -36,11 +36,8 @@ def quadratics_to_cubics(font: TTFont, tolerance: float = 1.0) -> t.Dict[str, T2
         qu2cu_pen = Qu2CuPen(t2_pen, max_err=tolerance, all_cubic=True, reverse_direction=True)
         try:
             glyph_set[k].draw(qu2cu_pen)
-            qu2cu_charstrings[k] = t2_pen.getCharString()
+            # qu2cu_charstrings[k] = t2_pen.getCharString()
         except NotImplementedError as e:
-            # BEGIN EDIT
-            logger.warning(f"Failed to get charstring for {k}: {e}")
-
             # Draw the glyph with the T2CharStringPen as first step
             glyph_set[k].draw(t2_pen)
 
@@ -68,8 +65,9 @@ def quadratics_to_cubics(font: TTFont, tolerance: float = 1.0) -> t.Dict[str, T2
             t2_pen = T2CharStringPen(v.width, glyphSet={k: tt_glyph})
             qu2cu_pen = Qu2CuPen(t2_pen, max_err=tolerance, all_cubic=True, reverse_direction=True)
             tt_glyph.draw(qu2cu_pen, None)
-            qu2cu_charstrings[k] = t2_pen.getCharString()
-            logger.success(f"Successfully got charstring for {k} at second attempt")
+            logger.info(f"{e}. Successfully got charstring for {k} at second attempt")
+
+        qu2cu_charstrings[k] = t2_pen.getCharString()
 
     return qu2cu_charstrings
 
