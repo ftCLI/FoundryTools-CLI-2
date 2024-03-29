@@ -41,9 +41,9 @@ def quadratics_to_cubics(font: TTFont, tolerance: float = 1.0) -> t.Dict[str, T2
             qu2cu_charstrings[k] = t2_pen.getCharString()
 
         except NotImplementedError as e:
-            t2_pen = T2CharStringPen(width=width, glyphSet={k: v})
-            glyph_set[k].draw(t2_pen)
-            t2_charstring = t2_pen.getCharString()
+            temp_t2_pen = T2CharStringPen(width=width, glyphSet=None)
+            glyph_set[k].draw(temp_t2_pen)
+            t2_charstring = temp_t2_pen.getCharString()
             t2_charstring.private = PrivateDict()
 
             tt_pen = TTGlyphPen(glyphSet=None)
