@@ -584,7 +584,7 @@ class Font:  # pylint: disable=too-many-public-methods
         build_ttf(font=self.ttfont, max_err=max_err, reverse_direction=reverse_direction)
         self.modified = True
 
-    def to_otf(self, tolerance: float = 1.0) -> None:
+    def to_otf(self, tolerance: float = 1.0, correct_contours: bool = True) -> None:
         """
         Convert a font to PostScript.
         """
@@ -595,7 +595,9 @@ class Font:  # pylint: disable=too-many-public-methods
                 "Conversion to PostScript is not supported for variable fonts."
             )
 
-        charstrings = quadratics_to_cubics(font=self.ttfont, tolerance=tolerance)
+        charstrings = quadratics_to_cubics(
+            font=self.ttfont, tolerance=tolerance, correct_contours=correct_contours
+        )
         build_otf(font=self.ttfont, charstrings_dict=charstrings)
         self.modified = True
 
