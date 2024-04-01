@@ -13,6 +13,7 @@ from foundrytools_cli_2.cli.converter.options import (
 )
 from foundrytools_cli_2.cli.shared_options import (
     base_options,
+    correct_contours_flag,
     reorder_tables_flag,
     subroutinize_flag,
     target_upm_option,
@@ -44,6 +45,7 @@ def otf_to_ttf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @ttf2otf_mode_choice()
 @tolerance_option()
 @target_upm_option(help_msg="Scale the converted fonts to the specified UPM.")
+@correct_contours_flag()
 @subroutinize_flag()
 @base_options()
 def ttf_to_otf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:

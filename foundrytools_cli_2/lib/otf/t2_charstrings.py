@@ -1,81 +1,96 @@
 import typing as t
 from copy import deepcopy
 
+import pathops
+from fontTools.cffLib import PrivateDict
 from fontTools.misc.psCharStrings import T2CharString
+from fontTools.pens.cu2quPen import Cu2QuPen
 from fontTools.pens.qu2cuPen import Qu2CuPen
 from fontTools.pens.t2CharStringPen import T2CharStringPen
+from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 
 from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
+from foundrytools_cli_2.lib.skia.skia_tools import simplify_path
 from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
 
 __all__ = ["quadratics_to_cubics", "get_t2_charstrings"]
 
 
-def quadratics_to_cubics(font: TTFont, tolerance: float = 1.0) -> t.Dict[str, T2CharString]:
+def skia_path_from_charstring(charstring: T2CharString) -> pathops.Path:
     """
-    Get CFF charstrings using Qu2CuPen, falling back to T2CharStringPen if Qu2CuPen fails.
-
-    Args:
-        font (TTFont): The TTFont object.
-        tolerance (float, optional): The tolerance for the conversion. Defaults to 1.0.
-
-    Returns:
-        dict: The T2 charstrings.
+    Get a Skia path from a T2CharString.
     """
-
-    charstrings: t.Dict = {}
-    try:
-        tolerance = tolerance / 1000 * font["head"].unitsPerEm
-        failed, charstrings = get_qu2cu_charstrings(font, tolerance=tolerance)
-
-        if len(failed) > 0:
-            logger.info(f"Retrying to get {len(failed)} charstrings...")
-            fallback_charstrings = get_fallback_charstrings(font, tolerance=tolerance)
-
-            for c in failed:
-                try:
-                    charstrings[c] = fallback_charstrings[c]
-                    logger.info(f"Successfully got charstring for {c}")
-                except Exception as e:  # pylint: disable=broad-except
-                    logger.error(f"Failed to get charstring for {c}: {e}")
-
-    except Exception as e:  # pylint: disable=broad-except
-        logger.error(f"Failed to get charstrings: {e}")
-
-    return charstrings
+    path = pathops.Path()
+    path_pen = path.getPen(glyphSet=None)
+    charstring.draw(path_pen)
+    return path
 
 
-def get_qu2cu_charstrings(
-    font: TTFont, tolerance: float = 1.0
-) -> t.Tuple[t.List[str], t.Dict[str, T2CharString]]:
+def charstring_from_skia_path(path: pathops.Path, width: int) -> T2CharString:
+    """
+    Get a T2CharString from a Skia path.
+    """
+    t2_pen = T2CharStringPen(width=width, glyphSet=None)
+    path.draw(t2_pen)
+    return t2_pen.getCharString()
+
+
+def quadratics_to_cubics(
+    font: TTFont, tolerance: float = 1.0, correct_contours: bool = True
+) -> t.Dict[str, T2CharString]:
     """
     Get CFF charstrings using Qu2CuPen
 
     Args:
         font (TTFont): The TTFont object.
         tolerance (float, optional): The tolerance for the conversion. Defaults to 1.0.
+        correct_contours (bool, optional): Whether to correct the contours with pathops. Defaults to
+            False.
 
     Returns:
         tuple: A tuple containing the list of failed glyphs and the T2 charstrings.
     """
 
     qu2cu_charstrings = {}
-    failed = []
     glyph_set = font.getGlyphSet()
 
     for k, v in glyph_set.items():
-        t2_pen = T2CharStringPen(v.width, glyphSet=glyph_set)
-        qu2cu_pen = Qu2CuPen(t2_pen, max_err=tolerance, all_cubic=True, reverse_direction=True)
+        width = v.width
+
         try:
+            t2_pen = T2CharStringPen(width=width, glyphSet={k: v})
+            qu2cu_pen = Qu2CuPen(t2_pen, max_err=tolerance, all_cubic=True, reverse_direction=True)
             glyph_set[k].draw(qu2cu_pen)
             qu2cu_charstrings[k] = t2_pen.getCharString()
-        except NotImplementedError as e:
-            logger.error(f"Failed to get charstring for {k}: {e}")
-            failed.append(k)
 
-    return failed, qu2cu_charstrings
+        except NotImplementedError as e:
+            temp_t2_pen = T2CharStringPen(width=width, glyphSet=None)
+            glyph_set[k].draw(temp_t2_pen)
+            t2_charstring = temp_t2_pen.getCharString()
+
+            tt_pen = TTGlyphPen(glyphSet=None)
+            cu2qu_pen = Cu2QuPen(other_pen=tt_pen, max_err=tolerance, reverse_direction=False)
+            t2_charstring.draw(cu2qu_pen)
+            tt_glyph = tt_pen.glyph()
+
+            t2_pen = T2CharStringPen(width=width, glyphSet=None)
+            qu2cu_pen = Qu2CuPen(t2_pen, max_err=tolerance, all_cubic=True, reverse_direction=True)
+            tt_glyph.draw(pen=qu2cu_pen, glyfTable=None)
+            logger.info(f"{e}. Successfully got charstring for {k} at second attempt")
+
+        charstring = t2_pen.getCharString()
+
+        if correct_contours:
+            charstring.private = PrivateDict()
+            path = skia_path_from_charstring(charstring)
+            simplified_path = simplify_path(path, glyph_name=k, clockwise=False)
+            charstring = charstring_from_skia_path(path=simplified_path, width=width)
+
+        qu2cu_charstrings[k] = charstring
+
+    return qu2cu_charstrings
 
 
 def get_t2_charstrings(font: TTFont) -> t.Dict[str, T2CharString]:
@@ -115,5 +130,5 @@ def get_fallback_charstrings(font: TTFont, tolerance: float = 1.0) -> t.Dict[str
     t2_charstrings = get_t2_charstrings(font=temp_font)
     build_otf(font=temp_font, charstrings_dict=t2_charstrings)
     build_ttf(font=temp_font, max_err=tolerance, reverse_direction=False)
-    _, fallback_charstrings = get_qu2cu_charstrings(temp_font, tolerance=tolerance)
+    fallback_charstrings = quadratics_to_cubics(temp_font, tolerance=tolerance)
     return fallback_charstrings

@@ -40,9 +40,9 @@ def ttf2otf(
     font: Font,
     tolerance: float = 1.0,
     target_upm: t.Optional[int] = None,
+    correct_contours: bool = True,
     subroutinize: bool = True,
     output_dir: t.Optional[Path] = None,
-    recalc_timestamp: bool = False,
     overwrite: bool = True,
 ) -> None:
     """
@@ -54,11 +54,11 @@ def ttf2otf(
             Defaults to 1.0.
         target_upm (t.Optional[int], optional): The target UPM to scale the font to. Defaults to
             ``None``.
+        correct_contours (bool, optional): Whether to correct the contours with pathops. Defaults to
+            ``True``.
         subroutinize (bool, optional): Whether to subroutinize the font. Defaults to ``True``.
         output_dir (t.Optional[Path], optional): The output directory. If ``None``, the output file
             will be saved in the same directory as the input file. Defaults to ``None``.
-        recalc_timestamp (bool, optional): Whether to recalculate the font's timestamp. Defaults to
-            ``False``.
         overwrite (bool, optional): Whether to overwrite the output file if it already exists.
             Defaults to ``True``.
     """
@@ -75,13 +75,7 @@ def ttf2otf(
         font.tt_scale_upem(target_upm=target_upm)
 
     logger.info("Converting to OTF...")
-    font.to_otf(tolerance=tolerance)
-
-    font.save(out_file, reorder_tables=None)
-    font = Font(out_file, recalc_timestamp=recalc_timestamp)
-
-    logger.info("Correcting contours...")
-    font.ps_correct_contours()
+    font.to_otf(tolerance=tolerance, correct_contours=correct_contours)
 
     os_2_table = OS2Table(font.ttfont)
     os_2_table.recalc_avg_char_width()

@@ -288,6 +288,23 @@ def subroutinize_flag() -> t.Callable:
     return add_options(_subroutinize_flag)
 
 
+def correct_contours_flag() -> t.Callable:
+    """
+    Add the ``correct_contours`` option to a click command.
+
+    Returns:
+        t.Callable: A decorator that adds the ``correct_contours`` option to a click command
+    """
+    _correct_contours_flag = [
+        click.option(
+            "--correct-contours/--no-correct-contours",
+            default=True,
+            help="Correct the contours with pathops.",
+        )
+    ]
+    return add_options(_correct_contours_flag)
+
+
 def min_area_option() -> t.Callable:
     """
     Add the ``min_area`` option to a click command.
