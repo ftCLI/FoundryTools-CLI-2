@@ -68,6 +68,13 @@ class HheaTable(DefaultTbl):
         """
         return self.table.advanceWidthMax
 
+    @advance_width_max.setter
+    def advance_width_max(self, value: int) -> None:
+        """
+        Sets the advanceWidthMax field of the 'hhea' table.
+        """
+        self.table.advanceWidthMax = value
+
     @property
     def min_left_side_bearing(self) -> int:
         """

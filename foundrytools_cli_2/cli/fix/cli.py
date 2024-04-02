@@ -63,3 +63,62 @@ def fix_empty_notdef(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     runner = FontRunner(input_path=input_path, task=task, **options)
     runner.run()
+
+
+@cli.command("monospace")
+@base_options()
+def fix_monospace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Fix metadata in monospaced fonts
+
+    fontbakery check id: com.google.fonts/check/monospace
+
+    Rationale:
+
+    There are various metadata in the OpenType spec to specify if a font is monospaced or not. If
+        the font is not truly monospaced, then no monospaced metadata should be set (as sometimes
+        they mistakenly are...)
+
+    Requirements for monospace fonts:
+
+    * ``post.isFixedPitch`` - "Set to 0 if the font is proportionally spaced, non-zero if the font
+    is not proportionally paced (monospaced)" (https://www.microsoft.com/typography/otspec/post.htm)
+
+    * ``hhea.advanceWidthMax`` must be correct, meaning no glyph's width value is greater.
+    (https://www.microsoft.com/typography/otspec/hhea.htm)
+
+    * ``OS/2.panose.bProportion`` must be set to 9 (monospace) on latin text fonts.
+
+    * ``OS/2.panose.bSpacing`` must be set to 3 (monospace) on latin handwritten or latin symbol
+    fonts.
+
+    * Spec says: "The PANOSE definition contains ten digits each of which currently describes up to
+    sixteen variations. Windows uses ``bFamilyType``, ``bSerifStyle`` and ``bProportion`` in the
+    font mapper to determine family type. It also uses ``bProportion`` to determine if the font is
+    monospaced."
+    (https://www.microsoft.com/typography/otspec/os2.htm#pan,
+    https://monotypecom-test.monotype.de/services/pan2)
+
+    * ``OS/2.xAvgCharWidth`` must be set accurately. "OS/2.xAvgCharWidth is used when rendering
+    monospaced fonts, at least by Windows GDI"
+    (https://typedrawers.com/discussion/comment/15397/#Comment_15397)
+
+    * ``CFF.cff.TopDictIndex[0].isFixedPitch`` must be set to ``True`` for CFF fonts.
+
+    Fixing procedure:
+
+    If the font is monospaced, then:
+
+    * Set ``post.isFixedPitch`` to ``True`` (1)
+
+    * Correct the ``hhea.advanceWidthMax`` value
+
+    * Set the ``OS/2.panose.bProportion`` value to 9 or 3, according to the
+    ``OS/2.panose.bFamilyType`` value
+
+    * Set ``CFF.cff.TopDictIndex[0].isFixedPitch`` to ``True`` for CFF fonts
+    """
+    from foundrytools_cli_2.cli.fix.snippets.monospace import main as task
+
+    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner.run()
