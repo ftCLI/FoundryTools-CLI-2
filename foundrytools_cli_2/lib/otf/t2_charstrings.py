@@ -69,6 +69,7 @@ def quadratics_to_cubics(
             temp_t2_pen = T2CharStringPen(width=width, glyphSet=None)
             glyph_set[k].draw(temp_t2_pen)
             t2_charstring = temp_t2_pen.getCharString()
+            t2_charstring.private = PrivateDict()
 
             tt_pen = TTGlyphPen(glyphSet=None)
             cu2qu_pen = Cu2QuPen(other_pen=tt_pen, max_err=tolerance, reverse_direction=False)
