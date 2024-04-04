@@ -1,6 +1,6 @@
 from fontTools.ttLib import TTFont
 
-from foundrytools_cli_2.lib.constants import POST_TABLE_TAG
+from foundrytools_cli_2.lib.constants import T_POST
 from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
 
 
@@ -13,7 +13,7 @@ class PostTable(DefaultTbl):
         """
         Initializes the ``post`` table handler.
         """
-        super().__init__(ttfont=ttfont, table_tag=POST_TABLE_TAG)
+        super().__init__(ttfont=ttfont, table_tag=T_POST)
 
     @property
     def italic_angle(self) -> float:

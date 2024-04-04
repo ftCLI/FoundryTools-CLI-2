@@ -20,20 +20,23 @@ MIN_US_WIDTH_CLASS = 1
 MAX_US_WIDTH_CLASS = 9
 
 # Table tags
-CFF_TABLE_TAG = "CFF "
-CMAP_TABLE_TAG = "cmap"
-CVAR_TABLE_TAG = "cvar"
-FVAR_TABLE_TAG = "fvar"
-GDEF_TABLE_TAG = "GDEF"
-GLYF_TABLE_TAG = "glyf"
-GSUB_TABLE_TAG = "GSUB"
-HEAD_TABLE_TAG = "head"
-HHEA_TABLE_TAG = "hhea"
-HMTX_TABLE_TAG = "hmtx"
-NAME_TABLE_TAG = "name"
-OS_2_TABLE_TAG = "OS/2"
-POST_TABLE_TAG = "post"
-STAT_TABLE_TAG = "STAT"
+T_CFF = "CFF "
+T_CMAP = "cmap"
+T_CVAR = "cvar"
+T_FVAR = "fvar"
+T_GDEF = "GDEF"
+T_GLYF = "glyf"
+T_GSUB = "GSUB"
+T_HEAD = "head"
+T_HHEA = "hhea"
+T_HMTX = "hmtx"
+T_LOCA = "loca"
+T_MAXP = "maxp"
+T_NAME = "name"
+T_OS_2 = "OS/2"
+T_POST = "post"
+T_STAT = "STAT"
+T_VORG = "VORG"
 
 
 @dataclass

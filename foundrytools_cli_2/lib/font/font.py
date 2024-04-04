@@ -13,13 +13,13 @@ from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import Axis, NamedInstance
 
 from foundrytools_cli_2.lib.constants import (
-    FVAR_TABLE_TAG,
-    GLYF_TABLE_TAG,
-    HEAD_TABLE_TAG,
     MAX_UPM,
     MIN_UPM,
     OTF_EXTENSION,
     PS_SFNT_VERSION,
+    T_FVAR,
+    T_GLYF,
+    T_HEAD,
     TT_SFNT_VERSION,
     TTF_EXTENSION,
     WOFF2_EXTENSION,
@@ -273,7 +273,7 @@ class Font:  # pylint: disable=too-many-public-methods
         Returns:
             ``True`` if the font is a static font, ``False`` otherwise.
         """
-        return self.ttfont.get(FVAR_TABLE_TAG) is None
+        return self.ttfont.get(T_FVAR) is None
 
     @property
     def is_variable(self) -> bool:
@@ -283,7 +283,7 @@ class Font:  # pylint: disable=too-many-public-methods
         Returns:
             ``True`` if the font is a variable font, ``False`` otherwise.
         """
-        return self.ttfont.get(FVAR_TABLE_TAG) is not None
+        return self.ttfont.get(T_FVAR) is not None
 
     @property
     def is_italic(self) -> bool:
@@ -538,7 +538,7 @@ class Font:  # pylint: disable=too-many-public-methods
         if not self.is_variable:
             raise NotImplementedError("Not a variable font.")
 
-        return [axis for axis in self.ttfont[FVAR_TABLE_TAG].axes if axis.flags == 0]
+        return [axis for axis in self.ttfont[T_FVAR].axes if axis.flags == 0]
 
     def get_instances(self) -> t.List[NamedInstance]:
         """
@@ -550,7 +550,7 @@ class Font:  # pylint: disable=too-many-public-methods
         if not self.is_variable:
             raise NotImplementedError("Not a variable font.")
 
-        return self.ttfont[FVAR_TABLE_TAG].instances
+        return self.ttfont[T_FVAR].instances
 
     def to_woff(self) -> None:
         """
@@ -646,7 +646,7 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError("Decomponentization is only supported for TrueType fonts.")
 
         glyph_set = self.ttfont.getGlyphSet()
-        glyf_table = self.ttfont[GLYF_TABLE_TAG]
+        glyf_table = self.ttfont[T_GLYF]
         dr_pen = DecomposingRecordingPen(glyph_set)
         tt_pen = TTGlyphPen(None)
 
@@ -675,7 +675,7 @@ class Font:  # pylint: disable=too-many-public-methods
         if target_upm < MIN_UPM or target_upm > MAX_UPM:
             raise ValueError(f"units_per_em must be in the range {MAX_UPM} to {MAX_UPM}.")
 
-        if self.ttfont[HEAD_TABLE_TAG].unitsPerEm == target_upm:
+        if self.ttfont[T_HEAD].unitsPerEm == target_upm:
             raise ValueError(f"Font already has {target_upm} units per em. No need to scale upem.")
 
         scale_upem(self.ttfont, new_upem=target_upm)

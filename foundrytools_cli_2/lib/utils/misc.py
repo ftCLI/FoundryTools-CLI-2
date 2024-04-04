@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.ttLib import TTFont
 
-from foundrytools_cli_2.lib.constants import GDEF_TABLE_TAG, HMTX_TABLE_TAG
+from foundrytools_cli_2.lib.constants import T_GDEF, T_HMTX
 
 
 @contextmanager
@@ -68,7 +68,7 @@ def get_glyph_metrics_stats(font: TTFont) -> t.Dict[str, t.Union[bool, int]]:
     width, otherwise all glyphs of printable characters must have one of
     two widths or be zero-width.
     """
-    glyph_metrics = font[HMTX_TABLE_TAG].metrics
+    glyph_metrics = font[T_HMTX].metrics
     # NOTE: `range(a, b)` includes `a` and does not include `b`.
     #       Here we don't include 0-31 as well as 127
     #       because these are control characters.
@@ -95,7 +95,7 @@ def get_glyph_metrics_stats(font: TTFont) -> t.Dict[str, t.Union[bool, int]]:
             if unicodedata.category(chr(value)).startswith(("L", "M", "N", "P", "S", "Zs")):
                 relevant_glyph_names.add(name)
         # Remove character glyphs that are mark glyphs.
-        gdef = font.get(GDEF_TABLE_TAG)
+        gdef = font.get(T_GDEF)
         if gdef and gdef.table.GlyphClassDef:
             marks = {name for name, c in gdef.table.GlyphClassDef.classDefs.items() if c == 3}
             relevant_glyph_names.difference_update(marks)
