@@ -7,11 +7,11 @@ from fontTools.ttLib.tables._g_l_y_f import Glyph
 from fontTools.ttLib.ttGlyphSet import _TTGlyphSetCFF, _TTGlyphSetGlyf
 
 from foundrytools_cli_2.lib.constants import (
-    CFF_TABLE_TAG,
-    GLYF_TABLE_TAG,
-    HEAD_TABLE_TAG,
-    HMTX_TABLE_TAG,
-    OS_2_TABLE_TAG,
+    T_CFF,
+    T_GLYF,
+    T_HEAD,
+    T_HMTX,
+    T_OS_2,
 )
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.skia.skia_tools import is_empty_glyph
@@ -112,11 +112,11 @@ def fix_notdef_empty(font: Font) -> None:
     if not is_empty_glyph(glyph_set=glyph_set, glyph_name=NOTDEF):
         return
 
-    width = round(font.ttfont[HEAD_TABLE_TAG].unitsPerEm / 1000 * WIDTH_CONSTANT)
+    width = round(font.ttfont[T_HEAD].unitsPerEm / 1000 * WIDTH_CONSTANT)
     # The sCapHeight attribute is defined in the OS/2 version 2 and later. If the attribute is not
     # present, the height is calculated as a percentage of the width.
     try:
-        height = font.ttfont[OS_2_TABLE_TAG].sCapHeight
+        height = font.ttfont[T_OS_2].sCapHeight
     except AttributeError:
         height = round(width * HEIGHT_CONSTANT)
     thickness = round(width / THICKNESS_CONSTANT)
@@ -125,14 +125,14 @@ def fix_notdef_empty(font: Font) -> None:
         charstring = draw_empty_notdef_cff(
             glyph_set=glyph_set, width=width, height=height, thickness=thickness
         )
-        charstrings = font.ttfont[CFF_TABLE_TAG].cff.topDictIndex[0].CharStrings
+        charstrings = font.ttfont[T_CFF].cff.topDictIndex[0].CharStrings
         charstrings[NOTDEF].bytecode = charstring.bytecode
 
     if isinstance(glyph_set, _TTGlyphSetGlyf):
         glyf_glyph = draw_empty_notdef_glyf(
             glyph_set=glyph_set, width=width, height=height, thickness=thickness
         )
-        font.ttfont[GLYF_TABLE_TAG][NOTDEF] = glyf_glyph
+        font.ttfont[T_GLYF][NOTDEF] = glyf_glyph
 
-    font.ttfont[HMTX_TABLE_TAG][NOTDEF] = (width, 0)
+    font.ttfont[T_HMTX][NOTDEF] = (width, 0)
     font.modified = True

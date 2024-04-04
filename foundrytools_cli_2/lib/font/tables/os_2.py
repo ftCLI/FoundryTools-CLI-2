@@ -10,7 +10,7 @@ from foundrytools_cli_2.lib.constants import (
     MAX_US_WIDTH_CLASS,
     MIN_US_WEIGHT_CLASS,
     MIN_US_WIDTH_CLASS,
-    OS_2_TABLE_TAG,
+    T_OS_2,
 )
 from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
 from foundrytools_cli_2.lib.utils.bits_tools import is_nth_bit_set
@@ -215,7 +215,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         Initializes the ``OS/2`` table handler.
         """
-        super().__init__(ttfont=ttfont, table_tag=OS_2_TABLE_TAG)
+        super().__init__(ttfont=ttfont, table_tag=T_OS_2)
         self.fs_selection = FsSelection(os_2_table=self)
 
     class InvalidOS2VersionError(Exception):

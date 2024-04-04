@@ -8,10 +8,10 @@ from fontTools.varLib.instancer import OverlapMode, instantiateVariableFont
 from pathvalidate import sanitize_filename
 
 from foundrytools_cli_2.lib.constants import (
-    CVAR_TABLE_TAG,
-    GSUB_TABLE_TAG,
-    NAME_TABLE_TAG,
-    STAT_TABLE_TAG,
+    T_CVAR,
+    T_GSUB,
+    T_NAME,
+    T_STAT,
 )
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font.tables import NameTable
@@ -30,7 +30,7 @@ def get_instance_file_name(font: Font, instance: NamedInstance) -> str:
         str: The file name of the instance.
     """
 
-    name_table = font.ttfont[NAME_TABLE_TAG]
+    name_table = font.ttfont[T_NAME]
 
     if hasattr(instance, "postscriptNameID") and instance.postscriptNameID < 65535:
         instance_file_name = name_table.getDebugName(instance.postscriptNameID)
@@ -64,11 +64,11 @@ def check_update_name_table(variable_font: Font) -> bool:
         bool: ``True`` if the name table can be updated, otherwise ``False``.
     """
 
-    if STAT_TABLE_TAG not in variable_font.ttfont:
+    if T_STAT not in variable_font.ttfont:
         logger.warning("The name table cannot be updated: There is no STAT table.")
         return False
 
-    stat_table = variable_font.ttfont[STAT_TABLE_TAG].table
+    stat_table = variable_font.ttfont[T_STAT].table
     if not stat_table.AxisValueArray:
         logger.warning("The name table cannot be updated: There are no STAT Axis Values.")
         return False
@@ -123,10 +123,10 @@ def get_ui_name_ids(font: TTFont) -> list:
         list: A list of UI name IDs.
     """
 
-    if GSUB_TABLE_TAG not in font:
+    if T_GSUB not in font:
         return []
     ui_name_ids = []
-    for record in font[GSUB_TABLE_TAG].table.FeatureList.FeatureRecord:
+    for record in font[T_GSUB].table.FeatureList.FeatureRecord:
         if record.Feature.FeatureParams:
             ui_name_ids.append(record.Feature.FeatureParams.UINameID)
     return sorted(set(ui_name_ids))
@@ -140,19 +140,19 @@ def reorder_ui_name_ids(font: TTFont) -> None:
         font (TTFont): The font object.
     """
 
-    if GSUB_TABLE_TAG not in font:
+    if T_GSUB not in font:
         return
 
     ui_name_ids = get_ui_name_ids(font=font)
     if not ui_name_ids:
         return
 
-    name_table = font[NAME_TABLE_TAG]
+    name_table = font[T_NAME]
     for count, value in enumerate(ui_name_ids, start=256):
         for n in name_table.names:
             if n.nameID == value:
                 n.nameID = count
-        for record in font[GSUB_TABLE_TAG].table.FeatureList.FeatureRecord:
+        for record in font[T_GSUB].table.FeatureList.FeatureRecord:
             if record.Feature.FeatureParams and record.Feature.FeatureParams.UINameID == value:
                 record.Feature.FeatureParams.UINameID = count
 
@@ -166,10 +166,10 @@ def post_process_static_instance(static_instance: TTFont) -> None:
         static_instance (TTFont): The static instance.
     """
 
-    if STAT_TABLE_TAG in static_instance:
-        del static_instance[STAT_TABLE_TAG]
-    if CVAR_TABLE_TAG in static_instance:
-        del static_instance[CVAR_TABLE_TAG]
+    if T_STAT in static_instance:
+        del static_instance[T_STAT]
+    if T_CVAR in static_instance:
+        del static_instance[T_CVAR]
 
     name_table = NameTable(ttfont=static_instance)
     name_table.remove_unused_names()

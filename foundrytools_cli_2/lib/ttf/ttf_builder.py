@@ -9,13 +9,16 @@ from fontTools.ttLib.tables._g_l_y_f import (
 )
 from fontTools.ttLib.ttGlyphSet import _TTGlyphCFF
 
-T_CFF = "CFF "
-T_LOCA = "loca"
-T_GLYF = "glyf"
-T_MAXP = "maxp"
-T_POST = "post"
-T_HMTX = "hmtx"
-T_VORG = "VORG"
+from foundrytools_cli_2.lib.constants import (
+    T_CFF,
+    T_GLYF,
+    T_HMTX,
+    T_LOCA,
+    T_MAXP,
+    T_POST,
+    T_VORG,
+)
+
 MAXP_TABLE_VERSION = 0x00010000
 
 

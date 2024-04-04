@@ -5,10 +5,10 @@ from fontTools.misc.psCharStrings import T2CharString
 from fontTools.ttLib import TTFont
 
 from foundrytools_cli_2.lib.constants import (
-    CFF_TABLE_TAG,
-    HEAD_TABLE_TAG,
-    NAME_TABLE_TAG,
-    POST_TABLE_TAG,
+    T_CFF,
+    T_HEAD,
+    T_NAME,
+    T_POST,
 )
 
 
@@ -78,10 +78,10 @@ def get_ps_name(font: TTFont) -> str:
     Returns:
         str: The PostScript name of the font.
     """
-    if CFF_TABLE_TAG not in font:
-        return font[NAME_TABLE_TAG].getDebugName(6)
+    if T_CFF not in font:
+        return font[T_NAME].getDebugName(6)
 
-    cff_table = font[CFF_TABLE_TAG]
+    cff_table = font[T_CFF]
     return cff_table.cff.fontNames[0]
 
 
@@ -96,10 +96,10 @@ def get_font_info_dict(font: TTFont) -> t.Dict[str, t.Any]:
         dict: The font info.
     """
 
-    if CFF_TABLE_TAG not in font:
+    if T_CFF not in font:
         return build_font_info_dict(font)
 
-    cff_table = font[CFF_TABLE_TAG]
+    cff_table = font[T_CFF]
     return {
         key: value
         for key, value in cff_table.cff.topDictIndex[0].rawDict.items()
@@ -118,12 +118,12 @@ def build_font_info_dict(font: TTFont) -> t.Dict[str, t.Any]:
         dict: The CFF topDict.
     """
 
-    font_revision = str(round(font[HEAD_TABLE_TAG].fontRevision, 3)).split(".")
+    font_revision = str(round(font[T_HEAD].fontRevision, 3)).split(".")
     major_version = str(font_revision[0])
     minor_version = str(font_revision[1]).ljust(3, "0")
 
-    name_table = font[NAME_TABLE_TAG]
-    post_table = font[POST_TABLE_TAG]
+    name_table = font[T_NAME]
+    post_table = font[T_POST]
     cff_font_info = {
         "version": ".".join([major_version, str(int(minor_version))]),
         "FullName": name_table.getBestFullName(),
@@ -147,10 +147,10 @@ def get_private_dict(font: TTFont) -> t.Dict[str, t.Any]:
     Returns:
         dict: The private dict.
     """
-    if CFF_TABLE_TAG not in font:
+    if T_CFF not in font:
         return {}
 
-    cff_table = font[CFF_TABLE_TAG]
+    cff_table = font[T_CFF]
     return {
         key: value
         for key, value in cff_table.cff.topDictIndex[0].Private.rawDict.items()
@@ -192,7 +192,7 @@ def get_post_values(font: TTFont) -> t.Dict[str, t.Any]:
     Returns:
         dict: The post table values.
     """
-    post_table = font[POST_TABLE_TAG]
+    post_table = font[T_POST]
     post_info = {
         "italicAngle": round(post_table.italicAngle),
         "underlinePosition": post_table.underlinePosition,

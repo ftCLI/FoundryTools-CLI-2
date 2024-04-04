@@ -3,7 +3,7 @@ from io import BytesIO
 from fontTools.ttLib import TTFont
 from ttfautohint import ttfautohint
 
-from foundrytools_cli_2.lib.constants import HEAD_TABLE_TAG
+from foundrytools_cli_2.lib.constants import T_HEAD
 from foundrytools_cli_2.lib.font import Font
 
 
@@ -25,6 +25,6 @@ def ttf_autohint(font: Font) -> None:
         data = ttfautohint(in_buffer=buffer.getvalue(), no_info=True)
         hinted_font = TTFont(BytesIO(data), recalcTimestamp=False)
         hinted_font.flavor = flavor
-        hinted_font[HEAD_TABLE_TAG].modified = font.ttfont[HEAD_TABLE_TAG].modified
+        hinted_font[T_HEAD].modified = font.ttfont[T_HEAD].modified
         font.ttfont = hinted_font
         font.modified = True

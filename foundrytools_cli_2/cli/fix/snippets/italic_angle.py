@@ -3,7 +3,7 @@ import typing as t
 from fontTools.misc.roundTools import otRound
 
 from foundrytools_cli_2.lib import logger
-from foundrytools_cli_2.lib.constants import OS_2_TABLE_TAG
+from foundrytools_cli_2.lib.constants import T_OS_2
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font.tables import CFFTable, HheaTable, PostTable
 
@@ -174,5 +174,5 @@ def main(font: Font, min_slant: float = 2.0, mode: int = 1) -> None:
     if font.is_ps:
         check_cff_table(font=font, calculated_italic_angle=calculated_italic_angle)
     check_italic_bits(font=font, calculated_italic_angle=calculated_italic_angle, mode=mode)
-    if font.ttfont[OS_2_TABLE_TAG].version >= 4:
+    if font.ttfont[T_OS_2].version >= 4:
         check_oblique_bit(font=font, calculated_italic_angle=calculated_italic_angle, mode=mode)

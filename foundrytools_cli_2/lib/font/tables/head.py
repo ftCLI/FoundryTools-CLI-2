@@ -1,7 +1,7 @@
 from fontTools.misc.textTools import num2binary
 from fontTools.ttLib import TTFont
 
-from foundrytools_cli_2.lib.constants import HEAD_TABLE_TAG
+from foundrytools_cli_2.lib.constants import T_HEAD
 from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
 from foundrytools_cli_2.lib.utils.bits_tools import is_nth_bit_set
 
@@ -66,5 +66,5 @@ class HeadTable(DefaultTbl):
         Returns:
             None
         """
-        super().__init__(ttfont=ttfont, table_tag=HEAD_TABLE_TAG)
+        super().__init__(ttfont=ttfont, table_tag=T_HEAD)
         self.mac_style = MacStyle(head_table=self)

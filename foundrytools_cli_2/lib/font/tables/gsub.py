@@ -1,6 +1,6 @@
 from fontTools.ttLib import TTFont
 
-from foundrytools_cli_2.lib.constants import GSUB_TABLE_TAG
+from foundrytools_cli_2.lib.constants import T_GSUB
 from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
 
 
@@ -13,7 +13,7 @@ class GsubTable(DefaultTbl):  # pylint: disable=too-few-public-methods
         """
         Initializes the ``GSUB`` table handler.
         """
-        super().__init__(ttfont=ttfont, table_tag=GSUB_TABLE_TAG)
+        super().__init__(ttfont=ttfont, table_tag=T_GSUB)
 
     def rename_feature(self, feature_tag: str, new_feature_tag: str) -> None:
         """

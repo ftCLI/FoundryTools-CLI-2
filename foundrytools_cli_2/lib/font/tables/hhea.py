@@ -4,7 +4,7 @@ import typing as t
 from fontTools.misc.roundTools import otRound
 from fontTools.ttLib import TTFont
 
-from foundrytools_cli_2.lib.constants import HEAD_TABLE_TAG, HHEA_TABLE_TAG, POST_TABLE_TAG
+from foundrytools_cli_2.lib.constants import T_HEAD, T_HHEA, T_POST
 from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
 
 
@@ -17,7 +17,7 @@ class HheaTable(DefaultTbl):
         """
         Initializes the ``hhea`` table handler.
         """
-        super().__init__(ttfont=ttfont, table_tag=HHEA_TABLE_TAG)
+        super().__init__(ttfont=ttfont, table_tag=T_HHEA)
 
     @property
     def ascent(self) -> int:
@@ -180,11 +180,11 @@ class HheaTable(DefaultTbl):
         """
 
         if italic_angle is None:
-            italic_angle = self.ttfont[POST_TABLE_TAG].italicAngle
+            italic_angle = self.ttfont[T_POST].italicAngle
 
         if italic_angle == 0:
             return 1
-        return self.ttfont[HEAD_TABLE_TAG].unitsPerEm
+        return self.ttfont[T_HEAD].unitsPerEm
 
     def calculate_caret_slope_run(
         self, italic_angle: t.Optional[t.Union[int, float]] = None
@@ -201,11 +201,11 @@ class HheaTable(DefaultTbl):
         """
 
         if italic_angle is None:
-            italic_angle = self.ttfont[POST_TABLE_TAG].italicAngle
+            italic_angle = self.ttfont[T_POST].italicAngle
 
         if italic_angle == 0:
             return 0
         return otRound(
-            math.tan(math.radians(-self.ttfont[POST_TABLE_TAG].italicAngle))
-            * self.ttfont[HEAD_TABLE_TAG].unitsPerEm
+            math.tan(math.radians(-self.ttfont[T_POST].italicAngle))
+            * self.ttfont[T_HEAD].unitsPerEm
         )
