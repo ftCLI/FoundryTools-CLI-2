@@ -122,3 +122,18 @@ def add_extremes(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.filter.filter_out_tt = True
     runner.filter.filter_out_variable = True
     runner.run()
+
+
+@cli.command("round-coordinates")
+@base_options()
+@subroutinize_flag()
+def round_coordinates(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Round the coordinates of OpenType-PS fonts.
+    """
+    from foundrytools_cli_2.cli.otf.snippets.round_coordinates import main as task
+
+    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner.filter.filter_out_tt = True
+    runner.filter.filter_out_variable = True
+    runner.run()
