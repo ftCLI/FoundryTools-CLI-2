@@ -66,6 +66,7 @@ def fix_contours(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     runner = FontRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_ps = True
+    runner.filter.filter_out_variable = True
     runner.run()
 
 
