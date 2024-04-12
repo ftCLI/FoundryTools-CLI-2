@@ -68,3 +68,108 @@ class HeadTable(DefaultTbl):
         """
         super().__init__(ttfont=ttfont, table_tag=T_HEAD)
         self.mac_style = MacStyle(head_table=self)
+
+    @property
+    def font_revision(self) -> float:
+        """
+        Returns the font revision value.
+        """
+        return self.table.fontRevision
+
+    @font_revision.setter
+    def font_revision(self, value: float) -> None:
+        """
+        Sets the font revision value.
+        """
+        self.table.fontRevision = value
+
+    @property
+    def units_per_em(self) -> int:
+        """
+        Returns the units per em value.
+        """
+        return self.table.unitsPerEm
+
+    @property
+    def created_timestamp(self) -> int:
+        """
+        Returns the created value.
+        """
+        return self.table.created_timestamp
+
+    @created_timestamp.setter
+    def created_timestamp(self, value: int) -> None:
+        """
+        Sets the created value.
+        """
+        self.table.created_timestamp = value
+
+    @property
+    def modified_timestamp(self) -> bool:
+        """
+        Returns the modified value.
+        """
+        return self.table.modified
+
+    @modified_timestamp.setter
+    def modified_timestamp(self, value: int) -> None:
+        """
+        Sets the modified value.
+        """
+        self.table.modified = value
+
+    @property
+    def x_min(self) -> int:
+        """
+        Returns the xMin value.
+        """
+        return self.table.xMin
+
+    @x_min.setter
+    def x_min(self, value: int) -> None:
+        """
+        Sets the xMin value.
+        """
+        self.table.xMin = value
+
+    @property
+    def y_min(self) -> int:
+        """
+        Returns the yMin value.
+        """
+        return self.table.yMin
+
+    @y_min.setter
+    def y_min(self, value: int) -> None:
+        """
+        Sets the yMin value.
+        """
+        self.table.yMin = value
+
+    @property
+    def x_max(self) -> int:
+        """
+        Returns the xMax value.
+        """
+        return self.table.xMax
+
+    @x_max.setter
+    def x_max(self, value: int) -> None:
+        """
+        Sets the xMax value.
+        """
+        self.table.xMax = value
+
+    @property
+    def y_max(self) -> int:
+        """
+        Returns the yMax value.
+        """
+        return self.table.yMax
+
+    @y_max.setter
+    def y_max(self, value: int) -> None:
+        """
+        Sets the yMax value.
+        """
+        self.table.yMax = value
