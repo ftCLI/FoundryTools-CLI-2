@@ -1,4 +1,4 @@
-from fontTools.cffLib import TopDict, CharStrings, PrivateDict
+from fontTools.cffLib import CharStrings, PrivateDict, TopDict
 from fontTools.misc.psCharStrings import T2CharString
 from fontTools.ttLib import TTFont
 
