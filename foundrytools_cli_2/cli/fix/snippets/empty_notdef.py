@@ -1,19 +1,14 @@
-import typing as t
-
 from fontTools.misc.psCharStrings import T2CharString
+from fontTools.misc.roundTools import otRound
 from fontTools.pens.t2CharStringPen import T2CharStringPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib.tables._g_l_y_f import Glyph
-from fontTools.ttLib.ttGlyphSet import _TTGlyphSetCFF, _TTGlyphSetGlyf
 
 from foundrytools_cli_2.lib.constants import (
-    T_CFF,
-    T_GLYF,
-    T_HEAD,
     T_HMTX,
-    T_OS_2,
 )
 from foundrytools_cli_2.lib.font import Font
+from foundrytools_cli_2.lib.font.tables import CFFTable, GlyfTable, HeadTable, OS2Table
 from foundrytools_cli_2.lib.skia.skia_tools import is_empty_glyph
 
 NOTDEF = ".notdef"
@@ -22,14 +17,12 @@ HEIGHT_CONSTANT = 1.25
 THICKNESS_CONSTANT = 10
 
 
-def draw_empty_notdef_cff(
-    glyph_set: _TTGlyphSetCFF, width: int, height: int, thickness: int
-) -> T2CharString:
+def draw_empty_notdef_cff(font: Font, width: int, height: int, thickness: int) -> T2CharString:
     """
     Draws an empty .notdef glyph in a CFF font.
 
     Args:
-        glyph_set (_TTGlyphSetCFF): The glyph set to which the .notdef glyph belongs.
+        font (Font): The Font object.
         width (int): The width of the .notdef glyph.
         height (int): The height of the .notdef glyph.
         thickness (int): The thickness of the .notdef glyph.
@@ -38,8 +31,7 @@ def draw_empty_notdef_cff(
         T2CharString: The .notdef glyph charstring.
     """
 
-    pen = T2CharStringPen(width=width, glyphSet=glyph_set)
-    notdef_glyph = glyph_set[NOTDEF]
+    pen = T2CharStringPen(width=0, glyphSet=font.glyph_set)
 
     # Draw the outer contour (clockwise)
     pen.moveTo((0, 0))
@@ -55,20 +47,19 @@ def draw_empty_notdef_cff(
     pen.lineTo((width - thickness, thickness))
     pen.closePath()
 
-    notdef_glyph.draw(pen)
+    font.glyph_set[NOTDEF].draw(pen)
     charstring = pen.getCharString()
-    charstring.compile()
     return charstring
 
 
 def draw_empty_notdef_glyf(
-    glyph_set: t.Union[t.Dict[str, t.Any], _TTGlyphSetGlyf], width: int, height: int, thickness: int
+    font: Font, width: int, height: int, thickness: int
 ) -> Glyph:
     """
     Draws an empty .notdef glyph in a TTF font.
 
     Args:
-        glyph_set (_TTGlyphSetGlyf): The glyph set to which the .notdef glyph belongs.
+        font (Font): The Font object.
         width (int): The width of the .notdef glyph.
         height (int): The height of the .notdef glyph.
         thickness (int): The thickness of the .notdef glyph.
@@ -76,8 +67,10 @@ def draw_empty_notdef_glyf(
     Returns:
         Glyph: The .notdef glyph.
     """
-    pen = TTGlyphPen(glyphSet=glyph_set)
-    notdef_glyph = glyph_set[NOTDEF]
+
+    # Do not use font.glyph_set property here, as TTGlyphPen expects a dict[str, Any] object, not a
+    # _TTGlyphSet object
+    pen = TTGlyphPen(glyphSet=font.ttfont.getGlyphSet())
 
     # Draw the outer contour (clockwise)
     pen.moveTo((0, 0))
@@ -93,7 +86,7 @@ def draw_empty_notdef_glyf(
     pen.lineTo((thickness, height - thickness))
     pen.closePath()
 
-    notdef_glyph.draw(pen)
+    font.glyph_set[NOTDEF].draw(pen)
     return pen.glyph()
 
 
@@ -104,7 +97,7 @@ def fix_notdef_empty(font: Font) -> None:
     Args:
         font (Font): The Font object representing the font file.
     """
-    glyph_set = font.ttfont.getGlyphSet()
+    glyph_set = font.glyph_set
 
     if NOTDEF not in glyph_set:
         raise ValueError("Font does not contain a .notdef glyph")
@@ -112,27 +105,27 @@ def fix_notdef_empty(font: Font) -> None:
     if not is_empty_glyph(glyph_set=glyph_set, glyph_name=NOTDEF):
         return
 
-    width = round(font.ttfont[T_HEAD].unitsPerEm / 1000 * WIDTH_CONSTANT)
-    # The sCapHeight attribute is defined in the OS/2 version 2 and later. If the attribute is not
-    # present, the height is calculated as a percentage of the width.
-    try:
-        height = font.ttfont[T_OS_2].sCapHeight
-    except AttributeError:
-        height = round(width * HEIGHT_CONSTANT)
-    thickness = round(width / THICKNESS_CONSTANT)
+    os_2_table = OS2Table(ttfont=font.ttfont)
+    head_table = HeadTable(ttfont=font.ttfont)
+    height = os_2_table.cap_height or otRound(HEIGHT_CONSTANT * head_table.units_per_em)
+    width = otRound(head_table.units_per_em / 1000 * WIDTH_CONSTANT)
+    thickness = otRound(width / THICKNESS_CONSTANT)
 
-    if isinstance(glyph_set, _TTGlyphSetCFF):
+    if font.is_ps:
+        cff_table = CFFTable(ttfont=font.ttfont)
+        width = cff_table.private_dict.nominalWidthX
         charstring = draw_empty_notdef_cff(
-            glyph_set=glyph_set, width=width, height=height, thickness=thickness
+            font=font, width=width, height=height, thickness=thickness
         )
-        charstrings = font.ttfont[T_CFF].cff.topDictIndex[0].CharStrings
-        charstrings[NOTDEF].bytecode = charstring.bytecode
+        charstring.compile()
+        cff_table.charstrings[NOTDEF].setBytecode(charstring.bytecode)
 
-    if isinstance(glyph_set, _TTGlyphSetGlyf):
-        glyf_glyph = draw_empty_notdef_glyf(
-            glyph_set=glyph_set, width=width, height=height, thickness=thickness
+    if font.is_tt:
+        glyf_table = GlyfTable(ttfont=font.ttfont)
+        glyph = draw_empty_notdef_glyf(
+            font=font, width=width, height=height, thickness=thickness
         )
-        font.ttfont[T_GLYF][NOTDEF] = glyf_glyph
+        glyf_table.glyphs[NOTDEF] = glyph
 
     font.ttfont[T_HMTX][NOTDEF] = (width, 0)
     font.modified = True
