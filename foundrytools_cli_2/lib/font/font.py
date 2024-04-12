@@ -11,6 +11,7 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import Axis, NamedInstance
+from fontTools.ttLib.ttGlyphSet import _TTGlyphSet
 
 from foundrytools_cli_2.lib.constants import (
     MAX_UPM,
@@ -214,6 +215,16 @@ class Font:  # pylint: disable=too-many-public-methods
             value: A boolean indicating whether the font has been modified.
         """
         self._modified = value
+
+    @property
+    def glyph_set(self) -> _TTGlyphSet:
+        """
+        Get the glyph set of the font.
+
+        Returns:
+            The glyph set of the font.
+        """
+        return self.ttfont.getGlyphSet()
 
     @property
     def is_ps(self) -> bool:
