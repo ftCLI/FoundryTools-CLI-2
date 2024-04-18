@@ -27,7 +27,7 @@ def weight_class() -> t.Callable:
             "--weight-class",
             type=click.IntRange(1, 1000),
             help="""
-            The new usWeightClass value.
+            The new ``usWeightClass`` value.
 
             Indicates the visual weight (degree of blackness or thickness of strokes) of the
             characters in the font. Values from 1 to 1000 are valid.

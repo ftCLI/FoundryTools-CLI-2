@@ -276,7 +276,7 @@ def set_panose(font: Font, **kwargs: t.Dict[str, int]) -> None:
 
     Args:
         font: The Font object representing the font to modify.
-        panose: The PANOSE classification string.
+        kwargs: A dictionary containing the PANOSE classification values to set.
     """
 
     os_2_table = OS2Table(font.ttfont)
