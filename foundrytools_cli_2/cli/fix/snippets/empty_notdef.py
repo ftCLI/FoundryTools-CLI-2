@@ -33,14 +33,14 @@ def draw_empty_notdef_cff(font: Font, width: int, height: int, thickness: int) -
 
     pen = T2CharStringPen(width=0, glyphSet=font.glyph_set)
 
-    # Draw the outer contour (clockwise)
+    # Draw the outer contour (counterclockwise)
     pen.moveTo((0, 0))
     pen.lineTo((width, 0))
     pen.lineTo((width, height))
     pen.lineTo((0, height))
     pen.closePath()
 
-    # Draw the inner contour (counterclockwise)
+    # Draw the inner contour (clockwise)
     pen.moveTo((thickness, thickness))
     pen.lineTo((thickness, height - thickness))
     pen.lineTo((width - thickness, height - thickness))
@@ -72,7 +72,7 @@ def draw_empty_notdef_glyf(
     # _TTGlyphSet object
     pen = TTGlyphPen(glyphSet=font.ttfont.getGlyphSet())
 
-    # Draw the outer contour (clockwise)
+    # Draw the outer contour (counterclockwise)
     pen.moveTo((0, 0))
     pen.lineTo((0, height))
     pen.lineTo((width, height))
