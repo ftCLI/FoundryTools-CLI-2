@@ -40,7 +40,7 @@ T_STAT = "STAT"
 T_VORG = "VORG"
 
 
-class NameIDs(IntEnum):
+class NAME_IDS(IntEnum):
     """
     Name IDs for the name table.
     """
