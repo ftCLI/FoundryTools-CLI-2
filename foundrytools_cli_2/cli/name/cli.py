@@ -141,6 +141,18 @@ def build_unique_id(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
+@cli.command("build-full-font-name")
+@win_or_mac_platform_id()
+@base_options()
+def build_full_font_name(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Builds the NameID 4 (Full Font Name).
+    """
+
+    runner = FontRunner(input_path=input_path, task=Font.build_full_font_name, **options)
+    runner.run()
+
+
 @cli.command("build-version-string")
 @win_or_mac_platform_id()
 @base_options()
@@ -150,4 +162,16 @@ def build_version_string(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     """
 
     runner = FontRunner(input_path=input_path, task=Font.build_version_string, **options)
+    runner.run()
+
+
+@cli.command("build-postscript-name")
+@win_or_mac_platform_id()
+@base_options()
+def build_postscript_name(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Builds the NameID 6 (PostScript Name).
+    """
+
+    runner = FontRunner(input_path=input_path, task=Font.build_postscript_name, **options)
     runner.run()
