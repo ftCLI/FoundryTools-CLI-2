@@ -16,6 +16,7 @@ from fontTools.ttLib.ttGlyphSet import _TTGlyphSet
 from foundrytools_cli_2.lib.constants import (
     MAX_UPM,
     MIN_UPM,
+    NameIDs,
     OTF_EXTENSION,
     PS_SFNT_VERSION,
     T_FVAR,
@@ -28,7 +29,7 @@ from foundrytools_cli_2.lib.constants import (
     WOFF_EXTENSION,
     WOFF_FLAVOR,
 )
-from foundrytools_cli_2.lib.font.tables import HeadTable, OS2Table
+from foundrytools_cli_2.lib.font.tables import HeadTable, NameTable, OS2Table
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.otf.t2_charstrings import quadratics_to_cubics
 from foundrytools_cli_2.lib.skia.skia_tools import correct_contours_cff, correct_contours_glyf
@@ -770,3 +771,48 @@ class Font:  # pylint: disable=too-many-public-methods
         with restore_flavor(self.ttfont):
             desubroutinize(self.ttfont)
         self.modified = True
+
+    def build_unique_identifier(self, platform_id: t.Optional[int] = None) -> None:
+        """
+        Build the NameID 3 (Unique Font Identifier) record based on the font revision, vendor ID,
+        and PostScript name.
+
+        Args:
+            platform_id (Optional[int]): The platform ID of the name record. Defaults to None.
+        """
+
+        head_table = HeadTable(ttfont=self.ttfont)
+        name_table = NameTable(ttfont=self.ttfont)
+        os_2_table = OS2Table(ttfont=self.ttfont)
+
+        font_revision = round(head_table.font_revision, 3)
+        vendor_id = os_2_table.vendor_id
+        postscript_name = name_table.get_debug_name(NameIDs.POSTSCRIPT_NAME)
+
+        unique_id = f"{font_revision};{vendor_id};{postscript_name}"
+
+        name_table.set_name(
+            name_id=NameIDs.UNIQUE_FONT_IDENTIFIER, name_string=unique_id, platform_id=platform_id
+        )
+
+        self.modified = name_table.modified
+
+    def build_version_string(self, platform_id: t.Optional[int] = None) -> None:
+        """
+        Build the NameID 5 (Version String) record based on the font revision.
+
+        Args:
+            platform_id (Optional[int]): The platform ID of the name record. Defaults to None.
+        """
+
+        head_table = HeadTable(ttfont=self.ttfont)
+        name_table = NameTable(ttfont=self.ttfont)
+
+        font_revision = round(head_table.font_revision, 3)
+        version_string = f"Version {font_revision}"
+
+        name_table.set_name(
+            name_id=NameIDs.VERSION_STRING, name_string=version_string, platform_id=platform_id
+        )
+
+        self.modified = name_table.modified
