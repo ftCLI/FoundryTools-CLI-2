@@ -18,25 +18,25 @@ class NameTable(DefaultTbl):
         """
         super().__init__(ttfont=ttfont, table_tag=T_NAME)
 
-    def get_debug_name(self, name_id: int):
+    def get_debug_name(self, name_id: int) -> str:
         """
         Returns the name of the NameID for debugging purposes.
         """
         return self.table.getDebugName(nameID=name_id)
 
-    def get_best_family_name(self):
+    def get_best_family_name(self) -> str:
         """
         Returns the best family name from the ``name`` table.
         """
         return self.table.getBestFamilyName()
 
-    def get_best_subfamily_name(self):
+    def get_best_subfamily_name(self) -> str:
         """
         Returns the best style name from the ``name`` table.
         """
         return self.table.getBestSubFamilyName()
 
-    def get_best_full_name(self):
+    def get_best_full_name(self) -> str:
         """
         Returns the best full name from the ``name`` table.
         """

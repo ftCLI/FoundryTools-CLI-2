@@ -17,7 +17,6 @@ from fontTools.ttLib.ttGlyphSet import _TTGlyphSet
 from foundrytools_cli_2.lib.constants import (
     MAX_UPM,
     MIN_UPM,
-    NameIDs,
     OTF_EXTENSION,
     PS_SFNT_VERSION,
     T_FVAR,
@@ -29,6 +28,7 @@ from foundrytools_cli_2.lib.constants import (
     WOFF2_FLAVOR,
     WOFF_EXTENSION,
     WOFF_FLAVOR,
+    NameIDs,
 )
 from foundrytools_cli_2.lib.font.tables import HeadTable, NameTable, OS2Table
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
