@@ -95,14 +95,14 @@ class HeadTable(DefaultTbl):
         """
         Returns the created value.
         """
-        return self.table.created_timestamp
+        return self.table.created
 
     @created_timestamp.setter
     def created_timestamp(self, value: int) -> None:
         """
         Sets the created value.
         """
-        self.table.created_timestamp = value
+        self.table.created = value
 
     @property
     def modified_timestamp(self) -> bool:
