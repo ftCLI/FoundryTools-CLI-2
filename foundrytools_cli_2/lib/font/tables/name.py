@@ -24,6 +24,24 @@ class NameTable(DefaultTbl):
         """
         return self.table.getDebugName(nameID=name_id)
 
+    def get_best_family_name(self):
+        """
+        Returns the best family name from the ``name`` table.
+        """
+        return self.table.getBestFamilyName()
+
+    def get_best_subfamily_name(self):
+        """
+        Returns the best style name from the ``name`` table.
+        """
+        return self.table.getBestSubFamilyName()
+
+    def get_best_full_name(self):
+        """
+        Returns the best full name from the ``name`` table.
+        """
+        return self.table.getBestFullName()
+
     def set_name(
         self,
         name_id: int,
