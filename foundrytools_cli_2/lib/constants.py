@@ -1,5 +1,6 @@
 import typing as t
 from dataclasses import dataclass
+from enum import IntEnum
 from pathlib import Path
 
 PS_SFNT_VERSION = "OTTO"
@@ -37,6 +38,37 @@ T_OS_2 = "OS/2"
 T_POST = "post"
 T_STAT = "STAT"
 T_VORG = "VORG"
+
+
+class NameIDs(IntEnum):
+    """
+    Name IDs for the name table.
+    """
+    FAMILY_NAME = 1
+    STYLE_NAME = 2
+    UNIQUE_FONT_IDENTIFIER = 3
+    FULL_FONT_NAME = 4
+    VERSION_STRING = 5
+    POSTSCRIPT_NAME = 6
+    TRADEMARK = 7
+    MANUFACTURER_NAME = 8
+    DESIGNER_NAME = 9
+    DESCRIPTION = 10
+    VENDOR_URL = 11
+    DESIGNER_URL = 12
+    LICENSE_DESCRIPTION = 13
+    LICENSE_INFO_URL = 14
+    RESERVED = 15
+    OT_FAMILY_NAME = 16
+    OT_STYLE_NAME = 17
+    COMPATIBLE_FULL_NAME_MAC = 18
+    SAMPLE_TEXT = 19
+    PS_CID_FINDFONT_NAME = 20
+    WWS_FAMILY_NAME = 21
+    WWS_SUBFAMILY_NAME = 22
+    LIGHT_BACKGROUND_PALETTE = 23
+    DARK_BACKGROUND_PALETTE = 24
+    VARIATIONS_POSTSCRIPT_NAME_PREFIX = 25
 
 
 @dataclass
