@@ -18,6 +18,12 @@ class NameTable(DefaultTbl):
         """
         super().__init__(ttfont=ttfont, table_tag=T_NAME)
 
+    def get_debug_name(self, name_id: int):
+        """
+        Returns the name of the NameID for debugging purposes.
+        """
+        return self.table.getDebugName(nameID=name_id)
+
     def set_name(
         self,
         name_id: int,
