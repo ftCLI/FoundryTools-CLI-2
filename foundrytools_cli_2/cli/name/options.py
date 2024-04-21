@@ -245,3 +245,24 @@ def delete_all() -> t.Callable:
         )
     ]
     return add_options(_delete_all_mac_names_flag)
+
+
+def alternate_unique_id() -> t.Callable:
+    """
+    Add the ``alternate_unique_id`` option to a click command.
+
+    Returns:
+        t.Callable: A decorator that adds the alternate_unique_id option to a click command
+    """
+    _alternate_unique_id_option = [
+        click.option(
+            "-alt",
+            "--alternate",
+            is_flag=True,
+            default=False,
+            help="""
+            Build the unique ID using the font's family name and subfamily name.
+            """,
+        )
+    ]
+    return add_options(_alternate_unique_id_option)
