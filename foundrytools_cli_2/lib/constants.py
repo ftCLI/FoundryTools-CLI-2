@@ -45,7 +45,7 @@ class NameIDs(IntEnum):
     Name IDs for the name table.
     """
     FAMILY_NAME = 1
-    STYLE_NAME = 2
+    SUBFAMILY_NAME = 2
     UNIQUE_FONT_IDENTIFIER = 3
     FULL_FONT_NAME = 4
     VERSION_STRING = 5
@@ -59,8 +59,8 @@ class NameIDs(IntEnum):
     LICENSE_DESCRIPTION = 13
     LICENSE_INFO_URL = 14
     RESERVED = 15
-    OT_FAMILY_NAME = 16
-    OT_STYLE_NAME = 17
+    TYPO_FAMILY_NAME = 16
+    TYPO_SUBFAMILY_NAME = 17
     COMPATIBLE_FULL_NAME_MAC = 18
     SAMPLE_TEXT = 19
     PS_CID_FINDFONT_NAME = 20
