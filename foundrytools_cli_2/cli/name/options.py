@@ -235,7 +235,8 @@ def delete_all() -> t.Callable:
     """
     _delete_all_mac_names_flag = [
         click.option(
-            "--delete-all",
+            "--del-all",
+            "delete_all",
             is_flag=True,
             default=False,
             help="""
