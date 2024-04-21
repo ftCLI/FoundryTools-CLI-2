@@ -809,6 +809,25 @@ class Font:  # pylint: disable=too-many-public-methods
 
         self.modified = name_table.modified
 
+    def build_full_font_name(self, platform_id: t.Optional[int] = None) -> None:
+        """
+        Build the NameID 4 (Full Font Name) record based on the family name and subfamily name.
+
+        Args:
+            platform_id (Optional[int]): The platform ID of the name record. Defaults to None.
+        """
+
+        name_table = NameTable(ttfont=self.ttfont)
+        family_name = name_table.get_best_family_name()
+        subfamily_name = name_table.get_best_subfamily_name()
+        full_font_name = f"{family_name} {subfamily_name}"
+
+        name_table.set_name(
+            name_id=NameIDs.FULL_FONT_NAME, name_string=full_font_name, platform_id=platform_id
+        )
+
+        self.modified = name_table.modified
+
     def build_version_string(self, platform_id: t.Optional[int] = None) -> None:
         """
         Build the NameID 5 (Version String) record based on the font revision.
@@ -825,6 +844,25 @@ class Font:  # pylint: disable=too-many-public-methods
 
         name_table.set_name(
             name_id=NameIDs.VERSION_STRING, name_string=version_string, platform_id=platform_id
+        )
+
+        self.modified = name_table.modified
+
+    def build_postscript_name(self, platform_id: t.Optional[int] = None) -> None:
+        """
+        Build the NameID 6 (PostScript Name) record based on the PostScript name.
+
+        Args:
+            platform_id (Optional[int]): The platform ID of the name record. Defaults to None.
+        """
+
+        name_table = NameTable(ttfont=self.ttfont)
+        family_name = name_table.get_best_family_name()
+        subfamily_name = name_table.get_best_subfamily_name()
+        postscript_name = f"{family_name}-{subfamily_name}".replace(" ", "")
+
+        name_table.set_name(
+            name_id=NameIDs.POSTSCRIPT_NAME, name_string=postscript_name, platform_id=platform_id
         )
 
         self.modified = name_table.modified
