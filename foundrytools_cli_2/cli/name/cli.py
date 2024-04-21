@@ -5,6 +5,7 @@ from pathlib import Path
 import click
 
 from foundrytools_cli_2.cli.name.options import (
+    alternate_unique_id,
     delete_all,
     language_string,
     name_id,
@@ -17,6 +18,7 @@ from foundrytools_cli_2.cli.name.options import (
     win_or_mac_platform_id,
 )
 from foundrytools_cli_2.cli.shared_options import base_options
+from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font_runner import FontRunner
 
 cli = click.Group(help="Utilities for editing the ``name`` table.")
@@ -115,4 +117,37 @@ def strip_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     from foundrytools_cli_2.cli.name.snippets import strip_names as task
 
     runner = FontRunner(input_path=input_path, task=task, **options)
+    runner.run()
+
+
+@cli.command("build-unique-id")
+@alternate_unique_id()
+@win_or_mac_platform_id()
+@base_options()
+def build_unique_id(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Builds the NameID 3 (Unique ID).
+
+    If the ``--alternate`` flag is set, the unique ID is built using the following fields:
+
+    ``Manufacturer Name: Family Name - Subfamily Name: Creation Year``
+
+    Otherwise, the unique ID is built using the following fields (Default):
+
+    ``Font Revision;Vendor ID;PostScript Name``
+    """
+
+    runner = FontRunner(input_path=input_path, task=Font.build_unique_identifier, **options)
+    runner.run()
+
+
+@cli.command("build-version-string")
+@win_or_mac_platform_id()
+@base_options()
+def build_version_string(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Builds the NameID 5 (Version String).
+    """
+
+    runner = FontRunner(input_path=input_path, task=Font.build_version_string, **options)
     runner.run()
