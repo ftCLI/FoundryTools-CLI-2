@@ -16,8 +16,69 @@ class NoFontsFoundError(Exception):
     """Raised when no fonts are found by the FontFinder"""
 
 
+class TaskRunnerConfig:  # pylint: disable=too-few-public-methods
+    """
+    Handle options for TaskRunner.
+    """
+
+    def __init__(self, options: t.Dict[str, t.Any], task: t.Callable):
+        self.filter = FinderFilter()
+        self.finder_options = FinderOptions()
+        self.save_options = SaveOptions()
+        self.task_options: t.Dict[str, t.Any] = {}
+        self.task = task
+        self._parse_options(options)
+
+    def _parse_options(self, options: t.Dict[str, t.Any]) -> None:
+        """
+        Parses and set options provided as a dictionary for: FinderOptions,
+        SaveOptions, and specific task options.
+        """
+        for k, v in options.items():
+            self._set_opts_attr(self.finder_options, k, v)
+            self._set_opts_attr(self.save_options, k, v)
+            if "kwargs" in self.task.__annotations__:  # type: ignore
+                self.task_options.update(
+                    {
+                        k: v
+                        for k, v in options.items()
+                        if k not in self.finder_options.__dict__.items()
+                        and k not in self.save_options.__dict__.items()
+                    }
+                )
+            else:
+                if k != "return" and k in self.task.__annotations__:  # type: ignore
+                    self.task_options[k] = v
+
+    @staticmethod
+    def _set_opts_attr(
+        option_group: t.Union[FinderOptions, SaveOptions], key: str, value: t.Any
+    ) -> bool:
+        """
+        Set an attribute on an option group if the attribute exists.
+        """
+        if hasattr(option_group, key):
+            setattr(option_group, key, value)
+            return True
+        return False
+
+
 class TaskRunner:  # pylint: disable=too-few-public-methods, too-many-instance-attributes
-    """A class for running tasks on multiple fonts."""
+    """
+    A class for running tasks on multiple fonts.
+
+    Attributes:
+        input_path (Path): The input path to search for fonts.
+        task (Callable): The task to be executed.
+        filter (FinderFilter): The filter to apply to the FontFinder.
+        save_if_modified (bool): Whether to save the font if it has been modified. Set to False
+            when the saving process is handled by the task itself. Defaults to True.
+        force_modified (bool): Whether to force the font to be saved even if it has not been
+            modified. Set to True when it's not possible to determine if the font has been modified,
+            or when it's too expensive to check. Defaults to False.
+        options (TaskRunnerConfig): A configuration object containing FinderOptions, SaveOptions,
+            and specific task options.
+    """
 
     def __init__(
         self,
@@ -31,16 +92,14 @@ class TaskRunner:  # pylint: disable=too-few-public-methods, too-many-instance-a
         Args:
             input_path (Path): The input path to search for fonts.
             task (Callable): The task to be executed.
-            **options (Dict[str, Any]): A dictionary containing various options.
+            **options (Dict[str, Any]): A dictionary containing the options to be parsed.
         """
         self.input_path = input_path
         self.task = task
         self.filter = FinderFilter()
         self.save_if_modified = True
-        self.save_always = False
-        self._finder_options, self._save_options, self._callable_options = self._parse_options(
-            options
-        )
+        self.force_modified = False
+        self.options = TaskRunnerConfig(options=options, task=task)
 
     @Timer(logger=logger.opt(colors=True).info, text="Elapsed time <cyan>{:0.4f} seconds</>")
     def run(self) -> None:
@@ -53,152 +112,64 @@ class TaskRunner:  # pylint: disable=too-few-public-methods, too-many-instance-a
             logger.error(e)
             return
 
-        timer = self._initialize_timer()
-
+        timer = Timer(
+            logger=logger.opt(colors=True).info,
+            text="Processing time: <cyan>{:0.4f} seconds</>",
+        )
         for font in fonts:
-            with font:
-                timer.start()
-
-                try:
-                    self._log_current_file(font)
-                    self.task(font, **self._callable_options)
-                except Exception as e:  # pylint: disable=broad-except
-                    logger.error(f"{type(e).__name__}: {e}")
-                    self._stop_timer(timer)
-                    continue
-
-                # Don't save the font, but delegate to the task. This is useful for tasks where we
-                # cannot check if the font has been modified.
-                if not self.save_if_modified:
-                    self._stop_timer(timer)
-                    continue
-
-                # Don't save the font if it hasn't been modified, unless the save_always option is
-                # set.
-                if not font.modified and not self.save_always:
-                    logger.skip("No changes made")  # type: ignore
-                    self._stop_timer(timer)
-                    continue
-
-                try:
-                    out_file = self._get_out_file_name(font)
-                    font.save(out_file, reorder_tables=self._save_options.reorder_tables)
-                    logger.success(f"File saved to {out_file}")
-                except Exception as e:  # pylint: disable=broad-except
-                    logger.error(f"{type(e).__name__}: {e}")
-                    self._stop_timer(timer)
-
-                self._stop_timer(timer)
+            self._process_font(font, timer=timer)
 
     def _find_fonts(self) -> t.List[Font]:
-        """
-        Finds fonts in the input path.
-
-        Returns:
-            List[Font]: A list of ``Font`` objects.
-        """
         finder = FontFinder(
-            input_path=self.input_path, options=self._finder_options, filter_=self.filter
+            input_path=self.input_path, options=self.options.finder_options, filter_=self.filter
         )
         fonts = finder.find_fonts()
         if not fonts:
             raise NoFontsFoundError(f"No fonts found in {self.input_path}")
         return fonts
 
-    def _parse_options(
-        self, options: t.Dict[str, t.Any]
-    ) -> t.Tuple[FinderOptions, SaveOptions, t.Dict[str, t.Any]]:
-        """
-        Parses options provided as a dictionary and returns three objects: FinderOptions,
-        SaveOptions, and a dictionary of callable options.
+    def _process_font(self, font: Font, timer: Timer) -> None:
+        with font:
+            timer.start()
+            logger.info(f"Processing file {font.file}")
+            self._execute_task(font)
+            self._save_or_skip(font)
+            timer.stop()
+            print()  # add a newline after each font
 
-        Args:
-            options (Dict[str, Any]): A dictionary containing various options.
+    def _execute_task(self, font: Font) -> None:
+        try:
+            self.task(font, **self.options.task_options)
+        except Exception as e:  # pylint: disable=broad-except
+            self._log_error(e)
+            return
 
-        Returns:
-            Tuple[FinderOptions, SaveOptions, Dict[str, Any]]: A tuple containing three objects:
-            FinderOptions, SaveOptions, and a dictionary of callable options.
-        """
-        finder_options = FinderOptions()
-        save_options = SaveOptions()
-        callable_options = {}
+    def _save_or_skip(self, font: Font) -> None:
+        if not self._font_should_be_saved(font):
+            if self.save_if_modified:
+                logger.skip("No changes made")  # type: ignore
+        else:
+            self._save_font_to_file(font)
 
-        def _set_opts_attr(
-            option_group: t.Union[FinderOptions, SaveOptions], key: str, value: t.Any
-        ) -> bool:
-            """Set an attribute on an option group"""
-            if hasattr(option_group, key):
-                setattr(option_group, key, value)
-                return True
-            return False
+    def _font_should_be_saved(self, font: Font) -> bool:
+        return (self.save_if_modified and font.modified) or self.force_modified
 
-        for k, v in options.items():
-            _set_opts_attr(finder_options, k, v)
-            _set_opts_attr(save_options, k, v)
-            if "kwargs" in self.task.__annotations__:  # type: ignore
-                callable_options.update(
-                    {
-                        k: v
-                        for k, v in options.items()
-                        if k not in finder_options.__dict__.items()
-                        and k not in save_options.__dict__.items()
-                    }
-                )
-            else:
-                if k != "return" and k in self.task.__annotations__:  # type: ignore
-                    callable_options[k] = v
-
-        return finder_options, save_options, callable_options
-
-    @staticmethod
-    def _initialize_timer() -> Timer:
-        """
-        Initializes a new instance of the Timer class.
-
-        Returns:
-            Timer: A new instance of the Timer class.
-        """
-        return Timer(
-            logger=logger.opt(colors=True).info,
-            text="Processing time: <cyan>{:0.4f} seconds</>",
-        )
-
-    @staticmethod
-    def _stop_timer(timer: Timer) -> None:
-        """
-        Stops the timer and prints a newline.
-
-        Args:
-            timer (Timer): The timer to stop.
-        """
-        timer.stop()
-        print()
-
-    @staticmethod
-    def _log_current_file(font: Font) -> None:
-        """
-        Logs the current font information.
-
-        Args
-            font (Font): The font  file to log.
-        """
-        if font.file is None:
-            raise ValueError("Font file is None")
-        logger.info(f"Processing file {font.file}")
+    def _save_font_to_file(self, font: Font) -> None:
+        try:
+            out_file = self._get_out_file_name(font)
+            font.save(out_file, reorder_tables=self.options.save_options.reorder_tables)
+            logger.success(f"File saved to {out_file}")
+        except Exception as e:  # pylint: disable=broad-except
+            self._log_error(e)
 
     def _get_out_file_name(self, font: Font) -> Path:
-        """
-        Returns the output file name for a given font.
-
-        Args:
-            font (Font): The font to get the output file name for.
-
-        Returns:
-            Path: The output file name.
-        """
         return font.make_out_file_name(
-            output_dir=self._save_options.output_dir,
+            output_dir=self.options.save_options.output_dir,
             extension=font.get_real_extension(),
-            overwrite=self._save_options.overwrite,
-            suffix=self._save_options.suffix,
+            overwrite=self.options.save_options.overwrite,
+            suffix=self.options.save_options.suffix,
         )
+
+    @staticmethod
+    def _log_error(e: Exception) -> None:
+        logger.error(f"{type(e).__name__}: {e}")

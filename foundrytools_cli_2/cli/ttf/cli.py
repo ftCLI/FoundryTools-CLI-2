@@ -49,7 +49,7 @@ def decompose(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     runner = TaskRunner(input_path=input_path, task=Font.tt_decomponentize, **options)
     runner.filter.filter_out_ps = True
-    runner.save_always = True
+    runner.force_modified = True
     runner.run()
 
 
@@ -81,5 +81,5 @@ def scale_upm(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     runner = TaskRunner(input_path=input_path, task=Font.tt_scale_upem, **options)
     runner.filter.filter_out_ps = True
-    runner.save_always = True
+    runner.force_modified = True
     runner.run()
