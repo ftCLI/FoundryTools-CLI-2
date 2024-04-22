@@ -35,7 +35,7 @@ def otf_to_ttf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     from foundrytools_cli_2.cli.converter.snippets.otf_to_ttf import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
-    runner.auto_save = False
+    runner.save_if_modified = False
     runner.filter.filter_out_tt = True
     runner.filter.filter_out_variable = True
     runner.run()
@@ -61,7 +61,7 @@ def ttf_to_otf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
         task = ttf2otf  # type: ignore
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
-    runner.auto_save = False
+    runner.save_if_modified = False
     runner.filter.filter_out_ps = True
     runner.filter.filter_out_variable = True
     runner.run()
@@ -101,7 +101,7 @@ def sfnt_to_web(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_woff = True
     runner.filter.filter_out_woff2 = True
-    runner.auto_save = False
+    runner.save_if_modified = False
     runner.run()
 
 
@@ -117,5 +117,5 @@ def variable_to_static(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_static = True
     runner.filter.filter_out_ps = True
-    runner.auto_save = False
+    runner.save_if_modified = False
     runner.run()
