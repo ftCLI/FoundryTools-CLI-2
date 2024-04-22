@@ -16,7 +16,7 @@ class NoFontsFoundError(Exception):
     """Raised when no fonts are found by the FontFinder"""
 
 
-class TaskRunner:  # pylint: disable=too-few-public-methods
+class TaskRunner:  # pylint: disable=too-few-public-methods, too-many-instance-attributes
     """A class for running tasks on multiple fonts."""
 
     def __init__(
@@ -37,6 +37,7 @@ class TaskRunner:  # pylint: disable=too-few-public-methods
         self.task = task
         self.filter = FinderFilter()
         self.save_if_modified = True
+        self.save_always = False
         self._finder_options, self._save_options, self._callable_options = self._parse_options(
             options
         )
@@ -70,12 +71,16 @@ class TaskRunner:  # pylint: disable=too-few-public-methods
                     print()
                     continue
 
+                # Don't save the font, but delegate to the task. This is useful for tasks where we
+                # cannot check if the font has been modified.
                 if not self.save_if_modified:
                     timer.stop()
                     print()  # Add a newline after each font
                     continue
 
-                if not font.modified:
+                # Don't save the font if it hasn't been modified, unless the save_always option is
+                # set.
+                if not font.modified and not self.save_always:
                     logger.skip("No changes made")  # type: ignore
                     timer.stop()
                     print()
