@@ -573,7 +573,6 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError("Font is already a WOFF font.")
 
         self.ttfont.flavor = WOFF_FLAVOR
-        self.modified = True
 
     def to_woff2(self) -> None:
         """
@@ -583,7 +582,6 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError("Font is already a WOFF2 font.")
 
         self.ttfont.flavor = WOFF2_FLAVOR
-        self.modified = True
 
     def to_ttf(self, max_err: float = 1.0, reverse_direction: bool = True) -> None:
         """
@@ -595,7 +593,6 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError("Conversion to TrueType is not supported for variable fonts.")
 
         build_ttf(font=self.ttfont, max_err=max_err, reverse_direction=reverse_direction)
-        self.modified = True
 
     def to_otf(self, tolerance: float = 1.0, correct_contours: bool = True) -> None:
         """
@@ -612,7 +609,6 @@ class Font:  # pylint: disable=too-many-public-methods
             font=self.ttfont, tolerance=tolerance, correct_contours=correct_contours
         )
         build_otf(font=self.ttfont, charstrings_dict=charstrings)
-        self.modified = True
 
     def to_sfnt(self) -> None:
         """
@@ -622,7 +618,6 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError("Font is already a SFNT font.")
 
         self.ttfont.flavor = None
-        self.modified = True
 
     def calculate_italic_angle(self, min_slant: float = 2.0) -> float:
         """
@@ -673,8 +668,6 @@ class Font:  # pylint: disable=too-many-public-methods
             dr_pen.replay(tt_pen)
             glyf_table[glyph_name] = tt_pen.glyph()
 
-        self.modified = True
-
     def tt_scale_upem(self, target_upm: int) -> None:
         """
         Scale the font's Units Per Em (UPM).
@@ -692,7 +685,6 @@ class Font:  # pylint: disable=too-many-public-methods
             raise ValueError(f"Font already has {target_upm} units per em. No need to scale upem.")
 
         scale_upem(self.ttfont, new_upem=target_upm)
-        self.modified = True
 
     def tt_correct_contours(self, min_area: int = 25) -> t.List[str]:
         """
@@ -759,7 +751,6 @@ class Font:  # pylint: disable=too-many-public-methods
             )
         with restore_flavor(self.ttfont):
             subroutinize(self.ttfont)
-        self.modified = True
 
     def ps_desubroutinize(self) -> None:
         """
@@ -771,7 +762,6 @@ class Font:  # pylint: disable=too-many-public-methods
             )
         with restore_flavor(self.ttfont):
             desubroutinize(self.ttfont)
-        self.modified = True
 
     def build_unique_identifier(
         self, platform_id: t.Optional[int] = None, alternate: bool = False

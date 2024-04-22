@@ -49,6 +49,7 @@ def decompose(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     runner = TaskRunner(input_path=input_path, task=Font.tt_decomponentize, **options)
     runner.filter.filter_out_ps = True
+    runner.save_always = True
     runner.run()
 
 
@@ -71,7 +72,7 @@ def fix_contours(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("scale-upm")
-@target_upm_option()
+@target_upm_option(required=True)
 @base_options()
 def scale_upm(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
@@ -80,4 +81,5 @@ def scale_upm(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     runner = TaskRunner(input_path=input_path, task=Font.tt_scale_upem, **options)
     runner.filter.filter_out_ps = True
+    runner.save_always = True
     runner.run()

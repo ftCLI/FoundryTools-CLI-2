@@ -61,6 +61,7 @@ def subr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     runner = TaskRunner(input_path=input_path, task=Font.ps_subroutinize, **options)
     runner.filter.filter_out_tt = True
+    runner.save_always = True
     runner.run()
 
 
@@ -73,6 +74,7 @@ def desubr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     runner = TaskRunner(input_path=input_path, task=Font.ps_desubroutinize, **options)
     runner.filter.filter_out_tt = True
+    runner.save_always = True
     runner.run()
 
 

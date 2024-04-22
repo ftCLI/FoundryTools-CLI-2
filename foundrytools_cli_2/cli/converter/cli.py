@@ -81,6 +81,7 @@ def web_to_sfnt(
     """
     runner = TaskRunner(input_path=input_path, task=Font.to_sfnt, **options)
     runner.filter.filter_out_sfnt = True
+    runner.save_always = True
     if in_format == "woff":
         runner.filter.filter_out_woff2 = True
     elif in_format == "woff2":
