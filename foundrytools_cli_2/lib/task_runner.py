@@ -53,10 +53,7 @@ class TaskRunner:  # pylint: disable=too-few-public-methods, too-many-instance-a
             logger.error(e)
             return
 
-        timer = Timer(
-            logger=logger.opt(colors=True).info,
-            text="Processing time: <cyan>{:0.4f} seconds</>",
-        )
+        timer = self._initialize_timer()
 
         for font in fonts:
             with font:
@@ -66,24 +63,21 @@ class TaskRunner:  # pylint: disable=too-few-public-methods, too-many-instance-a
                     self._log_current_file(font)
                     self.task(font, **self._callable_options)
                 except Exception as e:  # pylint: disable=broad-except
-                    timer.stop()
                     logger.error(f"{type(e).__name__}: {e}")
-                    print()
+                    self._stop_timer(timer)
                     continue
 
                 # Don't save the font, but delegate to the task. This is useful for tasks where we
                 # cannot check if the font has been modified.
                 if not self.save_if_modified:
-                    timer.stop()
-                    print()  # Add a newline after each font
+                    self._stop_timer(timer)
                     continue
 
                 # Don't save the font if it hasn't been modified, unless the save_always option is
                 # set.
                 if not font.modified and not self.save_always:
                     logger.skip("No changes made")  # type: ignore
-                    timer.stop()
-                    print()
+                    self._stop_timer(timer)
                     continue
 
                 try:
@@ -91,12 +85,10 @@ class TaskRunner:  # pylint: disable=too-few-public-methods, too-many-instance-a
                     font.save(out_file, reorder_tables=self._save_options.reorder_tables)
                     logger.success(f"File saved to {out_file}")
                 except Exception as e:  # pylint: disable=broad-except
-                    timer.stop()
                     logger.error(f"{type(e).__name__}: {e}")
-                    print()
+                    self._stop_timer(timer)
 
-                timer.stop()
-                print()  # Add a newline after each font
+                self._stop_timer(timer)
 
     def _find_fonts(self) -> t.List[Font]:
         """
@@ -157,6 +149,30 @@ class TaskRunner:  # pylint: disable=too-few-public-methods, too-many-instance-a
                     callable_options[k] = v
 
         return finder_options, save_options, callable_options
+
+    @staticmethod
+    def _initialize_timer() -> Timer:
+        """
+        Initializes a new instance of the Timer class.
+
+        Returns:
+            Timer: A new instance of the Timer class.
+        """
+        return Timer(
+            logger=logger.opt(colors=True).info,
+            text="Processing time: <cyan>{:0.4f} seconds</>",
+        )
+
+    @staticmethod
+    def _stop_timer(timer: Timer) -> None:
+        """
+        Stops the timer and prints a newline.
+
+        Args:
+            timer (Timer): The timer to stop.
+        """
+        timer.stop()
+        print()
 
     @staticmethod
     def _log_current_file(font: Font) -> None:
