@@ -36,7 +36,7 @@ class TaskRunner:  # pylint: disable=too-few-public-methods
         self.input_path = input_path
         self.task = task
         self.filter = FinderFilter()
-        self.auto_save = True
+        self.save_if_modified = True
         self._finder_options, self._save_options, self._callable_options = self._parse_options(
             options
         )
@@ -70,7 +70,7 @@ class TaskRunner:  # pylint: disable=too-few-public-methods
                     print()
                     continue
 
-                if not self.auto_save:
+                if not self.save_if_modified:
                     timer.stop()
                     print()  # Add a newline after each font
                     continue
