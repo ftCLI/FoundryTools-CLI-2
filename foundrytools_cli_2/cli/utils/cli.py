@@ -5,7 +5,7 @@ from pathlib import Path
 import click
 
 from foundrytools_cli_2.cli.shared_options import base_options
-from foundrytools_cli_2.lib import FontRunner
+from foundrytools_cli_2.lib import TaskRunner
 
 cli = click.Group(help="Miscellaneous utilities.")
 
@@ -18,5 +18,5 @@ def reorder_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.utils.snippets.reorder_glyphs import main as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()

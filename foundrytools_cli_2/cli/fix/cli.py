@@ -5,7 +5,7 @@ from pathlib import Path
 import click
 
 from foundrytools_cli_2.cli.shared_options import base_options
-from foundrytools_cli_2.lib.font_runner import FontRunner
+from foundrytools_cli_2.lib.task_runner import TaskRunner
 
 cli = click.Group(help="Fix font errors.")
 
@@ -44,7 +44,7 @@ def fix_italic_angle(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.fix.snippets.italic_angle import main as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -61,7 +61,7 @@ def fix_empty_notdef(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.fix.snippets.empty_notdef import fix_notdef_empty as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -120,5 +120,5 @@ def fix_monospace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.fix.snippets.monospace import main as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()

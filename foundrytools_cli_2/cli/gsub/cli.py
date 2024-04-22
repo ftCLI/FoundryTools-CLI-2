@@ -6,7 +6,7 @@ from pathlib import Path
 import click
 
 from foundrytools_cli_2.cli.shared_options import base_options
-from foundrytools_cli_2.lib.font_runner import FontRunner
+from foundrytools_cli_2.lib.task_runner import TaskRunner
 
 cli = click.Group(help="Utilities for editing the ``GSUB`` table.")
 
@@ -33,5 +33,5 @@ def rename_feature(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.gsub.snippets.rename_feature import main as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()

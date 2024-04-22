@@ -12,7 +12,7 @@ from foundrytools_cli_2.cli.os_2.options import (
     target_version,
 )
 from foundrytools_cli_2.cli.shared_options import base_options
-from foundrytools_cli_2.lib.font_runner import FontRunner
+from foundrytools_cli_2.lib.task_runner import TaskRunner
 
 cli = click.Group(help="Utilities for editing the ``OS/2`` table.")
 
@@ -25,7 +25,7 @@ def recalc_avg_char_width(input_path: Path, **options: t.Dict[str, t.Any]) -> No
     """
     from foundrytools_cli_2.cli.os_2.snippets import recalc_avg_char_width as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -37,7 +37,7 @@ def recalc_x_height(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.os_2.snippets import recalc_x_height as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -49,7 +49,7 @@ def recalc_cap_height(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.os_2.snippets import recalc_cap_height as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -61,7 +61,7 @@ def recalc_max_context(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.os_2.snippets import recalc_max_context as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -76,7 +76,7 @@ def recalc_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.os_2.snippets import recalc_ranges_afdko as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -89,7 +89,7 @@ def set_attrs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.os_2.snippets import set_attrs as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -102,7 +102,7 @@ def set_fs_selection(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.os_2.snippets import set_fs_selection as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -115,7 +115,7 @@ def set_fs_type(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.os_2.snippets import set_fs_type as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -130,7 +130,7 @@ def upgrade(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.os_2.snippets import upgrade_version as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -143,5 +143,5 @@ def set_panose(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.os_2.snippets import set_panose as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
