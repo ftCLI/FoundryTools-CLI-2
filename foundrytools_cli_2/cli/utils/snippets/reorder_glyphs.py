@@ -9,8 +9,9 @@ def create_new_glyph_order(font: Font) -> t.List[str]:
     """
     new_glyph_order: t.List[str] = []
     encoded_glyphs = list(font.ttfont.getBestCmap().values())
-    unencoded_glyphs = [glyph_name for glyph_name in font.ttfont.getGlyphOrder() if
-                        glyph_name not in encoded_glyphs]
+    unencoded_glyphs = [
+        glyph_name for glyph_name in font.ttfont.getGlyphOrder() if glyph_name not in encoded_glyphs
+    ]
 
     if ".notdef" in unencoded_glyphs:
         new_glyph_order.extend([".notdef"])

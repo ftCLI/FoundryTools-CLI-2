@@ -52,9 +52,7 @@ def draw_empty_notdef_cff(font: Font, width: int, height: int, thickness: int) -
     return charstring
 
 
-def draw_empty_notdef_glyf(
-    font: Font, width: int, height: int, thickness: int
-) -> Glyph:
+def draw_empty_notdef_glyf(font: Font, width: int, height: int, thickness: int) -> Glyph:
     """
     Draws an empty .notdef glyph in a TTF font.
 
@@ -122,9 +120,7 @@ def fix_notdef_empty(font: Font) -> None:
 
     if font.is_tt:
         glyf_table = GlyfTable(ttfont=font.ttfont)
-        glyph = draw_empty_notdef_glyf(
-            font=font, width=width, height=height, thickness=thickness
-        )
+        glyph = draw_empty_notdef_glyf(font=font, width=width, height=height, thickness=thickness)
         glyf_table.glyphs[NOTDEF] = glyph
 
     font.ttfont[T_HMTX][NOTDEF] = (width, 0)
