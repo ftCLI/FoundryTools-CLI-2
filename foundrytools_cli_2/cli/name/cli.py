@@ -19,7 +19,7 @@ from foundrytools_cli_2.cli.name.options import (
 )
 from foundrytools_cli_2.cli.shared_options import base_options
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font_runner import FontRunner
+from foundrytools_cli_2.lib.task_runner import TaskRunner
 
 cli = click.Group(help="Utilities for editing the ``name`` table.")
 
@@ -35,7 +35,7 @@ def del_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.name.snippets import del_names as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -47,7 +47,7 @@ def del_empty_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.name.snippets import del_empty_names as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -60,7 +60,7 @@ def del_mac_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.name.snippets import del_mac_names as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -72,7 +72,7 @@ def del_unused_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.name.snippets import del_unused_names as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -89,7 +89,7 @@ def find_replace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.name.snippets import find_replace as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -104,7 +104,7 @@ def set_name(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.name.snippets import set_name as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -116,7 +116,7 @@ def strip_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.name.snippets import strip_names as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -137,7 +137,7 @@ def build_unique_id(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     ``Font Revision;Vendor ID;PostScript Name``
     """
 
-    runner = FontRunner(input_path=input_path, task=Font.build_unique_identifier, **options)
+    runner = TaskRunner(input_path=input_path, task=Font.build_unique_identifier, **options)
     runner.run()
 
 
@@ -149,7 +149,7 @@ def build_full_font_name(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     Builds the NameID 4 (Full Font Name).
     """
 
-    runner = FontRunner(input_path=input_path, task=Font.build_full_font_name, **options)
+    runner = TaskRunner(input_path=input_path, task=Font.build_full_font_name, **options)
     runner.run()
 
 
@@ -161,7 +161,7 @@ def build_version_string(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     Builds the NameID 5 (Version String).
     """
 
-    runner = FontRunner(input_path=input_path, task=Font.build_version_string, **options)
+    runner = TaskRunner(input_path=input_path, task=Font.build_version_string, **options)
     runner.run()
 
 
@@ -173,5 +173,5 @@ def build_postscript_name(input_path: Path, **options: t.Dict[str, t.Any]) -> No
     Builds the NameID 6 (PostScript Name).
     """
 
-    runner = FontRunner(input_path=input_path, task=Font.build_postscript_name, **options)
+    runner = TaskRunner(input_path=input_path, task=Font.build_postscript_name, **options)
     runner.run()

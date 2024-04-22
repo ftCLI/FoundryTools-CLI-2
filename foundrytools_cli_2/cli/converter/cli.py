@@ -19,7 +19,7 @@ from foundrytools_cli_2.cli.shared_options import (
     target_upm_option,
 )
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font_runner import FontRunner
+from foundrytools_cli_2.lib.task_runner import TaskRunner
 
 cli = click.Group("converter", help="Font conversion utilities.")
 
@@ -34,7 +34,7 @@ def otf_to_ttf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.converter.snippets.otf_to_ttf import main as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.auto_save = False
     runner.filter.filter_out_tt = True
     runner.filter.filter_out_variable = True
@@ -60,7 +60,7 @@ def ttf_to_otf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     else:
         task = ttf2otf  # type: ignore
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.auto_save = False
     runner.filter.filter_out_ps = True
     runner.filter.filter_out_variable = True
@@ -79,7 +79,7 @@ def web_to_sfnt(
     """
     Convert WOFF and WOFF2 fonts to SFNT fonts.
     """
-    runner = FontRunner(input_path=input_path, task=Font.to_sfnt, **options)
+    runner = TaskRunner(input_path=input_path, task=Font.to_sfnt, **options)
     runner.filter.filter_out_sfnt = True
     if in_format == "woff":
         runner.filter.filter_out_woff2 = True
@@ -98,7 +98,7 @@ def sfnt_to_web(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools_cli_2.cli.converter.snippets.sfnt_to_web import main as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_woff = True
     runner.filter.filter_out_woff2 = True
     runner.auto_save = False
@@ -114,7 +114,7 @@ def variable_to_static(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     from foundrytools_cli_2.cli.converter.snippets.variable_to_static import main as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_static = True
     runner.filter.filter_out_ps = True
     runner.auto_save = False

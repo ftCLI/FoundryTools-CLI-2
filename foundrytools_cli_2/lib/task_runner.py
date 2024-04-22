@@ -16,8 +16,8 @@ class NoFontsFoundError(Exception):
     """Raised when no fonts are found by the FontFinder"""
 
 
-class FontRunner:  # pylint: disable=too-few-public-methods
-    """Base class for all runners"""
+class TaskRunner:  # pylint: disable=too-few-public-methods
+    """A class for running tasks on multiple fonts."""
 
     def __init__(
         self,
@@ -29,9 +29,8 @@ class FontRunner:  # pylint: disable=too-few-public-methods
         Initialize a new instance of the class.
 
         Args:
+            input_path (Path): The input path to search for fonts.
             task (Callable): The task to be executed.
-            auto_save (bool, optional): Flag indicating whether to automatically save the task
-                results. Defaults to True.
             **options (Dict[str, Any]): A dictionary containing various options.
         """
         self.input_path = input_path

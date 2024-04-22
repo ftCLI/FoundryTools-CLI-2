@@ -6,7 +6,7 @@ import click
 
 from foundrytools_cli_2.cli.shared_options import base_options, min_area_option, target_upm_option
 from foundrytools_cli_2.cli.ttf.options import remove_hinting_flag
-from foundrytools_cli_2.lib import FontRunner
+from foundrytools_cli_2.lib import TaskRunner
 from foundrytools_cli_2.lib.font import Font
 
 cli = click.Group(help="Utilities for editing OpenType-TT fonts.")
@@ -21,7 +21,7 @@ def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     from foundrytools_cli_2.cli.ttf.snippets.autohint import ttf_autohint as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_ps = True
     runner.run()
 
@@ -35,7 +35,7 @@ def dehint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     from foundrytools_cli_2.cli.ttf.snippets.dehint import ttf_dehint as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_ps = True
     runner.run()
 
@@ -47,7 +47,7 @@ def decompose(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Decomposes the composite glyphs of the given TrueType fonts.
     """
 
-    runner = FontRunner(input_path=input_path, task=Font.tt_decomponentize, **options)
+    runner = TaskRunner(input_path=input_path, task=Font.tt_decomponentize, **options)
     runner.filter.filter_out_ps = True
     runner.run()
 
@@ -64,7 +64,7 @@ def fix_contours(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     from foundrytools_cli_2.cli.ttf.snippets.fix_contours import main as task
 
-    runner = FontRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_ps = True
     runner.filter.filter_out_variable = True
     runner.run()
@@ -78,6 +78,6 @@ def scale_upm(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Scales the given TrueType fonts to the specified UPM.
     """
 
-    runner = FontRunner(input_path=input_path, task=Font.tt_scale_upem, **options)
+    runner = TaskRunner(input_path=input_path, task=Font.tt_scale_upem, **options)
     runner.filter.filter_out_ps = True
     runner.run()
