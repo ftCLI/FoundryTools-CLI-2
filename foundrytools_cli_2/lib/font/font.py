@@ -28,7 +28,7 @@ from foundrytools_cli_2.lib.constants import (
     WOFF2_FLAVOR,
     WOFF_EXTENSION,
     WOFF_FLAVOR,
-    NameIDs,
+    NameIds,
 )
 from foundrytools_cli_2.lib.font.tables import HeadTable, NameTable, OS2Table
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
@@ -774,7 +774,7 @@ class Font:  # pylint: disable=too-many-public-methods
         self.modified = True
 
     def build_unique_identifier(
-            self, platform_id: t.Optional[int] = None, alternate: bool = False
+        self, platform_id: t.Optional[int] = None, alternate: bool = False
     ) -> None:
         """
         Build the NameID 3 (Unique Font Identifier) record based on the font revision, vendor ID,
@@ -794,17 +794,17 @@ class Font:  # pylint: disable=too-many-public-methods
         if not alternate:
             font_revision = round(head_table.font_revision, 3)
             vendor_id = os_2_table.vendor_id
-            postscript_name = name_table.get_debug_name(NameIDs.POSTSCRIPT_NAME)
+            postscript_name = name_table.get_debug_name(NameIds.POSTSCRIPT_NAME)
             unique_id = f"{font_revision};{vendor_id};{postscript_name}"
         else:
             year_created = timestampToString(head_table.created_timestamp).split(" ")[-1]
             family_name = name_table.get_best_family_name()
             subfamily_name = name_table.get_best_subfamily_name()
-            manufacturer_name = name_table.get_debug_name(NameIDs.MANUFACTURER_NAME)
+            manufacturer_name = name_table.get_debug_name(NameIds.MANUFACTURER_NAME)
             unique_id = f"{manufacturer_name}: {family_name}-{subfamily_name}: {year_created}"
 
         name_table.set_name(
-            name_id=NameIDs.UNIQUE_FONT_IDENTIFIER, name_string=unique_id, platform_id=platform_id
+            name_id=NameIds.UNIQUE_FONT_IDENTIFIER, name_string=unique_id, platform_id=platform_id
         )
 
         self.modified = name_table.modified
@@ -823,7 +823,7 @@ class Font:  # pylint: disable=too-many-public-methods
         full_font_name = f"{family_name} {subfamily_name}"
 
         name_table.set_name(
-            name_id=NameIDs.FULL_FONT_NAME, name_string=full_font_name, platform_id=platform_id
+            name_id=NameIds.FULL_FONT_NAME, name_string=full_font_name, platform_id=platform_id
         )
 
         self.modified = name_table.modified
@@ -843,7 +843,7 @@ class Font:  # pylint: disable=too-many-public-methods
         version_string = f"Version {font_revision}"
 
         name_table.set_name(
-            name_id=NameIDs.VERSION_STRING, name_string=version_string, platform_id=platform_id
+            name_id=NameIds.VERSION_STRING, name_string=version_string, platform_id=platform_id
         )
 
         self.modified = name_table.modified
@@ -862,7 +862,7 @@ class Font:  # pylint: disable=too-many-public-methods
         postscript_name = f"{family_name}-{subfamily_name}".replace(" ", "")
 
         name_table.set_name(
-            name_id=NameIDs.POSTSCRIPT_NAME, name_string=postscript_name, platform_id=platform_id
+            name_id=NameIds.POSTSCRIPT_NAME, name_string=postscript_name, platform_id=platform_id
         )
 
         self.modified = name_table.modified

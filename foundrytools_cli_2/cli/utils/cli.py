@@ -17,5 +17,6 @@ def reorder_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Reorder the glyphs.
     """
     from foundrytools_cli_2.cli.utils.snippets.reorder_glyphs import main as task
+
     runner = FontRunner(input_path=input_path, task=task, **options)
     runner.run()
