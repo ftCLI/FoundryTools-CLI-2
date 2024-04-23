@@ -18,8 +18,8 @@ from foundrytools_cli_2.cli.name.options import (
     win_or_mac_platform_id,
 )
 from foundrytools_cli_2.cli.shared_options import base_options
+from foundrytools_cli_2.cli.task_runner import TaskRunner
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.task_runner import TaskRunner
 
 cli = click.Group(help="Utilities for editing the ``name`` table.")
 

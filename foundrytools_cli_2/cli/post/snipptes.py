@@ -1,8 +1,8 @@
 import typing as t
 
+from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font.tables import PostTable
-from foundrytools_cli_2.lib.logger import logger
 
 
 def set_attrs(

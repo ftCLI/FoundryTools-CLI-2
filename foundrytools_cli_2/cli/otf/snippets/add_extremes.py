@@ -1,6 +1,6 @@
+from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.lib.beziers import add_extremes
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 
 

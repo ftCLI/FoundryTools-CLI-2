@@ -3,7 +3,7 @@ import tempfile
 import typing as t
 from pathlib import Path
 
-from foundrytools_cli_2.lib.logger import logger
+from foundrytools_cli_2.cli.logger import logger
 
 
 def get_temp_file_path(directory: t.Optional[t.Union[str, Path]] = None) -> Path:

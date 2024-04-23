@@ -1,6 +1,6 @@
+from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font.tables import GsubTable
-from foundrytools_cli_2.lib.logger import logger
 
 
 def main(font: Font, old_feature_name: str, new_feature_name: str) -> None:

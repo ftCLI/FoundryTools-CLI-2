@@ -3,8 +3,8 @@ from pathlib import Path
 
 from afdko.checkoutlinesufo import run as check_outlines
 
+from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.logger import logger
 
 from . import get_file_to_process
 

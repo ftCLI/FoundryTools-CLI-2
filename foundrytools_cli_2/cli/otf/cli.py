@@ -6,8 +6,8 @@ import click
 
 from foundrytools_cli_2.cli.otf.options import otf_autohint_options
 from foundrytools_cli_2.cli.shared_options import base_options, min_area_option, subroutinize_flag
+from foundrytools_cli_2.cli.task_runner import TaskRunner
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.task_runner import TaskRunner
 
 cli = click.Group(help="Utilities for editing OpenType-PS fonts.")
 

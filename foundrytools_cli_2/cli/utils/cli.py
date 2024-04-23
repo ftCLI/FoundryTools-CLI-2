@@ -5,7 +5,7 @@ from pathlib import Path
 import click
 
 from foundrytools_cli_2.cli.shared_options import base_options
-from foundrytools_cli_2.lib import TaskRunner
+from foundrytools_cli_2.cli.task_runner import TaskRunner
 
 cli = click.Group(help="Miscellaneous utilities.")
 

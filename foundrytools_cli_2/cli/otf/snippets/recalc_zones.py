@@ -4,8 +4,8 @@ from collections import Counter
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.ttLib.ttFont import TTFont
 
+from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.logger import logger
 
 UPPERCASE_LETTERS = [chr(i) for i in range(65, 91)]  # A-Z
 UPPERCASE_DESCENDERS = ["J", "Q"]

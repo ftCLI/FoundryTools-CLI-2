@@ -5,8 +5,8 @@ from pathlib import Path
 import click
 
 from foundrytools_cli_2.cli.shared_options import base_options, min_area_option, target_upm_option
+from foundrytools_cli_2.cli.task_runner import TaskRunner
 from foundrytools_cli_2.cli.ttf.options import remove_hinting_flag
-from foundrytools_cli_2.lib import TaskRunner
 from foundrytools_cli_2.lib.font import Font
 
 cli = click.Group(help="Utilities for editing OpenType-TT fonts.")
