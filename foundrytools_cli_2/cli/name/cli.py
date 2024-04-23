@@ -19,7 +19,6 @@ from foundrytools_cli_2.cli.name.options import (
 )
 from foundrytools_cli_2.cli.shared_options import base_options
 from foundrytools_cli_2.cli.task_runner import TaskRunner
-from foundrytools_cli_2.lib.font import Font
 
 cli = click.Group(help="Utilities for editing the ``name`` table.")
 
@@ -136,8 +135,9 @@ def build_unique_id(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     ``Font Revision;Vendor ID;PostScript Name``
     """
+    from foundrytools_cli_2.cli.name.snippets import build_unique_id as task
 
-    runner = TaskRunner(input_path=input_path, task=Font.build_unique_identifier, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -148,8 +148,9 @@ def build_full_font_name(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     """
     Builds the NameID 4 (Full Font Name).
     """
+    from foundrytools_cli_2.cli.name.snippets import build_full_font_name as task
 
-    runner = TaskRunner(input_path=input_path, task=Font.build_full_font_name, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -160,8 +161,9 @@ def build_version_string(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     """
     Builds the NameID 5 (Version String).
     """
+    from foundrytools_cli_2.cli.name.snippets import build_version_string as task
 
-    runner = TaskRunner(input_path=input_path, task=Font.build_version_string, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -172,6 +174,7 @@ def build_postscript_name(input_path: Path, **options: t.Dict[str, t.Any]) -> No
     """
     Builds the NameID 6 (PostScript Name).
     """
+    from foundrytools_cli_2.cli.name.snippets import build_postscript_name as task
 
-    runner = TaskRunner(input_path=input_path, task=Font.build_postscript_name, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()

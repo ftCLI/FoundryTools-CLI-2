@@ -1,9 +1,10 @@
 import typing as t
 
+from fontTools.misc.timeTools import timestampToString
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables._n_a_m_e import _MAC_LANGUAGE_CODES, _WINDOWS_LANGUAGE_CODES, NameRecord
 
-from foundrytools_cli_2.lib.constants import T_NAME
+from foundrytools_cli_2.lib.constants import T_NAME, NameIds
 from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
 
 
@@ -275,3 +276,80 @@ class NameTable(DefaultTbl):
                 )
             )
         ]
+
+    def build_unique_identifier(
+        self, platform_id: t.Optional[int] = None, alternate: bool = False
+    ) -> None:
+        """
+        Build the NameID 3 (Unique Font Identifier) record based on the font revision, vendor ID,
+        and PostScript name.
+
+        Args:
+            platform_id (Optional[int]): The platform ID of the name record. Defaults to None.
+            alternate (bool): If True, the unique ID will be built using the manufacturer name,
+                family name, subfamily name, and year created. If False, the unique ID will be built
+                using the font revision, vendor ID, and PostScript name.
+        """
+
+        if not alternate:
+            font_revision = round(self.ttfont["head"].fontRevision, 3)
+            vendor_id = self.ttfont["OS/2"].achVendID
+            postscript_name = self.get_debug_name(NameIds.POSTSCRIPT_NAME)
+            unique_id = f"{font_revision};{vendor_id};{postscript_name}"
+        else:
+            year_created = timestampToString(self.ttfont["head"].created).split(" ")[-1]
+            family_name = self.get_best_family_name()
+            subfamily_name = self.get_best_subfamily_name()
+            manufacturer_name = self.get_debug_name(NameIds.MANUFACTURER_NAME)
+            unique_id = f"{manufacturer_name}: {family_name}-{subfamily_name}: {year_created}"
+
+        self.set_name(
+            name_id=NameIds.UNIQUE_FONT_IDENTIFIER, name_string=unique_id, platform_id=platform_id
+        )
+
+    def build_full_font_name(self, platform_id: t.Optional[int] = None) -> None:
+        """
+        Build the NameID 4 (Full Font Name) record based on the family name and subfamily name.
+
+        Args:
+            platform_id (Optional[int]): The platform ID of the name record. Defaults to None.
+        """
+
+        family_name = self.get_best_family_name()
+        subfamily_name = self.get_best_subfamily_name()
+        full_font_name = f"{family_name} {subfamily_name}"
+
+        self.set_name(
+            name_id=NameIds.FULL_FONT_NAME, name_string=full_font_name, platform_id=platform_id
+        )
+
+    def build_version_string(self, platform_id: t.Optional[int] = None) -> None:
+        """
+        Build the NameID 5 (Version String) record based on the font revision.
+
+        Args:
+            platform_id (Optional[int]): The platform ID of the name record. Defaults to None.
+        """
+
+        font_revision = round(self.ttfont["head"].fontRevision, 3)
+        version_string = f"Version {font_revision}"
+
+        self.set_name(
+            name_id=NameIds.VERSION_STRING, name_string=version_string, platform_id=platform_id
+        )
+
+    def build_postscript_name(self, platform_id: t.Optional[int] = None) -> None:
+        """
+        Build the NameID 6 (PostScript Name) record based on the PostScript name.
+
+        Args:
+            platform_id (Optional[int]): The platform ID of the name record. Defaults to None.
+        """
+
+        family_name = self.get_best_family_name()
+        subfamily_name = self.get_best_subfamily_name()
+        postscript_name = f"{family_name}-{subfamily_name}".replace(" ", "")
+
+        self.set_name(
+            name_id=NameIds.POSTSCRIPT_NAME, name_string=postscript_name, platform_id=platform_id
+        )

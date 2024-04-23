@@ -145,3 +145,61 @@ def strip_names(font: Font) -> None:
     name_table = NameTable(ttfont=font.ttfont)
     name_table.strip_names()
     font.modified = name_table.modified
+
+
+def build_unique_id(
+    font: Font, platform_id: t.Optional[int] = None, alternate: bool = False
+) -> None:
+    """
+    Builds a unique ID for the font file.
+
+    Args:
+        font (Font): The Font object representing the font file.
+        platform_id (int, optional): The platform ID of the name record. Defaults to None.
+        alternate (bool, optional): Whether to build an alternate unique ID. Defaults to False.
+    """
+
+    name_table = NameTable(ttfont=font.ttfont)
+    name_table.build_unique_identifier(platform_id=platform_id, alternate=alternate)
+    font.modified = name_table.modified
+
+
+def build_full_font_name(font: Font, platform_id: t.Optional[int] = None) -> None:
+    """
+    Builds a full font name for the font file.
+
+    Args:
+        font (Font): The Font object representing the font file.
+        platform_id (int, optional): The platform ID of the name record. Defaults to None.
+    """
+
+    name_table = NameTable(ttfont=font.ttfont)
+    name_table.build_full_font_name(platform_id=platform_id)
+    font.modified = name_table.modified
+
+
+def build_version_string(font: Font, platform_id: t.Optional[int] = None) -> None:
+    """
+    Builds a version string for the font file.
+
+    Args:
+        font (Font): The Font object representing the font file.
+        platform_id (int, optional): The platform ID of the name record. Defaults to None.
+    """
+
+    name_table = NameTable(ttfont=font.ttfont)
+    name_table.build_version_string(platform_id=platform_id)
+    font.modified = name_table.modified
+
+
+def build_postscript_name(font: Font, platform_id: t.Optional[int] = None) -> None:
+    """
+    Builds a postscript name for the font file.
+
+    Args:
+        font (Font): The Font object representing the font file.
+    """
+
+    name_table = NameTable(ttfont=font.ttfont)
+    name_table.build_postscript_name(platform_id=platform_id)
+    font.modified = name_table.modified
