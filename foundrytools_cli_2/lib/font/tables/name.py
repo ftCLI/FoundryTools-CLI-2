@@ -360,18 +360,11 @@ class NameTable(DefaultTbl):
         (Full Font Name), 5 (Version String), and 6 (PostScript Name).
         """
 
-        family_name = self.table.getName(NameIds.FAMILY_NAME, 3, 1, 0x409)
-        if family_name:
-            self.set_name(
-                name_id=NameIds.FAMILY_NAME, name_string=family_name.toUnicode(), platform_id=1
-            )
-        subfamily_name = self.table.getName(NameIds.SUBFAMILY_NAME, 3, 1, 0x409)
-        if subfamily_name:
-            self.set_name(
-                name_id=NameIds.SUBFAMILY_NAME,
-                name_string=subfamily_name.toUnicode(),
-                platform_id=1,
-            )
-        self.build_full_font_name(platform_id=1)
-        self.build_version_string(platform_id=1)
-        self.build_postscript_name(platform_id=1)
+        name_ids = {1, 2, 4, 5, 6}
+        names = self.filter_names(name_ids=name_ids, platform_id=3)
+        for name in names:
+            try:
+                string = self.get_debug_name(name_id=name.nameID)
+                self.set_name(name_id=name.nameID, name_string=string, platform_id=1)
+            except AttributeError:
+                continue

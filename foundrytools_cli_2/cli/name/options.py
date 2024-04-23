@@ -240,7 +240,7 @@ def delete_all() -> t.Callable:
             is_flag=True,
             default=False,
             help="""
-            Delete all Macintosh NameRecords.
+            Delete all Macintosh-specific NameRecords, including those with nameID 1, 2, 4, 5 and 6.
             """,
         )
     ]
