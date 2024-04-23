@@ -33,46 +33,49 @@ class TaskRunnerConfig:  # pylint: disable=too-few-public-methods
     Handle options for TaskRunner.
     """
 
-    def __init__(self, options: t.Dict[str, t.Any], task: t.Callable):
+    def __init__(self, task_callable: t.Callable, options: t.Dict[str, t.Any]):
+        self.task = task_callable
         self.filter = FinderFilter()
         self.finder_options = FinderOptions()
         self.save_options = SaveOptions()
         self.task_options: t.Dict[str, t.Any] = {}
-        self.task = task
-        self._parse_options(options)
+        self._handle_options(options)
 
-    def _parse_options(self, options: t.Dict[str, t.Any]) -> None:
-        """
-        Parses and set options provided as a dictionary for: FinderOptions,
-        SaveOptions, and specific task options.
-        """
-        for k, v in options.items():
-            self._set_opts_attr(self.finder_options, k, v)
-            self._set_opts_attr(self.save_options, k, v)
-            if "kwargs" in self.task.__annotations__:  # type: ignore
-                self.task_options.update(
-                    {
-                        k: v
-                        for k, v in options.items()
-                        if k not in self.finder_options.__dict__.items()
-                        and k not in self.save_options.__dict__.items()
-                    }
-                )
-            else:
-                if k != "return" and k in self.task.__annotations__:  # type: ignore
-                    self.task_options[k] = v
+    def _handle_options(self, options: t.Dict[str, t.Any]) -> None:
+        self._parse_finder_options(options)
+        self._parse_save_options(options)
+        self._parse_task_options(options)
+
+    def _parse_finder_options(self, options: t.Dict[str, t.Any]) -> None:
+        self._set_options(self.finder_options, options)
+
+    def _parse_save_options(self, options: t.Dict[str, t.Any]) -> None:
+        self._set_options(self.save_options, options)
+
+    def _parse_task_options(self, options: t.Dict[str, t.Any]) -> None:
+        if "kwargs" in t.get_type_hints(self.task):
+            self.task_options.update(
+                {
+                    k: v
+                    for k, v in options.items()
+                    if k not in t.get_type_hints(FinderOptions)
+                    and k not in t.get_type_hints(SaveOptions)
+                }
+            )
+        for key, value in options.items():
+            if key in t.get_type_hints(self.task):
+                self.task_options.update({key: value})
 
     @staticmethod
-    def _set_opts_attr(
-        option_group: t.Union[FinderOptions, SaveOptions], key: str, value: t.Any
-    ) -> bool:
+    def _set_options(
+        options_group: t.Union[dict, FinderOptions, SaveOptions], options: t.Dict[str, t.Any]
+    ) -> None:
         """
-        Set an attribute on an option group if the attribute exists.
+        Update attributes of an options_group with provided options if the attribute exists.
         """
-        if hasattr(option_group, key):
-            setattr(option_group, key, value)
-            return True
-        return False
+        for key, value in options.items():
+            if hasattr(options_group, key):
+                setattr(options_group, key, value)
 
 
 class TaskRunner:  # pylint: disable=too-few-public-methods
@@ -111,7 +114,7 @@ class TaskRunner:  # pylint: disable=too-few-public-methods
         self.filter = FinderFilter()
         self.save_if_modified = True
         self.force_modified = False
-        self.config = TaskRunnerConfig(options=options, task=task)
+        self.config = TaskRunnerConfig(options=options, task_callable=task)
 
     @Timer(logger=logger.opt(colors=True).info, text="Elapsed time <cyan>{:0.4f} seconds</>")
     def run(self) -> None:
