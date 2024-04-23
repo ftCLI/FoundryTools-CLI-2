@@ -30,7 +30,7 @@ cli = click.Group(help="Utilities for editing the ``name`` table.")
 @base_options()
 def del_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Delete names from the name table of the given font files.
+    Delete the specified NameRecords from the ``name`` table.
     """
     from foundrytools_cli_2.cli.name.snippets import del_names as task
 
@@ -42,7 +42,7 @@ def del_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @base_options()
 def del_empty_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Deletes empty names from the name table of the given font files.
+    Deletes empty NameRecords from the ``name`` table.
     """
     from foundrytools_cli_2.cli.name.snippets import del_empty_names as task
 
@@ -55,7 +55,7 @@ def del_empty_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @base_options()
 def del_mac_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Delete Macintosh names from the name table of the given font files.
+    Delete Macintosh-specific NameRecords from the ``name`` table.
     """
     from foundrytools_cli_2.cli.name.snippets import del_mac_names as task
 
@@ -67,7 +67,7 @@ def del_mac_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @base_options()
 def del_unused_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Delete unused names from the name table of the given font files.
+    Delete unused NameRecords from the ``name`` table.
     """
     from foundrytools_cli_2.cli.name.snippets import del_unused_names as task
 
@@ -84,7 +84,7 @@ def del_unused_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @base_options()
 def find_replace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Find and replace text in the name table of the given font files.
+    Find and replace text in the specified NameRecords.
     """
     from foundrytools_cli_2.cli.name.snippets import find_replace as task
 
@@ -99,7 +99,7 @@ def find_replace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @base_options()
 def set_name(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Set the name table of the given font files.
+    Set the string of the specified NameRecord in the ``name`` table.
     """
     from foundrytools_cli_2.cli.name.snippets import set_name as task
 
@@ -111,7 +111,7 @@ def set_name(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @base_options()
 def strip_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Strip the name table of the given font files.
+    Remove leading and trailing whitespace from the NameRecords.
     """
     from foundrytools_cli_2.cli.name.snippets import strip_names as task
 
@@ -175,6 +175,21 @@ def build_postscript_name(input_path: Path, **options: t.Dict[str, t.Any]) -> No
     Builds the NameID 6 (PostScript Name).
     """
     from foundrytools_cli_2.cli.name.snippets import build_postscript_name as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.run()
+
+
+@cli.command("build-mac-names")
+@base_options()
+def build_mac_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Builds the Macintosh-specific names.
+
+    The following names are built: 1 (Font Family Name), 2 (Font Subfamily Name), 4
+    (Full Font Name), 5 (Version String), 6 (PostScript Name).
+    """
+    from foundrytools_cli_2.cli.name.snippets import build_mac_names as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
