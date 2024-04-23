@@ -8,6 +8,7 @@ from foundrytools_cli_2.lib.font import Font
 
 __all__ = ["FinderError", "FinderFilter", "FinderOptions", "FontFinder"]
 
+
 @dataclass
 class FinderOptions:
     """
