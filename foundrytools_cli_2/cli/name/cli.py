@@ -55,7 +55,8 @@ def del_empty_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @base_options()
 def del_mac_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Delete Macintosh-specific NameRecords from the ``name`` table.
+    Delete Macintosh-specific NameRecords from the ``name`` table, excluding those with nameID 1, 2,
+    4, 5 and 6. If the ``--del-all`` flag is set, all Macintosh-specific NameRecords are deleted.
     """
     from foundrytools_cli_2.cli.name.snippets import del_mac_names as task
 
