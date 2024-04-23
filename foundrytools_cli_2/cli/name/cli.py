@@ -178,3 +178,15 @@ def build_postscript_name(input_path: Path, **options: t.Dict[str, t.Any]) -> No
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
+
+
+@cli.command("build-mac-names")
+@base_options()
+def build_mac_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Builds the Macintosh-specific names.
+    """
+    from foundrytools_cli_2.cli.name.snippets import build_mac_names as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.run()

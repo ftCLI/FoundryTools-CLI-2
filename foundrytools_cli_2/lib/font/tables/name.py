@@ -353,3 +353,25 @@ class NameTable(DefaultTbl):
         self.set_name(
             name_id=NameIds.POSTSCRIPT_NAME, name_string=postscript_name, platform_id=platform_id
         )
+
+    def build_mac_names(self) -> None:
+        """
+        Build the Macintosh-specific NameRecords 1 (Font Family Name), 2 (Font Subfamily Name), 4
+        (Full Font Name), 5 (Version String), and 6 (PostScript Name).
+        """
+
+        family_name = self.table.getName(NameIds.FAMILY_NAME, 3, 1, 0x409)
+        if family_name:
+            self.set_name(
+                name_id=NameIds.FAMILY_NAME, name_string=family_name.toUnicode(), platform_id=1
+            )
+        subfamily_name = self.table.getName(NameIds.SUBFAMILY_NAME, 3, 1, 0x409)
+        if subfamily_name:
+            self.set_name(
+                name_id=NameIds.SUBFAMILY_NAME,
+                name_string=subfamily_name.toUnicode(),
+                platform_id=1,
+            )
+        self.build_full_font_name(platform_id=1)
+        self.build_version_string(platform_id=1)
+        self.build_postscript_name(platform_id=1)

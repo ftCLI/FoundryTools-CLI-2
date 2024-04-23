@@ -203,3 +203,16 @@ def build_postscript_name(font: Font, platform_id: t.Optional[int] = None) -> No
     name_table = NameTable(ttfont=font.ttfont)
     name_table.build_postscript_name(platform_id=platform_id)
     font.modified = name_table.modified
+
+
+def build_mac_names(font: Font) -> None:
+    """
+    Builds Macintosh-specific font names for the given font.
+
+    Args:
+        font (Font): The font object to build the Macintosh names for.
+    """
+
+    name_table = NameTable(ttfont=font.ttfont)
+    name_table.build_mac_names()
+    font.modified = name_table.modified
