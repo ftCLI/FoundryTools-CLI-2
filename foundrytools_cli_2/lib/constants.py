@@ -1,7 +1,4 @@
-import typing as t
-from dataclasses import dataclass
 from enum import IntEnum
-from pathlib import Path
 
 PS_SFNT_VERSION = "OTTO"
 TT_SFNT_VERSION = "\0\1\0\0"
@@ -70,27 +67,3 @@ class NameIds(IntEnum):
     LIGHT_BACKGROUND_PALETTE = 23
     DARK_BACKGROUND_PALETTE = 24
     VARIATIONS_POSTSCRIPT_NAME_PREFIX = 25
-
-
-@dataclass
-class SaveOptions:
-    """
-    A class that specifies how to save the font.
-    """
-
-    reorder_tables: t.Optional[bool] = True
-    suffix: str = ""
-    output_dir: t.Optional[Path] = None
-    overwrite: bool = False
-
-
-@dataclass
-class FinderOptions:
-    """
-    A class that specifies the options to pass to the FontFinder class.
-    """
-
-    recursive: bool = False
-    lazy: t.Optional[bool] = None
-    recalc_bboxes: bool = True
-    recalc_timestamp: bool = False

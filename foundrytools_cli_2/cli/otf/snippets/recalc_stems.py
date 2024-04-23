@@ -7,8 +7,8 @@ from afdko.otfautohint.hinter import glyphHinter
 from afdko.otfautohint.report import Report
 from fontTools.ttLib import TTFont
 
+from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.logger import logger
 from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path
 
 H_STEM_GLYPHS = ["A", "H", "T", "S", "C", "O"]

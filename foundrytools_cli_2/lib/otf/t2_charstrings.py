@@ -10,7 +10,7 @@ from fontTools.pens.t2CharStringPen import T2CharStringPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 
-from foundrytools_cli_2.lib.logger import logger
+from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.skia.skia_tools import simplify_path
 from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf

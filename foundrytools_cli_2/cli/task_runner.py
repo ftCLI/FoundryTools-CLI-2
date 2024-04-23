@@ -1,11 +1,11 @@
 import typing as t
+from dataclasses import dataclass
 from pathlib import Path
 
-from foundrytools_cli_2.lib.constants import FinderOptions, SaveOptions
+from foundrytools_cli_2.cli.font_finder import FinderError, FinderFilter, FinderOptions, FontFinder
+from foundrytools_cli_2.cli.logger import logger
+from foundrytools_cli_2.cli.timer import Timer
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font_finder import FinderError, FinderFilter, FontFinder
-from foundrytools_cli_2.lib.logger import logger
-from foundrytools_cli_2.lib.timer import Timer
 
 
 class FontSaveError(Exception):
@@ -14,6 +14,18 @@ class FontSaveError(Exception):
 
 class NoFontsFoundError(Exception):
     """Raised when no fonts are found by the FontFinder"""
+
+
+@dataclass
+class SaveOptions:
+    """
+    A class that specifies how to save the font.
+    """
+
+    reorder_tables: t.Optional[bool] = True
+    suffix: str = ""
+    output_dir: t.Optional[Path] = None
+    overwrite: bool = False
 
 
 class TaskRunnerConfig:  # pylint: disable=too-few-public-methods
@@ -63,7 +75,7 @@ class TaskRunnerConfig:  # pylint: disable=too-few-public-methods
         return False
 
 
-class TaskRunner:  # pylint: disable=too-few-public-methods, too-many-instance-attributes
+class TaskRunner:  # pylint: disable=too-few-public-methods
     """
     A class for running tasks on multiple fonts.
 
@@ -76,7 +88,7 @@ class TaskRunner:  # pylint: disable=too-few-public-methods, too-many-instance-a
         force_modified (bool): Whether to force the font to be saved even if it has not been
             modified. Set to True when it's not possible to determine if the font has been modified,
             or when it's too expensive to check. Defaults to False.
-        options (TaskRunnerConfig): A configuration object containing FinderOptions, SaveOptions,
+        config (TaskRunnerConfig): A configuration object containing FinderOptions, SaveOptions,
             and specific task options.
     """
 
@@ -99,7 +111,7 @@ class TaskRunner:  # pylint: disable=too-few-public-methods, too-many-instance-a
         self.filter = FinderFilter()
         self.save_if_modified = True
         self.force_modified = False
-        self.options = TaskRunnerConfig(options=options, task=task)
+        self.config = TaskRunnerConfig(options=options, task=task)
 
     @Timer(logger=logger.opt(colors=True).info, text="Elapsed time <cyan>{:0.4f} seconds</>")
     def run(self) -> None:
@@ -121,7 +133,7 @@ class TaskRunner:  # pylint: disable=too-few-public-methods, too-many-instance-a
 
     def _find_fonts(self) -> t.List[Font]:
         finder = FontFinder(
-            input_path=self.input_path, options=self.options.finder_options, filter_=self.filter
+            input_path=self.input_path, options=self.config.finder_options, filter_=self.filter
         )
         fonts = finder.find_fonts()
         if not fonts:
@@ -139,7 +151,7 @@ class TaskRunner:  # pylint: disable=too-few-public-methods, too-many-instance-a
 
     def _execute_task(self, font: Font) -> None:
         try:
-            self.task(font, **self.options.task_options)
+            self.task(font, **self.config.task_options)
         except Exception as e:  # pylint: disable=broad-except
             self._log_error(e)
             return
@@ -157,17 +169,17 @@ class TaskRunner:  # pylint: disable=too-few-public-methods, too-many-instance-a
     def _save_font_to_file(self, font: Font) -> None:
         try:
             out_file = self._get_out_file_name(font)
-            font.save(out_file, reorder_tables=self.options.save_options.reorder_tables)
+            font.save(out_file, reorder_tables=self.config.save_options.reorder_tables)
             logger.success(f"File saved to {out_file}")
         except Exception as e:  # pylint: disable=broad-except
             self._log_error(e)
 
     def _get_out_file_name(self, font: Font) -> Path:
         return font.make_out_file_name(
-            output_dir=self.options.save_options.output_dir,
+            output_dir=self.config.save_options.output_dir,
             extension=font.get_real_extension(),
-            overwrite=self.options.save_options.overwrite,
-            suffix=self.options.save_options.suffix,
+            overwrite=self.config.save_options.overwrite,
+            suffix=self.config.save_options.suffix,
         )
 
     @staticmethod

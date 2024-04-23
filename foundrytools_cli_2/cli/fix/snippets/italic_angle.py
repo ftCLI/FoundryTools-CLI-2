@@ -2,7 +2,7 @@ import typing as t
 
 from fontTools.misc.roundTools import otRound
 
-from foundrytools_cli_2.lib import logger
+from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.lib.constants import T_OS_2
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font.tables import CFFTable, HheaTable, PostTable

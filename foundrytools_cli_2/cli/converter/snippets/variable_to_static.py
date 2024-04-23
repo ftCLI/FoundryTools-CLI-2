@@ -7,6 +7,7 @@ from fontTools.ttLib.tables._f_v_a_r import NamedInstance
 from fontTools.varLib.instancer import OverlapMode, instantiateVariableFont
 from pathvalidate import sanitize_filename
 
+from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.lib.constants import (
     T_CVAR,
     T_GSUB,
@@ -15,7 +16,6 @@ from foundrytools_cli_2.lib.constants import (
 )
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font.tables import NameTable
-from foundrytools_cli_2.lib.logger import logger
 
 
 def get_instance_file_name(font: Font, instance: NamedInstance) -> str:

@@ -1,7 +1,7 @@
 from dehinter.font import dehint
 
+from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.logger import logger
 
 
 def main(font: Font, min_area: int = 25, remove_hinting: bool = True) -> None:
