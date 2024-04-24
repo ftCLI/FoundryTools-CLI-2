@@ -22,6 +22,27 @@ def otf_autohint_options() -> t.Callable:
     return add_options(_autohint_options)
 
 
+def drop_zones_stems_flag() -> t.Callable:
+    """
+    Add the ``drop_zones_stems`` option to a click command.
+
+    Returns:
+        t.Callable: A decorator that adds the ``drop_zones_stems`` option to a click command
+    """
+    _drop_zones_stems_flag = [
+        click.option(
+            "--drop-zones-stems",
+            is_flag=True,
+            default=False,
+            help="""
+            Drop BlueValues, OtherBlues, FamilyBlues, FamilyOtherBlues, StdHW, StdVW, StemSnapH, and
+            StemSnapV from the CFF Private dictionary.
+            """,
+        )
+    ]
+    return add_options(_drop_zones_stems_flag)
+
+
 def allow_changes_flag() -> t.Callable:
     """
     Add the ``allow_changes`` option to a click command.
@@ -120,24 +141,3 @@ def no_hint_sub_flag() -> t.Callable:
         )
     ]
     return add_options(_no_hint_sub_flag)
-
-
-def drop_zones_stems_flag() -> t.Callable:
-    """
-    Add the ``drop_zones_stems`` option to a click command.
-
-    Returns:
-        t.Callable: A decorator that adds the ``drop_zones_stems`` option to a click command
-    """
-    _drop_zones_stems_flag = [
-        click.option(
-            "--drop-zones-stems",
-            is_flag=True,
-            default=False,
-            help="""
-            Drop BlueValues, OtherBlues, FamilyBlues, FamilyOtherBlues, StdHW, StdVW, StemSnapH, and
-            StemSnapV from the CFF Private dictionary.
-            """,
-        )
-    ]
-    return add_options(_drop_zones_stems_flag)
