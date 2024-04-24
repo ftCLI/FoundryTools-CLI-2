@@ -241,7 +241,7 @@ def set_fs_type(
     """
 
     if all(value is None for value in (embed_level, no_subsetting, bitmap_embed_only)):
-        logger.warning("No attributes provided to set.")
+        logger.error("No attributes provided to set.")
         return
 
     os_2_table = OS2Table(font.ttfont)
