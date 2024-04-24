@@ -4,7 +4,7 @@ from pathlib import Path
 
 import click
 
-from foundrytools_cli_2.cli.otf.options import otf_autohint_options
+from foundrytools_cli_2.cli.otf.options import otf_autohint_options, drop_zones_stems_flag
 from foundrytools_cli_2.cli.shared_options import base_options, min_area_option, subroutinize_flag
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 from foundrytools_cli_2.lib.font import Font
@@ -20,6 +20,20 @@ def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Autohint OpenType-PS fonts with ``afdko.otfautohint``.
     """
     from foundrytools_cli_2.cli.otf.snippets.autohint import main as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.filter.filter_out_tt = True
+    runner.run()
+
+
+@cli.command("dehint")
+@drop_zones_stems_flag()
+@base_options()
+def dehint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Dehint OpenType-PS fonts.
+    """
+    from foundrytools_cli_2.cli.otf.snippets.dehint import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_tt = True
