@@ -3,8 +3,6 @@ import tempfile
 import typing as t
 from pathlib import Path
 
-from foundrytools_cli_2.cli.logger import logger
-
 
 def get_temp_file_path(directory: t.Optional[t.Union[str, Path]] = None) -> Path:
     """
@@ -18,8 +16,7 @@ def get_temp_file_path(directory: t.Optional[t.Union[str, Path]] = None) -> Path
         Path: The temporary file path.
     """
     if directory and not Path(directory).is_dir():
-        logger.warning(f"{directory} is not a directory, using default temp directory")
-        directory = None
+        raise NotADirectoryError(f"{directory} is not a directory.")
     file_descriptor, path = tempfile.mkstemp(dir=directory)
     os.close(file_descriptor)
     return Path(path)
