@@ -10,7 +10,6 @@ from fontTools.pens.t2CharStringPen import T2CharStringPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 
-from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.skia.skia_tools import simplify_path
 from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
@@ -65,7 +64,7 @@ def quadratics_to_cubics(
             glyph_set[k].draw(qu2cu_pen)
             qu2cu_charstrings[k] = t2_pen.getCharString()
 
-        except NotImplementedError as e:
+        except NotImplementedError:
             temp_t2_pen = T2CharStringPen(width=width, glyphSet=None)
             glyph_set[k].draw(temp_t2_pen)
             t2_charstring = temp_t2_pen.getCharString()
@@ -79,7 +78,6 @@ def quadratics_to_cubics(
             t2_pen = T2CharStringPen(width=width, glyphSet=None)
             qu2cu_pen = Qu2CuPen(t2_pen, max_err=tolerance, all_cubic=True, reverse_direction=True)
             tt_glyph.draw(pen=qu2cu_pen, glyfTable=None)
-            logger.info(f"{e}. Successfully got charstring for {k} at second attempt")
 
         charstring = t2_pen.getCharString()
 
