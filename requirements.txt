@@ -2,9 +2,11 @@ fonttools[woff,pathops,unicode]==4.51.0
 afdko==4.0.1
 beziers==0.5.0
 cffsubr==0.3.0
+defcon==0.10.3
 click==8.1.7
 dehinter==4.0.0
 loguru==0.7.2
 pathvalidate==3.2.0
 rich==13.7.1
 ttfautohint-py==0.5.1
+ufo-extractor==0.6.0
