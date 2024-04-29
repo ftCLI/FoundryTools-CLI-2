@@ -40,7 +40,7 @@ class CFFTable(DefaultTbl):
 
     def get_charstring(self, glyph_name: str) -> T2CharString:
         """
-        Returns the char string of a given glyph name.
+        Returns the charstring of a given glyph name.
 
         Args:
             glyph_name (str): The glyph name to get the char string from.

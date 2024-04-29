@@ -10,13 +10,13 @@ from foundrytools_cli_2.cli.task_runner import TaskRunner
 cli = click.Group(help="Miscellaneous utilities.")
 
 
-@cli.command("reorder-glyphs")
+@cli.command("sort-glyphs")
 @base_options()
-def reorder_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def sort_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Reorder the glyphs.
+    Reorder the glyphs based on their Unicode values.
     """
-    from foundrytools_cli_2.cli.utils.snippets.reorder_glyphs import main as task
+    from foundrytools_cli_2.cli.utils.snippets.sort_glyphs import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
