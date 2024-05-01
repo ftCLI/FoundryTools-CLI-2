@@ -208,6 +208,7 @@ class Font:  # pylint: disable=too-many-public-methods
         self.ttfont.save(buf)
         buf.seek(0)
         self.ttfont = TTFont(buf, recalcBBoxes=recalc_bboxes, recalcTimestamp=recalc_timestamp)
+        buf.close()
 
     @property
     def modified(self) -> bool:
