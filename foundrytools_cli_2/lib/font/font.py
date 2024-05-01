@@ -198,7 +198,7 @@ class Font:  # pylint: disable=too-many-public-methods
 
     def reload(self) -> None:
         """
-        Reload the font from the temporary file.
+        Reload the font by saving it to a temporary stream and then loading it back.
         """
         recalc_bboxes = self.ttfont.recalcBBoxes
         recalc_timestamp = self.ttfont.recalcTimestamp
