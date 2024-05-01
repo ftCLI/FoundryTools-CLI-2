@@ -5,7 +5,6 @@ from pathlib import Path
 
 from cffsubr import desubroutinize, subroutinize
 from fontTools.misc.cliTools import makeOutputFileName
-from fontTools.misc.timeTools import timestampToString
 from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.pens.statisticsPen import StatisticsPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
@@ -28,9 +27,8 @@ from foundrytools_cli_2.lib.constants import (
     WOFF2_FLAVOR,
     WOFF_EXTENSION,
     WOFF_FLAVOR,
-    NameIds,
 )
-from foundrytools_cli_2.lib.font.tables import HeadTable, NameTable, OS2Table
+from foundrytools_cli_2.lib.font.tables import HeadTable, OS2Table
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.otf.t2_charstrings import quadratics_to_cubics
 from foundrytools_cli_2.lib.skia.skia_tools import correct_contours_cff, correct_contours_glyf
