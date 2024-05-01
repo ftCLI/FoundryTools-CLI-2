@@ -5,7 +5,6 @@ from pathlib import Path
 
 from cffsubr import desubroutinize, subroutinize
 from fontTools.misc.cliTools import makeOutputFileName
-from fontTools.misc.timeTools import timestampToString
 from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.pens.statisticsPen import StatisticsPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
@@ -28,9 +27,8 @@ from foundrytools_cli_2.lib.constants import (
     WOFF2_FLAVOR,
     WOFF_EXTENSION,
     WOFF_FLAVOR,
-    NameIds,
 )
-from foundrytools_cli_2.lib.font.tables import HeadTable, NameTable, OS2Table
+from foundrytools_cli_2.lib.font.tables import HeadTable, OS2Table
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.otf.t2_charstrings import quadratics_to_cubics
 from foundrytools_cli_2.lib.skia.skia_tools import correct_contours_cff, correct_contours_glyf
@@ -197,6 +195,18 @@ class Font:  # pylint: disable=too-many-public-methods
             The temporary file path of the font.
         """
         return self._temp_file
+
+    def reload(self) -> None:
+        """
+        Reload the font by saving it to a temporary stream and then loading it back.
+        """
+        recalc_bboxes = self.ttfont.recalcBBoxes
+        recalc_timestamp = self.ttfont.recalcTimestamp
+        buf = BytesIO()
+        self.ttfont.save(buf)
+        buf.seek(0)
+        self.ttfont = TTFont(buf, recalcBBoxes=recalc_bboxes, recalcTimestamp=recalc_timestamp)
+        buf.close()
 
     @property
     def modified(self) -> bool:
@@ -762,39 +772,3 @@ class Font:  # pylint: disable=too-many-public-methods
             )
         with restore_flavor(self.ttfont):
             desubroutinize(self.ttfont)
-
-    def build_unique_identifier(
-        self, platform_id: t.Optional[int] = None, alternate: bool = False
-    ) -> None:
-        """
-        Build the NameID 3 (Unique Font Identifier) record based on the font revision, vendor ID,
-        and PostScript name.
-
-        Args:
-            platform_id (Optional[int]): The platform ID of the name record. Defaults to None.
-            alternate (bool): If True, the unique ID will be built using the manufacturer name,
-                family name, subfamily name, and year created. If False, the unique ID will be built
-                using the font revision, vendor ID, and PostScript name.
-        """
-
-        head_table = HeadTable(ttfont=self.ttfont)
-        name_table = NameTable(ttfont=self.ttfont)
-        os_2_table = OS2Table(ttfont=self.ttfont)
-
-        if not alternate:
-            font_revision = round(head_table.font_revision, 3)
-            vendor_id = os_2_table.vendor_id
-            postscript_name = name_table.get_debug_name(NameIds.POSTSCRIPT_NAME)
-            unique_id = f"{font_revision};{vendor_id};{postscript_name}"
-        else:
-            year_created = timestampToString(head_table.created_timestamp).split(" ")[-1]
-            family_name = name_table.get_best_family_name()
-            subfamily_name = name_table.get_best_subfamily_name()
-            manufacturer_name = name_table.get_debug_name(NameIds.MANUFACTURER_NAME)
-            unique_id = f"{manufacturer_name}: {family_name}-{subfamily_name}: {year_created}"
-
-        name_table.set_name(
-            name_id=NameIds.UNIQUE_FONT_IDENTIFIER, name_string=unique_id, platform_id=platform_id
-        )
-
-        self.modified = name_table.modified
