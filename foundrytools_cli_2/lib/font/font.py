@@ -198,6 +198,17 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         return self._temp_file
 
+    def reload(self) -> None:
+        """
+        Reload the font from the temporary file.
+        """
+        recalc_bboxes = self.ttfont.recalcBBoxes
+        recalc_timestamp = self.ttfont.recalcTimestamp
+        buf = BytesIO()
+        self.ttfont.save(buf)
+        buf.seek(0)
+        self.ttfont = TTFont(buf, recalcBBoxes=recalc_bboxes, recalcTimestamp=recalc_timestamp)
+
     @property
     def modified(self) -> bool:
         """
