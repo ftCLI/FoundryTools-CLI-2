@@ -4,6 +4,7 @@ import defcon
 import extractor
 
 from foundrytools_cli_2.lib.font import Font
+from foundrytools_cli_2.lib.font.tables import CFFTable
 
 
 def create_new_glyph_order(font: Font) -> t.List[str]:
@@ -26,8 +27,6 @@ def main(font: Font) -> None:
     """
     Reorders the glyphs based on the Unicode values.
     """
-    if font.is_ps:
-        raise NotImplementedError("Reordering glyphs for PostScript fonts is not supported yet.")
 
     ufo = defcon.Font()
     extractor.extractUFO(
@@ -37,5 +36,11 @@ def main(font: Font) -> None:
     new_glyph_order = create_new_glyph_order(font)
     font.ttfont.reorderGlyphs(new_glyph_order=new_glyph_order)
     font.ttfont.setGlyphOrder(new_glyph_order)
+
+    if font.is_ps:
+        cff_table = CFFTable(font.ttfont)
+        charstrings = cff_table.charstrings.charStrings
+        cff_table.top_dict.charset = new_glyph_order
+        cff_table.charstrings.charStrings = {k: charstrings.get(k) for k in new_glyph_order}
 
     font.modified = new_glyph_order != original_glyph_order
