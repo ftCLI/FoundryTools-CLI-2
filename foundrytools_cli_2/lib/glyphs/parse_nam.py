@@ -12,7 +12,30 @@ NAM_FILE = "standard.nam"
 """
 
 
-def parse_nam(file: str) -> t.Dict[str, t.Dict[str, t.List[str]]]:
+def get_names_unicodes(file: str) -> t.Dict[str, int]:
+    names_unicodes = {}
+
+    with open(file, encoding="utf-8") as f:
+        for line in f.readlines():
+            if line.startswith("%"):
+                continue
+            unicode, name = line.strip().split(" ", 1)
+            name = name.strip()
+            unicode = int(unicode.replace("0x", ""), 16)
+
+            if name.startswith("!"):
+                name = name[1:]
+            elif name.startswith(">"):
+                name = name[1:]
+            elif name.startswith("<"):
+                name = name[1:]
+
+            names_unicodes[name] = unicode
+
+    return names_unicodes
+
+
+def get_unicodes_names(file: str) -> t.Dict[str, t.Dict[str, t.List[str]]]:
     """
     Parses the NAM file and returns a dictionary with the unicode code points as keys and a
     dictionary with the names as values.
@@ -58,8 +81,13 @@ def parse_nam(file: str) -> t.Dict[str, t.Dict[str, t.List[str]]]:
 
 
 if __name__ == "__main__":
-    print(parse_nam(NAM_FILE)["0x04BB"])
+    print(get_unicodes_names(NAM_FILE)["0x04BB"])
+    print(get_names_unicodes(NAM_FILE)["space"])
 
-    names = parse_nam(NAM_FILE)
-    with open("../../data/names.json", "w", encoding="utf-8") as j:
-        json.dump(names, j, indent=4)
+    names_unicodes = get_names_unicodes(NAM_FILE)
+    with open("../../data/names_unicodes.json", "w", encoding="utf-8") as j:
+        json.dump(names_unicodes, j, indent=4)
+
+    unicodes_names = get_unicodes_names(NAM_FILE)
+    with open("../../data/unicodes_names.json", "w", encoding="utf-8") as j:
+        json.dump(unicodes_names, j, indent=4)
