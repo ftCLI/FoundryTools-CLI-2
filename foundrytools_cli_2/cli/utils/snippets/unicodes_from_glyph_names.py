@@ -13,7 +13,7 @@ with open(NAMES_UNICODES_FILE, encoding="utf-8") as f:
     NAMES_UNICODES = json.load(f)
 
 
-def collect_unmapped_glyphs(font: Font, reversed_cmap: t.Dict[str, int]):
+def collect_unmapped_glyphs(font: Font, reversed_cmap: t.Dict[str, int]) -> t.List[str]:
     """
     Collects the unmapped glyphs from the font.
 
@@ -28,7 +28,7 @@ def collect_unmapped_glyphs(font: Font, reversed_cmap: t.Dict[str, int]):
     return unmapped_glyphs
 
 
-def remap_glyphs(unmapped_glyphs: t.List[str], cmap: table__c_m_a_p):
+def remap_glyphs(unmapped_glyphs: t.List[str], cmap: table__c_m_a_p) -> t.List[str]:
     """
     Remaps the glyphs to their Unicode values.
 
