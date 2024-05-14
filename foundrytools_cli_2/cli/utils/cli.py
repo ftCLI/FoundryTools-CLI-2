@@ -20,3 +20,15 @@ def sort_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
+
+
+@cli.command("unicodes-from-names")
+@base_options()
+def unicodes_from_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Rename glyphs based on a mapping file.
+    """
+    from foundrytools_cli_2.cli.utils.snippets.unicodes_from_glyph_names import main as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.run()
