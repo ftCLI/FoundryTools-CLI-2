@@ -1,8 +1,11 @@
 import itertools
 import json
 import typing as t
+from pathlib import Path
 
 NAM_FILE = "standard.nam"
+NAMES_FILE = "names.json"
+UNICODES_FILE = "unicodes.json"
 
 """
 - names without prefix are used as production, friendly and alternative names
@@ -12,36 +15,17 @@ NAM_FILE = "standard.nam"
 """
 
 
-def get_names_unicodes(file: str) -> t.Dict[str, int]:
-    names_unicodes = {}
-
-    with open(file, encoding="utf-8") as f:
-        for line in f.readlines():
-            if line.startswith("%"):
-                continue
-            unicode, name = line.strip().split(" ", 1)
-            name = name.strip()
-            unicode = int(unicode.replace("0x", ""), 16)
-
-            if name.startswith("!"):
-                name = name[1:]
-            elif name.startswith(">"):
-                name = name[1:]
-            elif name.startswith("<"):
-                name = name[1:]
-
-            names_unicodes[name] = unicode
-
-    return names_unicodes
-
-
-def get_unicodes_names(file: str) -> t.Dict[str, t.Dict[str, t.List[str]]]:
+def get_unicodes_and_names(
+        nam_file: Path
+) -> t.Tuple[t.Dict[str, t.Dict[str, t.List[str]]], t.Dict[str, str]]:
     """
     Parses the NAM file and returns a dictionary with the unicode code points as keys and a
     dictionary with the names as values.
     """
-    parsed_names: t.Dict[str, t.Dict[str, t.List[str]]] = {}
-    with open(file, encoding="utf-8") as f:
+    unicodes_dict: t.Dict[str, t.Dict[str, t.List[str]]] = {}
+    names_dict: t.Dict[str, str] = {}
+
+    with open(nam_file, encoding="utf-8") as f:
         lines = itertools.islice(f, 3, None)  # skip the first 3 lines
         for line in lines:
             if line.startswith("%"):
@@ -60,34 +44,35 @@ def get_unicodes_names(file: str) -> t.Dict[str, t.Dict[str, t.List[str]]]:
                 name = name[1:]  # removing '<' prefix
                 name_type = "alternative"
 
-            if unicode not in parsed_names:
-                parsed_names[unicode] = {
+            if unicode not in unicodes_dict:
+                unicodes_dict[unicode] = {
                     "production": [],
                     "friendly": [],
                     "alternative": [],
                     "synonym": [],
                 }
 
-            parsed_names[unicode][name_type].append(name)
+            unicodes_dict[unicode][name_type].append(name)
+            names_dict[name] = unicode
 
-    for k, v in parsed_names.items():
+    for k, v in unicodes_dict.items():
         if not v["production"]:
             if int(k, 16) > 0xFFFF:
-                v["production"] = [f"u{k.replace('0x', '')}"]
+                prefix = "u"
             else:
-                v["production"] = [f"uni{k.replace('0x', '')}"]
+                prefix = "uni"
+            production_name = k.replace('0x', prefix)
 
-    return parsed_names
+            v["production"] = [production_name]
+            names_dict[production_name] = k
+
+    return unicodes_dict, names_dict
 
 
 if __name__ == "__main__":
-    print(get_unicodes_names(NAM_FILE)["0x04BB"])
-    print(get_names_unicodes(NAM_FILE)["space"])
+    unicodes, names = get_unicodes_and_names(Path(NAM_FILE))
+    with open(NAMES_FILE, "w", encoding="utf-8") as j:
+        json.dump(names, j, indent=4)
+    with open(UNICODES_FILE, "w", encoding="utf-8") as j:
+        json.dump(unicodes, j, indent=4)
 
-    names_unicodes = get_names_unicodes(NAM_FILE)
-    with open("../../data/names_unicodes.json", "w", encoding="utf-8") as j:
-        json.dump(names_unicodes, j, indent=4)
-
-    unicodes_names = get_unicodes_names(NAM_FILE)
-    with open("../../data/unicodes_names.json", "w", encoding="utf-8") as j:
-        json.dump(unicodes_names, j, indent=4)
