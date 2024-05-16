@@ -8,9 +8,9 @@ from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.cli.logger import logger
 
 
-NAMES_UNICODES_FILE = Path(__file__).parent / "names.json"
-with open(NAMES_UNICODES_FILE, encoding="utf-8") as f:
-    NAMES_UNICODES = json.load(f)
+NAMES_JSON = Path(__file__).parent / "names.json"
+with open(NAMES_JSON, encoding="utf-8") as f:
+    JSON_CONTENT = json.load(f)
 
 
 def collect_unmapped_glyphs(font: Font, reversed_cmap: t.Dict[str, int]) -> t.List[str]:
@@ -49,7 +49,7 @@ def remap_glyphs(unmapped_glyphs: t.List[str], cmap: table__c_m_a_p) -> t.List[s
                     )
 
         for glyph_name in unmapped_glyphs:
-            unicode_value = NAMES_UNICODES.get(glyph_name)
+            unicode_value = JSON_CONTENT.get(glyph_name)
             if unicode_value:
                 codepoint = int(unicode_value, 16)
                 if codepoint in subtable.cmap:
