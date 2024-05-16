@@ -8,7 +8,7 @@ from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.cli.logger import logger
 
 
-NAMES_UNICODES_FILE = Path(__file__).parent / "names_unicodes.json"
+NAMES_UNICODES_FILE = Path(__file__).parent / "names.json"
 with open(NAMES_UNICODES_FILE, encoding="utf-8") as f:
     NAMES_UNICODES = json.load(f)
 
@@ -37,15 +37,27 @@ def remap_glyphs(unmapped_glyphs: t.List[str], cmap: table__c_m_a_p) -> t.List[s
         cmap (table__c_m_a_p): The cmap table.
     """
     remapped_glyphs = []
-    for glyph_name in unmapped_glyphs:
-        unicode_value = NAMES_UNICODES.get(glyph_name)
-        if unicode_value:
-            logger.info(f"Remapping {glyph_name} to {hex(unicode_value)}")
-            for subtable in cmap.tables:
-                if subtable.isUnicode() and unicode_value in subtable.cmap:
+
+    for subtable in cmap.tables:
+        if not subtable.isUnicode():
+            continue
+
+        logger.info(f"Remapping glyphs in subtable (format {subtable.format}, "
+                    f"platformID: {subtable.platformID}, "
+                    f"platEncID: {subtable.platEncID}, "
+                    f"language: {subtable.language})"
+                    )
+
+        for glyph_name in unmapped_glyphs:
+            unicode_value = NAMES_UNICODES.get(glyph_name)
+            if unicode_value:
+                codepoint = int(unicode_value, 16)
+                if codepoint in subtable.cmap:
                     continue
-                subtable.cmap[unicode_value] = glyph_name
+                subtable.cmap[codepoint] = glyph_name
+                logger.info(f"Remapped {glyph_name} to {unicode_value}")
                 remapped_glyphs.append(glyph_name)
+
     return remapped_glyphs
 
 
