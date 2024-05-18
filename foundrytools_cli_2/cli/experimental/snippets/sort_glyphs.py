@@ -16,7 +16,7 @@ def create_new_glyph_order(font: Font) -> t.List[str]:
     )
     new_glyph_order = ufo.unicodeData.sortGlyphNames(
         glyphNames=font.ttfont.getGlyphOrder(),
-        sortDescriptors=[dict(type="unicode")],
+        sortDescriptors=[{"type": "unicode"}],
     )
     if ".notdef" in new_glyph_order:
         new_glyph_order.remove(".notdef")

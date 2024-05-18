@@ -1,12 +1,11 @@
 import json
-from pathlib import Path
 import typing as t
+from pathlib import Path
 
 from fontTools.ttLib.tables._c_m_a_p import table__c_m_a_p
 
-from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.cli.logger import logger
-
+from foundrytools_cli_2.lib.font import Font
 
 NAMES_JSON = Path(__file__).parent / "names.json"
 with open(NAMES_JSON, encoding="utf-8") as f:
@@ -42,11 +41,12 @@ def remap_glyphs(unmapped_glyphs: t.List[str], cmap: table__c_m_a_p) -> t.List[s
         if not subtable.isUnicode():
             continue
 
-        logger.info(f"Remapping glyphs in subtable (format {subtable.format}, "
-                    f"platformID: {subtable.platformID}, "
-                    f"platEncID: {subtable.platEncID}, "
-                    f"language: {subtable.language})"
-                    )
+        logger.info(
+            f"Remapping glyphs in subtable (format {subtable.format}, "
+            f"platformID: {subtable.platformID}, "
+            f"platEncID: {subtable.platEncID}, "
+            f"language: {subtable.language})"
+        )
 
         for glyph_name in unmapped_glyphs:
             unicode_value = JSON_CONTENT.get(glyph_name)

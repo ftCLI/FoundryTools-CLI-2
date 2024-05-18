@@ -1,12 +1,10 @@
 import json
-from pathlib import Path
 import typing as t
+from pathlib import Path
 
-from fontTools.ttLib.tables._c_m_a_p import table__c_m_a_p
+from ufo2ft.postProcessor import PostProcessor
 
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.cli.logger import logger
-
 
 NAMES_JSON = Path(__file__).parent / "names.json"
 with open(NAMES_JSON, encoding="utf-8") as f:
@@ -64,7 +62,7 @@ def get_production_name(unicode_value: str) -> t.Optional[str]:
     return UNICODES_CONTENT.get(unicode_value)["production"][0]
 
 
-def rename_glyphs(font: Font):
+def rename_glyphs(font: Font) -> None:
     """
     Rename glyphs in the font to their Unicode values.
 
@@ -94,7 +92,6 @@ def rename_glyphs(font: Font):
 
     name_map = dict(zip(glyph_order, new_glyph_order))
 
-    from ufo2ft.postProcessor import PostProcessor
     PostProcessor.rename_glyphs(font.ttfont, name_map)
 
     font.modified = True

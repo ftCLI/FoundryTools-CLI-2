@@ -75,4 +75,3 @@ if __name__ == "__main__":
         json.dump(names, j, indent=4)
     with open(UNICODES_FILE, "w", encoding="utf-8") as j:
         json.dump(unicodes, j, indent=4)
-

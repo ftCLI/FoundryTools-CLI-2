@@ -16,7 +16,7 @@ def sort_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Reorder the glyphs based on their Unicode values.
     """
-    from foundrytools_cli_2.cli.utils.snippets.sort_glyphs import main as task
+    from foundrytools_cli_2.cli.experimental.snippets.sort_glyphs import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -28,7 +28,7 @@ def unicodes_from_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None
     """
     Rename glyphs based on a mapping file.
     """
-    from foundrytools_cli_2.cli.utils.snippets.unicodes_from_glyph_names import main as task
+    from foundrytools_cli_2.cli.experimental.snippets.unicodes_from_glyph_names import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -40,7 +40,9 @@ def glyph_names_from_unicodes(input_path: Path, **options: t.Dict[str, t.Any]) -
     """
     Rename glyphs in the font to their Unicode values.
     """
-    from foundrytools_cli_2.cli.utils.snippets.names_from_unicodes import rename_glyphs as task
+    from foundrytools_cli_2.cli.experimental.snippets.names_from_unicodes import (
+        rename_glyphs as task,
+    )
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
