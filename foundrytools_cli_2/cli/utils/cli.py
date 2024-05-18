@@ -32,3 +32,15 @@ def unicodes_from_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
+
+
+@cli.command("names-from-unicodes")
+@base_options()
+def glyph_names_from_unicodes(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Rename glyphs in the font to their Unicode values.
+    """
+    from foundrytools_cli_2.cli.utils.snippets.names_from_unicodes import rename_glyphs as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.run()
