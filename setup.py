@@ -25,6 +25,7 @@ setuptools.setup(
     author_email="ftcli@proton.me",
     url="https://github.com/ftCLI/FoundryTools-CLI-2",
     packages=setuptools.find_packages(),
+    package_data={"foundrytools_cli_2": ["data/*.json"]},
     include_package_data=True,
     entry_points={"console_scripts": ["ft-cli = foundrytools_cli_2.__main__:cli"]},
     install_requires=_get_requirements(),

@@ -9,4 +9,5 @@ loguru==0.7.2
 pathvalidate==3.2.0
 rich==13.7.1
 ttfautohint-py==0.5.1
+ufo2ft==3.2.2
 ufo-extractor==0.6.0

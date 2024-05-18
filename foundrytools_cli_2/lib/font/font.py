@@ -28,7 +28,7 @@ from foundrytools_cli_2.lib.constants import (
     WOFF_EXTENSION,
     WOFF_FLAVOR,
 )
-from foundrytools_cli_2.lib.font.tables import HeadTable, OS2Table
+from foundrytools_cli_2.lib.font.tables import CFFTable, HeadTable, OS2Table
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.otf.t2_charstrings import quadratics_to_cubics
 from foundrytools_cli_2.lib.skia.skia_tools import correct_contours_cff, correct_contours_glyf
@@ -772,3 +772,17 @@ class Font:  # pylint: disable=too-many-public-methods
             )
         with restore_flavor(self.ttfont):
             desubroutinize(self.ttfont)
+
+    def sort_glyphs(self, new_glyph_order: t.List[str]) -> None:
+        """
+        Reorder the glyphs based on the Unicode values.
+
+        Args:
+            new_glyph_order (list): The new glyph order.
+        """
+        self.ttfont.reorderGlyphs(new_glyph_order=new_glyph_order)
+        if self.is_ps:
+            cff_table = CFFTable(self.ttfont)
+            charstrings = cff_table.charstrings.charStrings
+            cff_table.top_dict.charset = new_glyph_order
+            cff_table.charstrings.charStrings = {k: charstrings.get(k) for k in new_glyph_order}
