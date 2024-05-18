@@ -57,10 +57,7 @@ def get_unicodes_and_names(
 
     for k, v in unicodes_dict.items():
         if not v["production"]:
-            if int(k, 16) > 0xFFFF:
-                prefix = "u"
-            else:
-                prefix = "uni"
+            prefix = "u" if int(k, 16) > 65535 else "uni"
             production_name = k.replace('0x', prefix)
 
             v["production"] = [production_name]
