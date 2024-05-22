@@ -122,3 +122,27 @@ def fix_monospace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
+
+
+@cli.command("legacy-accents")
+@base_options()
+def fix_legacy_accents(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Check that legacy accents aren't used in composite glyphs.
+
+    fontbakery check id: com.google.fonts/check/legacy_accents
+
+    Rationale:
+
+    Legacy accents should not have anchors and should have positive width. They are often used
+    independently of a letter, either as a placeholder for an expected combined mark+letter
+    combination in macOS, or separately. For instance, U+00B4 (ACUTE ACCENT) is often mistakenly
+    used as an apostrophe, U+0060 (GRAVE ACCENT) is used in Markdown to notify code blocks, and ^ is
+    used as an exponential operator in maths.
+
+    More info: https://github.com/googlefonts/fontbakery/issues/4310
+    """
+    from foundrytools_cli_2.cli.fix.snippets.legacy_accents import fix_legacy_accents as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.run()
