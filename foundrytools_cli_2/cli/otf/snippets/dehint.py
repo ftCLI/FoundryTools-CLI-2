@@ -11,11 +11,8 @@ def main(font: Font, drop_zones_stems: bool = False) -> None:
 
     cff_table = CFFTable(font.ttfont)
     private = cff_table.private_dict.rawDict
+    cff_table.table.cff.remove_hints()
 
-    # pylint: disable=import-outside-toplevel, unused-import
-    from fontTools.subset.cff import remove_hints  # noqa: F401
-
-    cff_table.table.remove_hints()
     if not drop_zones_stems:
         cff_table.private_dict.BlueValues = private.get("BlueValues", None)
         cff_table.private_dict.OtherBlues = private.get("OtherBlues", None)
