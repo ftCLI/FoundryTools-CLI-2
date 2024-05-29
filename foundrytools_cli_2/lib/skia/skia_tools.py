@@ -196,9 +196,7 @@ def same_path(path_1: pathops.Path, path_2: pathops.Path) -> bool:
         bool: ``True`` if the paths are the same, ``False`` if the paths are different
     """
 
-    if {tuple(c) for c in path_1.contours} != {tuple(c) for c in path_2.contours}:
-        return False
-    return True
+    return {tuple(c) for c in path_1.contours} == {tuple(c) for c in path_2.contours}
 
 
 def remove_tiny_paths(path: pathops.Path, min_area: int = 25) -> pathops.Path:
