@@ -40,7 +40,7 @@ def glyph_names_from_unicodes(input_path: Path, **options: t.Dict[str, t.Any]) -
     """
     Rename glyphs in the font to their Unicode values.
     """
-    from foundrytools_cli_2.cli.experimental.snippets.names_from_unicodes import (
+    from foundrytools_cli_2.cli.experimental.snippets.glyph_names_from_unicodes import (
         rename_glyphs as task,
     )
 

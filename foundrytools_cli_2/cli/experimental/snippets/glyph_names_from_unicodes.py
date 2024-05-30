@@ -29,7 +29,7 @@ def get_unicode_from_json(glyph_name: str) -> t.Optional[str]:
     return NAMES_CONTENT.get(glyph_name)
 
 
-def get_unicode_from_cmap(glyph_name: str, font: Font) -> t.Optional[str]:
+def get_unicode_from_reversed_cmap(glyph_name: str, font: Font) -> t.Optional[str]:
     """
     Get the Unicode value of a glyph from the cmap table.
 
@@ -74,16 +74,16 @@ def rename_glyphs(font: Font) -> None:
     new_glyph_order = []
 
     for glyph_name in glyph_order:
-        unicode_from_cmap = get_unicode_from_cmap(glyph_name, font)
+        unicode_from_reversed_cmap = get_unicode_from_reversed_cmap(glyph_name, font)
         unicode_from_json = get_unicode_from_json(glyph_name)
-        if unicode_from_cmap != unicode_from_json:
-            print(f"Glyph {glyph_name} {unicode_from_cmap} {unicode_from_json}")
-        # continue
-        if not unicode_from_cmap:
-            new_glyph_order.append(glyph_name)
-            continue
 
-        production_name = get_production_name(unicode_from_cmap)
+        if unicode_from_reversed_cmap != unicode_from_json:
+            print(f"Glyph {glyph_name} {unicode_from_reversed_cmap} {unicode_from_json}")
+            continue
+        if not unicode_from_reversed_cmap:
+            new_glyph_order.append(glyph_name)
+
+        production_name = get_production_name(unicode_from_reversed_cmap)
         if not production_name or production_name in glyph_order:
             new_glyph_order.append(glyph_name)
             continue
