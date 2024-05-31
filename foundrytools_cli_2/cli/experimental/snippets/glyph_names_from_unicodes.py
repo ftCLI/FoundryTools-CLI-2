@@ -82,6 +82,7 @@ def rename_glyphs(font: Font) -> None:
             continue
         if not unicode_from_reversed_cmap:
             new_glyph_order.append(glyph_name)
+            continue
 
         production_name = get_production_name(unicode_from_reversed_cmap)
         if not production_name or production_name in glyph_order:
