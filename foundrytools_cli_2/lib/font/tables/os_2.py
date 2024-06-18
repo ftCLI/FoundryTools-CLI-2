@@ -25,7 +25,7 @@ STRIKEOUT_BIT = 4
 BOLD_BIT = 5
 REGULAR_BIT = 6
 USE_TYPO_METRICS_BIT = 7
-WWWS_BIT = 8
+WWS_BIT = 8
 OBLIQUE_BIT = 9
 NO_SUBSETTING_BIT = 8
 BITMAP_EMBED_ONLY_BIT = 9
@@ -173,7 +173,7 @@ class FsSelection:
         Returns True if the bit 8 (WWWS) of the ``OS/2.fsSelection`` field is set, False
         otherwise.
         """
-        return is_nth_bit_set(self.os_2_table.table.fsSelection, WWWS_BIT)
+        return is_nth_bit_set(self.os_2_table.table.fsSelection, WWS_BIT)
 
     @wws_consistent.setter
     def wws_consistent(self, value: bool) -> None:
@@ -184,7 +184,7 @@ class FsSelection:
             raise self.os_2_table.InvalidOS2VersionError(
                 "fsSelection bit 8 (WWWS) is only defined in OS/2 table versions 4 and up."
             )
-        self.os_2_table.set_bit(field_name="fsSelection", pos=WWWS_BIT, value=value)
+        self.os_2_table.set_bit(field_name="fsSelection", pos=WWS_BIT, value=value)
 
     @property
     def oblique(self) -> bool:
