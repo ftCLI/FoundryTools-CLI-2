@@ -6,7 +6,6 @@ from fontTools.ttLib.tables._c_m_a_p import CmapSubtable
 
 from foundrytools_cli_2.lib.constants import NAMES_TO_UNICODES_FILE
 
-
 CharacterMapping = t.TypeVar("CharacterMapping", t.Dict[int, str], t.Dict[str, int])
 
 

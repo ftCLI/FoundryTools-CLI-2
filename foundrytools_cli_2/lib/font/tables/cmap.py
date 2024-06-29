@@ -1,6 +1,6 @@
 from fontTools.ttLib import TTFont
 
-from foundrytools_cli_2.lib.constants import NAMES_TO_UNICODES_FILE, T_CMAP, UNICODES_TO_NAMES_FILE
+from foundrytools_cli_2.lib.constants import T_CMAP
 from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
 
 
