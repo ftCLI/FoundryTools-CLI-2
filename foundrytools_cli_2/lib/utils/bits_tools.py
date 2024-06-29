@@ -9,7 +9,7 @@ def is_nth_bit_set(x: int, n: int) -> bool:
     Returns:
         bool: ``True`` if the nth bit is set, ``False`` otherwise
     """
-    return bool(x & 1 << n)
+    return bool(x & (1 << n))
 
 
 def set_nth_bit(x: int, n: int) -> int:
