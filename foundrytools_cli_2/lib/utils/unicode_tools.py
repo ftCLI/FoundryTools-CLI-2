@@ -6,8 +6,6 @@ from fontTools.ttLib.tables._c_m_a_p import CmapSubtable
 
 from foundrytools_cli_2.lib.constants import NAMES_TO_UNICODES_FILE
 
-CharacterMapping = t.TypeVar("CharacterMapping", t.Dict[int, str], t.Dict[str, int])
-
 
 def guess_unicode_from_name(glyph_name: str) -> t.Optional[int]:
     """
@@ -26,9 +24,10 @@ def guess_unicode_from_name(glyph_name: str) -> t.Optional[int]:
                 return int(glyph_name[len(prefix):], 16)
             except ValueError:
                 return None
+    return None
 
 
-def build_cmap_from_glyph_names(glyphs_list: t.List[str]) -> CharacterMapping:
+def build_cmap_from_glyph_names(glyphs_list: t.List[str]) -> t.Dict[int, str]:
     """
     Get the Unicode values for the given list of glyph names.
 
@@ -169,7 +168,9 @@ def setup_character_map(ttfont: TTFont, mapping: t.Dict[int, str]) -> None:
     ttfont["cmap"] = cmap_table
 
 
-def main(font: TTFont, remap_all: bool = False) -> None:
+def main(
+        font: TTFont, remap_all: bool = False
+) -> t.Tuple[t.List[t.Tuple[int, str]], t.List[t.Tuple[int, str, str]]]:
     """
     :param remap_all: A boolean indicating whether to remap all glyphs or only the unmapped ones.
     :param font: A TTFont object.
@@ -215,3 +216,5 @@ def main(font: TTFont, remap_all: bool = False) -> None:
         source_cmap=additional_cmap, target_cmap=initial_cmap
     )
     setup_character_map(ttfont=font, mapping=updated_cmap)
+
+    return remapped, duplicates

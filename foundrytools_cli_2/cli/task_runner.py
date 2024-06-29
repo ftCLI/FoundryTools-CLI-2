@@ -157,7 +157,6 @@ class TaskRunner:  # pylint: disable=too-few-public-methods
             self.task(font, **self.config.task_options)
         except Exception as e:  # pylint: disable=broad-except
             self._log_error(e)
-            return
 
     def _save_or_skip(self, font: Font) -> None:
         if not self._font_should_be_saved(font):
