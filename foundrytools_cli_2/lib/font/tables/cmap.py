@@ -14,10 +14,3 @@ class CmapTable(DefaultTbl):  # pylint: disable=too-few-public-methods
         Initializes the ``cmap`` table handler.
         """
         super().__init__(ttfont=ttfont, table_tag=T_CMAP)
-
-    def rebuild_tables(self) -> None:
-        """
-        Rebuild the ``cmap`` table.
-        """
-        self.ttfont.getBestCmap()
-        self.ttfont.getReverseGlyphMap()

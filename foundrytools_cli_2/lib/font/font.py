@@ -35,6 +35,7 @@ from foundrytools_cli_2.lib.skia.skia_tools import correct_contours_cff, correct
 from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
 from foundrytools_cli_2.lib.utils.misc import restore_flavor
 from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path
+from foundrytools_cli_2.lib.utils.unicode_tools import rebuild_character_map
 
 __all__ = ["Font"]
 
@@ -628,6 +629,15 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError("Font is already a SFNT font.")
 
         self.ttfont.flavor = None
+
+    def rebuild_cmap(self, remap_all: bool = False) -> None:
+        """
+        Rebuild the character map of a font.
+
+        Args:
+            remap_all: Whether to remap all glyphs.
+        """
+        rebuild_character_map(font=self.ttfont, remap_all=remap_all)
 
     def calculate_italic_angle(self, min_slant: float = 2.0) -> float:
         """

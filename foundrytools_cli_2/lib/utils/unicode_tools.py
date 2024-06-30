@@ -6,6 +6,8 @@ from fontTools.ttLib.tables._c_m_a_p import CmapSubtable
 
 from foundrytools_cli_2.lib.constants import NAMES_TO_UNICODES_FILE
 
+_CharacterMap = t.Dict[int, str]
+
 
 def guess_unicode_from_name(glyph_name: str) -> t.Optional[int]:
     """
@@ -27,7 +29,7 @@ def guess_unicode_from_name(glyph_name: str) -> t.Optional[int]:
     return None
 
 
-def build_cmap_from_glyph_names(glyphs_list: t.List[str]) -> t.Dict[int, str]:
+def cmap_from_glyph_names(glyphs_list: t.List[str]) -> _CharacterMap:
     """
     Get the Unicode values for the given list of glyph names.
 
@@ -40,7 +42,7 @@ def build_cmap_from_glyph_names(glyphs_list: t.List[str]) -> t.Dict[int, str]:
     with open(NAMES_TO_UNICODES_FILE, encoding="utf-8") as f:
         glyphs_to_codepoints = json.load(f)
 
-    new_mapping: t.Dict[int, str] = {}
+    new_mapping: _CharacterMap = {}
     for glyph_name in glyphs_list:
         unicode_value = glyphs_to_codepoints.get(glyph_name)
         if unicode_value:
@@ -50,7 +52,7 @@ def build_cmap_from_glyph_names(glyphs_list: t.List[str]) -> t.Dict[int, str]:
     return new_mapping
 
 
-def cmap_from_reversed_cmap(ttfont: TTFont) -> t.Dict[int, str]:
+def cmap_from_reversed_cmap(ttfont: TTFont) -> _CharacterMap:
     """
     Rebuild the cmap from the reversed cmap. Alternative to getBestCmap.
 
@@ -61,7 +63,7 @@ def cmap_from_reversed_cmap(ttfont: TTFont) -> t.Dict[int, str]:
         dict: A dictionary mapping Unicode values to glyph names.
     """
     reversed_cmap: t.Dict[str, t.Set[int]] = ttfont["cmap"].buildReversed()
-    cmap_dict: t.Dict[int, str] = {}
+    cmap_dict: _CharacterMap = {}
 
     for glyph_name, codepoints in reversed_cmap.items():
         for codepoint in codepoints:
@@ -98,8 +100,8 @@ def get_mapped_and_unmapped_glyphs(ttfont: TTFont) -> t.Tuple[t.List[str], t.Lis
 
 
 def update_character_map(
-    source_cmap: t.Dict[int, str], target_cmap: t.Dict[int, str]
-) -> t.Tuple[t.Dict[int, str], t.List[t.Tuple[int, str]], t.List[t.Tuple[int, str, str]]]:
+    source_cmap: _CharacterMap, target_cmap: _CharacterMap
+) -> t.Tuple[_CharacterMap, t.List[t.Tuple[int, str]], t.List[t.Tuple[int, str, str]]]:
     """
     Update the target character map with the source character map.
 
@@ -122,7 +124,7 @@ def update_character_map(
 
 
 def create_cmap_tables(
-    subtable_format: int, platform_id: int, plat_enc_id: int, cmap: t.Dict[int, str]
+    subtable_format: int, platform_id: int, plat_enc_id: int, cmap: _CharacterMap
 ) -> CmapSubtable:
     """
     Create a cmap subtable with the given parameters.
@@ -135,7 +137,7 @@ def create_cmap_tables(
     return cmap_table
 
 
-def setup_character_map(ttfont: TTFont, mapping: t.Dict[int, str]) -> None:
+def setup_character_map(ttfont: TTFont, mapping: _CharacterMap) -> None:
     """
     Set up the character map for the given TTFont object.
 
@@ -168,52 +170,32 @@ def setup_character_map(ttfont: TTFont, mapping: t.Dict[int, str]) -> None:
     ttfont["cmap"] = cmap_table
 
 
-def main(
+def rebuild_character_map(
         font: TTFont, remap_all: bool = False
 ) -> t.Tuple[t.List[t.Tuple[int, str]], t.List[t.Tuple[int, str, str]]]:
     """
-    :param remap_all: A boolean indicating whether to remap all glyphs or only the unmapped ones.
-    :param font: A TTFont object.
-    :return: None
+    Rebuild the character map for the given TTFont object.
 
-    The `main` method is used to perform glyph remapping on a TrueType font. It takes an optional
-    boolean parameter `remap_all` which determines whether to remap all glyphs or only the unmapped
-    ones. The method does not return any value.
+    Args:
+        font (TTFont): The TTFont object.
+        remap_all (bool): Whether to remap all glyphs.
 
-    The method first creates a `TTFont` object using the `TEST_FONT_FILE` file. It then retrieves
-    the glyph order of the font using the `getGlyphOrder` method. Next, it calls the
-    `get_mapped_and_unmapped_glyphs` function to obtain the mapped and unmapped glyphs in the font.
-
-    If the `remap_all` parameter is `False`, the method updates the existing character map.
-    Otherwise, it creates a new mapping for all glyphs. The initial character map is obtained using
-    the `getBestCmap` method. The additional character map is created using the
-    `build_cmap_from_glyph_names` function with the `unmapped` list as the parameter.
-
-    Next, the method calls the `update_character_map` function with `additional_cmap` as the
-    source and `initial_cmap` as the target. It assigns the returned values of `updated_cmap`,
-    `remapped`, and `duplicates` to their respective variables.
-
-    The method then calls the `setup_character_map` function with the `ttfont` parameter set to
-    `font` and the `mapping` parameter set to `updated_cmap`. It saves the modified font using
-    `font.save` to a file named "remapped.ttf".
-
-    Finally, the method calls the `print_results` function with various parameters including
-    `remap_all`, `glyph_order`, `initial_cmap`, `additional_cmap`, `unmapped`, `remapped`,
-    and `duplicates`.
+    Returns:
+        tuple: A tuple containing the remapped and duplicate glyphs.
     """
 
     glyph_order = font.getGlyphOrder()
     _, unmapped = get_mapped_and_unmapped_glyphs(font)
 
     if not remap_all:
-        initial_cmap = font.getBestCmap()  # We can also use cmap_from_reversed_cmap
-        additional_cmap = build_cmap_from_glyph_names(glyphs_list=unmapped)
+        target_cmap = font.getBestCmap()  # We can also use cmap_from_reversed_cmap
+        source_cmap = cmap_from_glyph_names(glyphs_list=unmapped)
     else:
-        initial_cmap = {}
-        additional_cmap = build_cmap_from_glyph_names(glyphs_list=glyph_order)
+        target_cmap = {}
+        source_cmap = cmap_from_glyph_names(glyphs_list=glyph_order)
 
     updated_cmap, remapped, duplicates = update_character_map(
-        source_cmap=additional_cmap, target_cmap=initial_cmap
+        source_cmap=source_cmap, target_cmap=target_cmap
     )
     setup_character_map(ttfont=font, mapping=updated_cmap)
 
