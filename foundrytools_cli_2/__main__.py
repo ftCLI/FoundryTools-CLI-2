@@ -9,6 +9,7 @@ from foundrytools_cli_2.cli.os_2 import cli as os_2
 from foundrytools_cli_2.cli.otf import cli as otf
 from foundrytools_cli_2.cli.post import cli as post
 from foundrytools_cli_2.cli.ttf import cli as ttf
+from foundrytools_cli_2.cli.utils import cli as utils
 
 
 @click.group(
@@ -22,6 +23,7 @@ from foundrytools_cli_2.cli.ttf import cli as ttf
         "otf": otf,
         "post": post,
         "ttf": ttf,
+        "utils": utils,
     }
 )
 @click.version_option()

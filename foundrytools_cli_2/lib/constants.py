@@ -1,7 +1,7 @@
 from enum import IntEnum
 from pathlib import Path
 
-DATA_DIR = Path(__file__).parent / "data"
+DATA_DIR = Path(__file__).parent.parent / "data"
 NAMES_TO_UNICODES_FILE = Path.joinpath(DATA_DIR, "names_to_unicodes.json")
 UNICODES_TO_NAMES_FILE = Path.joinpath(DATA_DIR, "unicodes_to_names.json")
 
