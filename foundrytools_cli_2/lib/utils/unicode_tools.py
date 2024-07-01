@@ -9,7 +9,7 @@ from foundrytools_cli_2.lib.constants import NAMES_TO_UNICODES_FILE
 _CharacterMap = t.Dict[int, str]
 
 
-def guess_unicode_from_name(glyph_name: str) -> t.Optional[int]:
+def calc_unicode_from_name(glyph_name: str) -> t.Optional[str]:
     """
     Guess the Unicode value of a glyph from its name.
 
@@ -23,7 +23,7 @@ def guess_unicode_from_name(glyph_name: str) -> t.Optional[int]:
     for prefix in ("uni", "u"):
         if glyph_name.startswith(prefix):
             try:
-                return int(glyph_name[len(prefix):], 16)
+                return hex(int(glyph_name[len(prefix):], 16))
             except ValueError:
                 return None
     return None
@@ -45,6 +45,8 @@ def cmap_from_glyph_names(glyphs_list: t.List[str]) -> _CharacterMap:
     new_mapping: _CharacterMap = {}
     for glyph_name in glyphs_list:
         unicode_value = glyphs_to_codepoints.get(glyph_name)
+        if not unicode_value:
+            unicode_value = calc_unicode_from_name(glyph_name)
         if unicode_value:
             codepoint = int(unicode_value, 16)
             new_mapping.setdefault(codepoint, glyph_name)
