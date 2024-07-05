@@ -198,6 +198,8 @@ def build_postscript_name(font: Font, platform_id: t.Optional[int] = None) -> No
 
     Args:
         font (Font): The Font object representing the font file.
+        platform_id (int, optional): The platform ID of the name record. Defaults to None, which
+            will build the postscript name both platform 1 and 3.
     """
 
     name_table = NameTable(ttfont=font.ttfont)
