@@ -48,7 +48,7 @@ def calc_name_from_unicode(unicode_value: str) -> t.Optional[str]:
 
     if 0 <= codepoint <= 0xFFFF:
         return f"uni{unicode_value.replace('0x', '').upper()}"
-    elif 0x10000 <= codepoint <= 0x10FFFF:
+    if 0x10000 <= codepoint <= 0x10FFFF:
         return f"u{unicode_value.replace('0x', '').upper()}"
     return None
 
@@ -67,6 +67,7 @@ def get_production_name(unicode_value: str) -> t.Optional[str]:
         codepoints_to_glyphs = json.load(f)
     if unicode_value in codepoints_to_glyphs:
         return codepoints_to_glyphs.get(unicode_value)["production"]
+    return None
 
 
 def get_friendly_name(unicode_value: str) -> t.Optional[str]:
@@ -83,6 +84,7 @@ def get_friendly_name(unicode_value: str) -> t.Optional[str]:
         codepoints_to_glyphs = json.load(f)
     if unicode_value in codepoints_to_glyphs:
         return codepoints_to_glyphs.get(unicode_value)["friendly"][0]
+    return None
 
 
 def cmap_from_glyph_names(glyphs_list: t.List[str]) -> _CharacterMap:
