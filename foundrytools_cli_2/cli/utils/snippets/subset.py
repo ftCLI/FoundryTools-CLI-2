@@ -1,3 +1,4 @@
+import typing as t
 from pathlib import Path
 
 from afdko.fdkutils import run_shell_command
@@ -7,7 +8,10 @@ from foundrytools_cli_2.lib.font import Font
 
 
 def subset_font(
-    font: Font, output_dir: Path = None, overwrite: bool = True, recalc_timestamp: bool = False
+    font: Font,
+    output_dir: t.Optional[Path] = None,
+    overwrite: bool = True,
+    recalc_timestamp: bool = False
 ) -> None:
     """
     Subsets a font file by removing all glyphs except the ones specified.
@@ -46,10 +50,14 @@ def subset_font(
         "--legacy-cmap",
         "--symbol-cmap",
         "--recalc-bounds",
-        "--no-recalc-timestamp",
         "--recalc-average-width",
         "--recalc-max-context",
     ]
+
+    if recalc_timestamp:
+        command.append("--recalc-timestamp")
+    else:
+        command.append("--no-recalc-timestamp")
 
     run_shell_command(command)
     logger.opt(colors=True).success(f"File saved to {out_file}")
