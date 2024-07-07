@@ -37,7 +37,8 @@ from foundrytools_cli_2.lib.utils.misc import restore_flavor
 from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path
 from foundrytools_cli_2.lib.utils.unicode_tools import (
     rebuild_character_map,
-    set_production_names, rename_glyph,
+    rename_glyph,
+    set_production_names,
 )
 
 __all__ = ["Font"]
