@@ -35,7 +35,10 @@ from foundrytools_cli_2.lib.skia.skia_tools import correct_contours_cff, correct
 from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
 from foundrytools_cli_2.lib.utils.misc import restore_flavor
 from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path
-from foundrytools_cli_2.lib.utils.unicode_tools import rebuild_character_map
+from foundrytools_cli_2.lib.utils.unicode_tools import (
+    rebuild_character_map,
+    set_production_names, rename_glyph,
+)
 
 __all__ = ["Font"]
 
@@ -630,15 +633,6 @@ class Font:  # pylint: disable=too-many-public-methods
 
         self.ttfont.flavor = None
 
-    def rebuild_cmap(self, remap_all: bool = False) -> None:
-        """
-        Rebuild the character map of a font.
-
-        Args:
-            remap_all: Whether to remap all glyphs.
-        """
-        rebuild_character_map(font=self.ttfont, remap_all=remap_all)
-
     def calculate_italic_angle(self, min_slant: float = 2.0) -> float:
         """
         Calculates the italic angle of a font by measuring the slant of the glyph 'H' or 'uni0048'.
@@ -782,6 +776,34 @@ class Font:  # pylint: disable=too-many-public-methods
             )
         with restore_flavor(self.ttfont):
             desubroutinize(self.ttfont)
+
+    def rebuild_cmap(self, remap_all: bool = False) -> None:
+        """
+        Rebuild the character map of a font.
+
+        Args:
+            remap_all: Whether to remap all glyphs.
+        """
+        rebuild_character_map(font=self.ttfont, remap_all=remap_all)
+
+    def set_production_names(self) -> t.List[t.Tuple[str, str]]:
+        """
+        Set the production names for the glyphs in the font.
+
+        Returns:
+            A boolean indicating whether the TTFont.glyphOrder has been modified.
+        """
+        return set_production_names(font=self.ttfont)
+
+    def rename_glyph(self, old_name: str, new_name: str) -> bool:
+        """
+        Rename the glyphs in the font.
+
+        Args:
+            old_name (str): The old name of the glyph.
+            new_name (str): The new name of the glyph.
+        """
+        return rename_glyph(font=self.ttfont, old_name=old_name, new_name=new_name)
 
     def sort_glyphs(self, new_glyph_order: t.List[str]) -> None:
         """

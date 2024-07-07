@@ -10,6 +10,13 @@ from foundrytools_cli_2.lib.constants import NAMES_TO_UNICODES_FILE, UNICODES_TO
 _CharacterMap = t.Dict[int, str]
 
 
+with open(NAMES_TO_UNICODES_FILE, encoding="utf-8") as f:
+    NAMES_TO_UNICODES = json.load(f)
+
+with open(UNICODES_TO_NAMES_FILE, encoding="utf-8") as f:
+    UNICODES_TO_NAMES = json.load(f)
+
+
 def calc_unicode_from_name(glyph_name: str) -> t.Optional[str]:
     """
     Guess the Unicode value of a glyph from its name.
@@ -22,9 +29,10 @@ def calc_unicode_from_name(glyph_name: str) -> t.Optional[str]:
     """
 
     for prefix in ("uni", "u"):
-        if glyph_name.startswith(prefix):
+        if glyph_name.startswith(prefix) and len(glyph_name) == 7:
             try:
-                return hex(int(glyph_name[len(prefix) :], 16))
+                _ = int(glyph_name[len(prefix) :], 16)
+                return glyph_name.replace(prefix, "0x")
             except ValueError:
                 return None
     return None
@@ -63,11 +71,7 @@ def get_production_name(unicode_value: str) -> t.Optional[str]:
     Returns:
         str: The production name of the glyph.
     """
-    with open(UNICODES_TO_NAMES_FILE, encoding="utf-8") as f:
-        codepoints_to_glyphs = json.load(f)
-    if unicode_value in codepoints_to_glyphs:
-        return codepoints_to_glyphs.get(unicode_value)["production"]
-    return None
+    return UNICODES_TO_NAMES.get(unicode_value, {}).get("production", None)
 
 
 def get_friendly_name(unicode_value: str) -> t.Optional[str]:
@@ -80,11 +84,7 @@ def get_friendly_name(unicode_value: str) -> t.Optional[str]:
     Returns:
         str: The first friendly name of the glyph.
     """
-    with open(UNICODES_TO_NAMES_FILE, encoding="utf-8") as f:
-        codepoints_to_glyphs = json.load(f)
-    if unicode_value in codepoints_to_glyphs:
-        return codepoints_to_glyphs.get(unicode_value)["friendly"][0]
-    return None
+    return UNICODES_TO_NAMES.get(unicode_value, {}).get("friendly", [None])[0]
 
 
 def cmap_from_glyph_names(glyphs_list: t.List[str]) -> _CharacterMap:
@@ -97,12 +97,11 @@ def cmap_from_glyph_names(glyphs_list: t.List[str]) -> _CharacterMap:
     Returns:
         dict: A dictionary mapping Unicode values to glyph names.
     """
-    with open(NAMES_TO_UNICODES_FILE, encoding="utf-8") as f:
-        glyphs_to_codepoints = json.load(f)
-
     new_mapping: _CharacterMap = {}
     for glyph_name in glyphs_list:
-        unicode_value = glyphs_to_codepoints.get(glyph_name)
+        if glyph_name.startswith("f_"):
+            print(f"Skipping {glyph_name}")
+        unicode_value = NAMES_TO_UNICODES.get(glyph_name)
         if not unicode_value:
             unicode_value = calc_unicode_from_name(glyph_name)
         if unicode_value:
@@ -262,7 +261,7 @@ def rebuild_character_map(
     return remapped, duplicates
 
 
-def set_production_names(font: TTFont) -> None:
+def set_production_names(font: TTFont) -> t.List[t.Tuple[str, str]]:
     """
     Set the production names for the glyphs in the given TTFont object.
 
@@ -271,9 +270,20 @@ def set_production_names(font: TTFont) -> None:
     """
     old_glyph_order = font.getGlyphOrder()
     new_glyph_order = []
+    renamed_glyphs: t.List[t.Tuple[str, str]] = []
+
+    print(calc_unicode_from_name("uniFB00"))
+    print(calc_name_from_unicode("0xFB00"))
+    print(get_production_name("0xFB00"))
+    print("f_f" in old_glyph_order)
 
     for glyph_name in old_glyph_order:
-        unicode_value = calc_unicode_from_name(glyph_name)
+        # Check if the glyph name is in the NAMES_TO_UNICODES dictionary
+        unicode_value = NAMES_TO_UNICODES.get(glyph_name)
+        # If not, calculate the Unicode value from the glyph name
+        if not unicode_value:
+            unicode_value = calc_unicode_from_name(glyph_name)
+
         if not unicode_value:
             new_glyph_order.append(glyph_name)
             continue
@@ -284,6 +294,43 @@ def set_production_names(font: TTFont) -> None:
             continue
 
         new_glyph_order.append(production_name)
-        name_map = dict(zip(old_glyph_order, new_glyph_order))
-        PostProcessor.rename_glyphs(font, name_map)
-        font.modified = old_glyph_order != new_glyph_order
+        renamed_glyphs.append((glyph_name, production_name))
+
+    if not renamed_glyphs:
+        return []
+
+    rename_map = dict(zip(old_glyph_order, new_glyph_order))
+    PostProcessor.rename_glyphs(otf=font, rename_map=rename_map)
+
+    return renamed_glyphs
+
+
+def rename_glyph(font: TTFont, old_name: str, new_name: str) -> bool:
+    """
+    Rename a glyph in the given TTFont object.
+
+    Args:
+        font (TTFont): The TTFont object.
+        old_name (str): The old name of the glyph.
+        new_name (str): The new name of the glyph.
+    """
+    old_glyph_order = font.getGlyphOrder()
+    new_glyph_order = []
+
+    if old_name not in old_glyph_order:
+        raise ValueError(f"Glyph '{old_name}' not found in the font.")
+
+    if new_name in old_glyph_order:
+        raise ValueError(f"Glyph '{new_name}' already exists in the font.")
+
+    for glyph_name in old_glyph_order:
+        if glyph_name == old_name:
+            print(f"Renaming {old_name} to {new_name}.")
+            new_glyph_order.append(new_name)
+        else:
+            new_glyph_order.append(glyph_name)
+
+    rename_map = dict(zip(old_glyph_order, new_glyph_order))
+    PostProcessor.rename_glyphs(otf=font, rename_map=rename_map)
+
+    return new_glyph_order != old_glyph_order
