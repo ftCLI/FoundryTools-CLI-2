@@ -34,6 +34,32 @@ def rebuild_cmap_command(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     runner.run()
 
 
+@cli.command("rename-glyph")
+@base_options()
+@click.option("-old", "--old-name", required=True, help="The old name of the glyph.")
+@click.option("-new", "--new-name", required=True, help="The new name of the glyph.")
+def rename_glyph_command(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Rename a glyph in a font file.
+    """
+    from foundrytools_cli_2.cli.utils.snippets.rename_glyph import main as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.run()
+
+
+@cli.command("set-production-names")
+@base_options()
+def set_production_names_command(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Set the production names of glyphs in a font file.
+    """
+    from foundrytools_cli_2.cli.utils.snippets.set_production_names import main as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.run()
+
+
 @cli.command("subset")
 @input_path_argument()
 @output_dir_option()

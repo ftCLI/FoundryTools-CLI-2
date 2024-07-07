@@ -11,7 +11,7 @@ def subset_font(
     font: Font,
     output_dir: t.Optional[Path] = None,
     overwrite: bool = True,
-    recalc_timestamp: bool = False
+    recalc_timestamp: bool = False,
 ) -> None:
     """
     Subsets a font file by removing all glyphs except the ones specified.
