@@ -7,7 +7,7 @@ from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.lib.font import Font
 
 
-def subset_font(
+def main(
     font: Font,
     output_dir: t.Optional[Path] = None,
     overwrite: bool = True,
