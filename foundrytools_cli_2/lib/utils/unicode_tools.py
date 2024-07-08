@@ -298,34 +298,3 @@ def set_production_names(font: TTFont) -> t.List[t.Tuple[str, str]]:
     PostProcessor.rename_glyphs(otf=font, rename_map=rename_map)
 
     return renamed_glyphs
-
-
-def rename_glyph(font: TTFont, old_name: str, new_name: str) -> bool:
-    """
-    Rename a glyph in the given TTFont object.
-
-    Args:
-        font (TTFont): The TTFont object.
-        old_name (str): The old name of the glyph.
-        new_name (str): The new name of the glyph.
-    """
-    old_glyph_order = font.getGlyphOrder()
-    new_glyph_order = []
-
-    if old_name not in old_glyph_order:
-        raise ValueError(f"Glyph '{old_name}' not found in the font.")
-
-    if new_name in old_glyph_order:
-        raise ValueError(f"Glyph '{new_name}' already exists in the font.")
-
-    for glyph_name in old_glyph_order:
-        if glyph_name == old_name:
-            print(f"Renaming {old_name} to {new_name}.")
-            new_glyph_order.append(new_name)
-        else:
-            new_glyph_order.append(glyph_name)
-
-    rename_map = dict(zip(old_glyph_order, new_glyph_order))
-    PostProcessor.rename_glyphs(otf=font, rename_map=rename_map)
-
-    return new_glyph_order != old_glyph_order
