@@ -16,7 +16,7 @@ def main(font: Font, source_file: Path) -> None:
     try:
         source_font = Font(source_file)
         new_glyph_order = source_font.ttfont.getGlyphOrder()
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         logger.error(f"Failed to get the glyph order from the source font: {e}")
         return
     if old_glyph_order == new_glyph_order:
