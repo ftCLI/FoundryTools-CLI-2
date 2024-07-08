@@ -272,11 +272,6 @@ def set_production_names(font: TTFont) -> t.List[t.Tuple[str, str]]:
     new_glyph_order = []
     renamed_glyphs: t.List[t.Tuple[str, str]] = []
 
-    print(calc_unicode_from_name("uniFB00"))
-    print(calc_name_from_unicode("0xFB00"))
-    print(get_production_name("0xFB00"))
-    print("f_f" in old_glyph_order)
-
     for glyph_name in old_glyph_order:
         # Check if the glyph name is in the NAMES_TO_UNICODES dictionary
         unicode_value = NAMES_TO_UNICODES.get(glyph_name)
