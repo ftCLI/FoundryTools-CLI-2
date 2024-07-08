@@ -11,6 +11,6 @@ def main(font: Font, old_name: str, new_name:str) -> None:
         new_name (str): The new name of the glyph.
     """
     result = font.rename_glyph(old_name=old_name, new_name=new_name)
-    print(result)
     if result:
+        font.rebuild_cmap(remap_all=True)
         font.modified = True
