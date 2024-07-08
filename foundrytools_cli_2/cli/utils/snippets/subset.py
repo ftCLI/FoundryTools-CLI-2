@@ -25,10 +25,6 @@ def subset_font(
     """
     in_file = font.file
     out_file = font.make_out_file_name(file=in_file, output_dir=output_dir, overwrite=overwrite)
-    if in_file == out_file:
-        out_file = font.make_out_file_name(
-            file=in_file, output_dir=output_dir, overwrite=True, suffix="_subset"
-        )
 
     command = [
         "fonttools",
