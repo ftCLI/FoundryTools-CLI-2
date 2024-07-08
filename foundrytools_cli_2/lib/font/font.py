@@ -12,6 +12,7 @@ from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import Axis, NamedInstance
 from fontTools.ttLib.ttGlyphSet import _TTGlyphSet
+from ufo2ft.postProcessor import PostProcessor
 
 from foundrytools_cli_2.lib.constants import (
     MAX_UPM,
@@ -37,7 +38,6 @@ from foundrytools_cli_2.lib.utils.misc import restore_flavor
 from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path
 from foundrytools_cli_2.lib.utils.unicode_tools import (
     rebuild_character_map,
-    rename_glyph,
     set_production_names,
 )
 
@@ -798,13 +798,49 @@ class Font:  # pylint: disable=too-many-public-methods
 
     def rename_glyph(self, old_name: str, new_name: str) -> bool:
         """
-        Rename the glyphs in the font.
+        Rename a single glyph in the font.
 
         Args:
             old_name (str): The old name of the glyph.
             new_name (str): The new name of the glyph.
         """
-        return rename_glyph(font=self.ttfont, old_name=old_name, new_name=new_name)
+        old_glyph_order = self.ttfont.getGlyphOrder()
+        new_glyph_order = []
+
+        if old_name not in old_glyph_order:
+            raise ValueError(f"Glyph '{old_name}' not found in the font.")
+
+        if new_name in old_glyph_order:
+            raise ValueError(f"Glyph '{new_name}' already exists in the font.")
+
+        for glyph_name in old_glyph_order:
+            if glyph_name == old_name:
+                new_glyph_order.append(new_name)
+            else:
+                new_glyph_order.append(glyph_name)
+
+        rename_map = dict(zip(old_glyph_order, new_glyph_order))
+        PostProcessor.rename_glyphs(otf=self.ttfont, rename_map=rename_map)
+        self.rebuild_cmap(remap_all=True)
+
+        return new_glyph_order != old_glyph_order
+
+    def rename_glyphs(self, new_glyph_order: t.List[str]) -> bool:
+        """
+        Rename the glyphs in the font based on the new glyph order.
+
+        Args:
+            new_glyph_order (list): The new glyph order.
+        """
+        old_glyph_order = self.ttfont.getGlyphOrder()
+        if new_glyph_order == old_glyph_order:
+            return False
+
+        rename_map = dict(zip(old_glyph_order, new_glyph_order))
+        PostProcessor.rename_glyphs(otf=self.ttfont, rename_map=rename_map)
+        self.rebuild_cmap(remap_all=True)
+
+        return True
 
     def sort_glyphs(self, new_glyph_order: t.List[str]) -> None:
         """

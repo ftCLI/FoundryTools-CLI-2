@@ -45,6 +45,25 @@ def rename_glyph_command(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     from foundrytools_cli_2.cli.utils.snippets.rename_glyph import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.force_modified = True
+    runner.run()
+
+
+@cli.command("rename-glyphs")
+@base_options()
+@click.option(
+    "-s", "--source-file",
+    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+    required=True,
+    help="The source font file to get the glyph order from.",
+)
+def rename_glyphs_command(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Rename glyphs in a font file based on the glyph order of another font file.
+    """
+    from foundrytools_cli_2.cli.utils.snippets.rename_glyphs import main as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -60,16 +79,16 @@ def set_production_names_command(input_path: Path, **options: t.Dict[str, t.Any]
     runner.run()
 
 
-@cli.command("subset")
+@cli.command("remove-unused-glyphs")
 @input_path_argument()
 @output_dir_option()
 @overwrite_flag()
 @recalc_timestamp_flag()
-def subset_command(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def remove_unused_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Subsets a font file by removing all glyphs except the ones specified.
+    Subsets a font file by removing unreachable glyphs.
     """
-    from foundrytools_cli_2.cli.utils.snippets.subset import subset_font as task
+    from foundrytools_cli_2.cli.utils.snippets.remove_unused_glyphs import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.save_if_modified = False
