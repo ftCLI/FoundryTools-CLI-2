@@ -838,7 +838,7 @@ class Font:  # pylint: disable=too-many-public-methods
 
         rename_map = dict(zip(old_glyph_order, new_glyph_order))
         PostProcessor.rename_glyphs(otf=self.ttfont, rename_map=rename_map)
-        self.rebuild_cmap(remap_all=True)
+        self.rebuild_cmap(remap_all=False)
 
         return True
 
