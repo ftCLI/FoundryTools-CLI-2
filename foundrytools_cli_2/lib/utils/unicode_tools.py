@@ -156,13 +156,11 @@ def _cmap_from_glyph_names(glyphs_list: t.List[str]) -> _CharacterMap:
     """
     new_mapping: _CharacterMap = {}
     for glyph_name in glyphs_list:
-        if glyph_name.startswith("f_"):
-            print(f"Skipping {glyph_name}")
-        unicode_value = NAMES_TO_UNICODES.get(glyph_name)
-        if not unicode_value:
-            unicode_value = _uni_str_from_glyph_name(glyph_name)
-        if unicode_value:
-            codepoint = int(unicode_value, 16)
+        uni_str = NAMES_TO_UNICODES.get(glyph_name)
+        if not uni_str:
+            uni_str = _uni_str_from_glyph_name(glyph_name)
+        if uni_str:
+            codepoint = int(uni_str, 16)
             new_mapping.setdefault(codepoint, glyph_name)
 
     return new_mapping
@@ -336,7 +334,7 @@ def _get_multi_mapped_glyphs(
     return multi_mapped
 
 
-def get_uni_str(glyph_name, reversed_cmap) -> t.Optional[str]:
+def get_uni_str(glyph_name: str, reversed_cmap: _ReversedCmap) -> t.Optional[str]:
     """
     Attempt to retrieve a Unicode string, using various fallback mechanisms.
     It will try to:
