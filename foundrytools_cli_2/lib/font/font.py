@@ -794,7 +794,7 @@ class Font:  # pylint: disable=too-many-public-methods
         Returns:
             A boolean indicating whether the TTFont.glyphOrder has been modified.
         """
-        return set_production_names(font=self.ttfont)
+        return set_production_names(ttfont=self.ttfont)
 
     def rename_glyph(self, old_name: str, new_name: str) -> bool:
         """
