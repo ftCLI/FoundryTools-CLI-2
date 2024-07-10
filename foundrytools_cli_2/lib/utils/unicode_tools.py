@@ -342,7 +342,7 @@ def set_production_names(ttfont: TTFont) -> t.List[t.Tuple[str, str]]:
     old_glyph_order = ttfont.getGlyphOrder()
     new_glyph_order = []
     renamed_glyphs: t.List[t.Tuple[str, str]] = []
-    reversed_cmap = ttfont[T_CMAP].buildReversed()
+    reversed_cmap: _ReversedCmap = ttfont[T_CMAP].buildReversed()
 
     for glyph_name in old_glyph_order:
 
