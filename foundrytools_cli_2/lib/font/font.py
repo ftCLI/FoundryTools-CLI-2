@@ -19,6 +19,7 @@ from foundrytools_cli_2.lib.constants import (
     MIN_UPM,
     OTF_EXTENSION,
     PS_SFNT_VERSION,
+    T_CMAP,
     T_FVAR,
     T_GLYF,
     T_HEAD,
@@ -37,8 +38,10 @@ from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
 from foundrytools_cli_2.lib.utils.misc import restore_flavor
 from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path
 from foundrytools_cli_2.lib.utils.unicode_tools import (
+    _prod_name_from_uni_str,
+    _ReversedCmap,
+    get_uni_str,
     rebuild_character_map,
-    set_production_names,
 )
 
 __all__ = ["Font"]
@@ -789,12 +792,48 @@ class Font:  # pylint: disable=too-many-public-methods
 
     def set_production_names(self) -> t.List[t.Tuple[str, str]]:
         """
-        Set the production names for the glyphs in the font.
+        Set the production names for the glyphs in the given TTFont object.
+
+        Args:
+            ttfont (TTFont): The TTFont object.
 
         Returns:
-            A boolean indicating whether the TTFont.glyphOrder has been modified.
+            list: A list of tuples containing the old and new production names of the glyphs.
         """
-        return set_production_names(ttfont=self.ttfont)
+        old_glyph_order = self.ttfont.getGlyphOrder()
+        new_glyph_order = []
+        renamed_glyphs: t.List[t.Tuple[str, str]] = []
+        reversed_cmap: _ReversedCmap = self.ttfont[T_CMAP].buildReversed()
+
+        for glyph_name in old_glyph_order:
+            uni_str = get_uni_str(glyph_name, reversed_cmap)
+            # If still no uni_str, the glyph name is unmodified.
+            if not uni_str:
+                new_glyph_order.append(glyph_name)
+                continue
+
+            # In case the production could not be found, the glyph is already named with the
+            # production name, or the production name is already assigned, we skip the renaming
+            # process.
+            production_name = _prod_name_from_uni_str(uni_str)
+            if (
+                not production_name
+                or production_name == glyph_name
+                or production_name in new_glyph_order
+            ):
+                new_glyph_order.append(glyph_name)
+                continue
+
+            new_glyph_order.append(production_name)
+            renamed_glyphs.append((glyph_name, production_name))
+
+        if not renamed_glyphs:
+            return []
+
+        rename_map = dict(zip(old_glyph_order, new_glyph_order))
+        PostProcessor.rename_glyphs(otf=self.ttfont, rename_map=rename_map)
+        self.rebuild_cmap(remap_all=True)
+        return renamed_glyphs
 
     def rename_glyph(self, old_name: str, new_name: str) -> bool:
         """

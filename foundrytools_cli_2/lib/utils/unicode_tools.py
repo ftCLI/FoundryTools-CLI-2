@@ -3,7 +3,6 @@ import typing as t
 
 from fontTools.ttLib import TTFont, newTable
 from fontTools.ttLib.tables._c_m_a_p import CmapSubtable
-from ufo2ft.postProcessor import PostProcessor
 
 from foundrytools_cli_2.lib.constants import NAMES_TO_UNICODES_FILE, T_CMAP, UNICODES_TO_NAMES_FILE
 
@@ -66,7 +65,11 @@ def _uni_str_from_reversed_cmap(glyph_name: str, reversed_cmap: _ReversedCmap) -
         reversed_cmap (dict): The reversed character map.
 
     Returns:
-        str: The Unicode value of the glyph.
+        str: The Unicode string of the glyph.
+
+    Examples:
+        >>> _uni_str_from_reversed_cmap("A", {"A": {65}})
+        '0x0041'
     """
     codepoints = reversed_cmap.get(glyph_name)
     if not codepoints:
@@ -333,54 +336,24 @@ def _get_multi_mapped_glyphs(
     return multi_mapped
 
 
-def set_production_names(ttfont: TTFont) -> t.List[t.Tuple[str, str]]:
+def get_uni_str(glyph_name, reversed_cmap) -> t.Optional[str]:
     """
-    Set the production names for the glyphs in the given TTFont object.
+    Attempt to retrieve a Unicode string, using various fallback mechanisms.
+    It will try to:
+        - check if the glyph is present in the reversed cmap;
+        - check if the Unicode value is present in the JSON file;
+        - calculate the Unicode value from the glyph name;
 
     Args:
-        ttfont (TTFont): The TTFont object.
+        glyph_name (str): the glyph name.
+        reversed_cmap (_ReversedCmap): the reversed cmap.
+
+    Returns:
+        A Unicode string if one is found, or None otherwise.
     """
-    old_glyph_order = ttfont.getGlyphOrder()
-    new_glyph_order = []
-    renamed_glyphs: t.List[t.Tuple[str, str]] = []
-    reversed_cmap: _ReversedCmap = ttfont[T_CMAP].buildReversed()
-
-    for glyph_name in old_glyph_order:
-        # Check if the glyph is present in the reversed cmap
-        uni_str = _uni_str_from_reversed_cmap(glyph_name, reversed_cmap)
-
-        # If not, check if the Unicode value is present in the JSON file
-        if not uni_str:
-            uni_str = NAMES_TO_UNICODES.get(glyph_name)
-
-        # If not, calculate the Unicode value from the glyph name
-        if not uni_str:
-            uni_str = _uni_str_from_glyph_name(glyph_name)
-
-        # If not, add the current glyph name to the new glyph order and continue
-        if not uni_str:
-            new_glyph_order.append(glyph_name)
-            continue
-
-        production_name = _prod_name_from_uni_str(uni_str)
-
-        if production_name == glyph_name:
-            new_glyph_order.append(glyph_name)
-            continue
-
-        if not production_name or production_name in new_glyph_order:
-            new_glyph_order.append(glyph_name)
-            continue
-
-        new_glyph_order.append(production_name)
-        renamed_glyphs.append((glyph_name, production_name))
-        print(f"Renamed {glyph_name} to {production_name}")
-
-    if not renamed_glyphs:
-        return []
-
-    rename_map = dict(zip(old_glyph_order, new_glyph_order))
-    PostProcessor.rename_glyphs(otf=ttfont, rename_map=rename_map)
-    rebuild_character_map(font=ttfont, remap_all=True)
-
-    return renamed_glyphs
+    uni_str = _uni_str_from_reversed_cmap(glyph_name, reversed_cmap)
+    if not uni_str:
+        uni_str = NAMES_TO_UNICODES.get(glyph_name)
+    if not uni_str:
+        uni_str = _uni_str_from_glyph_name(glyph_name)
+    return uni_str
