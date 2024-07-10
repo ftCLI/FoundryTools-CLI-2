@@ -37,19 +37,28 @@ def _uni_str_from_int(codepoint: int) -> t.Optional[str]:
 
 def _uni_str_from_glyph_name(glyph_name: str) -> t.Optional[str]:
     """
-    Guess the Unicode value of a glyph from its name.
+    Guess the Unicode value of a glyph from its name. If the glyph name is not in the expected
+    format (e.g. "uniXXXX" or "uXXXXXX"), it will return None.
 
     Args:
         glyph_name (str): The name of the glyph.
 
     Returns:
         str: The Unicode value of the glyph.
+
+    Examples:
+        >>> _uni_str_from_glyph_name("uni0041")
+        '0x0041'
+        >>> _uni_str_from_glyph_name("u10FFFF")
+        '0x10FFFF'
+        >>> _uni_str_from_glyph_name("A")
+        None
     """
 
     for prefix in ("uni", "u"):
         if glyph_name.startswith(prefix) and len(glyph_name) == 7:
             try:
-                _ = int(glyph_name[len(prefix) :], 16)
+                _ = int(glyph_name.replace(prefix, ""), 16)
                 return glyph_name.replace(prefix, "0x")
             except ValueError:
                 return None
