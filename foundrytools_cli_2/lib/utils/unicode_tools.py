@@ -357,7 +357,7 @@ def set_production_names(ttfont: TTFont) -> t.List[t.Tuple[str, str]]:
         if not uni_str:
             uni_str = _uni_str_from_glyph_name(glyph_name)
 
-        # If not, skip the glyph
+        # If not, add the current glyph name to the new glyph order and continue
         if not uni_str:
             new_glyph_order.append(glyph_name)
             continue
