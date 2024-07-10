@@ -50,7 +50,7 @@ def _uni_str_from_glyph_name(glyph_name: str) -> t.Optional[str]:
     for prefix in ("uni", "u"):
         if glyph_name.startswith(prefix) and len(glyph_name) == 7:
             try:
-                _ = int(glyph_name[len(prefix):], 16)
+                _ = int(glyph_name[len(prefix) :], 16)
                 return glyph_name.replace(prefix, "0x")
             except ValueError:
                 return None
@@ -212,7 +212,7 @@ def get_mapped_and_unmapped_glyphs(ttfont: TTFont) -> t.Tuple[t.List[str], t.Lis
 
 
 def update_character_map(
-        source_cmap: _CharacterMap, target_cmap: _CharacterMap
+    source_cmap: _CharacterMap, target_cmap: _CharacterMap
 ) -> t.Tuple[_CharacterMap, t.List[t.Tuple[int, str]], t.List[t.Tuple[int, str, str]]]:
     """
     Update the target character map with the source character map.
@@ -236,7 +236,7 @@ def update_character_map(
 
 
 def create_cmap_tables(
-        subtable_format: int, platform_id: int, plat_enc_id: int, cmap: _CharacterMap
+    subtable_format: int, platform_id: int, plat_enc_id: int, cmap: _CharacterMap
 ) -> CmapSubtable:
     """
     Create a cmap subtable with the given parameters.
@@ -283,7 +283,7 @@ def setup_character_map(ttfont: TTFont, mapping: _CharacterMap) -> None:
 
 
 def rebuild_character_map(
-        font: TTFont, remap_all: bool = False
+    font: TTFont, remap_all: bool = False
 ) -> t.Tuple[t.List[t.Tuple[int, str]], t.List[t.Tuple[int, str, str]]]:
     """
     Rebuild the character map for the given TTFont object.
@@ -314,8 +314,9 @@ def rebuild_character_map(
     return remapped, duplicates
 
 
-def _get_multi_mapped_glyphs(reversed_cmap: t.Dict[str, t.Set[int]]) -> t.List[
-    t.Tuple[str, t.List[int]]]:
+def _get_multi_mapped_glyphs(
+    reversed_cmap: t.Dict[str, t.Set[int]],
+) -> t.List[t.Tuple[str, t.List[int]]]:
     """
     Get the glyphs that are mapped to multiple Unicode values.
 
@@ -345,7 +346,6 @@ def set_production_names(ttfont: TTFont) -> t.List[t.Tuple[str, str]]:
     reversed_cmap: _ReversedCmap = ttfont[T_CMAP].buildReversed()
 
     for glyph_name in old_glyph_order:
-
         # Check if the glyph is present in the reversed cmap
         uni_str = _uni_str_from_reversed_cmap(glyph_name, reversed_cmap)
 
