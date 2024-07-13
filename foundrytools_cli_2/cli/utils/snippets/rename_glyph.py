@@ -1,7 +1,7 @@
 from foundrytools_cli_2.lib.font import Font
 
 
-def main(font: Font, old_name: str, new_name:str) -> None:
+def main(font: Font, old_name: str, new_name: str) -> None:
     """
     Rename a single glyph in a font file.
 

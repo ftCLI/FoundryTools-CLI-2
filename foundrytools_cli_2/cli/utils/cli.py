@@ -52,7 +52,8 @@ def rename_glyph_command(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
 @cli.command("rename-glyphs")
 @base_options()
 @click.option(
-    "-s", "--source-file",
+    "-s",
+    "--source-file",
     type=click.Path(exists=True, dir_okay=False, path_type=Path),
     required=True,
     help="The source font file to get the glyph order from.",
