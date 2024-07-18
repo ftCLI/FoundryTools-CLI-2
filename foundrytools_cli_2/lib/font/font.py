@@ -38,10 +38,13 @@ from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
 from foundrytools_cli_2.lib.utils.misc import restore_flavor
 from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path
 from foundrytools_cli_2.lib.utils.unicode_tools import (
+    _cmap_from_glyph_names,
     _prod_name_from_uni_str,
     _ReversedCmap,
+    get_mapped_and_unmapped_glyphs,
     get_uni_str,
-    rebuild_character_map,
+    setup_character_map,
+    update_character_map,
 )
 
 __all__ = ["Font"]
@@ -781,14 +784,40 @@ class Font:  # pylint: disable=too-many-public-methods
         with restore_flavor(self.ttfont):
             desubroutinize(self.ttfont)
 
-    def rebuild_cmap(self, remap_all: bool = False) -> None:
+    def rebuild_cmap(self, remap_all: bool = False) -> t.Dict[str, int]:
         """
         Rebuild the character map of a font.
 
         Args:
             remap_all: Whether to remap all glyphs.
         """
-        rebuild_character_map(font=self.ttfont, remap_all=remap_all)
+        # rebuild_character_map(font=self.ttfont, remap_all=remap_all)
+
+        glyph_order = self.ttfont.getGlyphOrder()
+        mapped, unmapped = get_mapped_and_unmapped_glyphs(ttfont=self.ttfont)
+        if not remap_all:
+            target_cmap = self.ttfont.getBestCmap()  # We can also use cmap_from_reversed_cmap
+            source_cmap = _cmap_from_glyph_names(glyphs_list=unmapped)
+        else:
+            target_cmap = {}
+            source_cmap = _cmap_from_glyph_names(glyphs_list=glyph_order)
+
+        updated_cmap, remapped, duplicates = update_character_map(
+            source_cmap=source_cmap, target_cmap=target_cmap
+        )
+        setup_character_map(ttfont=self.ttfont, mapping=updated_cmap)
+
+        result = {
+            "total_glyphs": len(glyph_order),
+            "mapped_glyphs": len(mapped),
+            "unmapped_glyphs": len(unmapped),
+            "remapped_glyphs": len(remapped),
+            "skipped_glyphs": len(duplicates),
+            "mapped_glyphs_after": len(get_mapped_and_unmapped_glyphs(ttfont=self.ttfont)[0]),
+            "unmapped_glyphs_after": len(get_mapped_and_unmapped_glyphs(ttfont=self.ttfont)[1]),
+        }
+
+        return result
 
     def set_production_names(self) -> t.List[t.Tuple[str, str]]:
         """
