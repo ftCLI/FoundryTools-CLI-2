@@ -39,8 +39,8 @@ def fix_italic_angle(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     The italic angle is recalculated as first step.
 
-    The italic and oblique bits are then set based
-    on the calculated italic angle and the provided mode.
+    The italic and oblique bits are then set based on the calculated italic angle and the provided
+    mode.
     """
     from foundrytools_cli_2.cli.fix.snippets.italic_angle import main as task
 
@@ -145,4 +145,45 @@ def fix_legacy_accents(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     from foundrytools_cli_2.cli.fix.snippets.legacy_accents import fix_legacy_accents as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.run()
+
+
+@cli.command("transformed-components")
+@base_options()
+def fix_transformed_components(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Decompose glyphs with transformed components.
+
+    fontbakery check id: com.google.fonts/check/transformed_components
+
+    Rationale:
+
+    Some families have glyphs which have been constructed by using transformed components e.g.
+    the 'u' being constructed from a flipped 'n'.
+
+    From a designers point of view, this sounds like a win (less work). However, such approaches
+    can lead to rasterization issues, such as having the 'u' not sitting on the baseline at
+    certain sizes after running the font through ttfautohint.
+
+    Other issues are outlines that end up reversed when only one dimension is flipped while the
+    other isn't.
+
+    As of July 2019, Marc Foley observed that ttfautohint assigns cvt values to transformed
+    glyphs as if they are not transformed and the result is they render very badly, and that
+    vttLib does not support flipped components.
+
+    When building the font with fontmake, the problem can be fixed by adding this to the command
+    line:
+
+    ``--filter DecomposeTransformedComponentsFilter``
+
+    Fixing procedure:
+
+    * Decompose composite glyphs that have transformed components.
+    """
+    from foundrytools_cli_2.cli.fix.snippets.decompose_transformed import main as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.filter.filter_out_ps = True
+    runner.filter.filter_out_variable = True
     runner.run()
