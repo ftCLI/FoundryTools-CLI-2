@@ -26,6 +26,7 @@ MAX_US_WIDTH_CLASS = 9
 T_CFF = "CFF "
 T_CMAP = "cmap"
 T_CVAR = "cvar"
+T_FPGM = "fpgm"
 T_FVAR = "fvar"
 T_GDEF = "GDEF"
 T_GLYF = "glyf"
