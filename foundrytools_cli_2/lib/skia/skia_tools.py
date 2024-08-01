@@ -149,7 +149,7 @@ def round_path(path: pathops.Path, rounder: t.Callable[[float], float] = otRound
 
 def simplify_path(path: pathops.Path, glyph_name: str, clockwise: bool) -> pathops.Path:
     """
-    Simplify a ``pathops.Path by`` removing overlaps, fixing contours direction and, optionally,
+    Simplify a ``pathops.Path`` by removing overlaps, fixing contours direction and, optionally,
     removing tiny paths
 
     Args:
