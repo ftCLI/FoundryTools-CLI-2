@@ -207,18 +207,6 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         return self._temp_file
 
-    def reload(self) -> None:
-        """
-        Reload the font by saving it to a temporary stream and then loading it back.
-        """
-        recalc_bboxes = self.ttfont.recalcBBoxes
-        recalc_timestamp = self.ttfont.recalcTimestamp
-        buf = BytesIO()
-        self.ttfont.save(buf)
-        buf.seek(0)
-        self.ttfont = TTFont(buf, recalcBBoxes=recalc_bboxes, recalcTimestamp=recalc_timestamp)
-        buf.close()
-
     @property
     def modified(self) -> bool:
         """
@@ -478,6 +466,18 @@ class Font:  # pylint: disable=too-many-public-methods
         self._temp_file.unlink(missing_ok=True)
         if self.bytesio:
             self.bytesio.close()
+
+    def reload(self) -> None:
+        """
+        Reload the font by saving it to a temporary stream and then loading it back.
+        """
+        recalc_bboxes = self.ttfont.recalcBBoxes
+        recalc_timestamp = self.ttfont.recalcTimestamp
+        buf = BytesIO()
+        self.ttfont.save(buf)
+        buf.seek(0)
+        self.ttfont = TTFont(buf, recalcBBoxes=recalc_bboxes, recalcTimestamp=recalc_timestamp)
+        buf.close()
 
     def get_real_extension(self) -> str:
         """
