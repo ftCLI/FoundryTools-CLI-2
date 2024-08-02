@@ -38,6 +38,7 @@ def fix_legacy_accents(font: Font) -> None:
     # Not being marks in GDEF also typically means that they don't have anchors, as font compilers
     # would have otherwise classified them as marks in GDEF.
     if T_GDEF in font.ttfont and font.ttfont[T_GDEF].table.GlyphClassDef:
+        deleted = set()
         gdef = GdefTable(ttfont=font.ttfont)
         class_defs = gdef.table.table.GlyphClassDef.classDefs
         for name in reverse_cmap:
@@ -47,5 +48,10 @@ def fix_legacy_accents(font: Font) -> None:
                 and class_defs[name] == 3
             ):
                 del class_defs[name]
-                logger.info(f'"{name}" was defined in GDEF as a mark (class 3). Removed.')
+                deleted.add(name)
+
+        if deleted:
+            logger.info(
+                f"Deleted {len(deleted)} legacy accents from GDEF table: {', '.join(deleted)}"
+            )
         font.modified = gdef.modified
