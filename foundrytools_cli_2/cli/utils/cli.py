@@ -104,7 +104,7 @@ def remove_unused_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     show_default=True,
     help="""
     The method to sort the glyphs.
-    
+
     \b
     - unicode: Sort the glyphs based on their Unicode values.
     - alphabetical: Sort the glyphs alphabetically.
