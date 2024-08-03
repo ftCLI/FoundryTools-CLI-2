@@ -2,7 +2,7 @@ from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font.tables.cmap import CmapTable
 
 
-def fix_missing_nbsp(font: Font) -> None:
+def main(font: Font) -> None:
     """
     Fixes the missing non-breaking space glyph by double mapping the space glyph.
     """
