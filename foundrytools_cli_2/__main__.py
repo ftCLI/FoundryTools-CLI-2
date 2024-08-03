@@ -1,7 +1,6 @@
 import click
 
 from foundrytools_cli_2.cli.converter import cli as converter
-from foundrytools_cli_2.cli.experimental import cli as experimental
 from foundrytools_cli_2.cli.fix import cli as fix
 from foundrytools_cli_2.cli.gsub import cli as gsub
 from foundrytools_cli_2.cli.name import cli as name
@@ -15,7 +14,6 @@ from foundrytools_cli_2.cli.utils import cli as utils
 @click.group(
     commands={
         "converter": converter,
-        "experimental": experimental,
         "fix": fix,
         "gsub": gsub,
         "name": name,
