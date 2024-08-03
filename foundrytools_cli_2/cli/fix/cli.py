@@ -55,6 +55,48 @@ def fix_empty_notdef(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
+@cli.command("kern-table")
+@base_options()
+def fix_kern_table(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Fix the ``kern`` table by removing pairs that contain unmapped glyphs.
+
+    fontbakery check id: com.google.fonts/check/kern_table
+
+    Rationale:
+
+    Even though all fonts should have their kerning implemented in the ``GPOS`` table, there may
+    be kerning info at the ``kern`` table as well.
+
+    Some applications such as MS PowerPoint require kerning info on the kern table. More
+    specifically, they require a format 0 kern subtable from a kern table version 0 with only
+    glyphs defined in the ``cmap`` table, which is the only one that Windows understands (and
+    which is also the simplest and more limited of all the kern subtables).
+
+    Google Fonts ingests fonts made for download and use on desktops, and does all web font
+    optimizations in the serving pipeline (using libre libraries that anyone can replicate.)
+
+    Ideally, TTFs intended for desktop users (and thus the ones intended for Google Fonts) should
+    have both ``kern`` and ``GPOS`` tables.
+
+    Given all of the above, we currently treat kerning on a v0 ``kern`` table as a good-to-have (
+    but optional) feature.
+
+    \b
+    * Original proposal: legacy:check/066
+    * See also: https://github.com/fonttools/fontbakery/issues/1675
+    * See also: https://github.com/fonttools/fontbakery/issues/3148
+
+    Fixing procedure:
+
+    * Remove glyphs that are not defined in the ``cmap`` table from the ``kern`` table.
+    """
+    from foundrytools_cli_2.cli.fix.snippets.kern_table import main as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.run()
+
+
 @cli.command("italic-angle")
 @click.option(
     "--min-slant",

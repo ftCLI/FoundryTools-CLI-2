@@ -98,7 +98,8 @@ def remove_unused_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
 
 @cli.command("sort-glyphs")
 @click.option(
-    "-m", "--sort-method",
+    "-m",
+    "--sort-method",
     type=click.Choice(["unicode", "alphabetical", "cannedDesign"]),
     default="unicode",
     show_default=True,
