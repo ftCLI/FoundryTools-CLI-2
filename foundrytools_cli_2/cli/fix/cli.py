@@ -187,3 +187,31 @@ def fix_transformed_components(input_path: Path, **options: t.Dict[str, t.Any]) 
     runner.filter.filter_out_ps = True
     runner.filter.filter_out_variable = True
     runner.run()
+
+
+@cli.command("duplicate-components")
+@base_options()
+def fix_duplicate_components(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Remove duplicate components.
+
+    fontbakery check id: com.google.fonts/check/glyf_non_transformed_duplicate_components
+
+    Rationale:
+
+    There have been cases in which fonts had faulty double quote marks, with each of them
+    containing two single quote marks as components with the same x, y coordinates which makes
+    them visually look like single quote marks.
+
+    This check ensures that glyphs do not contain duplicate components which have the same x,
+    y coordinates.
+
+    Fixing procedure:
+
+    * Remove duplicate components which have the same x,y coordinates.
+    """
+    from foundrytools_cli_2.cli.fix.snippets.duplicate_components import main as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.filter.filter_out_ps = True
+    runner.run()
