@@ -117,6 +117,60 @@ def fix_legacy_accents(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
+@cli.command("nbsp-missing")
+@base_options()
+def fix_missing_nbsp(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Fixes the missing non-breaking space glyph by double mapping the space glyph.
+
+    fontbakery check id: com.google.fonts/check/whitespace_glyphs
+
+    Rationale:
+
+    Font contains glyphs for whitespace characters?
+
+    Fixing procedure:
+
+    * Add a glyph for the missing ``nbspace`` character by double mapping the ``space`` character
+    """
+    from foundrytools_cli_2.cli.fix.snippets.nbsp_missing import main as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.run()
+
+
+@cli.command("nbsp-width")
+@base_options()
+def fix_nbsp_width(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Fixes the width of the non-breaking space glyph to be the same as the space glyph.
+
+    fontbakery check id: com.google.fonts/check/whitespace_widths
+
+    Rationale:
+
+    If the ``space`` and ``nbspace`` glyphs have different widths, then Google Workspace has
+    problems with the font.
+
+    The ``nbspace`` is used to replace the space character in multiple situations in documents;
+    such as the space before punctuation in languages that do that. It avoids the punctuation to
+    be separated from the last word and go to next line.
+
+    This is automatic substitution by the text editors, not by fonts. It's also used by designers
+    in text composition practice to create nicely shaped paragraphs. If the ``space`` and the
+    ``nbspace`` are not the same width, it breaks the text composition of documents.
+
+    Fixing procedure:
+
+    * Check if ``nbspace`` and space glyphs have the same width. If not, correct ``nbspace``
+    width to match the ``space`` width.
+    """
+    from foundrytools_cli_2.cli.fix.snippets.nbsp_width import main as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.run()
+
+
 @cli.command("monospace")
 @base_options()
 def fix_monospace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
@@ -171,28 +225,6 @@ def fix_monospace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     * Set ``CFF.cff.TopDictIndex[0].isFixedPitch`` to ``True`` for CFF fonts
     """
     from foundrytools_cli_2.cli.fix.snippets.monospace import main as task
-
-    runner = TaskRunner(input_path=input_path, task=task, **options)
-    runner.run()
-
-
-@cli.command("nbsp-missing")
-@base_options()
-def fix_missing_nbsp(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
-    """
-    Fixes the missing non-breaking space glyph by double mapping the space glyph.
-
-    fontbakery check id: com.google.fonts/check/whitespace_glyphs
-
-    Rationale:
-
-    Font contains glyphs for whitespace characters?
-
-    Fixing procedure:
-
-    * Add a glyph for the missing ``nbspace`` character by double mapping the ``space`` character
-    """
-    from foundrytools_cli_2.cli.fix.snippets.nbsp_missing import fix_missing_nbsp as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
