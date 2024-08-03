@@ -94,3 +94,29 @@ def remove_unused_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.save_if_modified = False
     runner.run()
+
+
+@cli.command("sort-glyphs")
+@click.option(
+    "-m", "--sort-method",
+    type=click.Choice(["unicode", "alphabetical", "cannedDesign"]),
+    default="unicode",
+    show_default=True,
+    help="""
+    The method to sort the glyphs.
+    
+    \b
+    - unicode: Sort the glyphs based on their Unicode values.
+    - alphabetical: Sort the glyphs alphabetically.
+    - cannedDesign: Sort glyphs into a design process friendly order.
+    """,
+)
+@base_options()
+def sort_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Sort the glyphs in a font file.
+    """
+    from foundrytools_cli_2.cli.utils.snippets.sort_glyphs import main as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.run()
