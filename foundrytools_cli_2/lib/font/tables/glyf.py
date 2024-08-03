@@ -71,3 +71,25 @@ class GlyfTable(DefaultTbl):  # pylint: disable=too-few-public-methods
                 decomposed_glyphs.add(glyph_name)
 
         return decomposed_glyphs
+
+    def remove_duplicate_components(self) -> t.Set[str]:
+        """
+        Remove duplicate components from composite glyphs.
+        """
+        fixed_glyphs = set()
+        for glyph_name in self.ttfont.getGlyphOrder():
+            glyph = self.table[glyph_name]
+            if not glyph.isComposite():
+                continue
+
+            components = []
+            for component in glyph.components:
+                if component not in components:
+                    components.append(component)
+                else:
+                    fixed_glyphs.add(glyph_name)
+
+            glyph.components = components
+            self.table[glyph_name] = glyph
+
+        return fixed_glyphs
