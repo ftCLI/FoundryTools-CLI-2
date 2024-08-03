@@ -14,3 +14,23 @@ class CmapTable(DefaultTbl):  # pylint: disable=too-few-public-methods
         Initializes the ``cmap`` table handler.
         """
         super().__init__(ttfont=ttfont, table_tag=T_CMAP)
+
+    def add_missing_non_breaking_space(self) -> None:
+        """
+        Fixes the missing non-breaking space glyph by double mapping the space glyph.
+        """
+        # Get the space glyph
+        best_cmap = self.ttfont.getBestCmap()
+        space_glyph = best_cmap.get(0x0020)
+        if space_glyph is None:
+            return
+
+        # Get the non-breaking space glyph
+        nbsp_glyph = best_cmap.get(0x00A0)
+        if nbsp_glyph is not None:
+            return
+
+        # Copy the space glyph to the non-breaking space glyph
+        for table in self.ttfont["cmap"].tables:
+            if table.isUnicode():
+                table.cmap[0x00A0] = space_glyph

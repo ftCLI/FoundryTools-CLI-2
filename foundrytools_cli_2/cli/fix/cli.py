@@ -10,6 +10,51 @@ from foundrytools_cli_2.cli.task_runner import TaskRunner
 cli = click.Group(help="Fix font errors.")
 
 
+@cli.command("duplicate-components")
+@base_options()
+def fix_duplicate_components(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Remove duplicate components.
+
+    fontbakery check id: com.google.fonts/check/glyf_non_transformed_duplicate_components
+
+    Rationale:
+
+    There have been cases in which fonts had faulty double quote marks, with each of them
+    containing two single quote marks as components with the same x, y coordinates which makes
+    them visually look like single quote marks.
+
+    This check ensures that glyphs do not contain duplicate components which have the same x,
+    y coordinates.
+
+    Fixing procedure:
+
+    * Remove duplicate components which have the same x,y coordinates.
+    """
+    from foundrytools_cli_2.cli.fix.snippets.duplicate_components import main as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.filter.filter_out_ps = True
+    runner.run()
+
+
+@cli.command("notdef-empty")
+@base_options()
+def fix_empty_notdef(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Fixes the empty .notdef glyph by drawing a simple rectangle.
+
+    Glyph 0 must be assigned to a .notdef glyph. The .notdef glyph is very important for providing
+    the user feedback that a glyph is not found in the font. This glyph should not be left without
+    an outline as the user will only see what looks like a space if a glyph is missing and not be
+    aware of the active font’s limitation.
+    """
+    from foundrytools_cli_2.cli.fix.snippets.empty_notdef import fix_notdef_empty as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.run()
+
+
 @cli.command("italic-angle")
 @click.option(
     "--min-slant",
@@ -48,18 +93,25 @@ def fix_italic_angle(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("notdef-empty")
+@cli.command("legacy-accents")
 @base_options()
-def fix_empty_notdef(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def fix_legacy_accents(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Fixes the empty .notdef glyph by drawing a simple rectangle.
+    Check that legacy accents aren't used in composite glyphs.
 
-    Glyph 0 must be assigned to a .notdef glyph. The .notdef glyph is very important for providing
-    the user feedback that a glyph is not found in the font. This glyph should not be left without
-    an outline as the user will only see what looks like a space if a glyph is missing and not be
-    aware of the active font’s limitation.
+    fontbakery check id: com.google.fonts/check/legacy_accents
+
+    Rationale:
+
+    Legacy accents should not have anchors and should have positive width. They are often used
+    independently of a letter, either as a placeholder for an expected combined mark+letter
+    combination in macOS, or separately. For instance, U+00B4 (ACUTE ACCENT) is often mistakenly
+    used as an apostrophe, U+0060 (GRAVE ACCENT) is used in Markdown to notify code blocks, and ^ is
+    used as an exponential operator in maths.
+
+    More info: https://github.com/googlefonts/fontbakery/issues/4310
     """
-    from foundrytools_cli_2.cli.fix.snippets.empty_notdef import fix_notdef_empty as task
+    from foundrytools_cli_2.cli.fix.snippets.legacy_accents import fix_legacy_accents as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -124,25 +176,23 @@ def fix_monospace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("legacy-accents")
+@cli.command("nbsp-missing")
 @base_options()
-def fix_legacy_accents(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def fix_missing_nbsp(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Check that legacy accents aren't used in composite glyphs.
+    Fixes the missing non-breaking space glyph by double mapping the space glyph.
 
-    fontbakery check id: com.google.fonts/check/legacy_accents
+    fontbakery check id: com.google.fonts/check/whitespace_glyphs
 
     Rationale:
 
-    Legacy accents should not have anchors and should have positive width. They are often used
-    independently of a letter, either as a placeholder for an expected combined mark+letter
-    combination in macOS, or separately. For instance, U+00B4 (ACUTE ACCENT) is often mistakenly
-    used as an apostrophe, U+0060 (GRAVE ACCENT) is used in Markdown to notify code blocks, and ^ is
-    used as an exponential operator in maths.
+    Font contains glyphs for whitespace characters?
 
-    More info: https://github.com/googlefonts/fontbakery/issues/4310
+    Fixing procedure:
+
+    * Add a glyph for the missing ``nbspace`` character by double mapping the ``space`` character
     """
-    from foundrytools_cli_2.cli.fix.snippets.legacy_accents import fix_legacy_accents as task
+    from foundrytools_cli_2.cli.fix.snippets.nbsp_missing import fix_missing_nbsp as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -186,32 +236,4 @@ def fix_transformed_components(input_path: Path, **options: t.Dict[str, t.Any]) 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_ps = True
     runner.filter.filter_out_variable = True
-    runner.run()
-
-
-@cli.command("duplicate-components")
-@base_options()
-def fix_duplicate_components(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
-    """
-    Remove duplicate components.
-
-    fontbakery check id: com.google.fonts/check/glyf_non_transformed_duplicate_components
-
-    Rationale:
-
-    There have been cases in which fonts had faulty double quote marks, with each of them
-    containing two single quote marks as components with the same x, y coordinates which makes
-    them visually look like single quote marks.
-
-    This check ensures that glyphs do not contain duplicate components which have the same x,
-    y coordinates.
-
-    Fixing procedure:
-
-    * Remove duplicate components which have the same x,y coordinates.
-    """
-    from foundrytools_cli_2.cli.fix.snippets.duplicate_components import main as task
-
-    runner = TaskRunner(input_path=input_path, task=task, **options)
-    runner.filter.filter_out_ps = True
     runner.run()
