@@ -418,13 +418,13 @@ def regular() -> t.Callable:
     """
     _regular = [
         click.option(
-            "-rg/-no-rg",
-            "--regular/--no-regular",
+            "-rg",
+            "--regular",
             "regular",
             default=None,
             is_flag=True,
             help="""
-            Sets or clears the ``OS/2.fsSelection`` bit 6 (REGULAR).
+            Sets the ``OS/2.fsSelection`` bit 6 (REGULAR).
 
             If bit 6 is set, then ``OS/2.fsSelection`` bits 0 and 5 will be cleared, as well as the
             ``macStyle`` bits 0 and 1 in the ``head`` table.
