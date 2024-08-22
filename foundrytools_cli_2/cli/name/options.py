@@ -74,7 +74,7 @@ def skip_name_ids() -> t.Callable:
             help="""
             Specify the name IDs to be excluded.
 
-            Example: ``-n 1 -n 2`` will modify name IDs 1 and 2.
+            Example: ``-n 1 -n 2`` will modify all NameRecords except those with name IDs 1 and 2.
             """,
         )
     ]
