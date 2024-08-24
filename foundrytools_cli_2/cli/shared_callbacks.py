@@ -68,3 +68,13 @@ def choice_to_int_callback(
     if isinstance(value, tuple):
         return tuple(_to_int(v) for v in value)
     return _to_int(value)
+
+
+def validate_params(ctx: click.Context) -> None:
+    """
+    Checks if any attributes are provided to set, except for the ignored ones.
+    """
+    ignored = ["input_path", "output_dir", "recursive", "recalc_timestamp", "overwrite"]
+
+    if all(value is None for key, value in ctx.params.items() if key not in ignored):
+        raise click.UsageError("No attributes provided to set.")
