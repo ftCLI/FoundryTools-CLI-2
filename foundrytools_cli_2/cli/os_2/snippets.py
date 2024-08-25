@@ -157,10 +157,6 @@ def set_attrs(
         "cap_height": cap_height,
     }
 
-    if all(value is None for value in attrs.values()):
-        logger.warning("No attributes provided to set.")
-        return
-
     for attr, value in attrs.items():
         if value is not None:
             try:
@@ -196,14 +192,6 @@ def set_fs_selection(
         oblique (optional): A boolean value indicating whether to set the oblique bit in the OS/2
             table.
     """
-
-    if all(
-        value is None
-        for value in (italic, bold, regular, use_typo_metrics, wws_consistent, oblique)
-    ):
-        logger.error("No flags provided to set.")
-        return
-
     os_2_table = OS2Table(font.ttfont)
     head_table = HeadTable(font.ttfont)
     if italic is not None:
@@ -239,11 +227,6 @@ def set_fs_type(
         bitmap_embed_only (optional): A boolean value indicating whether only bitmaps should be
             embedded.
     """
-
-    if all(value is None for value in (embed_level, no_subsetting, bitmap_embed_only)):
-        logger.error("No attributes provided to set.")
-        return
-
     os_2_table = OS2Table(font.ttfont)
     attrs = {
         "embed_level": embed_level,
@@ -278,10 +261,6 @@ def set_panose(font: Font, **kwargs: t.Dict[str, int]) -> None:
         font: The Font object representing the font to modify.
         kwargs: A dictionary containing the PANOSE classification values to set.
     """
-    if all(value is None for value in kwargs.values()):
-        logger.error("No attributes provided to set.")
-        return
-
     os_2_table = OS2Table(font.ttfont)
     for key, value in kwargs.items():
         if value is not None:
