@@ -83,16 +83,16 @@ class CFFTable(DefaultTbl):
         for attr_name, attr_value in names.items():
             setattr(self.top_dict, attr_name, attr_value)
 
-    def del_top_dict_names(self, **names: t.Dict[str, str]) -> None:
+    def del_top_dict_names(self, **kwargs: t.Dict[str, str]) -> None:
         """
         Deletes names from topDictIndex[0]
         Args:
-            names: The names to delete.
+            kwargs: The names to delete.
 
         Returns:
             None
         """
-        for k, v in names.items():
+        for k, v in kwargs.items():
             if v is not None:
                 with contextlib.suppress(KeyError):
                     del self.top_dict.rawDict[k]
