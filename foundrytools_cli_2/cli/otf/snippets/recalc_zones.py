@@ -52,7 +52,7 @@ def get_glyph_bounds(font: TTFont, glyph_name: str) -> GlyphBounds:
 
     glyph_set = font.getGlyphSet()
     if glyph_name not in glyph_set:
-        raise ValueError(f"Glyph '{glyph_name}' does not exist in the font.")
+        raise ValueError(f"Glyph '{glyph_name}' doesn't exist in the font.")
 
     bounds_pen = BoundsPen(glyphSet=glyph_set)
 
