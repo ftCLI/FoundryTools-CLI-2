@@ -311,3 +311,33 @@ def fix_transformed_components(input_path: Path, **options: t.Dict[str, t.Any]) 
     runner.filter.filter_out_ps = True
     runner.filter.filter_out_variable = True
     runner.run()
+
+
+@cli.command("unreachable-glyphs")
+@base_options()
+def fix_unreachable_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Remove unreachable glyphs from the font.
+
+    fontbakery check id: com.google.fonts/check/unreachable_glyphs
+
+    Rationale:
+
+    Glyphs are either accessible directly through Unicode codepoints or through substitution rules.
+
+    In Color Fonts, glyphs are also referenced by the COLR table. And mathematical fonts also
+    reference glyphs via the MATH table.
+
+    Any glyphs not accessible by these means are redundant and serve only to increase the font's
+    file size.
+
+    More info: https://github.com/fonttools/fontbakery/issues/3160
+
+    Fixing procedure:
+
+    * Remove glyphs that are not reachable by subsetting the font.
+    """
+    from foundrytools_cli_2.cli.fix.snippets.unreachable_glyphs import main as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.run()

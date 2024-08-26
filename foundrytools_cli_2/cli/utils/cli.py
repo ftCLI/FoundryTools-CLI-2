@@ -4,13 +4,7 @@ from pathlib import Path
 
 import click
 
-from foundrytools_cli_2.cli.shared_options import (
-    base_options,
-    input_path_argument,
-    output_dir_option,
-    overwrite_flag,
-    recalc_timestamp_flag,
-)
+from foundrytools_cli_2.cli.shared_options import base_options
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
 cli = click.Group(help="Miscellaneous utilities.")
@@ -77,22 +71,6 @@ def set_production_names_command(input_path: Path, **options: t.Dict[str, t.Any]
     from foundrytools_cli_2.cli.utils.snippets.set_production_names import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
-    runner.run()
-
-
-@cli.command("remove-unused-glyphs")
-@input_path_argument()
-@output_dir_option()
-@overwrite_flag()
-@recalc_timestamp_flag()
-def remove_unused_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
-    """
-    Subsets a font file by removing unreachable glyphs.
-    """
-    from foundrytools_cli_2.cli.utils.snippets.remove_unused_glyphs import main as task
-
-    runner = TaskRunner(input_path=input_path, task=task, **options)
-    runner.save_if_modified = False
     runner.run()
 
 
