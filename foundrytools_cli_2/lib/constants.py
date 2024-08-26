@@ -74,3 +74,13 @@ class NameIds(IntEnum):
     LIGHT_BACKGROUND_PALETTE = 23
     DARK_BACKGROUND_PALETTE = 24
     VARIATIONS_POSTSCRIPT_NAME_PREFIX = 25
+
+
+TOP_DICT_NAMES = {
+    "full-name": "FullName",
+    "family-name": "FamilyName",
+    "weight": "Weight",
+    "version": "version",
+    "notice": "Notice",
+    "copyright": "Copyright",
+}

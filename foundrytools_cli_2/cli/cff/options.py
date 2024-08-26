@@ -3,16 +3,7 @@ import typing as t
 import click
 
 from foundrytools_cli_2.cli.shared_options import add_options
-
-TOP_DICT_NAMES = {
-    "full-name": "FullName",
-    "family-name": "FamilyName",
-    "weight": "Weight",
-    "version": "version",
-    "notice": "Notice",
-    "copyright": "Copyright",
-    "unique-id": "UniqueID",
-}
+from foundrytools_cli_2.lib.constants import TOP_DICT_NAMES
 
 
 def font_names_option() -> t.Callable:
