@@ -322,3 +322,45 @@ def min_area_option() -> t.Callable:
         )
     ]
     return add_options(_min_area_option)
+
+
+def old_string() -> t.Callable:
+    """
+    Add the ``old_string`` option to a click command.
+
+    Returns:
+        t.Callable: A decorator that adds the old_string option to a click command
+    """
+    _old_string_option = [
+        click.option(
+            "-os",
+            "--old-string",
+            type=str,
+            required=True,
+            help="""
+            Specify the string to be replaced.
+            """,
+        )
+    ]
+    return add_options(_old_string_option)
+
+
+def new_string() -> t.Callable:
+    """
+    Add the ``new_string`` option to a click command.
+
+    Returns:
+        t.Callable: A decorator that adds the new_string option to a click command
+    """
+    _new_string_option = [
+        click.option(
+            "-ns",
+            "--new-string",
+            type=str,
+            required=True,
+            help="""
+            Specify the string to replace the old string with.
+            """,
+        )
+    ]
+    return add_options(_new_string_option)
