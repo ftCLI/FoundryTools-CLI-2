@@ -24,6 +24,26 @@ def font_names_option() -> t.Callable:
     return add_options(_font_name_option)
 
 
+def unique_id_flag() -> t.Callable:
+    """
+    Add the ``unique-id`` flag to a click command.
+
+    Returns:
+        t.Callable: A decorator that adds the ``unique-id`` flag to a click command
+    """
+    return add_options(
+        [
+            click.option(
+                "--unique-id",
+                "UniqueID",
+                is_flag=True,
+                default=None,
+                help="Deletes the ``cff.topDictIndex[0].UniqueID`` value",
+            )
+        ]
+    )
+
+
 def top_dict_names_flags() -> t.Callable:
     """
     Add the ``full-name``, ``family-name``, ``weight``, and ``version`` flags to a click command.
