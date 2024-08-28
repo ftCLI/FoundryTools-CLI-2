@@ -10,19 +10,19 @@ from foundrytools_cli_2.cli.task_runner import TaskRunner
 cli = click.Group(help="Miscellaneous utilities.")
 
 
-@cli.command("rebuild-cmap")
+@cli.command("remap")
 @base_options()
 @click.option(
     "--remap-all",
     is_flag=True,
     help="Remap all characters in the cmap table.",
 )
-def rebuild_cmap_command(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def rebuild_cmap(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Rebuild the cmap table of a font. Optionally remap all characters, including those already in
     the cmap table.
     """
-    from foundrytools_cli_2.cli.utils.snippets.rebuild_cmap import main as task
+    from foundrytools_cli_2.cli.glyphs.snippets.rebuild_cmap import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -32,11 +32,11 @@ def rebuild_cmap_command(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
 @base_options()
 @click.option("-old", "--old-name", required=True, help="The old name of the glyph.")
 @click.option("-new", "--new-name", required=True, help="The new name of the glyph.")
-def rename_glyph_command(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def rename_glyph(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Rename a glyph in a font file.
     """
-    from foundrytools_cli_2.cli.utils.snippets.rename_glyph import main as task
+    from foundrytools_cli_2.cli.glyphs.snippets.rename_glyph import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.force_modified = True
@@ -52,11 +52,11 @@ def rename_glyph_command(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     required=True,
     help="The source font file to get the glyph order from.",
 )
-def rename_glyphs_command(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def rename_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Rename glyphs in a font file based on the glyph order of another font file.
     """
-    from foundrytools_cli_2.cli.utils.snippets.rename_glyphs import main as task
+    from foundrytools_cli_2.cli.glyphs.snippets.rename_glyphs import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -64,17 +64,17 @@ def rename_glyphs_command(input_path: Path, **options: t.Dict[str, t.Any]) -> No
 
 @cli.command("set-production-names")
 @base_options()
-def set_production_names_command(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def set_production_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Set the production names of glyphs in a font file.
     """
-    from foundrytools_cli_2.cli.utils.snippets.set_production_names import main as task
+    from foundrytools_cli_2.cli.glyphs.snippets.set_production_names import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
-@cli.command("sort-glyphs")
+@cli.command("sort")
 @click.option(
     "-m",
     "--sort-method",
@@ -95,7 +95,7 @@ def sort_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Sort the glyphs in a font file.
     """
-    from foundrytools_cli_2.cli.utils.snippets.sort_glyphs import main as task
+    from foundrytools_cli_2.cli.glyphs.snippets.sort_glyphs import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
