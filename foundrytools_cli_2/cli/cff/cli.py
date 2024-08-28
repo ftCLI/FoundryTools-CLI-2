@@ -24,7 +24,7 @@ cli = click.Group("cff", help="Utilities for editing the ``CFF`` table.")
 @base_options()
 def set_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Sets the provided values in the ``CFF`` table.
+    Sets the ``cff.fontNames[0]`` and/or ``topDictIndex[0]`` values.
     """
     validate_params(click.get_current_context())
 
@@ -41,7 +41,7 @@ def set_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @base_options()
 def del_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Deletes the provided names from the ``CFF`` table.
+    Deletes attributes from ``topDictIndex[0]`` using the provided keyword arguments.
     """
     validate_params(click.get_current_context())
 
@@ -58,15 +58,9 @@ def del_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @base_options()
 def find_replace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Replaces the provided string in the ``CFF`` table with a new string.
-
-    It searches for the old string in the following attributes:
-    - version
-    - FullName
-    - FamilyName
-    - Weight
-
-    If the old string is found in any of the above attributes, it is replaced with the new string.
+    Finds and replaces a string in the ``CFF`` table. It performs the replacement in
+    ``cff.fontNames[0]`` and in the following ``topDictIndex[0]`` fields: version, FullName,
+    FamilyName, Weight, Copyright, Notice.
     """
     from foundrytools_cli_2.cli.cff.snippets import find_replace as task
 
