@@ -148,9 +148,7 @@ class CFFTable(DefaultTbl):
         ]
 
         for attr_name in attr_list:
-            try:
+            with contextlib.suppress(AttributeError):
                 old_value = str(getattr(top_dict, attr_name))
                 new_value = old_value.replace(old_string, new_string).replace("  ", " ").strip()
                 setattr(top_dict, attr_name, new_value)
-            except AttributeError:
-                pass

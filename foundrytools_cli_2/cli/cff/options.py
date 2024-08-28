@@ -38,7 +38,7 @@ def unique_id_flag() -> t.Callable:
                 "UniqueID",
                 is_flag=True,
                 default=None,
-                help="Deletes the ``cff.topDictIndex[0].UniqueID`` value",
+                help="Deletes the ``UniqueID`` value",
             )
         ]
     )
@@ -58,7 +58,7 @@ def top_dict_names_flags() -> t.Callable:
             var_name,
             is_flag=True,
             default=None,
-            help=f"Deletes the ``cff.topDictIndex[0].{var_name}`` value",
+            help=f"Deletes the ``{var_name}`` value",
         )
         for option_param, var_name in sorted(TOP_DICT_NAMES.items())
     ]
