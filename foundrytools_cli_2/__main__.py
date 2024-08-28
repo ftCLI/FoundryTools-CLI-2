@@ -13,6 +13,7 @@ from foundrytools_cli_2.cli.ttf import cli as ttf
 
 
 @click.group(
+    help="A collection of command line tools for working with font files.",
     commands={
         "cff": cff,
         "converter": converter,
