@@ -11,12 +11,12 @@ cli = click.Group(help="Miscellaneous utilities.")
 
 
 @cli.command("remap")
-@base_options()
 @click.option(
     "--remap-all",
     is_flag=True,
     help="Remap all characters in the cmap table.",
 )
+@base_options()
 def rebuild_cmap(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Rebuild the cmap table of a font. Optionally remap all characters, including those already in
@@ -29,9 +29,9 @@ def rebuild_cmap(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("rename-glyph")
-@base_options()
 @click.option("-old", "--old-name", required=True, help="The old name of the glyph.")
 @click.option("-new", "--new-name", required=True, help="The new name of the glyph.")
+@base_options()
 def rename_glyph(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Rename a glyph in a font file.
@@ -44,7 +44,6 @@ def rename_glyph(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("rename-glyphs")
-@base_options()
 @click.option(
     "-s",
     "--source-file",
@@ -52,6 +51,7 @@ def rename_glyph(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     required=True,
     help="The source font file to get the glyph order from.",
 )
+@base_options()
 def rename_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Rename glyphs in a font file based on the glyph order of another font file.
