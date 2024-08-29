@@ -7,14 +7,14 @@ import click
 from foundrytools_cli_2.cli.shared_options import base_options
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
-cli = click.Group(help="Miscellaneous utilities.")
+cli = click.Group(help="A collection of utilities to remap, rename and sort glyphs.")
 
 
 @cli.command("remap")
 @click.option(
     "--remap-all",
     is_flag=True,
-    help="Remap all characters in the cmap table.",
+    help="Remap all glyphs, including the ones already in the cmap table.",
 )
 @base_options()
 def rebuild_cmap(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
