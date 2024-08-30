@@ -92,6 +92,7 @@ def ttf2otf(
 def ttf2otf_with_tx(
     font: Font,
     target_upm: t.Optional[int] = None,
+    correct_contours: bool = True,
     subroutinize: bool = True,
     output_dir: t.Optional[Path] = None,
     recalc_timestamp: bool = False,
@@ -104,6 +105,8 @@ def ttf2otf_with_tx(
         font (Font): The font to convert
         target_upm (t.Optional[int], optional): The target UPM to scale the font to. Defaults to
             ``None``, which means that the font will not be scaled.
+        correct_contours (bool, optional): Whether to correct the contours with pathops. Defaults to
+            ``True``.
         subroutinize (bool, optional): Whether to subroutinize the font. Defaults to ``True``.
         output_dir (t.Optional[Path], optional): The output directory. If ``None``, the output file
             will be saved in the same directory as the input file. Defaults to ``None``.
@@ -140,9 +143,10 @@ def ttf2otf_with_tx(
     sfntedit_command = ["sfntedit", "-a", "CFF=" + str(cff_file), str(out_file)]
     run_shell_command(sfntedit_command, suppress_output=True)
 
-    logger.info("Correcting contours...")
-    font = Font(out_file, recalc_timestamp=recalc_timestamp)
-    font.ps_correct_contours()
+    if correct_contours:
+        logger.info("Correcting contours...")
+        font = Font(out_file, recalc_timestamp=recalc_timestamp)
+        font.ps_correct_contours()
 
     os_2_table = OS2Table(font.ttfont)
     os_2_table.recalc_avg_char_width()
