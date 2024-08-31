@@ -12,6 +12,7 @@ from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import Axis, NamedInstance
 from fontTools.ttLib.ttGlyphSet import _TTGlyphSet
+from pathvalidate import sanitize_filename
 from ufo2ft.postProcessor import PostProcessor
 
 from foundrytools_cli_2.lib.constants import (
@@ -30,7 +31,7 @@ from foundrytools_cli_2.lib.constants import (
     WOFF_EXTENSION,
     WOFF_FLAVOR,
 )
-from foundrytools_cli_2.lib.font.tables import CFFTable, HeadTable, OS2Table
+from foundrytools_cli_2.lib.font.tables import CFFTable, HeadTable, NameTable, OS2Table
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.otf.t2_charstrings import quadratics_to_cubics
 from foundrytools_cli_2.lib.skia.skia_tools import correct_contours_cff, correct_contours_glyf
@@ -562,6 +563,33 @@ class Font:  # pylint: disable=too-many-public-methods
         )
         return out_file
 
+    def get_best_file_name(self, source: int = 1) -> Path:
+        """
+        Get the best file name for a font.
+
+        Returns:
+            The best file name for the font.
+        """
+        name_table = NameTable(self.ttfont)
+        cff_table = CFFTable(self.ttfont)
+        if self.is_tt and source in (4, 5):
+            source = 1
+        if source == 1:
+            family_name = name_table.get_best_family_name()
+            subfamily_name = name_table.get_best_subfamily_name()
+            file_name = f"{family_name}-{subfamily_name}".replace(" ", "").replace(".", "")
+        elif source == 2:
+            file_name = name_table.get_debug_name(name_id=6)
+        elif source == 3:
+            file_name = name_table.get_best_full_name()
+        elif source == 4:
+            file_name = cff_table.table.cff.fontNames[0]
+        elif source == 5:
+            file_name = cff_table.table.cff.topDictIndex[0].FullName
+        else:
+            raise ValueError("Invalid source value.")
+        return Path(sanitize_filename(file_name, platform="auto"))
+
     def get_axes(self) -> t.List[Axis]:
         """
         Get axes from a variable font.
@@ -837,7 +865,7 @@ class Font:  # pylint: disable=too-many-public-methods
             name.
 
         The method iterates through each glyph in the old glyph order and determines its production
-        name based on its assigned or calculated unicode value. If the production name is already
+        name based on its assigned or calculated Unicode value. If the production name is already
         assigned, the glyph is skipped. If the production name is different from the original glyph
         name and is not already assigned, the glyph is renamed and added to the new glyph order
         list. Finally, the font is updated with the new glyph order, the cmap table is rebuilt, and
