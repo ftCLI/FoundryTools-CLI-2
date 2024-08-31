@@ -571,7 +571,8 @@ class Font:  # pylint: disable=too-many-public-methods
             The best file name for the font.
         """
         name_table = NameTable(self.ttfont)
-        cff_table = CFFTable(self.ttfont)
+        if self.is_ps:
+            cff_table = CFFTable(self.ttfont)
         if self.is_tt and source in (4, 5):
             source = 1
         if source == 1:
