@@ -25,7 +25,7 @@ def rename_source_option() -> t.Callable:
         The source string(s) from which to extract the new file name. Default is 1
         (FamilyName-StyleName), used also as fallback name when 4 or 5 are passed but the font
         is TrueType
-        
+
         \b
         1: FamilyName-StyleName
         2: PostScript Name
