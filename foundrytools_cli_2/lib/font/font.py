@@ -567,8 +567,13 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         Get the best file name for a font.
 
+        Args:
+            source (int, optional): The source string(s) from which to extract the new file name.
+                Default is 1 (FamilyName-StyleName), used also as fallback name when 4 or 5 are
+                passed but the font is TrueType.
+
         Returns:
-            The best file name for the font.
+            A ``Path`` object pointing to the best file name for the font.
         """
         name_table = NameTable(self.ttfont)
         cff_table = CFFTable(self.ttfont) if self.is_ps else None
