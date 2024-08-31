@@ -30,7 +30,7 @@ def rename_source_option() -> t.Callable:
         1: FamilyName-StyleName
         2: PostScript Name
         3: Full Font Name
-        4: CFF TopDict fontNames (CFF fonts only)
+        4: CFF fontNames (CFF fonts only)
         5: CFF TopDict FullName (CFF fonts only)
         """,
         )

@@ -572,6 +572,12 @@ class Font:  # pylint: disable=too-many-public-methods
                 Default is 1 (FamilyName-StyleName), used also as fallback name when 4 or 5 are
                 passed but the font is TrueType.
 
+                1: FamilyName-StyleName
+                2: PostScript Name
+                3: Full Font Name
+                4: CFF fontNames (CFF fonts only)
+                5: CFF TopDict FullName (CFF fonts only)
+
         Returns:
             A ``Path`` object pointing to the best file name for the font.
         """
