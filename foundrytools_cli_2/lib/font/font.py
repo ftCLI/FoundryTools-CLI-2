@@ -571,8 +571,7 @@ class Font:  # pylint: disable=too-many-public-methods
             The best file name for the font.
         """
         name_table = NameTable(self.ttfont)
-        if self.is_ps:
-            cff_table = CFFTable(self.ttfont)
+        cff_table = CFFTable(self.ttfont) if self.is_ps else None
         if self.is_tt and source in (4, 5):
             source = 1
         if source == 1:
@@ -583,9 +582,9 @@ class Font:  # pylint: disable=too-many-public-methods
             file_name = name_table.get_debug_name(name_id=6)
         elif source == 3:
             file_name = name_table.get_best_full_name()
-        elif source == 4:
+        elif source == 4 and cff_table is not None:
             file_name = cff_table.table.cff.fontNames[0]
-        elif source == 5:
+        elif source == 5 and cff_table is not None:
             file_name = cff_table.table.cff.topDictIndex[0].FullName
         else:
             raise ValueError("Invalid source value.")
