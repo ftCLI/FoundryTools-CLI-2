@@ -55,6 +55,26 @@ def fix_empty_notdef(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
+@cli.command("fs-selection")
+@base_options()
+def fix_fs_selection(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    fontbakery check id: com.google.fonts/check/fsselection>
+
+    The ``OS/2.fsSelection`` field is a bit field used to specify the stylistic qualities of the
+    font - in particular, it specifies to some operating systems whether the font is italic (bit 0),
+    bold (bit 5) or regular (bit 6).
+
+    This fix verifies that the ``fsSelection`` field is set correctly for the font style. If the
+    font is not bold or italic, the regular bit is set. If the font is bold or italic, the regular
+    bit is cleared.
+    """
+    from foundrytools_cli_2.cli.fix.snippets.fs_selection import main as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.run()
+
+
 @cli.command("kern-table")
 @base_options()
 def fix_kern_table(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
