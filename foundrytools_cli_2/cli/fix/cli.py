@@ -59,6 +59,9 @@ def fix_empty_notdef(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @base_options()
 def fix_fs_selection(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
+    Fixes the style flags (Regular, Italic, Bold) in the ``OS/2.fsSelection`` field and in the
+    ``head.macStyle`` field.
+
     fontbakery check id: com.google.fonts/check/fsselection>
 
     The ``OS/2.fsSelection`` field is a bit field used to specify the stylistic qualities of the
