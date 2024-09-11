@@ -43,6 +43,12 @@ class NameTable(DefaultTbl):
         """
         return self.table.getBestFullName()
 
+    def get_manufacturer_name(self) -> str:
+        """
+        Returns the manufacturer name from the ``name`` table.
+        """
+        return self.get_debug_name(NameIds.MANUFACTURER_NAME)
+
     def set_name(
         self,
         name_id: int,

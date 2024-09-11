@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 import math
 import typing as t
 from io import BytesIO
@@ -480,28 +481,6 @@ class Font:  # pylint: disable=too-many-public-methods
         self.ttfont = TTFont(buf, recalcBBoxes=recalc_bboxes, recalcTimestamp=recalc_timestamp)
         buf.close()
 
-    def get_real_extension(self) -> str:
-        """
-        Get the real extension of the font. If the font is a web font, the extension will be
-        determined by the font flavor. If the font is a SFNT font, the extension will be determined
-        by the sfntVersion attribute.
-
-        Returns:
-            The real extension of the font (e.g. '.woff', '.woff2', '.otf', '.ttf').
-        """
-
-        # Order of the if statements is important. WOFF and WOFF2 must be checked before OTF and
-        # TTF.
-        if self.is_woff:
-            return WOFF_EXTENSION
-        if self.is_woff2:
-            return WOFF2_EXTENSION
-        if self.is_ps:
-            return OTF_EXTENSION
-        if self.is_tt:
-            return TTF_EXTENSION
-        raise ValueError("Unknown font type.")
-
     def make_out_file_name(
         self,
         file: t.Optional[Path] = None,
@@ -563,7 +542,29 @@ class Font:  # pylint: disable=too-many-public-methods
         )
         return out_file
 
-    def get_best_file_name(self, source: int = 1) -> Path:
+    def get_real_extension(self) -> str:
+        """
+        Get the real extension of the font. If the font is a web font, the extension will be
+        determined by the font flavor. If the font is a SFNT font, the extension will be determined
+        by the sfntVersion attribute.
+
+        Returns:
+            The real extension of the font (e.g. '.woff', '.woff2', '.otf', '.ttf').
+        """
+
+        # Order of the if statements is important. WOFF and WOFF2 must be checked before OTF and
+        # TTF.
+        if self.is_woff:
+            return WOFF_EXTENSION
+        if self.is_woff2:
+            return WOFF2_EXTENSION
+        if self.is_ps:
+            return OTF_EXTENSION
+        if self.is_tt:
+            return TTF_EXTENSION
+        raise ValueError("Unknown font type.")
+
+    def get_best_file_name(self, source: int = 1) -> str:
         """
         Get the best file name for a font.
 
@@ -599,7 +600,47 @@ class Font:  # pylint: disable=too-many-public-methods
             file_name = cff_table.table.cff.topDictIndex[0].FullName
         else:
             raise ValueError("Invalid source value.")
-        return Path(sanitize_filename(file_name, platform="auto"))
+        return sanitize_filename(file_name, platform="auto")
+
+    def get_best_family_name(self) -> str:
+        """
+        Get the best family name for a font.
+
+        Returns:
+            The best family name for the font.
+        """
+        name_table = NameTable(self.ttfont)
+        return name_table.get_best_family_name()
+
+    def get_best_subfamily_name(self) -> str:
+        """
+        Get the best subfamily name for a font.
+
+        Returns:
+            The best subfamily name for the font.
+        """
+        name_table = NameTable(self.ttfont)
+        return name_table.get_best_subfamily_name()
+
+    def get_manufacturer(self) -> str:
+        """
+        Get the manufacturer of the font.
+
+        Returns:
+            The manufacturer of the font.
+        """
+        name_table = NameTable(self.ttfont)
+        return name_table.get_manufacturer_name()
+
+    def get_font_revision(self) -> str:
+        """
+        Get the font revision.
+
+        Returns:
+            The font revision.
+        """
+        head = HeadTable(self.ttfont)
+        return f"{head.font_revision:.3f}"
 
     def get_axes(self) -> t.List[Axis]:
         """
