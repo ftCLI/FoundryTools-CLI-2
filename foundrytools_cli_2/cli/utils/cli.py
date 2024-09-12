@@ -32,7 +32,7 @@ def font_renamer(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @recursive_flag()
 def font_organizer(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Organizes the given font files.
+    Organizes the given font files based on specified sorting options.
     """
     # This is a workaround to make the task work with the current TaskRunner
     options["in_path"] = t.cast(t.Any, input_path)
