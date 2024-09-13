@@ -16,7 +16,6 @@ def main(font: Font, subroutinize: bool = True) -> None:
     charstrings = add_extremes(font.ttfont)
     logger.info("Rebuilding OTF")
     build_otf(font=font.ttfont, charstrings_dict=charstrings)
-    font.ps_correct_contours()
     if subroutinize:
         logger.info("Subroutinizing")
         font.ps_subroutinize()
