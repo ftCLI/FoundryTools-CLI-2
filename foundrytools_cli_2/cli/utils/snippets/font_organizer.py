@@ -29,16 +29,18 @@ def _determine_output_directory(
         Path: The sanitized output directory path.
     """
     family_name = font.get_best_family_name().strip()
-    manufacturer_name = font.get_manufacturer().strip()
-    font_revision = "v" + font.get_font_revision().strip()
-    extension = font.get_real_extension().replace(".", "").strip()
+    manufacturer_name = font.get_manufacturer()
+    font_revision = "v" + font.get_font_revision()
+    extension = font.get_real_extension().replace(".", "")
 
     out_dir = base_dir
 
-    if sort_by_manufacturer:
+    if sort_by_manufacturer and manufacturer_name:
+        manufacturer_name = manufacturer_name.strip()
         out_dir = out_dir.joinpath(manufacturer_name)
 
-    if sort_by_font_revision:
+    if sort_by_font_revision and font_revision:
+        font_revision = font_revision.strip()
         out_dir = out_dir.joinpath(f"{family_name} {font_revision}")
     else:
         out_dir = out_dir.joinpath(family_name)
