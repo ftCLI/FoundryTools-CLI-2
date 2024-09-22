@@ -587,6 +587,8 @@ class Font:  # pylint: disable=too-many-public-methods
 
         if self.is_variable:
             family_name = name_table.get_best_family_name().replace(" ", "").strip()
+            if self.is_italic:
+                family_name += "Italic"
             axes = self.get_axes()
             file_name = f"{family_name}[{','.join([axis.axisTag for axis in axes])}]"
             return sanitize_filename(file_name, platform="auto")
