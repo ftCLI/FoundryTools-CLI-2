@@ -584,6 +584,15 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         name_table = NameTable(self.ttfont)
         cff_table = CFFTable(self.ttfont) if self.is_ps else None
+
+        if self.is_variable:
+            family_name = name_table.get_best_family_name().replace(" ", "").strip()
+            if self.is_italic:
+                family_name += "Italic"
+            axes = self.get_axes()
+            file_name = f"{family_name}[{','.join([axis.axisTag for axis in axes])}]"
+            return sanitize_filename(file_name, platform="auto")
+
         if self.is_tt and source in (4, 5):
             source = 1
         if source == 1:
@@ -652,6 +661,7 @@ class Font:  # pylint: disable=too-many-public-methods
         if not self.is_variable:
             raise NotImplementedError("Not a variable font.")
 
+        # Filter out the 'hidden' axes (flags != 0)
         return [axis for axis in self.ttfont[T_FVAR].axes if axis.flags == 0]
 
     def get_instances(self) -> t.List[NamedInstance]:
