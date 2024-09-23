@@ -1,4 +1,4 @@
-fonttools[woff,pathops,unicode]==4.53.1
+fonttools[woff,pathops,unicode]==4.54.0
 afdko==4.0.1
 beziers==0.6.0
 cffsubr==0.3.0
