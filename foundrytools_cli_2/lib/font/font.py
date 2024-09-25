@@ -1,4 +1,3 @@
-# pylint: disable=too-many-lines
 import math
 import typing as t
 from io import BytesIO
