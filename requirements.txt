@@ -1,4 +1,4 @@
-fonttools[woff,pathops,unicode]==4.54.0
+fonttools[woff,pathops,unicode]==4.54.1
 afdko==4.0.1
 beziers==0.6.0
 cffsubr==0.3.0
@@ -10,4 +10,4 @@ pathvalidate==3.2.1
 rich==13.8.1
 ttfautohint-py==0.5.1
 ufo2ft==3.3.0
-ufo-extractor==0.6.1
+ufo-extractor==0.7.0
