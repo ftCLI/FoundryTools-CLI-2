@@ -3,9 +3,11 @@ import typing as t
 from pathlib import Path
 
 import click
+from fontTools.misc.roundTools import otRound
 
 from foundrytools_cli_2.cli.shared_options import base_options
 from foundrytools_cli_2.cli.task_runner import TaskRunner
+from foundrytools_cli_2.lib.font.tables import HeadTable
 
 cli = click.Group(help="Fix font errors.")
 
@@ -361,6 +363,47 @@ def fix_unreachable_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> N
     * Remove glyphs that are not reachable by subsetting the font.
     """
     from foundrytools_cli_2.cli.fix.snippets.unreachable_glyphs import main as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.run()
+
+
+@cli.command("vertical-metrics")
+@base_options()
+def fix_vertical_metrics(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Ensures that the vertical metrics are consistent across the font family.
+
+    This task calculates the minimum y_min and maximum y_max values from the head table of all
+    fonts in the family and sets the vertical metrics accordingly.
+
+    Args:
+        input_path (Path): The path to the input font file.
+        options (Dict[str, Any]): Additional options for the task runner.
+
+    Raises:
+        ClickException: If no fonts are found in the specified path.
+    """
+    from foundrytools_cli_2.cli.font_finder import FinderOptions, FontFinder
+
+    finder_options = FinderOptions()
+    fonts = FontFinder(input_path, options=finder_options).find_fonts()
+    if not fonts:
+        raise click.ClickException("No fonts found.")
+
+    metrics = []
+    for font in fonts:
+        table_head = HeadTable(font.ttfont)
+        metrics.append((table_head.y_min, table_head.y_max))
+
+    # Calculate the minimum y_min and maximum y_max values
+    safe_bottom = otRound(min(m[0] for m in metrics))
+    safe_top = otRound(max(m[1] for m in metrics))
+
+    options["safe_bottom"] = t.cast(t.Any, safe_bottom)
+    options["safe_top"] = t.cast(t.Any, safe_top)
+
+    from foundrytools_cli_2.cli.fix.snippets.vertical_metrics import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
