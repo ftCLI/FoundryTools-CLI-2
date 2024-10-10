@@ -2,18 +2,21 @@ import itertools
 import typing as t
 
 import pathops
+from fontTools.cffLib import CFFFontSet
 from fontTools.misc.psCharStrings import T2CharString
-from fontTools.misc.roundTools import otRound
+from fontTools.misc.roundTools import noRound, otRound
 from fontTools.pens.t2CharStringPen import T2CharStringPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables import _g_l_y_f, _h_m_t_x
 from fontTools.ttLib.ttGlyphSet import _TTGlyph, _TTGlyphSet
 
+from foundrytools_cli_2.lib.constants import T_CFF, T_GLYF, T_HMTX
+
 _TTGlyphMapping = t.Mapping[str, _TTGlyph]
 
 
-class CorrectTTFContoursError(Exception):
+class CorrectContoursError(Exception):
     """Raised when an error occurs while correcting the contours of a TrueType font."""
 
 
@@ -87,7 +90,6 @@ def ttf_components_overlap(glyph: _g_l_y_f.Glyph, glyph_set: _TTGlyphMapping) ->
             pathops.PathOp.INTERSECTION,
             clockwise=True,
             fix_winding=True,
-            keep_starting_points=False,
         )
         for i, j in itertools.combinations(range(len(glyph.components)), 2)
     )
@@ -111,25 +113,28 @@ def tt_glyph_from_skia_path(path: pathops.Path) -> _g_l_y_f.Glyph:
     return glyph
 
 
-def t2_charstring_from_skia_path(path: pathops.Path, width: int) -> T2CharString:
+def t2_charstring_from_skia_path(
+    path: pathops.Path,
+    charstring: T2CharString,
+) -> T2CharString:
     """
     Returns a ``T2CharString`` from a ``pathops.Path``
 
     Args:
         path (pathops.Path): The ``pathops.Path``
-        width (int): The width of the charstring
+        charstring (T2CharString): The original ``T2CharString``
 
     Returns:
         T2CharString: The ``T2CharString`` object
     """
 
-    t2_pen = T2CharStringPen(width, glyphSet=None)
+    t2_pen = T2CharStringPen(width=charstring.width, glyphSet=None)
     path.draw(t2_pen)
-    charstring = t2_pen.getCharString()
+    charstring = t2_pen.getCharString(charstring.private, charstring.globalSubrs)
     return charstring
 
 
-def round_path(path: pathops.Path, rounder: t.Callable[[float], float] = otRound) -> pathops.Path:
+def _round_path(path: pathops.Path, rounder: t.Callable[[float], float] = otRound) -> pathops.Path:
     """
     Rounds the points coordinate of a ``pathops.Path``
 
@@ -147,7 +152,7 @@ def round_path(path: pathops.Path, rounder: t.Callable[[float], float] = otRound
     return rounded_path
 
 
-def simplify_path(path: pathops.Path, glyph_name: str, clockwise: bool) -> pathops.Path:
+def _simplify(path: pathops.Path, glyph_name: str, clockwise: bool) -> pathops.Path:
     """
     Simplify a ``pathops.Path`` by removing overlaps, fixing contours direction and, optionally,
     removing tiny paths
@@ -176,15 +181,15 @@ def simplify_path(path: pathops.Path, glyph_name: str, clockwise: bool) -> patho
     except pathops.PathOpsError:
         pass
 
-    path = round_path(path)
+    path = _round_path(path, rounder=noRound)
     try:
         path = pathops.simplify(path, fix_winding=True, clockwise=clockwise)
         return path
     except pathops.PathOpsError as e:
-        raise CorrectTTFContoursError(f"Failed to remove overlaps from glyph {glyph_name!r}") from e
+        raise CorrectContoursError(f"Failed to remove overlaps from glyph {glyph_name!r}") from e
 
 
-def same_path(path_1: pathops.Path, path_2: pathops.Path) -> bool:
+def _same_path(path_1: pathops.Path, path_2: pathops.Path) -> bool:
     """
     Checks if two pathops paths are the same
 
@@ -220,6 +225,7 @@ def correct_tt_glyph_contours(
     glyph_set: _TTGlyphMapping,
     glyf_table: _g_l_y_f.table__g_l_y_f,
     hmtx_table: _h_m_t_x.table__h_m_t_x,
+    remove_hinting: bool = True,
     min_area: int = 25,
 ) -> bool:
     """
@@ -231,6 +237,7 @@ def correct_tt_glyph_contours(
         glyph_set (_TTGlyphMapping): The glyph set to which the glyph belongs.
         glyf_table (_g_l_y_f.table__g_l_y_f): The glyf table of the font.
         hmtx_table (_h_m_t_x.table__h_m_t_x): The hmtx table of the font.
+        remove_hinting (bool, optional): Whether to remove hinting instructions. Defaults to True.
         min_area (int, optional): The minimum area of a contour to be considered. Defaults to 25.
 
     Returns:
@@ -238,29 +245,37 @@ def correct_tt_glyph_contours(
     """
 
     glyph: _g_l_y_f.Glyph = glyf_table[glyph_name]
-
+    # decompose composite glyphs only if components overlap each other
     if (
         glyph.numberOfContours > 0
         or glyph.isComposite()
         and ttf_components_overlap(glyph=glyph, glyph_set=glyph_set)
     ):
-        path_1 = skia_path_from_glyph(glyph_name, glyph_set)
-        path_2 = skia_path_from_glyph(glyph_name, glyph_set)
-        path_2 = simplify_path(path_2, glyph_name, clockwise=True)
+        path = skia_path_from_glyph(glyph_name, glyph_set)
+        path_2 = _simplify(path, glyph_name, clockwise=True)
         if min_area > 0:
             path_2 = remove_tiny_paths(path_2, min_area=min_area)
 
-        if not same_path(path_1=path_1, path_2=path_2):
+        if not _same_path(path_1=path, path_2=path_2):
             glyf_table[glyph_name] = glyph = tt_glyph_from_skia_path(path_2)
             width, lsb = hmtx_table[glyph_name]
             if lsb != glyph.xMin:
                 hmtx_table[glyph_name] = (width, glyph.xMin)
             return True
 
+    if remove_hinting:
+        glyph.removeHinting()
     return False
 
 
-def correct_contours_glyf(font: TTFont, min_area: int = 25) -> t.List[str]:
+def _correct_glyf_contours(
+    font: TTFont,
+    glyph_names: t.Iterable[str],
+    glyph_set: _TTGlyphMapping,
+    remove_hinting: bool,
+    ignore_errors: bool,
+    min_area: int = 25,
+) -> t.Set[str]:
     """
     Corrects the contours of the given TrueType font by removing overlaps, correcting the direction
     of the contours, and removing tiny paths.
@@ -272,15 +287,8 @@ def correct_contours_glyf(font: TTFont, min_area: int = 25) -> t.List[str]:
     Returns:
         List[str]: The list of modified glyphs.
     """
-
-    try:
-        glyf_table = font["glyf"]
-    except KeyError as e:
-        raise NotImplementedError("Not a TTF font") from e
-
-    glyph_set = font.getGlyphSet()
-    hmtx_table = font["hmtx"]
-    glyph_names = font.getGlyphOrder()
+    glyf_table = font[T_GLYF]
+    hmtx_table = font[T_HMTX]
 
     # process all simple glyphs first, then composites with increasing component depth,
     # so that by the time we test for component intersections the respective base glyphs
@@ -288,29 +296,62 @@ def correct_contours_glyf(font: TTFont, min_area: int = 25) -> t.List[str]:
     glyph_names = sorted(
         glyph_names,
         key=lambda name: (
-            glyf_table[name].getCompositeMaxpValues(glyf_table).maxComponentDepth
-            if glyf_table[name].isComposite()
-            else 0,
+            (
+                glyf_table[name].getCompositeMaxpValues(glyf_table).maxComponentDepth
+                if glyf_table[name].isComposite()
+                else 0
+            ),
             name,
         ),
     )
-    modified_glyphs = []
+    modified_glyphs = set()
     for glyph_name in glyph_names:
-        if correct_tt_glyph_contours(
-            glyph_name=glyph_name,
-            glyph_set=glyph_set,
-            glyf_table=glyf_table,
-            hmtx_table=hmtx_table,
-            min_area=min_area,
-        ):
-            modified_glyphs.append(glyph_name)
+        try:
+            if correct_tt_glyph_contours(
+                glyph_name=glyph_name,
+                glyph_set=glyph_set,
+                glyf_table=glyf_table,
+                hmtx_table=hmtx_table,
+                remove_hinting=remove_hinting,
+                min_area=min_area,
+            ):
+                modified_glyphs.add(glyph_name)
+        except CorrectContoursError as e:
+            if not ignore_errors:
+                raise e
 
     return modified_glyphs
 
 
-def correct_contours_cff(
-    font: TTFont, min_area: int = 25
-) -> t.Tuple[t.Dict[str, T2CharString], t.List[str]]:
+def _correct_charstring_contours(
+    glyph_name: str,
+    glyph_set: _TTGlyphMapping,
+    cff_font_set: CFFFontSet,
+    min_area: int = 25,
+) -> bool:
+    path = skia_path_from_glyph(glyph_name, glyph_set)
+    path_2 = _simplify(path, glyph_name, clockwise=False)
+
+    if min_area > 0:
+        path_2 = remove_tiny_paths(path_2, min_area=min_area)
+
+    if not _same_path(path_1=path, path_2=path_2):
+        charstrings = cff_font_set[0].CharStrings
+        charstrings[glyph_name] = t2_charstring_from_skia_path(path_2, charstrings[glyph_name])
+        return True
+
+    return False
+
+
+def _correct_cff_contours(
+    font: TTFont,
+    glyph_names: t.Iterable[str],
+    glyph_set: _TTGlyphMapping,
+    remove_hinting: bool,
+    ignore_errors: bool,
+    remove_unused_subroutines: bool = True,
+    min_area: int = 25,
+) -> t.Set[str]:
     """
     Corrects the contours of the given OpenType-PS font by removing overlaps, correcting the
     direction of the contours, and removing tiny paths.
@@ -323,29 +364,86 @@ def correct_contours_cff(
         Tuple[Dict[str, T2CharString], List[str]]: The corrected charstrings dict and the list of
             modified glyphs.
     """
+    cff_font_set: CFFFontSet = font[T_CFF].cff
+    modified_glyphs = set()
 
+    for glyph_name in glyph_names:
+        try:
+            if _correct_charstring_contours(
+                glyph_name=glyph_name,
+                glyph_set=glyph_set,
+                cff_font_set=cff_font_set,
+                min_area=min_area,
+            ):
+                modified_glyphs.add(glyph_name)
+        except CorrectContoursError as e:
+            if not ignore_errors:
+                raise e
+
+    if not modified_glyphs:
+        return modified_glyphs
+
+    if remove_hinting:
+        cff_font_set.remove_hints()
+
+    if remove_unused_subroutines:
+        cff_font_set.remove_unused_subroutines()
+
+    return modified_glyphs
+
+
+def correct_glyphs_contours(
+    font: TTFont,
+    remove_hinting: bool = True,
+    ignore_errors: bool = False,
+    remove_unused_subroutines: bool = True,
+    min_area: int = 25,
+) -> t.Set[str]:
+    """
+    Corrects the contours of the given font by removing overlaps, correcting the direction of the
+    contours, and removing tiny paths.
+
+    Args:
+        font (TTFont): The font object to be corrected.
+        remove_hinting (bool, optional): Whether to remove hinting instructions. Defaults to True.
+        ignore_errors (bool, optional): Whether to ignore errors while correcting contours. Defaults
+            to False.
+        remove_unused_subroutines (bool, optional): Whether to remove unused subroutines from the
+            font. Defaults to True.
+        min_area (int, optional): The minimum area of a contour to be considered. Defaults to 25.
+
+    Returns:
+        Set[str]: The set of modified glyphs.
+    """
+    if T_GLYF not in font and T_CFF not in font:
+        raise NotImplementedError(
+            "No outline data found in the font: missing 'glyf' or 'CFF ' table"
+        )
+
+    glyph_names = font.getGlyphOrder()
     glyph_set = font.getGlyphSet()
-    charstrings = {}
-    modified_glyphs = []
 
-    for k, v in glyph_set.items():
-        t2_pen = T2CharStringPen(width=v.width, glyphSet=glyph_set)
-        glyph_set[k].draw(t2_pen)
-        charstrings[k] = t2_pen.getCharString()
+    if T_GLYF in font:
+        modified_glyphs = _correct_glyf_contours(
+            font=font,
+            glyph_names=glyph_names,
+            glyph_set=glyph_set,
+            remove_hinting=remove_hinting,
+            ignore_errors=ignore_errors,
+            min_area=min_area,
+        )
+    else:
+        modified_glyphs = _correct_cff_contours(
+            font=font,
+            glyph_names=glyph_names,
+            glyph_set=glyph_set,
+            remove_hinting=remove_hinting,
+            ignore_errors=ignore_errors,
+            remove_unused_subroutines=remove_unused_subroutines,
+            min_area=min_area,
+        )
 
-        path_1 = skia_path_from_glyph(glyph_name=k, glyph_set=glyph_set)
-        path_2 = skia_path_from_glyph(glyph_name=k, glyph_set=glyph_set)
-        path_2 = simplify_path(path=path_2, glyph_name=k, clockwise=False)
-
-        if min_area > 0:
-            path_2 = remove_tiny_paths(path=path_2, min_area=min_area)
-
-        if not same_path(path_1=path_1, path_2=path_2):
-            cs = t2_charstring_from_skia_path(path=path_2, width=v.width)
-            charstrings[k] = cs
-            modified_glyphs.append(k)
-
-    return charstrings, modified_glyphs
+    return modified_glyphs
 
 
 def is_empty_glyph(glyph_set: _TTGlyphSet, glyph_name: str) -> bool:
