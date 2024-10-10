@@ -381,7 +381,7 @@ def _correct_cff_contours(
                 raise e
 
     if not modified_glyphs:
-        return modified_glyphs
+        return set()
 
     if remove_hinting:
         cff_font_set.remove_hints()
