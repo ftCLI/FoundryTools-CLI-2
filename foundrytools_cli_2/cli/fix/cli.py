@@ -5,11 +5,41 @@ from pathlib import Path
 import click
 from fontTools.misc.roundTools import otRound
 
+from foundrytools_cli_2.cli.fix.options import (
+    ignore_errors_flag,
+    keep_hinting_flag,
+    keep_unused_subroutines_flag,
+    min_area_option,
+)
 from foundrytools_cli_2.cli.shared_options import base_options
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 from foundrytools_cli_2.lib.font.tables import HeadTable
 
 cli = click.Group(help="Fix font errors.")
+
+
+@cli.command("contours")
+@min_area_option()
+@keep_hinting_flag()
+@ignore_errors_flag()
+@keep_unused_subroutines_flag()
+@base_options()
+def fix_contours(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Correct contours of the given fonts by removing overlaps, correcting the direction of the
+    contours, and removing tiny paths.
+
+    Fixing procedure:
+
+    * Remove overlaps in the contours of the glyphs.
+    * Correct the direction of the contours.
+    * Remove tiny paths.
+    """
+    from foundrytools_cli_2.cli.fix.snippets.contours import main as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.filter.filter_out_variable = True
+    runner.run()
 
 
 @cli.command("duplicate-components")
