@@ -34,9 +34,7 @@ from foundrytools_cli_2.lib.constants import (
 from foundrytools_cli_2.lib.font.tables import CFFTable, HeadTable, NameTable, OS2Table
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.otf.t2_charstrings import quadratics_to_cubics
-from foundrytools_cli_2.lib.skia.skia_tools import (
-    correct_glyphs_contours,
-)
+from foundrytools_cli_2.lib.skia.skia_tools import correct_contours_cff, correct_contours_glyf
 from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
 from foundrytools_cli_2.lib.utils.misc import restore_flavor
 from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path
@@ -798,39 +796,60 @@ class Font:  # pylint: disable=too-many-public-methods
 
         scale_upem(self.ttfont, new_upem=target_upm)
 
-    def correct_contours(
-        self,
-        remove_hinting: bool = True,
-        ignore_errors: bool = True,
-        remove_unused_subroutines: bool = True,
-        min_area: int = 25,
-    ) -> t.Set[str]:
+    def tt_correct_contours(self, min_area: int = 25) -> t.List[str]:
         """
-        Correct the contours of a font by removing overlaps and tiny paths and correcting the
-        direction of paths.
-        If one or more contours are modified, the glyf or CFF table will be rebuilt.
+        Correct the contours of a TrueType font by removing overlaps and tiny paths and correcting
+        the direction of paths.
+        If one or more contours are modified, the glyf table will be rebuilt.
         If no contours are modified, the font will remain unchanged and the method will return an
         empty list.
 
         Args:
-            remove_hinting (bool, optional): Whether to remove hinting instructions. Defaults to
-            True.
-            ignore_errors (bool, optional): Whether to ignore errors. Defaults to True.
-            remove_unused_subroutines (bool, optional): Whether to remove unused subroutines in CFF
-            fonts. Defaults to True.
             min_area (int, optional): The minimum area of a contour to be considered. Defaults to
             25.
 
         Returns:
             A list of modified glyphs.
         """
-        return correct_glyphs_contours(
-            font=self.ttfont,
-            remove_hinting=remove_hinting,
-            ignore_errors=ignore_errors,
-            remove_unused_subroutines=remove_unused_subroutines,
-            min_area=min_area,
-        )
+        if not self.is_tt:
+            raise NotImplementedError(
+                "TTF Contour correction is only supported for TrueType fonts."
+            )
+
+        if self.is_variable:
+            raise NotImplementedError("Contour correction is not supported for variable fonts.")
+
+        modified_glyphs = correct_contours_glyf(font=self.ttfont, min_area=min_area)
+        return modified_glyphs
+
+    def ps_correct_contours(self, min_area: int = 25) -> t.List[str]:
+        """
+        Correct the contours of a PostScript font by removing overlaps and tiny paths and correcting
+        the direction of paths.
+        If one or more contours are modified, the CFF table will be rebuilt.
+        If no contours are modified, the font will remain unchanged and the method will return an
+        empty list.
+
+        Args:
+            min_area (int, optional): The minimum area of a contour to be considered. Defaults to
+            25.
+
+        Returns:
+            A list of modified glyphs.
+        """
+        if not self.is_ps:
+            raise NotImplementedError(
+                "PS Contour correction is only supported for PostScript flavored fonts."
+            )
+
+        if self.is_variable:
+            raise NotImplementedError("PS Contour correction is not supported for variable fonts.")
+
+        charstrings, modified_glyphs = correct_contours_cff(font=self.ttfont, min_area=min_area)
+        if not modified_glyphs:
+            return []
+        build_otf(font=self.ttfont, charstrings_dict=charstrings)
+        return modified_glyphs
 
     def ps_subroutinize(self) -> None:
         """
