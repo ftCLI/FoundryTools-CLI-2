@@ -15,7 +15,7 @@ def main(font: Font, subroutinize: bool = True) -> None:
         subroutinize (bool): Whether to subroutinize the font.
     """
 
-    glyph_set = font.ttfont.getGlyphSet()
+    glyph_set = font.glyph_set
     cff = CFFTable(font.ttfont)
     private = cff.top_dict.Private
 
