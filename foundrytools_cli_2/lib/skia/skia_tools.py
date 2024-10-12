@@ -127,8 +127,12 @@ def t2_charstring_from_skia_path(
     Returns:
         T2CharString: The ``T2CharString`` object
     """
+    if charstring.width == charstring.private.defaultWidthX:
+        width = None
+    else:
+        width = charstring.width - charstring.private.nominalWidthX
 
-    t2_pen = T2CharStringPen(width=charstring.width, glyphSet=None)
+    t2_pen = T2CharStringPen(width=width, glyphSet=None)
     path.draw(t2_pen)
     charstring = t2_pen.getCharString(charstring.private, charstring.globalSubrs)
     return charstring
