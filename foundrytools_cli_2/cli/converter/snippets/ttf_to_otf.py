@@ -74,6 +74,9 @@ def ttf2otf(
         logger.info(f"Scaling UPM to {target_upm}...")
         font.tt_scale_upem(target_upm=target_upm)
 
+    # Adjust tolerance to font units per em after scaling, not before
+    tolerance = tolerance / 1000 * font.units_per_em
+
     logger.info("Converting to OTF...")
     font.to_otf(tolerance=tolerance, correct_contours=correct_contours)
 
