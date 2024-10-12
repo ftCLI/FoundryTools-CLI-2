@@ -755,7 +755,7 @@ class Font:  # pylint: disable=too-many-public-methods
         Raises:
             ValueError: If the font does not contain the glyph 'H' or 'uni0048'.
         """
-        glyph_set = self.ttfont.getGlyphSet()
+        glyph_set = self.glyph_set
         pen = StatisticsPen(glyphset=glyph_set)
         for g in ("H", "uni0048"):
             try:
@@ -775,7 +775,7 @@ class Font:  # pylint: disable=too-many-public-methods
         if not self.is_tt:
             raise NotImplementedError("Decomponentization is only supported for TrueType fonts.")
 
-        glyph_set = self.ttfont.getGlyphSet()
+        glyph_set = self.glyph_set
         glyf_table = self.ttfont[T_GLYF]
         dr_pen = DecomposingRecordingPen(glyph_set)
         tt_pen = TTGlyphPen(None)
