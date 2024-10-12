@@ -5,7 +5,7 @@ from pathlib import Path
 import click
 
 from foundrytools_cli_2.cli.otf.options import drop_zones_stems_flag, otf_autohint_options
-from foundrytools_cli_2.cli.shared_options import base_options, subroutinize_flag
+from foundrytools_cli_2.cli.shared_options import base_options, min_area_option, subroutinize_flag
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 from foundrytools_cli_2.lib.font import Font
 
@@ -89,6 +89,24 @@ def desubr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner = TaskRunner(input_path=input_path, task=Font.ps_desubroutinize, **options)
     runner.filter.filter_out_tt = True
     runner.force_modified = True
+    runner.run()
+
+
+@cli.command("fix-contours")
+@min_area_option()
+@subroutinize_flag()
+@base_options()
+def fix_contours(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Fix the contours of OpenType-PS fonts by removing overlaps, correcting contours direction, and
+    removing tiny paths.
+    """
+
+    from foundrytools_cli_2.cli.otf.snippets.fix_contours import main as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.filter.filter_out_tt = True
+    runner.filter.filter_out_variable = True
     runner.run()
 
 

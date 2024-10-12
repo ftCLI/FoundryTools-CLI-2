@@ -11,7 +11,7 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
-from foundrytools_cli_2.lib.skia.skia_tools import _simplify
+from foundrytools_cli_2.lib.skia.skia_tools import simplify_path
 from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
 
 __all__ = ["quadratics_to_cubics", "get_t2_charstrings"]
@@ -84,7 +84,7 @@ def quadratics_to_cubics(
         if correct_contours:
             charstring.private = PrivateDict()
             path = skia_path_from_charstring(charstring)
-            simplified_path = _simplify(path, glyph_name=k, clockwise=False)
+            simplified_path = simplify_path(path, glyph_name=k, clockwise=False)
             charstring = charstring_from_skia_path(path=simplified_path, width=width)
 
         qu2cu_charstrings[k] = charstring

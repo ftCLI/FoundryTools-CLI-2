@@ -149,7 +149,7 @@ def ttf2otf_with_tx(
     if correct_contours:
         logger.info("Correcting contours...")
         font = Font(out_file, recalc_timestamp=recalc_timestamp)
-        font.correct_contours()
+        font.ps_correct_contours()
 
     os_2_table = OS2Table(font.ttfont)
     os_2_table.recalc_avg_char_width()
