@@ -33,6 +33,8 @@ def main(
         output_dir=output_dir, overwrite=overwrite, extension=extension, suffix=suffix
     )
 
+    tolerance = tolerance / 1000 * font.units_per_em
+
     logger.info("Converting to TTF...")
     font.to_ttf(max_err=tolerance, reverse_direction=True)
 

@@ -239,6 +239,16 @@ class Font:  # pylint: disable=too-many-public-methods
         return self.ttfont.getGlyphSet()
 
     @property
+    def units_per_em(self) -> int:
+        """
+        Get the units per em of the font.
+
+        Returns:
+            The units per em of the font.
+        """
+        return self.ttfont[T_HEAD].unitsPerEm
+
+    @property
     def is_ps(self) -> bool:
         """
         Check if the font has PostScript outlines.
