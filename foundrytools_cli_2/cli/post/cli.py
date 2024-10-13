@@ -39,7 +39,7 @@ from foundrytools_cli_2.cli.task_runner import TaskRunner
 @base_options()
 def cli(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    A command line tool to manipulate the ``post`` table.
+    Utilities for editing the ``post`` table.
     """
     validate_params(click.get_current_context())
 
