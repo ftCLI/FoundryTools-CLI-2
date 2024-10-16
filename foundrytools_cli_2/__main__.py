@@ -9,6 +9,7 @@ from foundrytools_cli_2.cli.name import cli as name
 from foundrytools_cli_2.cli.os_2 import cli as os_2
 from foundrytools_cli_2.cli.otf import cli as otf
 from foundrytools_cli_2.cli.post import cli as post
+from foundrytools_cli_2.cli.print import cli as print_
 from foundrytools_cli_2.cli.ttf import cli as ttf
 from foundrytools_cli_2.cli.utils import cli as utils
 
@@ -25,6 +26,7 @@ from foundrytools_cli_2.cli.utils import cli as utils
         "os2": os_2,
         "otf": otf,
         "post": post,
+        "print": print_,
         "ttf": ttf,
         "utils": utils,
     },
