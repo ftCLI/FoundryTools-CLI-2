@@ -16,6 +16,10 @@ from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font.tables import CFFTable, NameTable
 from foundrytools_cli_2.lib.utils.string_tools import wrap_string
 
+
+__all__ = ["main"]
+
+
 MINIMAL_NAME_IDS = {1, 2, 3, 4, 5, 6, 16, 17, 18, 21, 22, 25}
 MINIMAL_CFF_NAMES = {"version", "FullName", "FamilyName", "Weight"}
 IGNORED_CFF_NAMES = {
@@ -30,6 +34,76 @@ IGNORED_CFF_NAMES = {
     "isFixedPitch",
     "ItalicAngle",
 }
+INITIAL_INDENT = 0
+INDENT = 33
+CFF_INITIAL_INDENT = 8
+FONT_STYLE = "[bold cyan]Font file: {name}[reset]"
+TABLE_NAME = "[bold magenta]'name' table[reset]"
+CFF_TABLE_NAME = "[bold magenta]'CFF ' table[reset]"
+JUSTIFY = 22
+
+
+def _process_name_table(
+    font: Font, table: Table, terminal_width: int, max_lines: t.Optional[int], minimal: bool
+) -> None:
+    name_table = NameTable(font.ttfont)
+    names = name_table.names
+    table.add_row(FONT_STYLE.format(name=font.file.name if font.file else font.bytesio))
+    table.add_section()
+    table.add_row(TABLE_NAME)
+    platforms = {(name.platformID, name.platEncID, name.langID) for name in names}
+    for platform in platforms:
+        platform_row = _get_platform_row(platform)
+        table.add_section()
+        table.add_row(platform_row)
+        table.add_section()
+        for name in names:
+            if (name.platformID, name.platEncID, name.langID) == platform:
+                if minimal and name.nameID not in MINIMAL_NAME_IDS:
+                    continue
+                _add_name_row_to_table(table, name, terminal_width, max_lines)
+
+
+def _add_name_row_to_table(
+    table: Table, name: NameRecord, terminal_width: int, max_lines: t.Optional[int]
+) -> None:
+    row_string = _get_name_row(name)
+    row_string = wrap_string(
+        width=terminal_width,
+        initial_indent=INITIAL_INDENT,
+        indent=INDENT,
+        max_lines=max_lines,
+        string=row_string,
+    )
+    table.add_row(row_string)
+
+
+def _process_cff_table(
+    font: Font, table: Table, terminal_width: int, max_lines: t.Optional[int], minimal: bool
+) -> None:
+    if not font.is_ps:
+        return
+    cff_table = CFFTable(font.ttfont)
+    cff_names = [
+        {k: v}
+        for k, v in cff_table.top_dict.rawDict.items()
+        if k not in IGNORED_CFF_NAMES and (not minimal or k in MINIMAL_CFF_NAMES)
+    ]
+    cff_names.insert(0, {"fontNames": cff_table.table.cff.fontNames})
+    table.add_section()
+    table.add_row(CFF_TABLE_NAME)
+    table.add_section()
+    for cff_name in cff_names:
+        for key, value in cff_name.items():
+            row_string = f"{key.ljust(JUSTIFY)} : {value}"
+            row_string = wrap_string(
+                width=terminal_width,
+                initial_indent=CFF_INITIAL_INDENT,
+                indent=INDENT,
+                max_lines=max_lines,
+                string=row_string,
+            )
+            table.add_row(row_string)
 
 
 def _get_platform_row(platform: t.Tuple[int, int, int]) -> str:
@@ -63,7 +137,7 @@ def _get_name_row(name: NameRecord) -> str:
     name_description = NAME_IDS_TO_DESCRIPTION.get(name.nameID, f"{name.nameID}")
     return (
         f"[bold cyan]{str(name.nameID).rjust(5)}[reset] : "
-        f"{name_description.ljust(22)} : {name.toUnicode()}"
+        f"{name_description.ljust(JUSTIFY)} : {name.toUnicode()}"
     )
 
 
@@ -71,63 +145,11 @@ def main(font: Font, max_lines: t.Optional[int] = None, minimal: bool = False) -
     """
     Prints the names of the font.
     """
-
     terminal_width = min(TERMINAL_WIDTH, get_terminal_size()[0] - 1)
     console = Console()
     table = Table(show_header=False, title_style="bold green")
 
-    name_table = NameTable(font.ttfont)
-    names = name_table.names
-
-    table.add_row(f"[bold cyan]Font file: {font.file.name if font.file else font.bytesio}[reset]")
-    table.add_section()
-
-    table.add_row("[bold magenta]'name' table[reset]")
-    platforms = {(name.platformID, name.platEncID, name.langID) for name in names}
-    for platform in platforms:
-        platform_row = _get_platform_row(platform)
-
-        table.add_section()
-        table.add_row(platform_row)
-        table.add_section()
-
-        for name in names:
-            if (name.platformID, name.platEncID, name.langID) == platform:
-                if minimal and name.nameID not in MINIMAL_NAME_IDS:
-                    continue
-                row_string = _get_name_row(name)
-                row_string = wrap_string(
-                    width=terminal_width,
-                    initial_indent=0,
-                    indent=33,
-                    max_lines=max_lines,
-                    string=row_string,
-                )
-                table.add_row(row_string)
-
-    if font.is_ps:
-        cff_table = CFFTable(font.ttfont)
-
-        cff_names = [
-            {k: v}
-            for k, v in cff_table.top_dict.rawDict.items()
-            if k not in IGNORED_CFF_NAMES and (not minimal or k in MINIMAL_CFF_NAMES)
-        ]
-        cff_names.insert(0, {"fontNames": cff_table.table.cff.fontNames})
-
-        table.add_section()
-        table.add_row("[bold magenta]'CFF ' table[reset]")
-        table.add_section()
-        for cff_name in cff_names:
-            for key, value in cff_name.items():
-                row_string = f"{key.ljust(22)} : {value}"
-                row_string = wrap_string(
-                    width=terminal_width,
-                    initial_indent=8,
-                    indent=33,
-                    max_lines=max_lines,
-                    string=row_string,
-                )
-                table.add_row(row_string)
+    _process_name_table(font, table, terminal_width, max_lines, minimal)
+    _process_cff_table(font, table, terminal_width, max_lines, minimal)
 
     console.print(table)
