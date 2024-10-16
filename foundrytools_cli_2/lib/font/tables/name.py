@@ -19,6 +19,13 @@ class NameTable(DefaultTbl):
         """
         super().__init__(ttfont=ttfont, table_tag=T_NAME)
 
+    @property
+    def names(self) -> t.List[NameRecord]:
+        """
+        Returns the NameRecords from the ``name`` table.
+        """
+        return self.table.names
+
     def get_debug_name(self, name_id: int) -> str:
         """
         Returns the name of the NameID for debugging purposes.
