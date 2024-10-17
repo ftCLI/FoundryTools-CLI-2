@@ -5,7 +5,7 @@ from pathlib import Path
 
 import click
 
-from foundrytools_cli_2.cli.font_finder import FinderOptions, FontFinder
+from foundrytools_cli_2.cli.font_finder import FontFinder
 from foundrytools_cli_2.cli.shared_options import input_path_argument
 
 cli = click.Group(help="Prints various font's information.")
@@ -35,6 +35,6 @@ def print_font_names(
     """
     from foundrytools_cli_2.cli.print.snippets.print_names import main as print_names
 
-    finder = FontFinder(input_path, options=FinderOptions())
+    finder = FontFinder(input_path)
     for font in finder.generate_fonts():
         print_names(font, max_lines=max_lines, minimal=minimal)

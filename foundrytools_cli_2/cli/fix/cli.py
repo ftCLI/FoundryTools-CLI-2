@@ -414,10 +414,9 @@ def fix_vertical_metrics(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     Raises:
         ClickException: If no fonts are found in the specified path.
     """
-    from foundrytools_cli_2.cli.font_finder import FinderOptions, FontFinder
+    from foundrytools_cli_2.cli.font_finder import FontFinder
 
-    finder_options = FinderOptions()
-    fonts = FontFinder(input_path, options=finder_options).find_fonts()
+    fonts = FontFinder(input_path).find_fonts()
     if not fonts:
         raise click.ClickException("No fonts found.")
 
