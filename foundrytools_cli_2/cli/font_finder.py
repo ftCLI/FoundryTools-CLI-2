@@ -57,7 +57,7 @@ class FontFinder:
     def __init__(
         self,
         input_path: Path,
-        options: FinderOptions,
+        options: t.Optional[FinderOptions] = None,
         filter_: t.Optional[FinderFilter] = None,
     ) -> None:
         """Initialize the FontFinder class.
@@ -72,7 +72,6 @@ class FontFinder:
             FontFinderError: If the input path is invalid.
         """
         self.input_path = input_path
-        self.options = options
 
         try:
             self.input_path = Path(self.input_path).resolve(strict=True)
@@ -80,6 +79,7 @@ class FontFinder:
             raise FinderError(f"Invalid input path: {self.input_path}") from e
 
         self.filter = filter_ or FinderFilter()
+        self.options = options or FinderOptions()
         self._filter_conditions = self._generate_filter_conditions(self.filter)
         self._validate_filter_conditions()
 
