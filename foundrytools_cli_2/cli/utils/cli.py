@@ -42,3 +42,17 @@ def font_organizer(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.save_if_modified = False
     runner.run()
+
+
+@cli.command("sync-timestamps")
+@input_path_argument()
+@recursive_flag()
+def align_timestamps(input_path: Path, recursive: bool = False) -> None:
+    """
+    Syncs the modified and created timestamps of the font files in the given path with the
+    created and modified timestamps stored in their head table.
+    """
+
+    from foundrytools_cli_2.cli.utils.snippets.sync_timestamps import main as task
+
+    task(input_path, recursive=recursive)
