@@ -11,7 +11,7 @@ from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.lib.constants import T_HEAD
 
 
-def _get_file_timestamps(input_path: Path, recursive: bool = True) -> dict[Path, tuple[int, int]]:
+def _get_file_timestamps(input_path: Path, recursive: bool = True) -> t.Dict[Path, t.Tuple[int, int]]:
     finder = FontFinder(input_path)
     finder.options.recursive = recursive
     fonts = finder.find_fonts()
@@ -26,9 +26,8 @@ def _get_file_timestamps(input_path: Path, recursive: bool = True) -> dict[Path,
 
 
 def _get_folder_timestamps(
-    folders: t.Set[Path],
-    files_timestamps: t.Dict[Path, tuple[int, int]],
-) -> dict[Path, tuple[int, int]]:
+    folders: t.Set[Path], files_timestamps: t.Dict[Path, tuple[int, int]],
+) -> t.Dict[Path, t.Tuple[int, int]]:
     folder_timestamps = {
         folder: (
             min(
@@ -48,7 +47,7 @@ def _get_folder_timestamps(
     return folder_timestamps
 
 
-def _set_timestamps(path_timestamps: t.Dict[Path, tuple[int, int]]) -> None:
+def _set_timestamps(path_timestamps: t.Dict[Path, t.Tuple[int, int]]) -> None:
     for path, timestamps in path_timestamps.items():
         logger.opt(colors=True).info(f"Current path: <light-cyan>{path}</>")
 
