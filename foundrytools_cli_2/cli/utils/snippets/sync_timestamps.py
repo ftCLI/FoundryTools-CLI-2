@@ -11,7 +11,18 @@ from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.lib.constants import T_HEAD
 
 
-def _get_file_timestamps(input_path: Path, recursive: bool = True) -> t.Dict[Path, t.Tuple[int, int]]:
+# Helper function for Python 3.8 compatibility
+def _is_relative_to(path: Path, other: Path) -> bool:
+    try:
+        path.relative_to(other)
+        return True
+    except ValueError:
+        return False
+
+
+def _get_file_timestamps(
+    input_path: Path, recursive: bool = True
+) -> t.Dict[Path, t.Tuple[int, int]]:
     finder = FontFinder(input_path)
     finder.options.recursive = recursive
     fonts = finder.find_fonts()
@@ -26,19 +37,24 @@ def _get_file_timestamps(input_path: Path, recursive: bool = True) -> t.Dict[Pat
 
 
 def _get_folder_timestamps(
-    folders: t.Set[Path], files_timestamps: t.Dict[Path, tuple[int, int]],
+    folders: t.Set[Path],
+    files_timestamps: t.Dict[Path, tuple[int, int]],
 ) -> t.Dict[Path, t.Tuple[int, int]]:
     folder_timestamps = {
         folder: (
             min(
                 files_timestamps[file][0]
                 for file in files_timestamps
-                if file.is_relative_to(folder)
+                if hasattr(file, "is_relative_to")
+                and file.is_relative_to(folder)
+                or _is_relative_to(file, folder)
             ),
             max(
                 files_timestamps[file][1]
                 for file in files_timestamps
-                if file.is_relative_to(folder)
+                if hasattr(file, "is_relative_to")
+                and file.is_relative_to(folder)
+                or _is_relative_to(file, folder)
             ),
         )
         for folder in folders
