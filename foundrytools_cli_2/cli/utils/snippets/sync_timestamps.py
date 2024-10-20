@@ -38,7 +38,7 @@ def _get_file_timestamps(
 
 def _get_folder_timestamps(
     folders: t.Set[Path],
-    files_timestamps: t.Dict[Path, tuple[int, int]],
+    files_timestamps: t.Dict[Path, t.Tuple[int, int]],
 ) -> t.Dict[Path, t.Tuple[int, int]]:
     folder_timestamps = {
         folder: (
