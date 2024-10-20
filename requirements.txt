@@ -11,5 +11,5 @@ rich==13.9.2
 ttfautohint-py==0.5.1
 ufo2ft==3.3.1
 ufo-extractor==0.8.0
-setuptools==75.1.0
+setuptools==75.2.0
 win32-setctime==1.1.0; sys_platform == 'win32'
