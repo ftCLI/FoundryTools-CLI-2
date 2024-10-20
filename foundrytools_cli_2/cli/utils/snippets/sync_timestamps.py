@@ -20,7 +20,7 @@ if platform.system() == "Windows":
         from win32_setctime import setctime
 
         SETCTIME = setctime
-    except ImportError as exc:
+    except (ImportError, Exception) as exc:  # pylint: disable=broad-except
         SETCTIME = None
         IMPORT_ERROR = exc
 
