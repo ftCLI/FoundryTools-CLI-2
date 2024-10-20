@@ -10,6 +10,23 @@ from foundrytools_cli_2.cli.font_finder import FontFinder
 from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.lib.constants import T_HEAD
 
+# Placeholder for `setctime`, and `import_error`
+SETCTIME = None
+IMPORT_ERROR = None
+
+# Conditionally import win32_setctime if running on Windows
+if platform.system() == "Windows":
+    try:
+        from win32_setctime import setctime
+
+        SETCTIME = setctime
+    except ImportError as exc:
+        SETCTIME = None
+        IMPORT_ERROR = exc
+
+
+__all__ = ["main"]
+
 
 # Helper function for Python 3.8 compatibility
 def _is_relative_to(path: Path, other: Path) -> bool:
@@ -69,22 +86,32 @@ def _set_timestamps(path_timestamps: t.Dict[Path, t.Tuple[int, int]]) -> None:
 
         # Set the file creation time on Windows. Figure out a way to do this on other platforms.
         if platform.system() == "Windows":
-            try:
-                from win32_setctime import setctime
-
-                setctime(path, timestamps[0] + epoch_diff)
-                logger.info(f"created timestamp  : {timestampToString(timestamps[0])}")
-            except ImportError as exc:
-                raise ImportError(
-                    "The 'win32_setctime' package is required for setting file creation times on "
-                    "Windows. Please install it by running 'pip install win32_setctime'."
-                ) from exc
-
-        os.utime(path, (timestamps[1] + epoch_diff, timestamps[1] + epoch_diff))
-        logger.info(f"modified timestamp : {timestampToString(timestamps[1])}")
-        logger.info(f"access timestamp   : {timestampToString(timestamps[1])}")
-
+            _set_windows_ctime(path, timestamps[0])
+        _set_mtime_and_atime(path, timestamps[1])
         print()
+
+
+def _set_windows_ctime(path: Path, timestamp: int) -> None:
+    if SETCTIME is None:
+        raise ImportError(
+            "Unable to set file creation time on Windows. Please install the "
+            "win32_setctime package."
+        ) from IMPORT_ERROR
+
+    try:
+        SETCTIME(path, timestamp + epoch_diff)
+        logger.info(f"created timestamp  : {timestampToString(timestamp)}")
+    except Exception as e:  # pylint: disable=broad-except
+        logger.error(f"Error setting file creation time: {e}")
+
+
+def _set_mtime_and_atime(path: Path, timestamp: int) -> None:
+    try:
+        os.utime(path, (timestamp + epoch_diff, timestamp + epoch_diff))
+        logger.info(f"modified timestamp : {timestampToString(timestamp)}")
+        logger.info(f"access timestamp   : {timestampToString(timestamp)}")
+    except Exception as e:  # pylint: disable=broad-except
+        logger.error(f"Error setting file timestamps: {e}")
 
 
 def main(input_path: Path, recursive: bool = False) -> None:
@@ -93,6 +120,7 @@ def main(input_path: Path, recursive: bool = False) -> None:
     head table.
     """
 
+    logger.info("Collecting file and folder timestamps...")
     file_timestamps = _get_file_timestamps(input_path, recursive=recursive)
     if not file_timestamps:
         logger.error("No valid font files found.")
