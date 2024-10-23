@@ -525,14 +525,14 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         self.table.setUnicodeRanges(bits)
 
     @property
-    def codepage_ranges(self) -> t.List[int]:
+    def codepage_ranges(self) -> t.Set[int]:
         """
         Returns the code page ranges of the ``OS/2`` table.
         """
         return self.table.getCodePageRanges()
 
     @codepage_ranges.setter
-    def codepage_ranges(self, bits: t.List[int]) -> None:
+    def codepage_ranges(self, bits: t.Set[int]) -> None:
         """
         Sets the code page ranges of the ``OS/2`` table.
         """
@@ -618,6 +618,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
                     modified_unicode_ranges.add((block.bit_number, block.block_name, "disabled"))
 
         self.unicode_ranges = new_unicode_ranges
+        print(self.codepage_ranges)
         return modified_unicode_ranges
 
 
