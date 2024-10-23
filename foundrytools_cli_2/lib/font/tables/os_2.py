@@ -618,7 +618,6 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
                     modified_unicode_ranges.add((block.bit_number, block.block_name, "disabled"))
 
         self.unicode_ranges = new_unicode_ranges
-        print(self.codepage_ranges)
         return modified_unicode_ranges
 
 
