@@ -84,7 +84,7 @@ def recalc_codepage_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> N
     "--percentage",
     type=click.FloatRange(0.0001, 100),
     default=33.0,
-    help="Minimum percentage of coverage required for a Unicode range to be enabled. Default is 33.",
+    help="Minimum percentage of coverage required for a Unicode range to be enabled.",
 )
 @base_options()
 def recalc_unicode_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
