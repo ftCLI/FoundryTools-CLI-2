@@ -66,16 +66,13 @@ def recalc_max_context(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("recalc-ranges")
+@cli.command("recalc-codepage-ranges")
 @base_options()
-def recalc_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def recalc_codepage_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
-    Recalculates the ulUnicodeRange and ulCodePageRange values of the OS/2 table using AFDKO.
-
-    The font is first converted to T1, then to OTF. The ulUnicodeRange and ulCodePageRange values
-    are then retrieved from the OS/2 table of the OTF font and written to the original font.
+    Recalculates the ulCodePageRange values of the OS/2 table.
     """
-    from foundrytools_cli_2.cli.os_2.snippets import recalc_ranges_afdko as task
+    from foundrytools_cli_2.cli.os_2.snippets import recalc_codepage_ranges as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -83,10 +80,11 @@ def recalc_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 @cli.command("recalc-unicode-ranges")
 @click.option(
-    "-p", "--percentage",
+    "-p",
+    "--percentage",
     type=click.FloatRange(0.0001, 100),
-    default=33.,
-    help="Minimum percentage of coverage required for a Unicode range to be enabled. Default is 33."
+    default=33.0,
+    help="Minimum percentage of coverage required for a Unicode range to be enabled. Default is 33.",
 )
 @base_options()
 def recalc_unicode_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
@@ -98,6 +96,7 @@ def recalc_unicode_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> No
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
+
 
 @cli.command("set-attrs", no_args_is_help=True)
 @set_attrs_options()

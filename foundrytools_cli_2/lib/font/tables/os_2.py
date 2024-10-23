@@ -620,7 +620,6 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         self.unicode_ranges = new_unicode_ranges
         return modified_unicode_ranges
 
-
     def recalc_code_page_ranges(self) -> None:
         """
         Recalculates the code page ranges of the ``OS/2`` table.
