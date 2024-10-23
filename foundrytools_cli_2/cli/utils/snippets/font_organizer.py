@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from pathvalidate import sanitize_filepath
+from pathvalidate import sanitize_filepath, sanitize_filename
 
 from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.lib.font import Font
@@ -28,19 +28,17 @@ def _determine_output_directory(
     Returns:
         Path: The sanitized output directory path.
     """
-    family_name = font.get_best_family_name().strip()
-    manufacturer_name = font.get_manufacturer()
-    font_revision = "v" + font.get_font_revision()
+    family_name = sanitize_filename(font.get_best_family_name().strip())
+    manufacturer_name = sanitize_filename(font.get_manufacturer().strip())
+    font_revision = "v" + sanitize_filename(font.get_font_revision().strip())
     extension = font.get_real_extension().replace(".", "")
 
     out_dir = base_dir
 
     if sort_by_manufacturer and manufacturer_name:
-        manufacturer_name = manufacturer_name.strip()
         out_dir = out_dir.joinpath(manufacturer_name)
 
     if sort_by_font_revision and font_revision:
-        font_revision = font_revision.strip()
         out_dir = out_dir.joinpath(f"{family_name} {font_revision}")
     else:
         out_dir = out_dir.joinpath(family_name)
