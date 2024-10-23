@@ -60,16 +60,25 @@ def recalc_max_context(font: Font) -> None:
     font.modified = os_2_table.modified
 
 
-def recalc_unicode_ranges(font: Font) -> None:
+def recalc_unicode_ranges(font: Font, percentage: float = 33) -> None:
     """
     Recalculates the ``OS/2.ulUnicodeRange1`` through ``OS/2.ulUnicodeRange4`` values.
 
     Args:
+        percentage: The minimum percentage of codepoints required for support. Default is 33.
         font (Font): The Font object representing the font file.
     """
 
     os_2_table = OS2Table(font.ttfont)
-    os_2_table.recalc_unicode_ranges()
+    result = os_2_table.recalc_unicode_ranges(percentage=percentage)
+
+    if result:
+        for block in result:
+            if block[0] < 0:
+                logger.info(f"Block {block[0]} ({block[1]}): {block[2]}")
+            else:
+                logger.info(f"Block {block[0]} ({block[1]}): {block[2]}")
+
     font.modified = os_2_table.modified
 
 
