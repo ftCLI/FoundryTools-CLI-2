@@ -81,6 +81,24 @@ def recalc_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
+@cli.command("recalc-unicode-ranges")
+@click.option(
+    "-p", "--percentage",
+    type=click.FloatRange(0.0001, 100),
+    default=33.,
+    help="Minimum percentage of coverage required for a Unicode range to be enabled. Default is 33."
+)
+@base_options()
+def recalc_unicode_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Recalculates the ulUnicodeRange values of the OS/2 table based on a minimum percentage of
+    coverage.
+    """
+    from foundrytools_cli_2.cli.os_2.snippets import recalc_unicode_ranges as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.run()
+
 @cli.command("set-attrs", no_args_is_help=True)
 @set_attrs_options()
 @base_options()

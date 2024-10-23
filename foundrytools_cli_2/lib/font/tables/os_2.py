@@ -10,12 +10,18 @@ from foundrytools_cli_2.lib.constants import (
     MAX_US_WIDTH_CLASS,
     MIN_US_WEIGHT_CLASS,
     MIN_US_WIDTH_CLASS,
+    T_CMAP,
     T_OS_2,
 )
 from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
 from foundrytools_cli_2.lib.utils.bits_tools import is_nth_bit_set
 from foundrytools_cli_2.lib.utils.misc import get_glyph_bounds
 from foundrytools_cli_2.lib.utils.string_tools import adjust_string_length
+from foundrytools_cli_2.lib.utils.unicode_tools import (
+    OS_2_UNICODE_RANGES,
+    check_block_support,
+    count_block_codepoints,
+)
 
 ITALIC_BIT = 0
 UNDERSCORE_BIT = 1
@@ -505,14 +511,14 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         self.table.usMaxContext = value
 
     @property
-    def unicode_ranges(self) -> t.List[int]:
+    def unicode_ranges(self) -> t.Set[int]:
         """
         Returns the Unicode ranges of the ``OS/2`` table.
         """
         return self.table.getUnicodeRanges()
 
     @unicode_ranges.setter
-    def unicode_ranges(self, bits: t.List[int]) -> None:
+    def unicode_ranges(self, bits: t.Set[int]) -> None:
         """
         Sets the Unicode ranges of the ``OS/2`` table.
         """
@@ -574,11 +580,46 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
         """
         self.max_context = maxCtxFont(self.ttfont)
 
-    def recalc_unicode_ranges(self) -> None:
+    def recalc_unicode_ranges(self, percentage: float = 33.0) -> t.Set[t.Tuple[int, str, str]]:
         """
         Recalculates the Unicode ranges of the ``OS/2`` table.
         """
-        self.table.recalcUnicodeRanges(self.ttfont)
+        try:
+            cmap_table = self.ttfont[T_CMAP]
+        except KeyError as e:
+            raise KeyError("Font does not have a cmap table") from e
+
+        unicodes = set()
+        has_cmap_32 = False
+
+        for table in cmap_table.tables:
+            if table.isUnicode():
+                unicodes.update(table.cmap.keys())
+            if table.platformID == 3 and table.platEncID == 10:
+                has_cmap_32 = True
+
+        new_unicode_ranges = set()
+        modified_unicode_ranges = set()
+
+        for block in OS_2_UNICODE_RANGES:
+            min_codepoints = otRound(block.size / 100 * percentage) if block.bit_number != 57 else 1
+            found_codepoints = count_block_codepoints(block, unicodes)
+            is_enabled = block.bit_number in self.unicode_ranges
+            is_supported = check_block_support(
+                block, found_codepoints, min_codepoints, self.version, has_cmap_32
+            )
+
+            if is_supported:
+                new_unicode_ranges.add(block.bit_number)
+                if not is_enabled:
+                    modified_unicode_ranges.add((block.bit_number, block.block_name, "enabled"))
+            else:
+                if is_enabled:
+                    modified_unicode_ranges.add((block.bit_number, block.block_name, "disabled"))
+
+        self.unicode_ranges = new_unicode_ranges
+        return modified_unicode_ranges
+
 
     def recalc_code_page_ranges(self) -> None:
         """
