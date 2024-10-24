@@ -732,6 +732,9 @@ class Font:  # pylint: disable=too-many-public-methods
         )
         build_otf(font=self.ttfont, charstrings_dict=charstrings)
 
+        os_2_table = OS2Table(self.ttfont)
+        os_2_table.recalc_avg_char_width()
+
     def to_sfnt(self) -> None:
         """
         Convert a font to SFNT.

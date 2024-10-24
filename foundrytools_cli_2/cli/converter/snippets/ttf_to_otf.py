@@ -80,9 +80,6 @@ def ttf2otf(
     logger.info("Converting to OTF...")
     font.to_otf(tolerance=tolerance, correct_contours=correct_contours)
 
-    os_2_table = OS2Table(font.ttfont)
-    os_2_table.recalc_avg_char_width()
-
     if subroutinize:
         logger.info("Subroutinizing...")
         font.ps_subroutinize()
