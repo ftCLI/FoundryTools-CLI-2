@@ -861,6 +861,30 @@ class Font:  # pylint: disable=too-many-public-methods
             cff = hint_font(self._temp_file, **kwargs)
             self.ttfont[T_CFF] = cff
 
+    def ps_dehint(self, drop_zones_stems: bool = False) -> None:
+        """
+        Dehint a PostScript font.
+        """
+        if not self.is_ps:
+            raise NotImplementedError("Dehinting is only supported for PostScript flavored fonts.")
+
+        cff_table = CFFTable(self.ttfont)
+        private = cff_table.private_dict.rawDict
+        cff_table.table.cff.remove_hints()
+
+        if not drop_zones_stems:
+            for arg in (
+                "BlueValues",
+                "OtherBlues",
+                "FamilyBlues",
+                "FamilyOtherBlues",
+                "StdHW",
+                "StdVW",
+                "StemSnapH",
+                "StemSnapV",
+            ):
+                setattr(cff_table.private_dict, arg, private.get(arg, None))
+
     def ps_subroutinize(self) -> None:
         """
         Subroutinize a PostScript font.
