@@ -729,6 +729,8 @@ class Font:  # pylint: disable=too-many-public-methods
                 "Conversion to PostScript is not supported for variable fonts."
             )
 
+        self.tt_decomponentize()
+
         charstrings = quadratics_to_cubics(
             font=self.ttfont, tolerance=tolerance, correct_contours=correct_contours
         )

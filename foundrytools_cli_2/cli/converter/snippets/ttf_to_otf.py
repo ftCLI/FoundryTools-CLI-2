@@ -67,9 +67,6 @@ def ttf2otf(
     flavor = font.ttfont.flavor
     font.ttfont.flavor = None
 
-    logger.info("Decomponentizing source font...")
-    font.tt_decomponentize()
-
     if target_upm:
         logger.info(f"Scaling UPM to {target_upm}...")
         font.tt_scale_upem(target_upm=target_upm)
