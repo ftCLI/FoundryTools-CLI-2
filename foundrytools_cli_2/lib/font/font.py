@@ -20,6 +20,7 @@ from foundrytools_cli_2.lib.constants import (
     MIN_UPM,
     OTF_EXTENSION,
     PS_SFNT_VERSION,
+    T_CFF,
     T_CMAP,
     T_FVAR,
     T_GLYF,
@@ -32,6 +33,7 @@ from foundrytools_cli_2.lib.constants import (
     WOFF_FLAVOR,
 )
 from foundrytools_cli_2.lib.font.tables import CFFTable, HeadTable, NameTable, OS2Table
+from foundrytools_cli_2.lib.otf.otf_autohint import hint_font
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.otf.t2_charstrings import quadratics_to_cubics
 from foundrytools_cli_2.lib.skia.skia_tools import (
@@ -844,6 +846,20 @@ class Font:  # pylint: disable=too-many-public-methods
             remove_unused_subroutines=remove_unused_subroutines,
             min_area=min_area,
         )
+
+    def ps_autohint(self, **kwargs: t.Dict[str, t.Any]) -> None:
+        """
+        Autohint a PostScript font.
+        """
+        if not self.is_ps:
+            raise NotImplementedError(
+                "OTF autohinting is only supported for PostScript flavored fonts."
+            )
+
+        with restore_flavor(self.ttfont):
+            self.save_to_temp_file()
+            cff = hint_font(self._temp_file, **kwargs)
+            self.ttfont[T_CFF] = cff
 
     def ps_subroutinize(self) -> None:
         """

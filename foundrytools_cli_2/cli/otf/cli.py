@@ -19,10 +19,10 @@ def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Autohint OpenType-PS fonts with ``afdko.otfautohint``.
     """
-    from foundrytools_cli_2.cli.otf.snippets.autohint import main as task
 
-    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=Font.ps_autohint, **options)
     runner.filter.filter_out_tt = True
+    runner.force_modified = True
     runner.run()
 
 
