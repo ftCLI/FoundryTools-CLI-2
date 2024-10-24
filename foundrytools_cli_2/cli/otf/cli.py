@@ -97,9 +97,8 @@ def check_outlines(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Check the outlines of OpenType-PS fonts with ``afdko.checkoutlinesufo``.
     """
-    from foundrytools_cli_2.cli.otf.snippets.check_outlines import main as task
 
-    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=Font.ps_check_outlines, **options)
     runner.filter.filter_out_tt = True
     runner.filter.filter_out_variable = True
     runner.save_if_modified = False

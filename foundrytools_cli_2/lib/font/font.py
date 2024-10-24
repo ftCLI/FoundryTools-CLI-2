@@ -3,6 +3,7 @@ import typing as t
 from io import BytesIO
 from pathlib import Path
 
+from afdko.checkoutlinesufo import run as check_outlines
 from cffsubr import desubroutinize, subroutinize
 from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.recordingPen import DecomposingRecordingPen
@@ -908,6 +909,22 @@ class Font:  # pylint: disable=too-many-public-methods
             )
         with restore_flavor(self.ttfont):
             desubroutinize(self.ttfont)
+
+    def ps_check_outlines(self) -> None:
+        """
+        Check the outlines of a PostScript font.
+
+        Returns:
+            A list of warnings.
+        """
+        if not self.is_ps:
+            raise NotImplementedError("Checking outlines is only supported for PostScript fonts.")
+
+        with restore_flavor(self.ttfont):
+            self.save_to_temp_file()
+            check_outlines(args=[self._temp_file.as_posix(), "--error-correction-mode"])
+            with Font(self._temp_file) as temp_font:
+                self.ttfont[T_CFF] = temp_font.ttfont[T_CFF]
 
     def rebuild_cmap(self, remap_all: bool = False) -> t.Dict[str, int]:
         """
