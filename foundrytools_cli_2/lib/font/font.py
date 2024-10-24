@@ -861,7 +861,7 @@ class Font:  # pylint: disable=too-many-public-methods
             cff = hint_font(self._temp_file, **kwargs)
             self.ttfont[T_CFF] = cff
 
-    def ps_dehint(self, drop_zones_stems: bool = False) -> None:
+    def ps_dehint(self, drop_hinting_data: bool = False) -> None:
         """
         Dehint a PostScript font.
         """
@@ -872,7 +872,7 @@ class Font:  # pylint: disable=too-many-public-methods
         private = cff_table.private_dict.rawDict
         cff_table.table.cff.remove_hints()
 
-        if not drop_zones_stems:
+        if not drop_hinting_data:
             for arg in (
                 "BlueValues",
                 "OtherBlues",

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import click
 
-from foundrytools_cli_2.cli.otf.options import drop_zones_stems_flag, otf_autohint_options
+from foundrytools_cli_2.cli.otf.options import drop_hinting_data_flag, otf_autohint_options
 from foundrytools_cli_2.cli.shared_options import base_options, subroutinize_flag
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 from foundrytools_cli_2.lib.font import Font
@@ -27,7 +27,7 @@ def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("dehint")
-@drop_zones_stems_flag()
+@drop_hinting_data_flag()
 @base_options()
 def dehint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
