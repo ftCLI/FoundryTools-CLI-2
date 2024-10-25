@@ -86,6 +86,8 @@ def recalc_ranges_afdko(font: Font) -> None:
         font (Font): The Font object representing the font file.
     """
 
+    # This is no more used in the codebase. Left here for reference.
+
     os2_table = OS2Table(font.ttfont)
     flavor = font.ttfont.flavor
     font.ttfont.flavor = None
