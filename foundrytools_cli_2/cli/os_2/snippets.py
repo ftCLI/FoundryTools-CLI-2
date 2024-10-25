@@ -78,35 +78,6 @@ def recalc_unicode_ranges(font: Font, percentage: float = 33) -> None:
         font.modified = True
 
 
-def recalc_ranges_afdko(font: Font) -> None:
-    """
-    Recalculates the ``OS/2.ulUnicodeRange1`` through ``OS/2.ulUnicodeRange4`` values.
-
-    Args:
-        font (Font): The Font object representing the font file.
-    """
-
-    # This is no more used in the codebase. Left here for reference.
-
-    os2_table = OS2Table(font.ttfont)
-    flavor = font.ttfont.flavor
-    font.ttfont.flavor = None
-    font.save_to_temp_file()
-    temp_t1_file = get_temp_file_path()
-    temp_otf_file = get_temp_file_path()
-    run_shell_command(["tx", "-t1", font.temp_file, temp_t1_file], suppress_output=True)
-    run_shell_command(["makeotf", "-f", temp_t1_file, "-o", temp_otf_file], suppress_output=True)
-    temp_font = Font(temp_otf_file)
-    temp_os2_table = OS2Table(temp_font.ttfont)
-    os2_table.unicode_ranges = temp_os2_table.unicode_ranges
-    os2_table.codepage_ranges = temp_os2_table.codepage_ranges
-    font.ttfont.flavor = flavor
-    font.modified = os2_table.modified
-    temp_font.close()
-    temp_t1_file.unlink()
-    temp_otf_file.unlink()
-
-
 def recalc_codepage_ranges(font: Font) -> None:
     """
     Recalculates the ``OS/2.ulCodePageRange1`` through ``OS/2.ulCodePageRange2`` values.
