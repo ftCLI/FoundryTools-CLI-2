@@ -14,13 +14,15 @@ cli = click.Group(help="Utilities for editing OpenType-PS fonts.")
 
 @cli.command("autohint")
 @otf_autohint_options()
+@subroutinize_flag()
 @base_options()
 def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Autohint OpenType-PS fonts with ``afdko.otfautohint``.
     """
+    from foundrytools_cli_2.cli.otf.tasks import autohint as task
 
-    runner = TaskRunner(input_path=input_path, task=Font.ps_autohint, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_tt = True
     runner.force_modified = True
     runner.run()
@@ -28,12 +30,15 @@ def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 @cli.command("dehint")
 @drop_hinting_data_flag()
+@subroutinize_flag()
 @base_options()
 def dehint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Dehint OpenType-PS fonts.
     """
-    runner = TaskRunner(input_path=input_path, task=Font.ps_dehint, **options)
+    from foundrytools_cli_2.cli.otf.tasks import dehint as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_tt = True
     runner.force_modified = True
     runner.run()
@@ -92,31 +97,35 @@ def desubr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("check-outlines")
+@subroutinize_flag()
 @base_options()
 def check_outlines(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Check the outlines of OpenType-PS fonts with ``afdko.checkoutlinesufo``.
     """
-
-    runner = TaskRunner(input_path=input_path, task=Font.ps_check_outlines, **options)
-    runner.filter.filter_out_tt = True
-    runner.filter.filter_out_variable = True
-    runner.save_if_modified = False
-    runner.run()
-
-
-@cli.command("add-extremes")
-@base_options()
-@subroutinize_flag()
-def add_extremes(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
-    """
-    Add missing extreme points to OpenType-PS fonts.
-    """
-    from foundrytools_cli_2.cli.otf.snippets.add_extremes import main as task
+    from foundrytools_cli_2.cli.otf.tasks import check_outlines as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_tt = True
     runner.filter.filter_out_variable = True
+    runner.force_modified = True
+    runner.run()
+
+
+@cli.command("add-extremes")
+@drop_hinting_data_flag()
+@subroutinize_flag()
+@base_options()
+def add_extremes(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Add missing extreme points to OpenType-PS fonts.
+    """
+    from foundrytools_cli_2.cli.otf.tasks import add_extremes as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.filter.filter_out_tt = True
+    runner.filter.filter_out_variable = True
+    runner.force_modified = True
     runner.run()
 
 
