@@ -74,12 +74,8 @@ def recalc_unicode_ranges(font: Font, percentage: float = 33) -> None:
 
     if result:
         for block in result:
-            if block[0] < 0:
-                logger.info(f"Block {block[0]} ({block[1]}): {block[2]}")
-            else:
-                logger.info(f"Block {block[0]} ({block[1]}): {block[2]}")
-
-    font.modified = os_2_table.modified
+            logger.info(f"({block[0]}) {block[1]}: {block[2]}")
+        font.modified = True
 
 
 def recalc_ranges_afdko(font: Font) -> None:

@@ -104,7 +104,7 @@ def check_block_support(
     is_supported = found_codepoints >= min_codepoints
     if block.min_os2_version > os2_version:
         is_supported = False
-    if not (has_cmap_32 and block.bit_number == 57):
+    if not has_cmap_32 and block.bit_number == 57:
         is_supported = False
     return is_supported
 
