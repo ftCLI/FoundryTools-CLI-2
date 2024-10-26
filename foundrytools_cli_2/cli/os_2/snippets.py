@@ -1,11 +1,8 @@
 import typing as t
 
-from afdko.fdkutils import run_shell_command
-
 from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font.tables import HeadTable, OS2Table
-from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path
 
 
 def recalc_avg_char_width(font: Font) -> None:

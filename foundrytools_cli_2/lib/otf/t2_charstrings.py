@@ -1,20 +1,22 @@
 import typing as t
-from copy import deepcopy
 
 import pathops
-from fontTools.cffLib import PrivateDict
+from fontTools.cffLib import CFFFontSet, PrivateDict
 from fontTools.misc.psCharStrings import T2CharString
 from fontTools.pens.cu2quPen import Cu2QuPen
 from fontTools.pens.qu2cuPen import Qu2CuPen
+from fontTools.pens.roundingPen import RoundingPen
 from fontTools.pens.t2CharStringPen import T2CharStringPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
+from fontTools.ttLib.ttGlyphSet import _TTGlyph
 
-from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.skia.skia_tools import _simplify
-from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
 
 __all__ = ["quadratics_to_cubics", "get_t2_charstrings"]
+
+
+_TTGlyphMapping = t.Mapping[str, _TTGlyph]
 
 
 def skia_path_from_charstring(charstring: T2CharString) -> pathops.Path:
@@ -112,3 +114,31 @@ def get_t2_charstrings(font: TTFont) -> t.Dict[str, T2CharString]:
         t2_charstrings[k] = charstring
 
     return t2_charstrings
+
+
+def round_coordinates(font: TTFont) -> None:
+    """
+    Round the coordinates of the glyphs in a font.
+
+    Args:
+        font (TTFont): The font to round the coordinates of.
+    """
+    glyph_names: t.List[str] = font.getGlyphOrder()
+    glyph_set: _TTGlyphMapping = font.getGlyphSet()
+    cff_font_set: CFFFontSet = font["CFF "].cff
+    charstrings = cff_font_set[0].CharStrings
+
+    for glyph_name in glyph_names:
+        charstring = charstrings[glyph_name]
+
+        glyph_width = glyph_set[glyph_name].width
+        if glyph_width == charstring.private.defaultWidthX:
+            width = None
+        else:
+            width = glyph_width - charstring.private.nominalWidthX
+
+        t2_pen = T2CharStringPen(width=width, glyphSet=glyph_set)
+        rounding_pen = RoundingPen(outPen=t2_pen)
+        glyph_set[glyph_name].draw(rounding_pen)
+        rounded_charstring = t2_pen.getCharString(private=charstring.private)
+        charstrings[glyph_name] = rounded_charstring

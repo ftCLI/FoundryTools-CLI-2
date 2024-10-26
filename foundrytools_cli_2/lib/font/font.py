@@ -37,7 +37,7 @@ from foundrytools_cli_2.lib.constants import (
 from foundrytools_cli_2.lib.font.tables import CFFTable, HeadTable, NameTable, OS2Table
 from foundrytools_cli_2.lib.otf.otf_autohint import hint_font
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
-from foundrytools_cli_2.lib.otf.t2_charstrings import quadratics_to_cubics
+from foundrytools_cli_2.lib.otf.t2_charstrings import quadratics_to_cubics, round_coordinates
 from foundrytools_cli_2.lib.skia.skia_tools import (
     correct_glyphs_contours,
 )
@@ -964,6 +964,7 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError(
                 "Rounding coordinates is only supported for PostScript fonts."
             )
+        round_coordinates(self.ttfont)
 
     def rebuild_cmap(self, remap_all: bool = False) -> t.Dict[str, int]:
         """
