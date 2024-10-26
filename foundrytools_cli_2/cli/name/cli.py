@@ -30,7 +30,7 @@ def del_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Delete the specified NameRecords from the ``name`` table.
     """
-    from foundrytools_cli_2.cli.name.snippets import del_names as task
+    from foundrytools_cli_2.cli.name.tasks import del_names as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -42,7 +42,7 @@ def del_empty_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Deletes empty NameRecords from the ``name`` table.
     """
-    from foundrytools_cli_2.cli.name.snippets import del_empty_names as task
+    from foundrytools_cli_2.cli.name.tasks import del_empty_names as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -56,7 +56,7 @@ def del_mac_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Delete Macintosh-specific NameRecords from the ``name`` table, excluding those with nameID 1, 2,
     4, 5 and 6. If the ``--del-all`` flag is set, all Macintosh-specific NameRecords are deleted.
     """
-    from foundrytools_cli_2.cli.name.snippets import del_mac_names as task
+    from foundrytools_cli_2.cli.name.tasks import del_mac_names as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -68,7 +68,7 @@ def del_unused_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Delete unused NameRecords from the ``name`` table.
     """
-    from foundrytools_cli_2.cli.name.snippets import del_unused_names as task
+    from foundrytools_cli_2.cli.name.tasks import del_unused_names as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -85,7 +85,7 @@ def find_replace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Find and replace text in the specified NameRecords.
     """
-    from foundrytools_cli_2.cli.name.snippets import find_replace as task
+    from foundrytools_cli_2.cli.name.tasks import find_replace as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -100,7 +100,7 @@ def set_name(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Set the string of the specified NameRecord in the ``name`` table.
     """
-    from foundrytools_cli_2.cli.name.snippets import set_name as task
+    from foundrytools_cli_2.cli.name.tasks import set_name as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -112,7 +112,7 @@ def strip_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Remove leading and trailing whitespace from the NameRecords.
     """
-    from foundrytools_cli_2.cli.name.snippets import strip_names as task
+    from foundrytools_cli_2.cli.name.tasks import strip_names as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -134,7 +134,7 @@ def build_unique_id(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     ``Font Revision;Vendor ID;PostScript Name``
     """
-    from foundrytools_cli_2.cli.name.snippets import build_unique_id as task
+    from foundrytools_cli_2.cli.name.tasks import build_unique_id as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -147,7 +147,7 @@ def build_full_font_name(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     """
     Builds the NameID 4 (Full Font Name).
     """
-    from foundrytools_cli_2.cli.name.snippets import build_full_font_name as task
+    from foundrytools_cli_2.cli.name.tasks import build_full_font_name as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -160,7 +160,7 @@ def build_version_string(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     """
     Builds the NameID 5 (Version String).
     """
-    from foundrytools_cli_2.cli.name.snippets import build_version_string as task
+    from foundrytools_cli_2.cli.name.tasks import build_version_string as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -173,7 +173,7 @@ def build_postscript_name(input_path: Path, **options: t.Dict[str, t.Any]) -> No
     """
     Builds the NameID 6 (PostScript Name).
     """
-    from foundrytools_cli_2.cli.name.snippets import build_postscript_name as task
+    from foundrytools_cli_2.cli.name.tasks import build_postscript_name as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -188,7 +188,7 @@ def build_mac_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     The following names are built: 1 (Font Family Name), 2 (Font Subfamily Name), 4
     (Full Font Name), 5 (Version String), 6 (PostScript Name).
     """
-    from foundrytools_cli_2.cli.name.snippets import build_mac_names as task
+    from foundrytools_cli_2.cli.name.tasks import build_mac_names as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()

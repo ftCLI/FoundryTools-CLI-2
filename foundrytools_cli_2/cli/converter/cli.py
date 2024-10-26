@@ -32,7 +32,7 @@ def otf_to_ttf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Convert PostScript flavored fonts to TrueType flavored fonts.
     """
-    from foundrytools_cli_2.cli.converter.snippets.otf_to_ttf import main as task
+    from foundrytools_cli_2.cli.converter.tasks.otf_to_ttf import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.save_if_modified = False
@@ -52,7 +52,7 @@ def ttf_to_otf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Convert TrueType flavored fonts to PostScript flavored fonts.
     """
-    from foundrytools_cli_2.cli.converter.snippets.ttf_to_otf import ttf2otf, ttf2otf_with_tx
+    from foundrytools_cli_2.cli.converter.tasks.ttf_to_otf import ttf2otf, ttf2otf_with_tx
 
     if options["mode"] == "tx":
         options.pop("tolerance")
@@ -97,7 +97,7 @@ def sfnt_to_web(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Convert SFNT fonts to WOFF and/or WOFF2 fonts.
     """
-    from foundrytools_cli_2.cli.converter.snippets.sfnt_to_web import main as task
+    from foundrytools_cli_2.cli.converter.tasks.sfnt_to_web import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_woff = True
@@ -113,7 +113,7 @@ def variable_to_static(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Convert variable fonts to static fonts.
     """
 
-    from foundrytools_cli_2.cli.converter.snippets.variable_to_static import main as task
+    from foundrytools_cli_2.cli.converter.tasks.variable_to_static import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_static = True

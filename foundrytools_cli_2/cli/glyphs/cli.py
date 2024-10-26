@@ -22,7 +22,7 @@ def rebuild_cmap(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Rebuild the cmap table of a font. Optionally remap all characters, including those already in
     the cmap table.
     """
-    from foundrytools_cli_2.cli.glyphs.snippets.rebuild_cmap import main as task
+    from foundrytools_cli_2.cli.glyphs.tasks.rebuild_cmap import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -36,7 +36,7 @@ def rename_glyph(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Rename a glyph in a font file.
     """
-    from foundrytools_cli_2.cli.glyphs.snippets.rename_glyph import main as task
+    from foundrytools_cli_2.cli.glyphs.tasks.rename_glyph import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.force_modified = True
@@ -56,7 +56,7 @@ def rename_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Rename glyphs in a font file based on the glyph order of another font file.
     """
-    from foundrytools_cli_2.cli.glyphs.snippets.rename_glyphs import main as task
+    from foundrytools_cli_2.cli.glyphs.tasks.rename_glyphs import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -68,7 +68,7 @@ def set_production_names(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     """
     Set the production names of glyphs in a font file.
     """
-    from foundrytools_cli_2.cli.glyphs.snippets.set_production_names import main as task
+    from foundrytools_cli_2.cli.glyphs.tasks.set_production_names import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -95,7 +95,7 @@ def sort_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Sort the glyphs in a font file.
     """
-    from foundrytools_cli_2.cli.glyphs.snippets.sort_glyphs import main as task
+    from foundrytools_cli_2.cli.glyphs.tasks.sort_glyphs import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
