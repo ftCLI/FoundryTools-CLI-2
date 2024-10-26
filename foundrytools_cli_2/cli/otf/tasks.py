@@ -69,3 +69,19 @@ def check_outlines(font: Font, subroutinize: bool = True) -> None:
         logger.info("Subroutinizing")
         font.ps_subroutinize()
     font.modified = True
+
+
+def round_coordinates(font: Font, subroutinize: bool = True) -> None:
+    """
+    Round the coordinates of the glyphs in an OpenType-PS font.
+
+    Args:
+        font (Font): The font to round the coordinates of.
+        subroutinize (bool): Whether to subroutinize the font.
+    """
+    logger.info("Rounding coordinates")
+    font.ps_round_coordinates()
+    if subroutinize:
+        logger.info("Subroutinizing")
+        font.ps_subroutinize()
+    font.modified = True

@@ -136,10 +136,9 @@ def round_coordinates(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Round the coordinates of OpenType-PS fonts.
     """
-    # from foundrytools_cli_2.cli.otf.snippets.round_coordinates import main as task
-    # from foundrytools_cli_2.lib.otf.t2_charstrings import round_coordinates as task
+    from foundrytools_cli_2.cli.otf.tasks import round_coordinates as task
 
-    runner = TaskRunner(input_path=input_path, task=Font.ps_round_coordinates, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_tt = True
     runner.filter.filter_out_variable = True
     runner.force_modified = True
