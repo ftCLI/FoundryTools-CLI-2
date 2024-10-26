@@ -28,7 +28,7 @@ def set_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     validate_params(click.get_current_context())
 
-    from foundrytools_cli_2.cli.cff.snippets import set_names as task
+    from foundrytools_cli_2.cli.cff.tasks import set_names as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_tt = True
@@ -45,7 +45,7 @@ def del_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     validate_params(click.get_current_context())
 
-    from foundrytools_cli_2.cli.cff.snippets import del_names as task
+    from foundrytools_cli_2.cli.cff.tasks import del_names as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_tt = True
@@ -62,7 +62,7 @@ def find_replace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     ``cff.fontNames[0]`` and in the following ``topDictIndex[0]`` fields: version, FullName,
     FamilyName, Weight, Copyright, Notice.
     """
-    from foundrytools_cli_2.cli.cff.snippets import find_replace as task
+    from foundrytools_cli_2.cli.cff.tasks import find_replace as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_tt = True

@@ -24,7 +24,7 @@ def recalc_avg_char_width(input_path: Path, **options: t.Dict[str, t.Any]) -> No
     """
     Recalculates the xAvgCharWidth value of the OS/2 table.
     """
-    from foundrytools_cli_2.cli.os_2.snippets import recalc_avg_char_width as task
+    from foundrytools_cli_2.cli.os_2.tasks import recalc_avg_char_width as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -36,7 +36,7 @@ def recalc_x_height(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Recalculates the sxHeight value of the OS/2 table.
     """
-    from foundrytools_cli_2.cli.os_2.snippets import recalc_x_height as task
+    from foundrytools_cli_2.cli.os_2.tasks import recalc_x_height as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -48,7 +48,7 @@ def recalc_cap_height(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Recalculates the sCapHeight value of the OS/2 table.
     """
-    from foundrytools_cli_2.cli.os_2.snippets import recalc_cap_height as task
+    from foundrytools_cli_2.cli.os_2.tasks import recalc_cap_height as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -60,7 +60,7 @@ def recalc_max_context(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Recalculates the usMaxContext value of the OS/2 table.
     """
-    from foundrytools_cli_2.cli.os_2.snippets import recalc_max_context as task
+    from foundrytools_cli_2.cli.os_2.tasks import recalc_max_context as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -72,7 +72,7 @@ def recalc_codepage_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> N
     """
     Recalculates the ulCodePageRange values of the OS/2 table.
     """
-    from foundrytools_cli_2.cli.os_2.snippets import recalc_codepage_ranges as task
+    from foundrytools_cli_2.cli.os_2.tasks import recalc_codepage_ranges as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -92,7 +92,7 @@ def recalc_unicode_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> No
     Recalculates the ulUnicodeRange values of the OS/2 table based on a minimum percentage of
     coverage.
     """
-    from foundrytools_cli_2.cli.os_2.snippets import recalc_unicode_ranges as task
+    from foundrytools_cli_2.cli.os_2.tasks import recalc_unicode_ranges as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -107,7 +107,7 @@ def set_attrs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     validate_params(click.get_current_context())
 
-    from foundrytools_cli_2.cli.os_2.snippets import set_attrs as task
+    from foundrytools_cli_2.cli.os_2.tasks import set_attrs as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -122,7 +122,7 @@ def set_fs_selection(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     validate_params(click.get_current_context())
 
-    from foundrytools_cli_2.cli.os_2.snippets import set_fs_selection as task
+    from foundrytools_cli_2.cli.os_2.tasks import set_fs_selection as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -137,7 +137,7 @@ def set_fs_type(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     validate_params(click.get_current_context())
 
-    from foundrytools_cli_2.cli.os_2.snippets import set_fs_type as task
+    from foundrytools_cli_2.cli.os_2.tasks import set_fs_type as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -152,7 +152,7 @@ def set_panose(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     validate_params(click.get_current_context())
 
-    from foundrytools_cli_2.cli.os_2.snippets import set_panose as task
+    from foundrytools_cli_2.cli.os_2.tasks import set_panose as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -167,7 +167,7 @@ def upgrade(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     If the target version is less or equal to the current version, the table is not modified.
     """
-    from foundrytools_cli_2.cli.os_2.snippets import upgrade_version as task
+    from foundrytools_cli_2.cli.os_2.tasks import upgrade_version as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()

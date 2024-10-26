@@ -22,7 +22,7 @@ def otf_autohint_options() -> t.Callable:
     return add_options(_autohint_options)
 
 
-def drop_zones_stems_flag() -> t.Callable:
+def drop_hinting_data_flag() -> t.Callable:
     """
     Add the ``drop_zones_stems`` option to a click command.
 
@@ -31,7 +31,7 @@ def drop_zones_stems_flag() -> t.Callable:
     """
     _drop_zones_stems_flag = [
         click.option(
-            "--drop-zones-stems",
+            "--drop-hinting-data",
             is_flag=True,
             default=False,
             help="""

@@ -3,6 +3,7 @@ import typing as t
 from io import BytesIO
 from pathlib import Path
 
+from afdko.checkoutlinesufo import run as check_outlines
 from cffsubr import desubroutinize, subroutinize
 from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.recordingPen import DecomposingRecordingPen
@@ -15,11 +16,13 @@ from fontTools.ttLib.ttGlyphSet import _TTGlyphSet
 from pathvalidate import sanitize_filename
 from ufo2ft.postProcessor import PostProcessor
 
+from foundrytools_cli_2.lib.beziers import add_extremes
 from foundrytools_cli_2.lib.constants import (
     MAX_UPM,
     MIN_UPM,
     OTF_EXTENSION,
     PS_SFNT_VERSION,
+    T_CFF,
     T_CMAP,
     T_FVAR,
     T_GLYF,
@@ -32,8 +35,9 @@ from foundrytools_cli_2.lib.constants import (
     WOFF_FLAVOR,
 )
 from foundrytools_cli_2.lib.font.tables import CFFTable, HeadTable, NameTable, OS2Table
+from foundrytools_cli_2.lib.otf.otf_autohint import hint_font
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
-from foundrytools_cli_2.lib.otf.t2_charstrings import quadratics_to_cubics
+from foundrytools_cli_2.lib.otf.t2_charstrings import quadratics_to_cubics, round_coordinates
 from foundrytools_cli_2.lib.skia.skia_tools import (
     correct_glyphs_contours,
 )
@@ -727,10 +731,15 @@ class Font:  # pylint: disable=too-many-public-methods
                 "Conversion to PostScript is not supported for variable fonts."
             )
 
+        self.tt_decomponentize()
+
         charstrings = quadratics_to_cubics(
             font=self.ttfont, tolerance=tolerance, correct_contours=correct_contours
         )
         build_otf(font=self.ttfont, charstrings_dict=charstrings)
+
+        os_2_table = OS2Table(self.ttfont)
+        os_2_table.recalc_avg_char_width()
 
     def to_sfnt(self) -> None:
         """
@@ -842,6 +851,51 @@ class Font:  # pylint: disable=too-many-public-methods
             min_area=min_area,
         )
 
+    def _restore_hinting_data(self, cff_table: CFFTable, private_dict: t.Dict[str, t.Any]) -> None:
+        if not self.is_ps:
+            raise NotImplementedError("Not a PostScript flavored font.")
+
+        hinting_attributes = (
+            "BlueValues",
+            "OtherBlues",
+            "FamilyBlues",
+            "FamilyOtherBlues",
+            "StdHW",
+            "StdVW",
+            "StemSnapH",
+            "StemSnapV",
+        )
+        for attr in hinting_attributes:
+            setattr(cff_table.private_dict, attr, private_dict.get(attr))
+
+    def ps_autohint(self, **kwargs: t.Dict[str, t.Any]) -> None:
+        """
+        Autohint a PostScript font.
+        """
+        if not self.is_ps:
+            raise NotImplementedError(
+                "OTF autohinting is only supported for PostScript flavored fonts."
+            )
+
+        with restore_flavor(self.ttfont):
+            self.save_to_temp_file()
+            cff = hint_font(self._temp_file, **kwargs)
+            self.ttfont[T_CFF] = cff
+
+    def ps_dehint(self, drop_hinting_data: bool = False) -> None:
+        """
+        Dehint a PostScript font.
+        """
+        if not self.is_ps:
+            raise NotImplementedError("Dehinting is only supported for PostScript flavored fonts.")
+
+        cff_table = CFFTable(self.ttfont)
+        data = cff_table.private_dict.rawDict
+        cff_table.table.cff.remove_hints()
+
+        if not drop_hinting_data:
+            self._restore_hinting_data(cff_table, data)
+
     def ps_subroutinize(self) -> None:
         """
         Subroutinize a PostScript font.
@@ -863,6 +917,54 @@ class Font:  # pylint: disable=too-many-public-methods
             )
         with restore_flavor(self.ttfont):
             desubroutinize(self.ttfont)
+
+    def ps_check_outlines(self) -> None:
+        """
+        Check the outlines of a PostScript font.
+
+        Returns:
+            A list of warnings.
+        """
+        if not self.is_ps:
+            raise NotImplementedError("Checking outlines is only supported for PostScript fonts.")
+
+        with restore_flavor(self.ttfont):
+            self.save_to_temp_file()
+            check_outlines(args=[self._temp_file.as_posix(), "--error-correction-mode"])
+            with Font(self._temp_file) as temp_font:
+                self.ttfont[T_CFF] = temp_font.ttfont[T_CFF]
+
+    def ps_add_extremes(self, drop_hinting_data: bool = False) -> None:
+        """
+        Add extrema to the outlines of a PostScript font.
+        """
+        if not self.is_ps:
+            raise NotImplementedError("Adding extrema is only supported for PostScript fonts.")
+
+        cff_table = CFFTable(self.ttfont)
+        data = cff_table.private_dict.rawDict
+        charstrings = add_extremes(self.ttfont)
+        build_otf(font=self.ttfont, charstrings_dict=charstrings)
+
+        # Reload the font before correcting contours, otherwise the CFF top dict entries will be
+        # deleted.
+        self.reload()
+        self.correct_contours(remove_hinting=True, ignore_errors=True)
+
+        if not drop_hinting_data:
+            # The font has been reloaded, so we need to instantiate the CFFTable again.
+            cff_table = CFFTable(self.ttfont)
+            self._restore_hinting_data(cff_table, data)
+
+    def ps_round_coordinates(self) -> None:
+        """
+        Round the coordinates of the outlines of a PostScript font.
+        """
+        if not self.is_ps:
+            raise NotImplementedError(
+                "Rounding coordinates is only supported for PostScript fonts."
+            )
+        round_coordinates(self.ttfont)
 
     def rebuild_cmap(self, remap_all: bool = False) -> t.Dict[str, int]:
         """

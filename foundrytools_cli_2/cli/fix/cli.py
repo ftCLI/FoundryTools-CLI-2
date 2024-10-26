@@ -35,7 +35,7 @@ def fix_contours(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     * Correct the direction of the contours.
     * Remove tiny paths.
     """
-    from foundrytools_cli_2.cli.fix.snippets.contours import main as task
+    from foundrytools_cli_2.cli.fix.tasks.contours import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_variable = True
@@ -63,7 +63,7 @@ def fix_duplicate_components(input_path: Path, **options: t.Dict[str, t.Any]) ->
 
     * Remove duplicate components which have the same x,y coordinates.
     """
-    from foundrytools_cli_2.cli.fix.snippets.duplicate_components import main as task
+    from foundrytools_cli_2.cli.fix.tasks.duplicate_components import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_ps = True
@@ -81,7 +81,7 @@ def fix_empty_notdef(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     an outline as the user will only see what looks like a space if a glyph is missing and not be
     aware of the active font’s limitation.
     """
-    from foundrytools_cli_2.cli.fix.snippets.empty_notdef import fix_notdef_empty as task
+    from foundrytools_cli_2.cli.fix.tasks.empty_notdef import fix_notdef_empty as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -104,7 +104,7 @@ def fix_fs_selection(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     font is not bold or italic, the regular bit is set. If the font is bold or italic, the regular
     bit is cleared.
     """
-    from foundrytools_cli_2.cli.fix.snippets.fs_selection import main as task
+    from foundrytools_cli_2.cli.fix.tasks.fs_selection import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -146,7 +146,7 @@ def fix_kern_table(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     * Remove glyphs that are not defined in the ``cmap`` table from the ``kern`` table.
     """
-    from foundrytools_cli_2.cli.fix.snippets.kern_table import main as task
+    from foundrytools_cli_2.cli.fix.tasks.kern_table import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -184,7 +184,7 @@ def fix_italic_angle(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     The italic and oblique bits are then set based on the calculated italic angle and the provided
     mode.
     """
-    from foundrytools_cli_2.cli.fix.snippets.italic_angle import main as task
+    from foundrytools_cli_2.cli.fix.tasks.italic_angle import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -208,7 +208,7 @@ def fix_legacy_accents(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     More info: https://github.com/googlefonts/fontbakery/issues/4310
     """
-    from foundrytools_cli_2.cli.fix.snippets.legacy_accents import fix_legacy_accents as task
+    from foundrytools_cli_2.cli.fix.tasks.legacy_accents import fix_legacy_accents as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -230,7 +230,7 @@ def fix_missing_nbsp(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     * Add a glyph for the missing ``nbspace`` character by double mapping the ``space`` character
     """
-    from foundrytools_cli_2.cli.fix.snippets.nbsp_missing import main as task
+    from foundrytools_cli_2.cli.fix.tasks.nbsp_missing import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -262,7 +262,7 @@ def fix_nbsp_width(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     * Check if ``nbspace`` and space glyphs have the same width. If not, correct ``nbspace``
     width to match the ``space`` width.
     """
-    from foundrytools_cli_2.cli.fix.snippets.nbsp_width import main as task
+    from foundrytools_cli_2.cli.fix.tasks.nbsp_width import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -321,7 +321,7 @@ def fix_monospace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     * Set ``CFF.cff.TopDictIndex[0].isFixedPitch`` to ``True`` for CFF fonts
     """
-    from foundrytools_cli_2.cli.fix.snippets.monospace import main as task
+    from foundrytools_cli_2.cli.fix.tasks.monospace import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -360,7 +360,7 @@ def fix_transformed_components(input_path: Path, **options: t.Dict[str, t.Any]) 
 
     * Decompose composite glyphs that have transformed components.
     """
-    from foundrytools_cli_2.cli.fix.snippets.decompose_transformed import main as task
+    from foundrytools_cli_2.cli.fix.tasks.decompose_transformed import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_ps = True
@@ -392,7 +392,7 @@ def fix_unreachable_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> N
 
     * Remove glyphs that are not reachable by subsetting the font.
     """
-    from foundrytools_cli_2.cli.fix.snippets.unreachable_glyphs import main as task
+    from foundrytools_cli_2.cli.fix.tasks.unreachable_glyphs import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -432,7 +432,7 @@ def fix_vertical_metrics(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     options["safe_bottom"] = t.cast(t.Any, safe_bottom)
     options["safe_top"] = t.cast(t.Any, safe_top)
 
-    from foundrytools_cli_2.cli.fix.snippets.vertical_metrics import main as task
+    from foundrytools_cli_2.cli.fix.tasks.vertical_metrics import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()

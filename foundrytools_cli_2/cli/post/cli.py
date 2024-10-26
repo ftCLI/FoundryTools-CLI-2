@@ -43,7 +43,7 @@ def cli(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     validate_params(click.get_current_context())
 
-    from foundrytools_cli_2.cli.post.snipptes import set_attrs as task
+    from foundrytools_cli_2.cli.post.tasks import set_attrs as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()

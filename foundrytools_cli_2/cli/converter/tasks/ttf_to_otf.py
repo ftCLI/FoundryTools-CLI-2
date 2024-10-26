@@ -67,9 +67,6 @@ def ttf2otf(
     flavor = font.ttfont.flavor
     font.ttfont.flavor = None
 
-    logger.info("Decomponentizing source font...")
-    font.tt_decomponentize()
-
     if target_upm:
         logger.info(f"Scaling UPM to {target_upm}...")
         font.tt_scale_upem(target_upm=target_upm)
@@ -79,9 +76,6 @@ def ttf2otf(
 
     logger.info("Converting to OTF...")
     font.to_otf(tolerance=tolerance, correct_contours=correct_contours)
-
-    os_2_table = OS2Table(font.ttfont)
-    os_2_table.recalc_avg_char_width()
 
     if subroutinize:
         logger.info("Subroutinizing...")
