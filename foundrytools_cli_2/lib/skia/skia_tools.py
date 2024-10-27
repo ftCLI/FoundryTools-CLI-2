@@ -127,6 +127,10 @@ def t2_charstring_from_skia_path(
     Returns:
         T2CharString: The ``T2CharString`` object
     """
+
+    # https://github.com/fonttools/fonttools/commit/40b525c1e3cc20b4b64004b8e3224a67adc2adf1
+    # The width argument of `T2CharStringPen()` is inserted directly into the CharString
+    # program, so it must be relative to Private.nominalWidthX.
     if charstring.width == charstring.private.defaultWidthX:
         width = None
     else:

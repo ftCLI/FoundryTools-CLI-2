@@ -956,7 +956,7 @@ class Font:  # pylint: disable=too-many-public-methods
             cff_table = CFFTable(self.ttfont)
             self._restore_hinting_data(cff_table, data)
 
-    def ps_round_coordinates(self) -> None:
+    def ps_round_coordinates(self) -> t.Set[str]:
         """
         Round the coordinates of the outlines of a PostScript font.
         """
@@ -964,7 +964,7 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError(
                 "Rounding coordinates is only supported for PostScript fonts."
             )
-        round_coordinates(self.ttfont)
+        return round_coordinates(self.ttfont)
 
     def rebuild_cmap(self, remap_all: bool = False) -> t.Dict[str, int]:
         """
