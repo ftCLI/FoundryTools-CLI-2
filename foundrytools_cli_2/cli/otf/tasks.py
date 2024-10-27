@@ -80,8 +80,13 @@ def round_coordinates(font: Font, subroutinize: bool = True) -> None:
         subroutinize (bool): Whether to subroutinize the font.
     """
     logger.info("Rounding coordinates")
-    font.ps_round_coordinates()
+    result = font.ps_round_coordinates()
+    if not result:
+        return
+
+    font.modified = True
+    logger.info(f"{len(result)} glyphs were modified")
+
     if subroutinize:
         logger.info("Subroutinizing")
         font.ps_subroutinize()
-    font.modified = True

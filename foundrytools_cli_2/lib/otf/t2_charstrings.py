@@ -5,6 +5,7 @@ from fontTools.cffLib import CFFFontSet, PrivateDict
 from fontTools.misc.psCharStrings import T2CharString
 from fontTools.pens.cu2quPen import Cu2QuPen
 from fontTools.pens.qu2cuPen import Qu2CuPen
+from fontTools.pens.recordingPen import RecordingPen
 from fontTools.pens.roundingPen import RoundingPen
 from fontTools.pens.t2CharStringPen import T2CharStringPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
@@ -116,7 +117,7 @@ def quadratics_to_cubics_2(font: TTFont) -> t.Dict[str, T2CharString]:
     return t2_charstrings
 
 
-def round_coordinates(font: TTFont) -> None:
+def round_coordinates(font: TTFont) -> t.Set[str]:
     """
     Round the coordinates of the glyphs in a font.
 
@@ -128,17 +129,37 @@ def round_coordinates(font: TTFont) -> None:
     cff_font_set: CFFFontSet = font["CFF "].cff
     charstrings = cff_font_set[0].CharStrings
 
+    rounded_charstrings = set()
     for glyph_name in glyph_names:
         charstring = charstrings[glyph_name]
 
+        # https://github.com/fonttools/fonttools/commit/40b525c1e3cc20b4b64004b8e3224a67adc2adf1
+        # The width argument of `T2CharStringPen()` is inserted directly into the CharString
+        # program, so it must be relative to Private.nominalWidthX.
         glyph_width = glyph_set[glyph_name].width
         if glyph_width == charstring.private.defaultWidthX:
             width = None
         else:
             width = glyph_width - charstring.private.nominalWidthX
 
+        # Record the original charstring
+        rec_pen = RecordingPen()
+        glyph_set[glyph_name].draw(rec_pen)
+        value = rec_pen.value
+
+        # Round the charstring
         t2_pen = T2CharStringPen(width=width, glyphSet=glyph_set)
         rounding_pen = RoundingPen(outPen=t2_pen)
         glyph_set[glyph_name].draw(rounding_pen)
         rounded_charstring = t2_pen.getCharString(private=charstring.private)
-        charstrings[glyph_name] = rounded_charstring
+
+        # Record the rounded charstring
+        rec_pen_2 = RecordingPen()
+        rounded_charstring.draw(rec_pen_2)
+        value_2 = rec_pen_2.value
+
+        if value != value_2:
+            charstrings[glyph_name] = rounded_charstring
+            rounded_charstrings.add(glyph_name)
+
+    return rounded_charstrings
