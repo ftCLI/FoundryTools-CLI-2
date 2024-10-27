@@ -133,6 +133,11 @@ def round_coordinates(font: TTFont) -> t.Set[str]:
     for glyph_name in glyph_names:
         charstring = charstrings[glyph_name]
 
+        # Record the original charstring and store the value
+        rec_pen = RecordingPen()
+        glyph_set[glyph_name].draw(rec_pen)
+        value = rec_pen.value
+
         # https://github.com/fonttools/fonttools/commit/40b525c1e3cc20b4b64004b8e3224a67adc2adf1
         # The width argument of `T2CharStringPen()` is inserted directly into the CharString
         # program, so it must be relative to Private.nominalWidthX.
@@ -141,11 +146,6 @@ def round_coordinates(font: TTFont) -> t.Set[str]:
             width = None
         else:
             width = glyph_width - charstring.private.nominalWidthX
-
-        # Record the original charstring
-        rec_pen = RecordingPen()
-        glyph_set[glyph_name].draw(rec_pen)
-        value = rec_pen.value
 
         # Round the charstring
         t2_pen = T2CharStringPen(width=width, glyphSet=glyph_set)
@@ -158,6 +158,7 @@ def round_coordinates(font: TTFont) -> t.Set[str]:
         rounded_charstring.draw(rec_pen_2)
         value_2 = rec_pen_2.value
 
+        # Update the charstring only if the rounded charstring is different
         if value != value_2:
             charstrings[glyph_name] = rounded_charstring
             rounded_charstrings.add(glyph_name)
