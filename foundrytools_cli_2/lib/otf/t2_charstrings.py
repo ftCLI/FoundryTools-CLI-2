@@ -13,13 +13,13 @@ from fontTools.ttLib.ttGlyphSet import _TTGlyph
 
 from foundrytools_cli_2.lib.skia.skia_tools import _simplify
 
-__all__ = ["quadratics_to_cubics", "get_t2_charstrings"]
+__all__ = ["quadratics_to_cubics", "quadratics_to_cubics_2", "round_coordinates"]
 
 
 _TTGlyphMapping = t.Mapping[str, _TTGlyph]
 
 
-def skia_path_from_charstring(charstring: T2CharString) -> pathops.Path:
+def _skia_path_from_charstring(charstring: T2CharString) -> pathops.Path:
     """
     Get a Skia path from a T2CharString.
     """
@@ -29,7 +29,7 @@ def skia_path_from_charstring(charstring: T2CharString) -> pathops.Path:
     return path
 
 
-def charstring_from_skia_path(path: pathops.Path, width: int) -> T2CharString:
+def _charstring_from_skia_path(path: pathops.Path, width: int) -> T2CharString:
     """
     Get a T2CharString from a Skia path.
     """
@@ -85,16 +85,16 @@ def quadratics_to_cubics(
 
         if correct_contours:
             charstring.private = PrivateDict()
-            path = skia_path_from_charstring(charstring)
+            path = _skia_path_from_charstring(charstring)
             simplified_path = _simplify(path, glyph_name=k, clockwise=False)
-            charstring = charstring_from_skia_path(path=simplified_path, width=width)
+            charstring = _charstring_from_skia_path(path=simplified_path, width=width)
 
         qu2cu_charstrings[k] = charstring
 
     return qu2cu_charstrings
 
 
-def get_t2_charstrings(font: TTFont) -> t.Dict[str, T2CharString]:
+def quadratics_to_cubics_2(font: TTFont) -> t.Dict[str, T2CharString]:
     """
     Get CFF charstrings using T2CharStringPen
 

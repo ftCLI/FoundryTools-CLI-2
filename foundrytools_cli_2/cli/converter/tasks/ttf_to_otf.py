@@ -7,7 +7,7 @@ from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font.tables import OS2Table
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
-from foundrytools_cli_2.lib.otf.t2_charstrings import get_t2_charstrings
+from foundrytools_cli_2.lib.otf.t2_charstrings import quadratics_to_cubics_2
 
 
 def _build_out_file_name(font: Font, output_dir: t.Optional[Path], overwrite: bool = True) -> Path:
@@ -134,7 +134,7 @@ def ttf2otf_with_tx(
     run_shell_command(tx_command, suppress_output=True)
 
     logger.info("Building OTF...")
-    charstrings_dict = get_t2_charstrings(font=font.ttfont)
+    charstrings_dict = quadratics_to_cubics_2(font=font.ttfont)
     build_otf(font=font.ttfont, charstrings_dict=charstrings_dict)
     font.save(out_file, reorder_tables=None)
     sfntedit_command = ["sfntedit", "-a", "CFF=" + str(cff_file), str(out_file)]
