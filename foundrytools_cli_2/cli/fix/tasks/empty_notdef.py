@@ -1,5 +1,6 @@
 from fontTools.misc.psCharStrings import T2CharString
 from fontTools.misc.roundTools import otRound
+from fontTools.pens.recordingPen import RecordingPen
 from fontTools.pens.t2CharStringPen import T2CharStringPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib.tables._g_l_y_f import Glyph
@@ -9,7 +10,6 @@ from foundrytools_cli_2.lib.constants import (
 )
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.font.tables import CFFTable, GlyfTable, HeadTable, OS2Table
-from foundrytools_cli_2.lib.skia.skia_tools import is_empty_glyph
 
 NOTDEF = ".notdef"
 WIDTH_CONSTANT = 600
@@ -30,7 +30,6 @@ def draw_empty_notdef_cff(font: Font, width: int, height: int, thickness: int) -
     Returns:
         T2CharString: The .notdef glyph charstring.
     """
-
     pen = T2CharStringPen(width=0, glyphSet=font.glyph_set)
 
     # Draw the outer contour (counterclockwise)
@@ -88,7 +87,7 @@ def draw_empty_notdef_glyf(font: Font, width: int, height: int, thickness: int) 
     return pen.glyph()
 
 
-def fix_notdef_empty(font: Font) -> None:
+def fix_empty_notdef(font: Font) -> None:
     """
     Fixes the empty .notdef glyph by adding a simple rectangle.
 
@@ -98,10 +97,12 @@ def fix_notdef_empty(font: Font) -> None:
     glyph_set = font.glyph_set
 
     if NOTDEF not in glyph_set:
-        raise ValueError("Font does not contain a .notdef glyph")
+        raise KeyError("Font does not contain a .notdef glyph")
 
-    if not is_empty_glyph(glyph_set=glyph_set, glyph_name=NOTDEF):
-        return
+    rec_pen = RecordingPen()
+    glyph_set[NOTDEF].draw(rec_pen)
+    if rec_pen.value:
+        raise ValueError("The .notdef glyph is not empty")
 
     os_2_table = OS2Table(ttfont=font.ttfont)
     head_table = HeadTable(ttfont=font.ttfont)

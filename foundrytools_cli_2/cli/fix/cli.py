@@ -70,7 +70,7 @@ def fix_duplicate_components(input_path: Path, **options: t.Dict[str, t.Any]) ->
     runner.run()
 
 
-@cli.command("notdef-empty")
+@cli.command("empty-notdef")
 @base_options()
 def fix_empty_notdef(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
@@ -81,7 +81,7 @@ def fix_empty_notdef(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     an outline as the user will only see what looks like a space if a glyph is missing and not be
     aware of the active font’s limitation.
     """
-    from foundrytools_cli_2.cli.fix.tasks.empty_notdef import fix_notdef_empty as task
+    from foundrytools_cli_2.cli.fix.tasks.empty_notdef import fix_empty_notdef as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()

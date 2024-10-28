@@ -9,7 +9,7 @@ from fontTools.pens.t2CharStringPen import T2CharStringPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables import _g_l_y_f, _h_m_t_x
-from fontTools.ttLib.ttGlyphSet import _TTGlyph, _TTGlyphSet
+from fontTools.ttLib.ttGlyphSet import _TTGlyph
 
 from foundrytools_cli_2.lib.constants import T_CFF, T_GLYF, T_HMTX
 
@@ -452,19 +452,3 @@ def correct_glyphs_contours(
         )
 
     return modified_glyphs
-
-
-def is_empty_glyph(glyph_set: _TTGlyphSet, glyph_name: str) -> bool:
-    """
-    Returns True if the glyph is empty.
-
-    Args:
-        glyph_set (_TTGlyphSet): The glyph set.
-        glyph_name (str): The name of the glyph.
-
-    Returns:
-        bool: ``True`` if the glyph is empty, ``False`` otherwise.
-    """
-
-    path = skia_path_from_glyph(glyph_name=glyph_name, glyph_set=glyph_set)
-    return path.area == 0
