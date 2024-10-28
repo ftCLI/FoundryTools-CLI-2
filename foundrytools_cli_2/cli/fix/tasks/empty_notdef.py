@@ -87,7 +87,7 @@ def draw_empty_notdef_glyf(font: Font, width: int, height: int, thickness: int) 
     return pen.glyph()
 
 
-def fix_notdef_empty(font: Font) -> None:
+def fix_empty_notdef(font: Font) -> None:
     """
     Fixes the empty .notdef glyph by adding a simple rectangle.
 
