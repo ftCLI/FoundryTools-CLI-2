@@ -9,6 +9,7 @@ from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.pens.statisticsPen import StatisticsPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
+from fontTools.subset import Options, Subsetter
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import Axis, NamedInstance
@@ -22,6 +23,7 @@ from foundrytools_cli_2.lib.constants import (
     MIN_UPM,
     OTF_EXTENSION,
     PS_SFNT_VERSION,
+    SUBSETTER_DEFAULTS,
     T_CFF,
     T_CMAP,
     T_FVAR,
@@ -1003,16 +1005,7 @@ class Font:  # pylint: disable=too-many-public-methods
 
     def set_production_names(self) -> t.List[t.Tuple[str, str]]:
         """
-
-        Set the production names for the glyphs in the TrueType font.
-
-        Returns a list of tuples containing the original glyph name and its corresponding
-        production name.
-
-        - `old_glyph_order`: A list of strings representing the original glyph order in the
-        underlying TTFont object.
-        - `reversed_cmap`: An instance of `_ReversedCmap` representing  the reversed cmap table of
-        the TrueType font.
+        Set the production names for the glyphs in the font.
 
         Returns:
             A list of tuples, where each tuple contains the original glyph name and its production
@@ -1021,9 +1014,9 @@ class Font:  # pylint: disable=too-many-public-methods
         The method iterates through each glyph in the old glyph order and determines its production
         name based on its assigned or calculated Unicode value. If the production name is already
         assigned, the glyph is skipped. If the production name is different from the original glyph
-        name and is not already assigned, the glyph is renamed and added to the new glyph order
-        list. Finally, the font is updated with the new glyph order, the cmap table is rebuilt, and
-        the list of renamed glyphs is returned.
+        name and is not yet assigned, the glyph is renamed and added to the new glyph order list.
+        Finally, the font is updated with the new glyph order, the cmap table is rebuilt, and the
+        list of renamed glyphs is returned.
         """
         old_glyph_order: t.List[str] = self.ttfont.getGlyphOrder()
         reversed_cmap: _ReversedCmap = self.ttfont[T_CMAP].buildReversed()
@@ -1119,3 +1112,27 @@ class Font:  # pylint: disable=too-many-public-methods
             charstrings = cff_table.charstrings.charStrings
             cff_table.top_dict.charset = new_glyph_order
             cff_table.charstrings.charStrings = {k: charstrings.get(k) for k in new_glyph_order}
+
+    def remove_unreachable_glyphs(self, recalc_timestamp: bool = False) -> t.Set[str]:
+        """
+        Remove glyphs that are not reachable by Unicode values or by substitution rules in the font.
+
+        Args:
+            recalc_timestamp (bool): Boolean flag indicating whether timestamps should be
+            recalculated. Defaults to False.
+
+        Returns:
+            Set[str]: A set of strings representing the glyphs that were removed.
+        """
+        options = Options(**SUBSETTER_DEFAULTS)
+        options.recalc_timestamp = recalc_timestamp
+        old_glyph_order = self.ttfont.getGlyphOrder()
+        unicodes = set()
+        for table in self.ttfont[T_CMAP].tables:
+            unicodes.update(table.cmap.keys())
+        subsetter = Subsetter(options=options)
+        subsetter.populate(unicodes=unicodes)
+        subsetter.subset(self.ttfont)
+        new_glyph_order = self.ttfont.getGlyphOrder()
+
+        return set(old_glyph_order) - set(new_glyph_order)
