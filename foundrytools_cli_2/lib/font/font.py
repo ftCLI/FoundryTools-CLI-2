@@ -1003,16 +1003,7 @@ class Font:  # pylint: disable=too-many-public-methods
 
     def set_production_names(self) -> t.List[t.Tuple[str, str]]:
         """
-
-        Set the production names for the glyphs in the TrueType font.
-
-        Returns a list of tuples containing the original glyph name and its corresponding
-        production name.
-
-        - `old_glyph_order`: A list of strings representing the original glyph order in the
-        underlying TTFont object.
-        - `reversed_cmap`: An instance of `_ReversedCmap` representing  the reversed cmap table of
-        the TrueType font.
+        Set the production names for the glyphs in the font.
 
         Returns:
             A list of tuples, where each tuple contains the original glyph name and its production
@@ -1021,9 +1012,9 @@ class Font:  # pylint: disable=too-many-public-methods
         The method iterates through each glyph in the old glyph order and determines its production
         name based on its assigned or calculated Unicode value. If the production name is already
         assigned, the glyph is skipped. If the production name is different from the original glyph
-        name and is not already assigned, the glyph is renamed and added to the new glyph order
-        list. Finally, the font is updated with the new glyph order, the cmap table is rebuilt, and
-        the list of renamed glyphs is returned.
+        name and is not yet assigned, the glyph is renamed and added to the new glyph order list.
+        Finally, the font is updated with the new glyph order, the cmap table is rebuilt, and the
+        list of renamed glyphs is returned.
         """
         old_glyph_order: t.List[str] = self.ttfont.getGlyphOrder()
         reversed_cmap: _ReversedCmap = self.ttfont[T_CMAP].buildReversed()
