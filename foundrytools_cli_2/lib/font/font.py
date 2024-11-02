@@ -9,6 +9,7 @@ from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.pens.statisticsPen import StatisticsPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
+from fontTools.subset import Options, Subsetter
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import Axis, NamedInstance
@@ -22,6 +23,7 @@ from foundrytools_cli_2.lib.constants import (
     MIN_UPM,
     OTF_EXTENSION,
     PS_SFNT_VERSION,
+    SUBSETTER_DEFAULTS,
     T_CFF,
     T_CMAP,
     T_FVAR,
@@ -1110,3 +1112,27 @@ class Font:  # pylint: disable=too-many-public-methods
             charstrings = cff_table.charstrings.charStrings
             cff_table.top_dict.charset = new_glyph_order
             cff_table.charstrings.charStrings = {k: charstrings.get(k) for k in new_glyph_order}
+
+    def remove_unreachable_glyphs(self, recalc_timestamp: bool = False) -> t.Set[str]:
+        """
+        Remove glyphs that are not reachable by Unicode values or by substitution rules in the font.
+
+        Args:
+            recalc_timestamp (bool): Boolean flag indicating whether timestamps should be
+            recalculated. Defaults to False.
+
+        Returns:
+            Set[str]: A set of strings representing the glyphs that were removed.
+        """
+        options = Options(**SUBSETTER_DEFAULTS)
+        options.recalc_timestamp = recalc_timestamp
+        old_glyph_order = self.ttfont.getGlyphOrder()
+        unicodes = set()
+        for table in self.ttfont[T_CMAP].tables:
+            unicodes.update(table.cmap.keys())
+        subsetter = Subsetter(options=options)
+        subsetter.populate(unicodes=unicodes)
+        subsetter.subset(self.ttfont)
+        new_glyph_order = self.ttfont.getGlyphOrder()
+
+        return set(old_glyph_order) - set(new_glyph_order)
