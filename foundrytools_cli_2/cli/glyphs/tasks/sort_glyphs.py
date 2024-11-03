@@ -41,4 +41,4 @@ def main(
     if new_glyph_order == original_glyph_order:
         return
     font.sort_glyphs(new_glyph_order=new_glyph_order)
-    font.modified = True
+    font.is_modified = True

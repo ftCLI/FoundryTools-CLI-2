@@ -1,3 +1,5 @@
+import typing as t
+
 from fontTools.ttLib import TTFont
 
 from foundrytools_cli_2.lib.constants import T_CMAP
@@ -14,6 +16,16 @@ class CmapTable(DefaultTbl):  # pylint: disable=too-few-public-methods
         Initializes the ``cmap`` table handler.
         """
         super().__init__(ttfont=ttfont, table_tag=T_CMAP)
+
+    def get_codepoints(self) -> t.Set[int]:
+        """
+        Returns all the codepoints in the cmap table.
+        """
+        codepoints = set()
+        for table in self.table.tables:
+            if table.isUnicode():
+                codepoints.update(table.cmap.keys())
+        return codepoints
 
     def add_missing_non_breaking_space(self) -> None:
         """

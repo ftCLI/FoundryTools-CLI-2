@@ -13,9 +13,9 @@ def main(font: Font) -> None:
     # If the font is not bold or italic, set it to regular
     if not (font.is_bold or font.is_italic or font.is_regular):
         font.is_regular = True
-        font.modified = True
+        font.is_modified = True
 
     # If the font is bold or italic, set it to not regular
     elif (font.is_bold or font.is_italic) and font.is_regular:
         font.is_regular = False
-        font.modified = True
+        font.is_modified = True

@@ -39,4 +39,4 @@ def main(font: Font, remap_all: bool = False) -> None:
     cmap_table = font.ttfont["cmap"]
     result = font.rebuild_cmap(remap_all=remap_all)
     print_results(**result)
-    font.modified = font.ttfont["cmap"].compile(font.ttfont) != cmap_table.compile(font.ttfont)
+    font.is_modified = font.ttfont["cmap"].compile(font.ttfont) != cmap_table.compile(font.ttfont)

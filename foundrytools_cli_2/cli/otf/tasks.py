@@ -18,7 +18,7 @@ def add_extremes(font: Font, drop_hinting_data: bool = False, subroutinize: bool
     if subroutinize:
         logger.info("Subroutinizing")
         font.ps_subroutinize()
-    font.modified = True
+    font.is_modified = True
 
 
 def autohint(font: Font, subroutinize: bool = True, **kwargs: t.Dict[str, t.Any]) -> None:
@@ -35,7 +35,7 @@ def autohint(font: Font, subroutinize: bool = True, **kwargs: t.Dict[str, t.Any]
         font.reload()  # DO NOT REMOVE
         logger.info("Subroutinizing")
         font.ps_subroutinize()
-    font.modified = True
+    font.is_modified = True
 
 
 def dehint(font: Font, drop_hinting_data: bool = False, subroutinize: bool = True) -> None:
@@ -52,7 +52,7 @@ def dehint(font: Font, drop_hinting_data: bool = False, subroutinize: bool = Tru
     if subroutinize:
         logger.info("Subroutinizing")
         font.ps_subroutinize()
-    font.modified = True
+    font.is_modified = True
 
 
 def check_outlines(font: Font, subroutinize: bool = True) -> None:
@@ -68,7 +68,7 @@ def check_outlines(font: Font, subroutinize: bool = True) -> None:
     if subroutinize:
         logger.info("Subroutinizing")
         font.ps_subroutinize()
-    font.modified = True
+    font.is_modified = True
 
 
 def round_coordinates(font: Font, subroutinize: bool = True) -> None:
@@ -84,7 +84,7 @@ def round_coordinates(font: Font, subroutinize: bool = True) -> None:
     if not result:
         return
 
-    font.modified = True
+    font.is_modified = True
     logger.info(f"{len(result)} glyphs were modified")
 
     if subroutinize:

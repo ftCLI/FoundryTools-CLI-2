@@ -25,4 +25,4 @@ def main(font: Font, source_file: Path) -> None:
     result = font.rename_glyphs(new_glyph_order=new_glyph_order)
     if result:
         font.rebuild_cmap(remap_all=True)
-        font.modified = True
+        font.is_modified = True

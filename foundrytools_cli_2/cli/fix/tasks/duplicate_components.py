@@ -11,4 +11,4 @@ def main(font: Font) -> None:
         logger.info(
             f"Removed duplicate components in the following glyphs: {', '.join(fixed_glyphs)}"
         )
-        font.modified = True
+        font.is_modified = True

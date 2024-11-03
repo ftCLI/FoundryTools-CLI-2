@@ -47,7 +47,7 @@ def check_post_table(font: Font, calculated_italic_angle: int) -> None:
     if check_passed:
         return
     post_table.italic_angle = calculated_italic_angle
-    font.modified = True
+    font.is_modified = True
 
 
 def check_hhea_table(font: Font, calculated_italic_angle: int) -> None:
@@ -73,7 +73,7 @@ def check_hhea_table(font: Font, calculated_italic_angle: int) -> None:
         return
     hhea_table.caret_slope_rise = calculated_rise
     hhea_table.caret_slope_run = calculated_run
-    font.modified = True
+    font.is_modified = True
 
 
 def check_cff_table(font: Font, calculated_italic_angle: int) -> None:
@@ -96,7 +96,7 @@ def check_cff_table(font: Font, calculated_italic_angle: int) -> None:
     if check_passed:
         return
     cff_table.top_dict.ItalicAngle = calculated_italic_angle
-    font.modified = True
+    font.is_modified = True
 
 
 def check_italic_bits(font: Font, calculated_italic_angle: int, mode: int) -> None:
@@ -122,7 +122,7 @@ def check_italic_bits(font: Font, calculated_italic_angle: int, mode: int) -> No
     if check_passed:
         return
     font.is_italic = should_be_italic
-    font.modified = True
+    font.is_modified = True
 
 
 def check_oblique_bit(font: Font, calculated_italic_angle: int, mode: int) -> None:
@@ -148,7 +148,7 @@ def check_oblique_bit(font: Font, calculated_italic_angle: int, mode: int) -> No
     if check_passed:
         return
     font.is_oblique = should_be_oblique
-    font.modified = True
+    font.is_modified = True
 
 
 def main(font: Font, min_slant: float = 2.0, mode: int = 1) -> None:

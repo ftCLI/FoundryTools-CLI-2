@@ -26,7 +26,7 @@ def del_names(
     name_table.remove_names(
         name_ids=name_ids_to_process, platform_id=platform_id, language_string=language_string
     )
-    font.modified = name_table.modified
+    font.is_modified = name_table.is_modified
 
 
 def del_empty_names(font: Font) -> None:
@@ -39,7 +39,7 @@ def del_empty_names(font: Font) -> None:
 
     name_table = NameTable(ttfont=font.ttfont)
     name_table.remove_empty_names()
-    font.modified = name_table.modified
+    font.is_modified = name_table.is_modified
 
 
 def del_mac_names(
@@ -61,7 +61,7 @@ def del_mac_names(
     if not delete_all:
         name_ids_to_delete.difference_update({1, 2, 4, 5, 6})
     name_table.remove_names(name_ids=name_ids_to_delete, platform_id=1)
-    font.modified = name_table.modified
+    font.is_modified = name_table.is_modified
 
 
 def del_unused_names(font: Font) -> None:
@@ -74,7 +74,7 @@ def del_unused_names(font: Font) -> None:
 
     name_table = NameTable(ttfont=font.ttfont)
     name_table.table.removeUnusedNames(font.ttfont)
-    font.modified = name_table.modified
+    font.is_modified = name_table.is_modified
 
 
 def find_replace(
@@ -104,7 +104,7 @@ def find_replace(
         name_ids_to_process=name_ids_to_process,
         name_ids_to_skip=name_ids_to_skip,
     )
-    font.modified = name_table.modified
+    font.is_modified = name_table.is_modified
 
 
 def set_name(
@@ -132,7 +132,7 @@ def set_name(
         platform_id=platform_id,
         language_string=language_string,
     )
-    font.modified = name_table.modified
+    font.is_modified = name_table.is_modified
 
 
 def strip_names(font: Font) -> None:
@@ -144,7 +144,7 @@ def strip_names(font: Font) -> None:
     """
     name_table = NameTable(ttfont=font.ttfont)
     name_table.strip_names()
-    font.modified = name_table.modified
+    font.is_modified = name_table.is_modified
 
 
 def build_unique_id(
@@ -161,7 +161,7 @@ def build_unique_id(
 
     name_table = NameTable(ttfont=font.ttfont)
     name_table.build_unique_identifier(platform_id=platform_id, alternate=alternate)
-    font.modified = name_table.modified
+    font.is_modified = name_table.is_modified
 
 
 def build_full_font_name(font: Font, platform_id: t.Optional[int] = None) -> None:
@@ -175,7 +175,7 @@ def build_full_font_name(font: Font, platform_id: t.Optional[int] = None) -> Non
 
     name_table = NameTable(ttfont=font.ttfont)
     name_table.build_full_font_name(platform_id=platform_id)
-    font.modified = name_table.modified
+    font.is_modified = name_table.is_modified
 
 
 def build_version_string(font: Font, platform_id: t.Optional[int] = None) -> None:
@@ -189,7 +189,7 @@ def build_version_string(font: Font, platform_id: t.Optional[int] = None) -> Non
 
     name_table = NameTable(ttfont=font.ttfont)
     name_table.build_version_string(platform_id=platform_id)
-    font.modified = name_table.modified
+    font.is_modified = name_table.is_modified
 
 
 def build_postscript_name(font: Font, platform_id: t.Optional[int] = None) -> None:
@@ -204,7 +204,7 @@ def build_postscript_name(font: Font, platform_id: t.Optional[int] = None) -> No
 
     name_table = NameTable(ttfont=font.ttfont)
     name_table.build_postscript_name(platform_id=platform_id)
-    font.modified = name_table.modified
+    font.is_modified = name_table.is_modified
 
 
 def build_mac_names(font: Font) -> None:
@@ -217,4 +217,4 @@ def build_mac_names(font: Font) -> None:
 
     name_table = NameTable(ttfont=font.ttfont)
     name_table.build_mac_names()
-    font.modified = name_table.modified
+    font.is_modified = name_table.is_modified

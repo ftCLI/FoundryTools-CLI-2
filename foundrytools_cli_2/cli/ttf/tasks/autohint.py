@@ -27,4 +27,4 @@ def ttf_autohint(font: Font) -> None:
         hinted_font.flavor = flavor
         hinted_font[T_HEAD].modified = font.ttfont[T_HEAD].modified
         font.ttfont = hinted_font
-        font.modified = True
+        font.is_modified = True

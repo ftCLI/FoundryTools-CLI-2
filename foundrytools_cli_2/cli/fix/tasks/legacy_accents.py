@@ -54,4 +54,4 @@ def fix_legacy_accents(font: Font) -> None:
             logger.info(
                 f"Deleted {len(deleted)} legacy accents from GDEF table: {', '.join(deleted)}"
             )
-        font.modified = gdef.modified
+        font.is_modified = gdef.is_modified

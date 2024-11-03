@@ -21,7 +21,7 @@ def main(font: Font, old_feature_name: str, new_feature_name: str) -> None:
         for feature_record in gsub.table.table.FeatureList.FeatureRecord:
             if feature_record.FeatureTag == old_feature_name:
                 feature_record.FeatureTag = new_feature_name
-                font.modified = True
+                font.is_modified = True
         return
 
     logger.info(f"GSUB feature '{old_feature_name}' not found")

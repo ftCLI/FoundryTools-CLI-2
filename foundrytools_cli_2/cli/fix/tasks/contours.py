@@ -34,5 +34,5 @@ def main(
         logger.info("No glyphs were modified")
         return
 
-    font.modified = True
+    font.is_modified = True
     logger.info(f"{len(modified_glyphs)} glyphs were modified: {', '.join(modified_glyphs)}")

@@ -168,4 +168,4 @@ def main(font: Font) -> None:
     else:
         set_font_stems(font.ttfont, std_h_w, std_v_w)
         font.ttfont.flavor = flavor
-        font.modified = True
+        font.is_modified = True

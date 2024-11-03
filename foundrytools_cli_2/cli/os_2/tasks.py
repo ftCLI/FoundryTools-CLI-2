@@ -15,7 +15,7 @@ def recalc_avg_char_width(font: Font) -> None:
 
     os_2_table = OS2Table(font.ttfont)
     os_2_table.recalc_avg_char_width()
-    font.modified = os_2_table.modified
+    font.is_modified = os_2_table.is_modified
 
 
 def recalc_cap_height(font: Font) -> None:
@@ -28,7 +28,7 @@ def recalc_cap_height(font: Font) -> None:
 
     os_2_table = OS2Table(font.ttfont)
     os_2_table.recalc_cap_height()
-    font.modified = os_2_table.modified
+    font.is_modified = os_2_table.is_modified
 
 
 def recalc_x_height(font: Font) -> None:
@@ -41,7 +41,7 @@ def recalc_x_height(font: Font) -> None:
 
     os_2_table = OS2Table(font.ttfont)
     os_2_table.recalc_x_height()
-    font.modified = os_2_table.modified
+    font.is_modified = os_2_table.is_modified
 
 
 def recalc_max_context(font: Font) -> None:
@@ -54,7 +54,7 @@ def recalc_max_context(font: Font) -> None:
 
     os_2_table = OS2Table(font.ttfont)
     os_2_table.recalc_max_context()
-    font.modified = os_2_table.modified
+    font.is_modified = os_2_table.is_modified
 
 
 def recalc_unicode_ranges(font: Font, percentage: float = 33) -> None:
@@ -72,7 +72,7 @@ def recalc_unicode_ranges(font: Font, percentage: float = 33) -> None:
     if result:
         for block in result:
             logger.info(f"({block[0]}) {block[1]}: {block[2]}")
-        font.modified = True
+        font.is_modified = True
 
 
 def recalc_codepage_ranges(font: Font) -> None:
@@ -85,7 +85,7 @@ def recalc_codepage_ranges(font: Font) -> None:
 
     os_2_table = OS2Table(font.ttfont)
     os_2_table.recalc_code_page_ranges()
-    font.modified = os_2_table.modified
+    font.is_modified = os_2_table.is_modified
 
 
 def set_attrs(
@@ -138,7 +138,7 @@ def set_attrs(
                 setattr(os_2_table, attr, value)
             except (ValueError, os_2_table.InvalidOS2VersionError) as e:
                 logger.error(f"Error setting {attr} to {value}: {e}")
-    font.modified = os_2_table.modified
+    font.is_modified = os_2_table.is_modified
 
 
 def set_fs_selection(
@@ -183,7 +183,7 @@ def set_fs_selection(
         os_2_table.fs_selection.oblique = oblique
     # IMPORTANT: head_table.modified must be evaluated before os_2_table.modified to suppress
     # fontTools warning about non-matching bits.
-    font.modified = head_table.modified or os_2_table.modified
+    font.is_modified = head_table.is_modified or os_2_table.is_modified
 
 
 def set_fs_type(
@@ -211,7 +211,7 @@ def set_fs_type(
     for attr, value in attrs.items():
         if value is not None:
             setattr(os_2_table, attr, value)
-    font.modified = os_2_table.modified
+    font.is_modified = os_2_table.is_modified
 
 
 def upgrade_version(font: Font, target_version: int) -> None:
@@ -225,7 +225,7 @@ def upgrade_version(font: Font, target_version: int) -> None:
 
     os_2_table = OS2Table(font.ttfont)
     os_2_table.upgrade(target_version)
-    font.modified = os_2_table.modified
+    font.is_modified = os_2_table.is_modified
 
 
 def set_panose(font: Font, **kwargs: t.Dict[str, int]) -> None:
@@ -240,4 +240,4 @@ def set_panose(font: Font, **kwargs: t.Dict[str, int]) -> None:
     for key, value in kwargs.items():
         if value is not None:
             setattr(os_2_table.table.panose, key, value)
-    font.modified = os_2_table.modified
+    font.is_modified = os_2_table.is_modified

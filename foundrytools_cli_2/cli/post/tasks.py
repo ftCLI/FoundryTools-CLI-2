@@ -39,4 +39,4 @@ def set_attrs(
             old_value = getattr(post_table, attr)
             logger.info(f"{attr}: {old_value} -> {value}")
             setattr(post_table, attr, value)
-    font.modified = post_table.modified
+    font.is_modified = post_table.is_modified

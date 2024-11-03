@@ -166,7 +166,7 @@ class TaskRunner:  # pylint: disable=too-few-public-methods
             self._save_font_to_file(font)
 
     def _font_should_be_saved(self, font: Font) -> bool:
-        return (self.save_if_modified and font.modified) or self.force_modified
+        return (self.save_if_modified and font.is_modified) or self.force_modified
 
     def _save_font_to_file(self, font: Font) -> None:
         try:

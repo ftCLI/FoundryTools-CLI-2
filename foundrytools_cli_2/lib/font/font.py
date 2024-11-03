@@ -37,6 +37,7 @@ from foundrytools_cli_2.lib.constants import (
     WOFF_FLAVOR,
 )
 from foundrytools_cli_2.lib.font.tables import CFFTable, HeadTable, NameTable, OS2Table
+from foundrytools_cli_2.lib.font.tables.cmap import CmapTable
 from foundrytools_cli_2.lib.otf.otf_autohint import hint_font
 from foundrytools_cli_2.lib.otf.otf_builder import build_otf
 from foundrytools_cli_2.lib.otf.t2_charstrings import quadratics_to_cubics, round_coordinates
@@ -217,7 +218,7 @@ class Font:  # pylint: disable=too-many-public-methods
         return self._temp_file
 
     @property
-    def modified(self) -> bool:
+    def is_modified(self) -> bool:
         """
         Check if the font has been modified.
 
@@ -226,8 +227,8 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         return self._modified
 
-    @modified.setter
-    def modified(self, value: bool) -> None:
+    @is_modified.setter
+    def is_modified(self, value: bool) -> None:
         """
         Set the modified flag of the font.
 
@@ -803,7 +804,7 @@ class Font:  # pylint: disable=too-many-public-methods
 
     def tt_scale_upem(self, target_upm: int) -> None:
         """
-        Scale the font's Units Per Em (UPM).
+        Scale the Units Per Em (UPM) of a TrueType font.
 
         Args:
             target_upm (int): The new units per em value. Must be in the range 16 to 16384.
@@ -960,7 +961,7 @@ class Font:  # pylint: disable=too-many-public-methods
 
     def ps_round_coordinates(self) -> t.Set[str]:
         """
-        Round the coordinates of the outlines of a PostScript font.
+        Round the outlines coordinates of a PostScript font.
         """
         if not self.is_ps:
             raise NotImplementedError(
@@ -1113,7 +1114,7 @@ class Font:  # pylint: disable=too-many-public-methods
             cff_table.top_dict.charset = new_glyph_order
             cff_table.charstrings.charStrings = {k: charstrings.get(k) for k in new_glyph_order}
 
-    def remove_unreachable_glyphs(self, recalc_timestamp: bool = False) -> t.Set[str]:
+    def remove_unused_glyphs(self, recalc_timestamp: bool = False) -> t.Set[str]:
         """
         Remove glyphs that are not reachable by Unicode values or by substitution rules in the font.
 
@@ -1127,9 +1128,8 @@ class Font:  # pylint: disable=too-many-public-methods
         options = Options(**SUBSETTER_DEFAULTS)
         options.recalc_timestamp = recalc_timestamp
         old_glyph_order = self.ttfont.getGlyphOrder()
-        unicodes = set()
-        for table in self.ttfont[T_CMAP].tables:
-            unicodes.update(table.cmap.keys())
+        cmap_table = CmapTable(self.ttfont)
+        unicodes = cmap_table.get_codepoints()
         subsetter = Subsetter(options=options)
         subsetter.populate(unicodes=unicodes)
         subsetter.subset(self.ttfont)

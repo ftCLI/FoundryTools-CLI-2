@@ -15,7 +15,7 @@ def set_names(font: Font, **kwargs: t.Dict[str, str]) -> None:
 
     cff_table = CFFTable(font.ttfont)
     cff_table.set_names(**kwargs)
-    font.modified = cff_table.modified
+    font.is_modified = cff_table.is_modified
 
 
 def del_names(font: Font, **kwargs: t.Dict[str, str]) -> None:
@@ -29,7 +29,7 @@ def del_names(font: Font, **kwargs: t.Dict[str, str]) -> None:
 
     cff_table = CFFTable(font.ttfont)
     cff_table.del_names(**kwargs)
-    font.modified = cff_table.modified
+    font.is_modified = cff_table.is_modified
 
 
 def find_replace(font: Font, old_string: str, new_string: str) -> None:
@@ -44,4 +44,4 @@ def find_replace(font: Font, old_string: str, new_string: str) -> None:
 
     cff_table = CFFTable(font.ttfont)
     cff_table.find_replace(old_string, new_string)
-    font.modified = cff_table.modified
+    font.is_modified = cff_table.is_modified

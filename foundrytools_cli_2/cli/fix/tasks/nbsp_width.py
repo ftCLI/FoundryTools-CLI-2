@@ -8,4 +8,4 @@ def main(font: Font) -> None:
     """
     hmtx_table = HmtxTable(ttfont=font.ttfont)
     hmtx_table.fix_non_breaking_space_width()
-    font.modified = hmtx_table.modified
+    font.is_modified = hmtx_table.is_modified

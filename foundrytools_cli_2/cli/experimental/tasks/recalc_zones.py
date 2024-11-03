@@ -316,4 +316,4 @@ def main(font: Font) -> None:
         logger.info("Zones are already up-to-date")
     else:
         set_font_zones(font.ttfont, other_blues, blue_values)
-        font.modified = True
+        font.is_modified = True

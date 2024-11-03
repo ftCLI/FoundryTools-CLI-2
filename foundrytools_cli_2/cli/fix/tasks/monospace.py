@@ -23,11 +23,11 @@ def main(font: Font) -> None:
         os2_table.table.panose.bProportion = 9
         hhea_table.advance_width_max = width_max
 
-        modified = os2_table.modified or post_table.modified or hhea_table.modified
+        modified = os2_table.is_modified or post_table.is_modified or hhea_table.is_modified
 
         if font.is_ps:
             cff_table = CFFTable(ttfont=font.ttfont)
             cff_table.top_dict.isFixedPitch = True
-            modified = cff_table.modified or modified
+            modified = cff_table.is_modified or modified
 
-        font.modified = modified
+        font.is_modified = modified
