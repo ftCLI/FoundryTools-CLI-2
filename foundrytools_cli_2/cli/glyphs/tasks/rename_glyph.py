@@ -12,4 +12,4 @@ def main(font: Font, old_name: str, new_name: str) -> None:
     """
     result = font.rename_glyph(old_name=old_name, new_name=new_name)
     if result:
-        font.modified = True
+        font.is_modified = True

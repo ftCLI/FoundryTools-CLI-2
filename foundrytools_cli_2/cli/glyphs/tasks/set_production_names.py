@@ -25,4 +25,4 @@ def main(font: Font) -> None:
     renamed_glyphs = font.set_production_names()
     if renamed_glyphs:
         _print_results(renamed_glyphs)
-        font.modified = True
+        font.is_modified = True

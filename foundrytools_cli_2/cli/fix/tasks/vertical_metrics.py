@@ -28,4 +28,4 @@ def main(font: Font, safe_bottom: int, safe_top: int) -> None:
     if os_table.version >= 4:
         os_table.fs_selection.use_typo_metrics = True
 
-    font.modified = os_table.modified or hhea_table.modified
+    font.is_modified = os_table.is_modified or hhea_table.is_modified

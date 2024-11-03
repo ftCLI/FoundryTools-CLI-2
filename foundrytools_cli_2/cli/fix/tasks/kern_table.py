@@ -11,4 +11,4 @@ def main(font: Font) -> None:
         return
     kern_table = KernTable(ttfont=font.ttfont)
     kern_table.remove_unmapped_glyphs()
-    font.modified = kern_table.modified
+    font.is_modified = kern_table.is_modified

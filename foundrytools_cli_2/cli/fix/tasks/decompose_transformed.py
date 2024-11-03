@@ -11,4 +11,4 @@ def main(font: Font) -> None:
         logger.info(
             f"Decomposed transformed components in the following glyphs: {', '.join(transformed)}"
         )
-        font.modified = True
+        font.is_modified = True

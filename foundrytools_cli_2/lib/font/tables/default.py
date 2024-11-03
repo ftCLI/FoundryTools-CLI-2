@@ -21,7 +21,7 @@ class DefaultTbl:
         self.table_copy = deepcopy(self.table)
 
     @property
-    def modified(self) -> bool:
+    def is_modified(self) -> bool:
         """
         Returns the modified status of the ``OS/2`` table by comparing it with the original table.
         """

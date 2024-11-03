@@ -125,4 +125,4 @@ def fix_empty_notdef(font: Font) -> None:
         glyf_table.table[NOTDEF] = glyph
 
     font.ttfont[T_HMTX][NOTDEF] = (width, 0)
-    font.modified = True
+    font.is_modified = True

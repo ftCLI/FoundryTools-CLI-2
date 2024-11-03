@@ -218,7 +218,7 @@ class Font:  # pylint: disable=too-many-public-methods
         return self._temp_file
 
     @property
-    def modified(self) -> bool:
+    def is_modified(self) -> bool:
         """
         Check if the font has been modified.
 
@@ -227,8 +227,8 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         return self._modified
 
-    @modified.setter
-    def modified(self, value: bool) -> None:
+    @is_modified.setter
+    def is_modified(self, value: bool) -> None:
         """
         Set the modified flag of the font.
 

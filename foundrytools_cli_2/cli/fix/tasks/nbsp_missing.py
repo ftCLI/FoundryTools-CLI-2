@@ -8,4 +8,4 @@ def main(font: Font) -> None:
     """
     cmap_table = CmapTable(ttfont=font.ttfont)
     cmap_table.add_missing_non_breaking_space()
-    font.modified = cmap_table.modified
+    font.is_modified = cmap_table.is_modified

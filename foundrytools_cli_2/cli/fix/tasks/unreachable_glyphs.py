@@ -16,4 +16,4 @@ def main(font: Font, recalc_timestamp: bool = False) -> None:
 
     if removed_glyphs:
         logger.info(f"Removed {len(removed_glyphs)} unreachable glyphs")
-        font.modified = True
+        font.is_modified = True
