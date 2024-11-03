@@ -12,7 +12,7 @@ def main(font: Font, recalc_timestamp: bool = False) -> None:
     Returns:
         None
     """
-    removed_glyphs = font.remove_unreachable_glyphs(recalc_timestamp=recalc_timestamp)
+    removed_glyphs = font.remove_unused_glyphs(recalc_timestamp=recalc_timestamp)
 
     if removed_glyphs:
         logger.info(f"Removed {len(removed_glyphs)} unreachable glyphs")
