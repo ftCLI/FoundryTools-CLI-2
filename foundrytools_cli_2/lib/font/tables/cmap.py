@@ -27,7 +27,7 @@ class CmapTable(DefaultTbl):  # pylint: disable=too-few-public-methods
                 codepoints.update(table.cmap.keys())
         return codepoints
 
-    def add_missing_non_breaking_space(self) -> None:
+    def add_missing_nbsp(self) -> None:
         """
         Fixes the missing non-breaking space glyph by double mapping the space glyph.
         """
