@@ -1134,8 +1134,6 @@ class Font:  # pylint: disable=too-many-public-methods
             cff_table.top_dict.charset = new_glyph_order
             cff_table.charstrings.charStrings = {k: charstrings.get(k) for k in new_glyph_order}
 
-        self.rebuild_cmap(remap_all=True)
-
         return True
 
     def remove_unused_glyphs(self, recalc_timestamp: bool = False) -> t.Set[str]:
