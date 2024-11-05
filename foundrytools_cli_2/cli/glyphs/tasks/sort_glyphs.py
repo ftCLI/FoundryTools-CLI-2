@@ -30,15 +30,10 @@ def create_new_glyph_order(
 
 def main(
     font: Font,
-    sort_method: t.Literal["unicode", "alphabetical", "cannedDesign"] = "unicode",
+    sort_by: t.Literal["unicode", "alphabetical", "cannedDesign"] = "unicode",
 ) -> None:
     """
     Reorders the glyphs based on the Unicode values.
     """
-
-    original_glyph_order = font.ttfont.getGlyphOrder()
-    new_glyph_order = create_new_glyph_order(font, sort_method=sort_method)
-    if new_glyph_order == original_glyph_order:
-        return
-    font.sort_glyphs(new_glyph_order=new_glyph_order)
-    font.is_modified = True
+    if font.sort_glyphs(sort_by=sort_by):
+        font.is_modified = True

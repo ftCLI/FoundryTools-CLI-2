@@ -3,8 +3,10 @@ import typing as t
 from io import BytesIO
 from pathlib import Path
 
+import defcon
 from afdko.checkoutlinesufo import run as check_outlines
 from cffsubr import desubroutinize, subroutinize
+from extractor import extractUFO
 from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.pens.statisticsPen import StatisticsPen
@@ -1100,19 +1102,41 @@ class Font:  # pylint: disable=too-many-public-methods
 
         return True
 
-    def sort_glyphs(self, new_glyph_order: t.List[str]) -> None:
+    def sort_glyphs(
+        self,
+        sort_by: t.Literal["unicode", "alphabetical", "cannedDesign"] = "unicode",
+    ) -> bool:
         """
         Reorder the glyphs based on the Unicode values.
 
         Args:
             new_glyph_order (list): The new glyph order.
         """
+        ufo = defcon.Font()
+        extractUFO(self.file, destination=ufo, doFeatures=False, doInfo=False, doKerning=False)
+        old_glyph_order = self.ttfont.getGlyphOrder()
+        new_glyph_order = ufo.unicodeData.sortGlyphNames(
+            glyphNames=old_glyph_order,
+            sortDescriptors=[{"type": sort_by}],
+        )
+
+        if ".notdef" in new_glyph_order:
+            new_glyph_order.remove(".notdef")
+            new_glyph_order.insert(0, ".notdef")
+
+        if old_glyph_order == new_glyph_order:
+            return False
+
         self.ttfont.reorderGlyphs(new_glyph_order=new_glyph_order)
         if self.is_ps:
             cff_table = CFFTable(self.ttfont)
             charstrings = cff_table.charstrings.charStrings
             cff_table.top_dict.charset = new_glyph_order
             cff_table.charstrings.charStrings = {k: charstrings.get(k) for k in new_glyph_order}
+
+        self.rebuild_cmap(remap_all=True)
+
+        return True
 
     def remove_unused_glyphs(self, recalc_timestamp: bool = False) -> t.Set[str]:
         """
