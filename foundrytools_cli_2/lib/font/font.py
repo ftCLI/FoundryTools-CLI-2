@@ -1132,8 +1132,9 @@ class Font:  # pylint: disable=too-many-public-methods
         if self.is_ps:
             cff_table = CFFTable(self.ttfont)
             charstrings = cff_table.charstrings.charStrings
+            sorted_charstrings = {k: charstrings.get(k) for k in new_glyph_order}
             cff_table.top_dict.charset = new_glyph_order
-            cff_table.charstrings.charStrings = {k: charstrings.get(k) for k in new_glyph_order}
+            cff_table.charstrings.charStrings = sorted_charstrings
 
         return True
 
