@@ -1110,7 +1110,8 @@ class Font:  # pylint: disable=too-many-public-methods
         Reorder the glyphs based on the Unicode values.
 
         Args:
-            new_glyph_order (list): The new glyph order.
+            sort_by (str): The sorting method. Can be one of 'unicode', 'alphabetical', or
+            'cannedDesign'.
         """
         ufo = defcon.Font()
         extractUFO(self.file, destination=ufo, doFeatures=False, doInfo=False, doKerning=False)
