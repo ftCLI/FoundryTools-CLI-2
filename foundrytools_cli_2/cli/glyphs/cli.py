@@ -76,8 +76,8 @@ def set_production_names(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
 
 @cli.command("sort")
 @click.option(
-    "-m",
-    "--sort-method",
+    "-by",
+    "--sort-by",
     type=click.Choice(["unicode", "alphabetical", "cannedDesign"]),
     default="unicode",
     show_default=True,

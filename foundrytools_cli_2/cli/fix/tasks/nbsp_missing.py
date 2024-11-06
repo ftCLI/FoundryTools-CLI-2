@@ -7,5 +7,5 @@ def main(font: Font) -> None:
     Fixes the missing non-breaking space glyph by double mapping the space glyph.
     """
     cmap_table = CmapTable(ttfont=font.ttfont)
-    cmap_table.add_missing_non_breaking_space()
+    cmap_table.add_missing_nbsp()
     font.is_modified = cmap_table.is_modified
