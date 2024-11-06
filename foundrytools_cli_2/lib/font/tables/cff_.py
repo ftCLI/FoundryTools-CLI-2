@@ -1,7 +1,7 @@
 import contextlib
 import typing as t
 
-from fontTools.cffLib import CharStrings, PrivateDict, TopDict
+from fontTools.cffLib import PrivateDict, TopDict
 from fontTools.ttLib import TTFont
 
 from foundrytools_cli_2.lib.constants import T_CFF
@@ -32,13 +32,6 @@ class CFFTable(DefaultTbl):
         Returns the private field of the 'CFF ' table.
         """
         return self.top_dict.Private
-
-    @property
-    def charstrings(self) -> CharStrings:
-        """
-        Returns the charStrings field of the 'CFF ' table.
-        """
-        return self.top_dict.CharStrings
 
     def set_names(self, **kwargs: t.Dict[str, str]) -> None:
         """
