@@ -4,6 +4,7 @@ from pathlib import Path
 
 import click
 
+from foundrytools_cli_2.cli.shared_callbacks import tuple_to_set_callback
 from foundrytools_cli_2.cli.shared_options import base_options
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
@@ -22,7 +23,40 @@ def rebuild_cmap(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Rebuild the cmap table of a font. Optionally remap all characters, including those already in
     the cmap table.
     """
-    from foundrytools_cli_2.cli.glyphs.tasks.rebuild_cmap import main as task
+    from foundrytools_cli_2.cli.glyphs.tasks import rebuild_cmap as task
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.run()
+
+
+@cli.command("remove-glyphs")
+@click.option(
+    "-gn",
+    "--glyph-name",
+    "glyph_names_to_remove",
+    type=str,
+    multiple=True,
+    help="The names of the glyphs to remove.",
+    callback=tuple_to_set_callback,
+)
+@click.option(
+    "-gid",
+    "--glyph-id",
+    "glyph_ids_to_remove",
+    type=int,
+    multiple=True,
+    help="The glyph IDs to remove.",
+    callback=tuple_to_set_callback,
+)
+@base_options()
+def remove_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Remove glyphs from a font file.
+    """
+    if not options.get("glyph_names_to_remove") and not options.get("glyph_ids_to_remove"):
+        raise click.UsageError("You must provide at least one glyph name or ID to remove.")
+
+    from foundrytools_cli_2.cli.glyphs.tasks import remove_glyphs as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -36,7 +70,7 @@ def rename_glyph(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Rename a glyph in a font file.
     """
-    from foundrytools_cli_2.cli.glyphs.tasks.rename_glyph import main as task
+    from foundrytools_cli_2.cli.glyphs.tasks import rename_glyph as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.force_modified = True
@@ -56,7 +90,7 @@ def rename_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Rename glyphs in a font file based on the glyph order of another font file.
     """
-    from foundrytools_cli_2.cli.glyphs.tasks.rename_glyphs import main as task
+    from foundrytools_cli_2.cli.glyphs.tasks import rename_glyphs as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -68,7 +102,7 @@ def set_production_names(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     """
     Set the production names of glyphs in a font file.
     """
-    from foundrytools_cli_2.cli.glyphs.tasks.set_production_names import main as task
+    from foundrytools_cli_2.cli.glyphs.tasks import set_production_names as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -95,7 +129,7 @@ def sort_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Sort the glyphs in a font file.
     """
-    from foundrytools_cli_2.cli.glyphs.tasks.sort_glyphs import main as task
+    from foundrytools_cli_2.cli.glyphs.tasks import sort_glyphs as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()

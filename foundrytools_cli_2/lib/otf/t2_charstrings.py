@@ -12,6 +12,7 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.ttGlyphSet import _TTGlyph
 
+from foundrytools_cli_2.lib.constants import T_CFF
 from foundrytools_cli_2.lib.skia.skia_tools import _simplify
 
 __all__ = ["quadratics_to_cubics", "quadratics_to_cubics_2", "round_coordinates"]
@@ -126,7 +127,7 @@ def round_coordinates(font: TTFont) -> t.Set[str]:
     """
     glyph_names: t.List[str] = font.getGlyphOrder()
     glyph_set: _TTGlyphMapping = font.getGlyphSet()
-    cff_font_set: CFFFontSet = font["CFF "].cff
+    cff_font_set: CFFFontSet = font[T_CFF].cff
     charstrings = cff_font_set[0].CharStrings
 
     rounded_charstrings = set()
