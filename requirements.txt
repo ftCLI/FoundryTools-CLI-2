@@ -1,5 +1,5 @@
 fonttools[woff,pathops,unicode]==4.54.1
-afdko==4.0.1
+afdko==4.0.2
 beziers==0.6.0
 cffsubr==0.3.0
 defcon==0.10.3
