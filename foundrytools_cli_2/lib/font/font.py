@@ -1129,12 +1129,14 @@ class Font:  # pylint: disable=too-many-public-methods
             return False
 
         self.ttfont.reorderGlyphs(new_glyph_order=new_glyph_order)
+
         if self.is_ps:
-            cff_table = CFFTable(self.ttfont)
-            charstrings = cff_table.charstrings.charStrings
+            cff_table = self.ttfont[T_CFF]
+            top_dict = cff_table.cff.topDictIndex[0]
+            charstrings = top_dict.CharStrings.charStrings
             sorted_charstrings = {k: charstrings.get(k) for k in new_glyph_order}
-            cff_table.top_dict.charset = new_glyph_order
-            cff_table.charstrings.charStrings = sorted_charstrings
+            top_dict.charset = new_glyph_order
+            top_dict.CharStrings.charStrings = sorted_charstrings
 
         return True
 
