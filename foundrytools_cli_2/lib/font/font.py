@@ -971,7 +971,7 @@ class Font:  # pylint: disable=too-many-public-methods
             )
         return round_coordinates(self.ttfont)
 
-    def rebuild_cmap(self, remap_all: bool = False) -> t.Dict[str, int]:
+    def rebuild_cmap(self, remap_all: bool = False) -> t.List[t.Tuple[int, str]]:
         """
         Rebuild the character map of a font.
 
@@ -981,7 +981,7 @@ class Font:  # pylint: disable=too-many-public-methods
         # rebuild_character_map(font=self.ttfont, remap_all=remap_all)
 
         glyph_order = self.ttfont.getGlyphOrder()
-        mapped, unmapped = get_mapped_and_unmapped_glyphs(ttfont=self.ttfont)
+        _, unmapped = get_mapped_and_unmapped_glyphs(ttfont=self.ttfont)
         if not remap_all:
             target_cmap = self.ttfont.getBestCmap()  # We can also use cmap_from_reversed_cmap
             source_cmap = _cmap_from_glyph_names(glyphs_list=unmapped)
@@ -989,22 +989,12 @@ class Font:  # pylint: disable=too-many-public-methods
             target_cmap = {}
             source_cmap = _cmap_from_glyph_names(glyphs_list=glyph_order)
 
-        updated_cmap, remapped, duplicates = update_character_map(
+        updated_cmap, remapped, _ = update_character_map(
             source_cmap=source_cmap, target_cmap=target_cmap
         )
         setup_character_map(ttfont=self.ttfont, mapping=updated_cmap)
 
-        result = {
-            "total_glyphs": len(glyph_order),
-            "mapped_glyphs": len(mapped),
-            "unmapped_glyphs": len(unmapped),
-            "remapped_glyphs": len(remapped),
-            "skipped_glyphs": len(duplicates),
-            "mapped_glyphs_after": len(get_mapped_and_unmapped_glyphs(ttfont=self.ttfont)[0]),
-            "unmapped_glyphs_after": len(get_mapped_and_unmapped_glyphs(ttfont=self.ttfont)[1]),
-        }
-
-        return result
+        return remapped
 
     def set_production_names(self) -> t.List[t.Tuple[str, str]]:
         """
@@ -1107,7 +1097,7 @@ class Font:  # pylint: disable=too-many-public-methods
         sort_by: t.Literal["unicode", "alphabetical", "cannedDesign"] = "unicode",
     ) -> bool:
         """
-        Reorder the glyphs based on the Unicode values.
+        Reorder the glyphs based on the Unicode values, alphabetical order, or canned design order.
 
         Args:
             sort_by (str): The sorting method. Can be one of 'unicode', 'alphabetical', or
@@ -1121,6 +1111,10 @@ class Font:  # pylint: disable=too-many-public-methods
             sortDescriptors=[{"type": sort_by}],
         )
 
+        # Ensure that the '.notdef' glyph is always the first glyph in the font as required by the
+        # OpenType specification. If the '.notdef' glyph is not the first glyph, compiling the CFF
+        # table will fail.
+        # https://learn.microsoft.com/en-us/typography/opentype/spec/recom#glyph-0-the-notdef-glyph
         if ".notdef" in new_glyph_order:
             new_glyph_order.remove(".notdef")
             new_glyph_order.insert(0, ".notdef")
@@ -1130,6 +1124,7 @@ class Font:  # pylint: disable=too-many-public-methods
 
         self.ttfont.reorderGlyphs(new_glyph_order=new_glyph_order)
 
+        # Remove this block when the new version of fontTools is released.
         if self.is_ps:
             cff_table = self.ttfont[T_CFF]
             top_dict = cff_table.cff.topDictIndex[0]
@@ -1162,3 +1157,45 @@ class Font:  # pylint: disable=too-many-public-methods
         new_glyph_order = self.ttfont.getGlyphOrder()
 
         return set(old_glyph_order) - set(new_glyph_order)
+
+    def remove_glyphs(
+        self,
+        glyph_names_to_remove: t.Optional[t.Set[str]],
+        glyph_ids_to_remove: t.Optional[t.Set[int]],
+    ) -> t.Set[str]:
+        """
+        Removes glyphs from the a font object.
+
+        Args:
+            glyphs_names_to_remove (Optional[Set[str]]): A set of glyph names to remove.
+            glyph_ids_to_remove (Optional[Set[int]]): A set of glyph IDs to remove.
+        Returns:
+            Set[str]: A set of strings representing the glyphs that were removed.
+        """
+
+        old_glyph_order = self.ttfont.getGlyphOrder()
+        if not glyph_names_to_remove and not glyph_ids_to_remove:
+            raise ValueError("No glyph names or glyph IDs provided to remove.")
+
+        glyph_names_to_remove = glyph_names_to_remove or set()
+
+        # Convert glyph IDs to glyph names.
+        if glyph_ids_to_remove:
+            for glyph_id in glyph_ids_to_remove:
+                if glyph_id < 0 or glyph_id >= len(old_glyph_order):
+                    continue
+                glyph_names_to_remove.add(old_glyph_order[glyph_id])
+
+        if not glyph_names_to_remove:
+            return set()
+
+        remaining_glyphs = {gn for gn in old_glyph_order if gn not in glyph_names_to_remove}
+        options = Options(**SUBSETTER_DEFAULTS)
+        options.recalc_timestamp = self.ttfont.recalcTimestamp
+
+        subsetter = Subsetter(options=options)
+        subsetter.populate(glyphs=remaining_glyphs)
+        subsetter.subset(self.ttfont)
+
+        new_glyph_order = self.ttfont.getGlyphOrder()
+        return set(old_glyph_order).difference(new_glyph_order)

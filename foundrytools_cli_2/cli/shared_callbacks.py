@@ -70,6 +70,29 @@ def choice_to_int_callback(
     return _to_int(value)
 
 
+def tuple_to_set_callback(
+    ctx: click.Context, _: click.Parameter, value: t.Tuple[t.Any, ...]
+) -> t.Set[t.Any]:
+    """
+    Callback for click options that accept a tuple. Converts the tuple to a set.
+
+    If the value is None or the click context is resilient, returns None. Otherwise, converts the
+    tuple to a set.
+
+    Args:
+        ctx (click.Context): click Context
+        _: click Parameter
+        value (t.Tuple[t.Any, ...]): The value to convert
+
+    Returns:
+        t.Set[t.Any]: The converted value
+    """
+
+    if not value or ctx.resilient_parsing:
+        return set()
+    return set(value)
+
+
 def validate_params(ctx: click.Context) -> None:
     """
     Checks if any attributes are provided to set, except for the ignored ones.
