@@ -1,7 +1,7 @@
 import typing as t
 
-from foundrytools_cli_2.lib.font.font import Font
-from foundrytools_cli_2.lib.font.tables.cff_ import CFFTable
+from foundrytools_cli_2.lib.font import Font
+from foundrytools_cli_2.lib.tables.cff_ import CFFTable
 
 
 def set_names(font: Font, **kwargs: t.Dict[str, str]) -> None:

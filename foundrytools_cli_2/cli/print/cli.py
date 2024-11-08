@@ -5,8 +5,8 @@ from pathlib import Path
 
 import click
 
-from foundrytools_cli_2.cli.font_finder import FontFinder
 from foundrytools_cli_2.cli.shared_options import input_path_argument
+from foundrytools_cli_2.lib.cli_tools.font_finder import FontFinder
 
 cli = click.Group(help="Prints various font's information.")
 

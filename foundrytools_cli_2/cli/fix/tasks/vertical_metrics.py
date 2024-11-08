@@ -1,5 +1,5 @@
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font.tables import HheaTable, OS2Table
+from foundrytools_cli_2.lib.tables import HheaTable, OS2Table
 
 
 def main(font: Font, safe_bottom: int, safe_top: int) -> None:

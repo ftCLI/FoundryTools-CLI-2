@@ -6,8 +6,8 @@ from pathlib import Path
 
 from fontTools.misc.timeTools import epoch_diff, timestampToString
 
-from foundrytools_cli_2.cli.font_finder import FontFinder
 from foundrytools_cli_2.cli.logger import logger
+from foundrytools_cli_2.lib.cli_tools.font_finder import FontFinder
 from foundrytools_cli_2.lib.constants import T_HEAD
 
 # Placeholder for `setctime`, and `import_error`

@@ -16,7 +16,7 @@ from foundrytools_cli_2.cli.name.options import (
     win_or_mac_platform_id,
 )
 from foundrytools_cli_2.cli.shared_options import base_options, new_string, old_string
-from foundrytools_cli_2.cli.task_runner import TaskRunner
+from foundrytools_cli_2.lib.cli_tools.task_runner import TaskRunner
 
 cli = click.Group(help="Utilities for editing the ``name`` table.")
 

@@ -5,7 +5,7 @@ from fontTools.misc.roundTools import otRound
 from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.lib.constants import T_OS_2
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font.tables import CFFTable, HheaTable, PostTable
+from foundrytools_cli_2.lib.tables import CFFTable, HheaTable, PostTable
 
 
 def log_check_results(check_passed: bool, old: t.Any, new: t.Any, attr_name: str) -> None:

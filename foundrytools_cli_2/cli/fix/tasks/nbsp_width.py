@@ -1,5 +1,5 @@
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font.tables.hmtx import HmtxTable
+from foundrytools_cli_2.lib.tables.hmtx import HmtxTable
 
 
 def main(font: Font) -> None:

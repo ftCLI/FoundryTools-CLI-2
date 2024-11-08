@@ -12,8 +12,8 @@ from foundrytools_cli_2.cli.fix.options import (
     min_area_option,
 )
 from foundrytools_cli_2.cli.shared_options import base_options
-from foundrytools_cli_2.cli.task_runner import TaskRunner
-from foundrytools_cli_2.lib.font.tables import HeadTable
+from foundrytools_cli_2.lib.cli_tools.task_runner import TaskRunner
+from foundrytools_cli_2.lib.tables import HeadTable
 
 cli = click.Group(help="Fix font errors.")
 
@@ -414,7 +414,7 @@ def fix_vertical_metrics(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     Raises:
         ClickException: If no fonts are found in the specified path.
     """
-    from foundrytools_cli_2.cli.font_finder import FontFinder
+    from foundrytools_cli_2.lib.cli_tools.font_finder import FontFinder
 
     fonts = FontFinder(input_path).find_fonts()
     if not fonts:

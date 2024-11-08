@@ -2,9 +2,14 @@ import typing as t
 from dataclasses import dataclass
 from pathlib import Path
 
-from foundrytools_cli_2.cli.font_finder import FinderError, FinderFilter, FinderOptions, FontFinder
 from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.cli.timer import Timer
+from foundrytools_cli_2.lib.cli_tools.font_finder import (
+    FinderError,
+    FinderFilter,
+    FinderOptions,
+    FontFinder,
+)
 from foundrytools_cli_2.lib.font import Font
 
 

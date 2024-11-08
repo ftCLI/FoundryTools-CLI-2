@@ -2,7 +2,7 @@ import typing as t
 
 from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font.tables import HeadTable, OS2Table
+from foundrytools_cli_2.lib.tables import HeadTable, OS2Table
 
 
 def recalc_avg_char_width(font: Font) -> None:

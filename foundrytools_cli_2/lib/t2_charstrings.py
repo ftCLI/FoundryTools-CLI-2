@@ -13,7 +13,7 @@ from fontTools.ttLib import TTFont
 from fontTools.ttLib.ttGlyphSet import _TTGlyph
 
 from foundrytools_cli_2.lib.constants import T_CFF
-from foundrytools_cli_2.lib.skia.skia_tools import _simplify
+from foundrytools_cli_2.lib.skia_tools import _simplify
 
 __all__ = ["quadratics_to_cubics", "quadratics_to_cubics_2", "round_coordinates"]
 
