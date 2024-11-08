@@ -13,7 +13,7 @@ from foundrytools_cli_2.lib.constants import (
     WINDOWS_ENCODING_IDS,
 )
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font.tables import CFFTable, NameTable
+from foundrytools_cli_2.lib.tables import CFFTable, NameTable
 from foundrytools_cli_2.lib.utils.string_tools import wrap_string
 
 __all__ = ["main"]

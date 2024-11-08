@@ -19,7 +19,7 @@ from fontTools.ttLib.ttGlyphSet import _TTGlyphSet
 from pathvalidate import sanitize_filename
 from ufo2ft.postProcessor import PostProcessor
 
-from foundrytools_cli_2.lib.beziers import add_extremes
+from foundrytools_cli_2.lib.beziers_tools import add_extremes
 from foundrytools_cli_2.lib.constants import (
     MAX_UPM,
     MIN_UPM,
@@ -38,16 +38,15 @@ from foundrytools_cli_2.lib.constants import (
     WOFF_EXTENSION,
     WOFF_FLAVOR,
 )
-from foundrytools_cli_2.lib.font.tables import CFFTable, HeadTable, NameTable, OS2Table
-from foundrytools_cli_2.lib.font.tables.cmap import CmapTable
-from foundrytools_cli_2.lib.otf.otf_autohint import hint_font
-from foundrytools_cli_2.lib.otf.otf_builder import build_otf
-from foundrytools_cli_2.lib.otf.t2_charstrings import quadratics_to_cubics, round_coordinates
-from foundrytools_cli_2.lib.skia.skia_tools import (
+from foundrytools_cli_2.lib.otf_builder import build_otf
+from foundrytools_cli_2.lib.skia_tools import (
     correct_glyphs_contours,
 )
-from foundrytools_cli_2.lib.ttf.ttf_builder import build_ttf
+from foundrytools_cli_2.lib.t2_charstrings import quadratics_to_cubics, round_coordinates
+from foundrytools_cli_2.lib.tables import CFFTable, CmapTable, HeadTable, NameTable, OS2Table
+from foundrytools_cli_2.lib.ttf_builder import build_ttf
 from foundrytools_cli_2.lib.utils.misc import restore_flavor
+from foundrytools_cli_2.lib.utils.otf_autohint import hint_font
 from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path
 from foundrytools_cli_2.lib.utils.unicode_tools import (
     _cmap_from_glyph_names,

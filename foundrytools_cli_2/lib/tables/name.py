@@ -5,7 +5,7 @@ from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables._n_a_m_e import _MAC_LANGUAGE_CODES, _WINDOWS_LANGUAGE_CODES, NameRecord
 
 from foundrytools_cli_2.lib.constants import T_NAME, NameIds
-from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
+from foundrytools_cli_2.lib.tables.default import DefaultTbl
 
 
 class NameTable(DefaultTbl):

@@ -1,7 +1,7 @@
 import typing as t
 
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font.tables import NameTable
+from foundrytools_cli_2.lib.tables import NameTable
 
 
 def del_names(

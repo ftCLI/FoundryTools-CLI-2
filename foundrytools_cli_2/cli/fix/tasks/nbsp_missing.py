@@ -1,5 +1,5 @@
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font.tables.cmap import CmapTable
+from foundrytools_cli_2.lib.tables.cmap import CmapTable
 
 
 def main(font: Font) -> None:

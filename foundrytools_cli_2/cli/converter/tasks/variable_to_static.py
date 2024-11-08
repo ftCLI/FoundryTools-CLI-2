@@ -15,7 +15,7 @@ from foundrytools_cli_2.lib.constants import (
     T_STAT,
 )
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font.tables import NameTable
+from foundrytools_cli_2.lib.tables import NameTable
 
 
 def get_instance_file_name(font: Font, instance: NamedInstance) -> str:

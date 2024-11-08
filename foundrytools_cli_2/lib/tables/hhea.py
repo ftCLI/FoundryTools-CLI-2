@@ -5,7 +5,7 @@ from fontTools.misc.roundTools import otRound
 from fontTools.ttLib import TTFont
 
 from foundrytools_cli_2.lib.constants import T_HEAD, T_HHEA, T_POST
-from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
+from foundrytools_cli_2.lib.tables.default import DefaultTbl
 
 
 class HheaTable(DefaultTbl):

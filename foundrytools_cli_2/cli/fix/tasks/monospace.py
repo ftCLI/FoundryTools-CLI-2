@@ -1,5 +1,5 @@
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font.tables import CFFTable, HheaTable, OS2Table, PostTable
+from foundrytools_cli_2.lib.tables import CFFTable, HheaTable, OS2Table, PostTable
 from foundrytools_cli_2.lib.utils.misc import get_glyph_metrics_stats
 
 

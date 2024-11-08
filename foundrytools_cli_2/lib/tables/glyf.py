@@ -6,7 +6,7 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 
 from foundrytools_cli_2.lib.constants import T_FPGM, T_GLYF
-from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
+from foundrytools_cli_2.lib.tables.default import DefaultTbl
 
 
 class GlyfTable(DefaultTbl):  # pylint: disable=too-few-public-methods

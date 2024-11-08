@@ -184,13 +184,13 @@ def get_hmtx_values(
 
 def get_post_values(font: TTFont) -> t.Dict[str, t.Any]:
     """
-    Setup CFF post table values
+    Setup 'post' table values
 
     Args:
         font (TTFont): The TTFont object.
 
     Returns:
-        dict: The post table values.
+        dict: The 'post' table values.
     """
     post_table = font[T_POST]
     post_info = {

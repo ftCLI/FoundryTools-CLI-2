@@ -13,7 +13,7 @@ from foundrytools_cli_2.lib.constants import (
     T_CMAP,
     T_OS_2,
 )
-from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
+from foundrytools_cli_2.lib.tables.default import DefaultTbl
 from foundrytools_cli_2.lib.utils.bits_tools import is_nth_bit_set
 from foundrytools_cli_2.lib.utils.misc import get_glyph_bounds
 from foundrytools_cli_2.lib.utils.string_tools import adjust_string_length

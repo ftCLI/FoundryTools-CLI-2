@@ -1,6 +1,6 @@
 from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font.tables import GlyfTable
+from foundrytools_cli_2.lib.tables import GlyfTable
 
 
 def main(font: Font) -> None:

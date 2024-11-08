@@ -1,6 +1,6 @@
 from foundrytools_cli_2.lib.constants import T_KERN
 from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.font.tables.kern import KernTable
+from foundrytools_cli_2.lib.tables.kern import KernTable
 
 
 def main(font: Font) -> None:

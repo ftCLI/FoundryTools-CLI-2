@@ -5,7 +5,7 @@ from fontTools.cffLib import PrivateDict, TopDict
 from fontTools.ttLib import TTFont
 
 from foundrytools_cli_2.lib.constants import T_CFF
-from foundrytools_cli_2.lib.font.tables.default import DefaultTbl
+from foundrytools_cli_2.lib.tables.default import DefaultTbl
 
 
 class CFFTable(DefaultTbl):
