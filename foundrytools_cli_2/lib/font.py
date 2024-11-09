@@ -5,6 +5,8 @@ from pathlib import Path
 
 import defcon
 from afdko.checkoutlinesufo import run as check_outlines
+from afdko.otfautohint.__main__ import ACOptions, _validate_path
+from afdko.otfautohint.autohint import FontInstance, fontWrapper, openFont
 from cffsubr import desubroutinize, subroutinize
 from extractor import extractUFO
 from fontTools.misc.cliTools import makeOutputFileName
@@ -46,7 +48,6 @@ from foundrytools_cli_2.lib.t2_charstrings import quadratics_to_cubics, round_co
 from foundrytools_cli_2.lib.tables import CFFTable, CmapTable, HeadTable, NameTable, OS2Table
 from foundrytools_cli_2.lib.ttf_builder import build_ttf
 from foundrytools_cli_2.lib.utils.misc import restore_flavor
-from foundrytools_cli_2.lib.utils.otf_autohint import hint_font
 from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path
 from foundrytools_cli_2.lib.utils.unicode_tools import (
     _cmap_from_glyph_names,
@@ -881,10 +882,18 @@ class Font:  # pylint: disable=too-many-public-methods
                 "OTF autohinting is only supported for PostScript flavored fonts."
             )
 
+        options = ACOptions()
+        for key, value in kwargs.items():
+            setattr(options, key, value)
+
         with restore_flavor(self.ttfont):
             self.save_to_temp_file()
-            cff = hint_font(self._temp_file, **kwargs)
-            self.ttfont[T_CFF] = cff
+            in_file = _validate_path(self._temp_file)
+            font = openFont(in_file, options=options)
+            font_instance = FontInstance(font=font, inpath=in_file, outpath=None)
+            fw = fontWrapper(options=options, fil=[font_instance])
+            fw.hint()
+            self.ttfont[T_CFF] = fw.fontInstances[0].font.ttFont[T_CFF]
 
     def ps_dehint(self, drop_hinting_data: bool = False) -> None:
         """

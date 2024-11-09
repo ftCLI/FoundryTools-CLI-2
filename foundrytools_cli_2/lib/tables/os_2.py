@@ -59,7 +59,7 @@ class FsSelection:
     @italic.setter
     def italic(self, value: bool) -> None:
         """
-        Sets the bit 0 (ITALIC) of the ``OS/2.fsSelection`` field.
+        Sets bit 0 (ITALIC) of the ``OS/2.fsSelection`` field.
         """
         self.os_2_table.set_bit(field_name="fsSelection", pos=ITALIC_BIT, value=value)
 
@@ -74,7 +74,7 @@ class FsSelection:
     @underscore.setter
     def underscore(self, value: bool) -> None:
         """
-        Sets the bit 1 (UNDERSCORE) of the ``OS/2.fsSelection`` field.
+        Sets bit 1 (UNDERSCORE) of the ``OS/2.fsSelection`` field.
         """
         self.os_2_table.set_bit(field_name="fsSelection", pos=UNDERSCORE_BIT, value=value)
 
@@ -104,14 +104,14 @@ class FsSelection:
     @outlined.setter
     def outlined(self, value: bool) -> None:
         """
-        Sets the bit 3 (OUTLINED) of the ``OS/2.fsSelection`` field.
+        Sets bit 3 (OUTLINED) of the ``OS/2.fsSelection`` field.
         """
         self.os_2_table.set_bit(field_name="fsSelection", pos=OUTLINED_BIT, value=value)
 
     @property
     def strikeout(self) -> bool:
         """
-        Returns True if the bit 4 (STRIKEOUT) of the ``OS/2.fsSelection`` field is set, False
+        Returns True if bit 4 (STRIKEOUT) of the ``OS/2.fsSelection`` field is set, False
         otherwise.
         """
         return is_nth_bit_set(self.os_2_table.table.fsSelection, STRIKEOUT_BIT)
@@ -119,7 +119,7 @@ class FsSelection:
     @strikeout.setter
     def strikeout(self, value: bool) -> None:
         """
-        Sets the bit 4 (STRIKEOUT) of the ``OS/2.fsSelection`` field.
+        Sets bit 4 (STRIKEOUT) of the ``OS/2.fsSelection`` field.
         """
         self.os_2_table.set_bit(field_name="fsSelection", pos=STRIKEOUT_BIT, value=value)
 
@@ -149,14 +149,14 @@ class FsSelection:
     @regular.setter
     def regular(self, value: bool) -> None:
         """
-        Sets the bit 6 (REGULAR) of the ``OS/2.fsSelection`` field.
+        Sets bit 6 (REGULAR) of the ``OS/2.fsSelection`` field.
         """
         self.os_2_table.set_bit(field_name="fsSelection", pos=REGULAR_BIT, value=value)
 
     @property
     def use_typo_metrics(self) -> bool:
         """
-        Returns True if the bit 7 (USE_TYPO_METRICS) of the ``OS/2.fsSelection`` field is set, False
+        Returns True if bit 7 (USE_TYPO_METRICS) of the ``OS/2.fsSelection`` field is set, False
         otherwise.
         """
         return is_nth_bit_set(self.os_2_table.table.fsSelection, USE_TYPO_METRICS_BIT)
@@ -164,7 +164,7 @@ class FsSelection:
     @use_typo_metrics.setter
     def use_typo_metrics(self, value: bool) -> None:
         """
-        Sets the bit 7 (USE_TYPO_METRICS) of the ``OS/2.fsSelection`` field.
+        Sets bit 7 (USE_TYPO_METRICS) of the ``OS/2.fsSelection`` field.
         """
         if self.os_2_table.version < 4 and value is True:
             raise self.os_2_table.InvalidOS2VersionError(
@@ -176,7 +176,7 @@ class FsSelection:
     @property
     def wws_consistent(self) -> bool:
         """
-        Returns True if the bit 8 (WWWS) of the ``OS/2.fsSelection`` field is set, False
+        Returns True if the bit 8 (WWS) of the ``OS/2.fsSelection`` field is set, False
         otherwise.
         """
         return is_nth_bit_set(self.os_2_table.table.fsSelection, WWS_BIT)
@@ -184,11 +184,11 @@ class FsSelection:
     @wws_consistent.setter
     def wws_consistent(self, value: bool) -> None:
         """
-        Sets the bit 8 (WWWS) of the ``OS/2.fsSelection`` field.
+        Sets bit 8 (WWS) of the ``OS/2.fsSelection`` field.
         """
         if self.os_2_table.version < 4 and value is True:
             raise self.os_2_table.InvalidOS2VersionError(
-                "fsSelection bit 8 (WWWS) is only defined in OS/2 table versions 4 and up."
+                "fsSelection bit 8 (WWS) is only defined in OS/2 table versions 4 and up."
             )
         self.os_2_table.set_bit(field_name="fsSelection", pos=WWS_BIT, value=value)
 
@@ -299,7 +299,8 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
     @property
     def embed_level(self) -> int:
         """
-        Returns the embedding level od the ``OS/2.fsType`` field. The value can be 0, 2, 4 or 8.
+        Returns the embedding level of the ``OS/2.fsType`` field.
+        The value can be 0, 2, 4 or 8.
 
         0: Installable Embedding
         2: Restricted License Embedding
@@ -347,7 +348,7 @@ class OS2Table(DefaultTbl):  # pylint: disable=too-many-public-methods
     @no_subsetting.setter
     def no_subsetting(self, value: bool) -> None:
         """
-        Sets the bit 8 (NO_SUBSETTING) of the ``OS/2.fsType`` field.
+        Sets bit 8 (NO_SUBSETTING) of the ``OS/2.fsType`` field.
         """
         self.set_bit(field_name="fsType", pos=NO_SUBSETTING_BIT, value=value)
 
