@@ -8,6 +8,7 @@ from afdko.checkoutlinesufo import run as check_outlines
 from afdko.otfautohint.__main__ import ACOptions, _validate_path
 from afdko.otfautohint.autohint import FontInstance, fontWrapper, openFont
 from cffsubr import desubroutinize, subroutinize
+from dehinter.font import dehint
 from extractor import extractUFO
 from fontTools.misc.cliTools import makeOutputFileName
 from fontTools.pens.recordingPen import DecomposingRecordingPen
@@ -19,6 +20,7 @@ from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import Axis, NamedInstance
 from fontTools.ttLib.ttGlyphSet import _TTGlyphSet
 from pathvalidate import sanitize_filename
+from ttfautohint import ttfautohint
 from ufo2ft.postProcessor import PostProcessor
 
 from foundrytools_cli_2.lib.beziers_tools import add_extremes
@@ -60,6 +62,12 @@ from foundrytools_cli_2.lib.utils.unicode_tools import (
 )
 
 __all__ = ["Font"]
+
+
+class FontError(Exception):
+    """
+    The ``FontError`` class is a custom exception class for font-related errors.
+    """
 
 
 class Font:  # pylint: disable=too-many-public-methods
@@ -781,6 +789,38 @@ class Font:  # pylint: disable=too-many-public-methods
             except KeyError:
                 continue
         raise ValueError("The font does not contain the glyph 'H' or 'uni0048'.")
+
+    def tt_autohint(self) -> None:
+        """
+        Autohint a TrueType font.
+        """
+        if not self.is_tt:
+            raise NotImplementedError("TTF auto-hinting is only supported for TrueType fonts.")
+
+        try:
+            with BytesIO() as buffer:
+                flavor = self.ttfont.flavor
+                self.ttfont.flavor = None
+                self.save(buffer, reorder_tables=None)
+                data = ttfautohint(in_buffer=buffer.getvalue(), no_info=True)
+                hinted_font = TTFont(BytesIO(data), recalcTimestamp=False)
+                hinted_font[T_HEAD].modified = self.ttfont[T_HEAD].modified
+                self.ttfont = hinted_font
+                self.ttfont.flavor = flavor
+        except Exception as e:
+            raise FontError(e) from e
+
+    def tt_dehint(self) -> None:
+        """
+        Dehint a TrueType font.
+        """
+        if not self.is_tt:
+            raise NotImplementedError("Dehinting is only supported for TrueType fonts.")
+
+        try:
+            dehint(self.ttfont, verbose=False)
+        except Exception as e:
+            raise FontError(e) from e
 
     def tt_decomponentize(self) -> None:
         """
