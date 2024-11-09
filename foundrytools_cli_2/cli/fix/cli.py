@@ -12,7 +12,7 @@ from foundrytools_cli_2.cli.fix.options import (
     min_area_option,
 )
 from foundrytools_cli_2.cli.shared_options import base_options
-from foundrytools_cli_2.lib.cli_tools.task_runner import TaskRunner
+from foundrytools_cli_2.cli.task_runner import TaskRunner
 from foundrytools_cli_2.lib.tables import HeadTable
 
 cli = click.Group(help="Fix font errors.")
