@@ -18,7 +18,6 @@ from fontTools.subset import Options, Subsetter
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import Axis, NamedInstance
-from fontTools.ttLib.ttGlyphSet import _TTGlyphSet
 from pathvalidate import sanitize_filename
 from ttfautohint import ttfautohint
 from ufo2ft.postProcessor import PostProcessor
@@ -43,9 +42,7 @@ from foundrytools_cli_2.lib.constants import (
     WOFF_FLAVOR,
 )
 from foundrytools_cli_2.lib.otf_builder import build_otf
-from foundrytools_cli_2.lib.skia_tools import (
-    correct_glyphs_contours,
-)
+from foundrytools_cli_2.lib.skia_tools import correct_glyphs_contours
 from foundrytools_cli_2.lib.t2_charstrings import quadratics_to_cubics, round_coordinates
 from foundrytools_cli_2.lib.tables import CFFTable, CmapTable, HeadTable, NameTable, OS2Table
 from foundrytools_cli_2.lib.ttf_builder import build_ttf
@@ -96,7 +93,7 @@ class Font:  # pylint: disable=too-many-public-methods
             recalc_bboxes: If ``True`` (the default), recalculates ``glyf``, ``CFF ``, ``head``
                 bounding box values and ``hhea``/``vhea`` min/max values on save. Also compiles the
                 glyphs on importing, which saves memory consumption and time.
-            recalc_timestamp: If ``True``, sets the ``modified`` timestamp in the ``head`` table
+            recalc_timestamp: If ``True``, set the ``modified`` timestamp in the ``head`` table
                 on save. Defaults to ``False``.
         """
 
@@ -248,16 +245,6 @@ class Font:  # pylint: disable=too-many-public-methods
         self._modified = value
 
     @property
-    def glyph_set(self) -> _TTGlyphSet:
-        """
-        Get the glyph set of the font.
-
-        Returns:
-            The glyph set of the font.
-        """
-        return self.ttfont.getGlyphSet()
-
-    @property
     def units_per_em(self) -> int:
         """
         Get the units per em of the font.
@@ -310,7 +297,7 @@ class Font:  # pylint: disable=too-many-public-methods
     @property
     def is_sfnt(self) -> bool:
         """
-        Check if the font is a SFNT font (i.e. not a WOFF or WOFF2 font).
+        Check if the font is a SFNT font (i.e., not a WOFF or WOFF2 font).
 
         Returns:
             ``True`` if the font is a SFNT font, ``False`` otherwise.
@@ -518,12 +505,12 @@ class Font:  # pylint: disable=too-many-public-methods
         suffix: str = "",
     ) -> Path:
         """
-        Get output file for a ``Font`` object. If ``output_dir`` is not specified, the output file
-        will be saved in the same directory as the input file. It the output file already exists and
-        ``overwrite`` is ``False``, file name will be incremented by adding a number preceded by '#'
-        before the extension until a non-existing file name is found. If ``suffix`` is specified,
-        it will be appended to the file name. If the suffix is already present, it will be removed
-        before adding it again.
+        Get the output file for a ``Font`` object. If ``output_dir`` is not specified, the output
+        file will be saved in the same directory as the input file. It the output file
+        exists and ``overwrite`` is ``False``, file name will be incremented by adding a number
+        preceded by '#' before the extension until a non-existing file name is found. If ``suffix``
+        is specified, it will be appended to the file name. If the suffix is already present, it
+        will be removed before adding it again.
 
         Args:
             file: The input file.
@@ -580,8 +567,8 @@ class Font:  # pylint: disable=too-many-public-methods
             The real extension of the font (e.g. '.woff', '.woff2', '.otf', '.ttf').
         """
 
-        # Order of the if statements is important. WOFF and WOFF2 must be checked before OTF and
-        # TTF.
+        # Order of if statements is important.
+        # WOFF and WOFF2 must be checked before OTF and TTF.
         if self.is_woff:
             return WOFF_EXTENSION
         if self.is_woff2:
@@ -787,7 +774,7 @@ class Font:  # pylint: disable=too-many-public-methods
         """
 
         try:
-            glyph_set = self.glyph_set
+            glyph_set = self.ttfont.getGlyphSet()
             pen = StatisticsPen(glyphset=glyph_set)
             for g in ("H", "uni0048"):
                 try:
@@ -842,7 +829,7 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError("Decomponentization is only supported for TrueType fonts.")
 
         try:
-            glyph_set = self.glyph_set
+            glyph_set = self.ttfont.getGlyphSet()
             glyf_table = self.ttfont[T_GLYF]
             dr_pen = DecomposingRecordingPen(glyph_set)
             tt_pen = TTGlyphPen(None)
@@ -1273,10 +1260,10 @@ class Font:  # pylint: disable=too-many-public-methods
         glyph_ids_to_remove: t.Optional[t.Set[int]],
     ) -> t.Set[str]:
         """
-        Removes glyphs from the a font object.
+        Removes glyphs from the font object.
 
         Args:
-            glyphs_names_to_remove (Optional[Set[str]]): A set of glyph names to remove.
+            glyph_names_to_remove (Optional[Set[str]]): A set of glyph names to remove.
             glyph_ids_to_remove (Optional[Set[int]]): A set of glyph IDs to remove.
         Returns:
             Set[str]: A set of strings representing the glyphs that were removed.
