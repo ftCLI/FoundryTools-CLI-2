@@ -731,7 +731,10 @@ class Font:  # pylint: disable=too-many-public-methods
         if self.is_variable:
             raise NotImplementedError("Conversion to TrueType is not supported for variable fonts.")
 
-        build_ttf(font=self.ttfont, max_err=max_err, reverse_direction=reverse_direction)
+        try:
+            build_ttf(font=self.ttfont, max_err=max_err, reverse_direction=reverse_direction)
+        except Exception as e:
+            raise FontError(e) from e
 
     def to_otf(self, tolerance: float = 1.0, correct_contours: bool = True) -> None:
         """
@@ -743,16 +746,18 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError(
                 "Conversion to PostScript is not supported for variable fonts."
             )
+        try:
+            self.tt_decomponentize()
 
-        self.tt_decomponentize()
+            charstrings = quadratics_to_cubics(
+                font=self.ttfont, tolerance=tolerance, correct_contours=correct_contours
+            )
+            build_otf(font=self.ttfont, charstrings_dict=charstrings)
 
-        charstrings = quadratics_to_cubics(
-            font=self.ttfont, tolerance=tolerance, correct_contours=correct_contours
-        )
-        build_otf(font=self.ttfont, charstrings_dict=charstrings)
-
-        os_2_table = OS2Table(self.ttfont)
-        os_2_table.recalc_avg_char_width()
+            os_2_table = OS2Table(self.ttfont)
+            os_2_table.recalc_avg_char_width()
+        except Exception as e:
+            raise FontError(e) from e
 
     def to_sfnt(self) -> None:
         """
@@ -761,7 +766,10 @@ class Font:  # pylint: disable=too-many-public-methods
         if self.is_sfnt:
             raise NotImplementedError("Font is already a SFNT font.")
 
-        self.ttfont.flavor = None
+        try:
+            self.ttfont.flavor = None
+        except Exception as e:
+            raise FontError(e) from e
 
     def calculate_italic_angle(self, min_slant: float = 2.0) -> float:
         """
@@ -777,18 +785,22 @@ class Font:  # pylint: disable=too-many-public-methods
         Raises:
             ValueError: If the font does not contain the glyph 'H' or 'uni0048'.
         """
-        glyph_set = self.glyph_set
-        pen = StatisticsPen(glyphset=glyph_set)
-        for g in ("H", "uni0048"):
-            try:
-                glyph_set[g].draw(pen)
-                italic_angle = -1 * math.degrees(math.atan(pen.slant))
-                if abs(italic_angle) >= abs(min_slant):
-                    return italic_angle
-                return 0.0
-            except KeyError:
-                continue
-        raise ValueError("The font does not contain the glyph 'H' or 'uni0048'.")
+
+        try:
+            glyph_set = self.glyph_set
+            pen = StatisticsPen(glyphset=glyph_set)
+            for g in ("H", "uni0048"):
+                try:
+                    glyph_set[g].draw(pen)
+                    italic_angle = -1 * math.degrees(math.atan(pen.slant))
+                    if abs(italic_angle) >= abs(min_slant):
+                        return italic_angle
+                    return 0.0
+                except KeyError:
+                    continue
+            raise ValueError("The font does not contain the glyph 'H' or 'uni0048'.")
+        except Exception as e:
+            raise FontError(e) from e
 
     def tt_autohint(self) -> None:
         """
@@ -829,20 +841,23 @@ class Font:  # pylint: disable=too-many-public-methods
         if not self.is_tt:
             raise NotImplementedError("Decomponentization is only supported for TrueType fonts.")
 
-        glyph_set = self.glyph_set
-        glyf_table = self.ttfont[T_GLYF]
-        dr_pen = DecomposingRecordingPen(glyph_set)
-        tt_pen = TTGlyphPen(None)
+        try:
+            glyph_set = self.glyph_set
+            glyf_table = self.ttfont[T_GLYF]
+            dr_pen = DecomposingRecordingPen(glyph_set)
+            tt_pen = TTGlyphPen(None)
 
-        for glyph_name in self.ttfont.glyphOrder:
-            glyph = glyf_table[glyph_name]
-            if not glyph.isComposite():
-                continue
-            dr_pen.value = []
-            tt_pen.init()
-            glyph.draw(dr_pen, glyf_table)
-            dr_pen.replay(tt_pen)
-            glyf_table[glyph_name] = tt_pen.glyph()
+            for glyph_name in self.ttfont.glyphOrder:
+                glyph = glyf_table[glyph_name]
+                if not glyph.isComposite():
+                    continue
+                dr_pen.value = []
+                tt_pen.init()
+                glyph.draw(dr_pen, glyf_table)
+                dr_pen.replay(tt_pen)
+                glyf_table[glyph_name] = tt_pen.glyph()
+        except Exception as e:
+            raise FontError(e) from e
 
     def tt_scale_upem(self, target_upm: int) -> None:
         """
@@ -859,8 +874,10 @@ class Font:  # pylint: disable=too-many-public-methods
 
         if self.ttfont[T_HEAD].unitsPerEm == target_upm:
             raise ValueError(f"Font already has {target_upm} units per em. No need to scale upem.")
-
-        scale_upem(self.ttfont, new_upem=target_upm)
+        try:
+            scale_upem(self.ttfont, new_upem=target_upm)
+        except Exception as e:
+            raise FontError(e) from e
 
     def correct_contours(
         self,
@@ -888,13 +905,16 @@ class Font:  # pylint: disable=too-many-public-methods
         Returns:
             A list of modified glyphs.
         """
-        return correct_glyphs_contours(
-            font=self.ttfont,
-            remove_hinting=remove_hinting,
-            ignore_errors=ignore_errors,
-            remove_unused_subroutines=remove_unused_subroutines,
-            min_area=min_area,
-        )
+        try:
+            return correct_glyphs_contours(
+                font=self.ttfont,
+                remove_hinting=remove_hinting,
+                ignore_errors=ignore_errors,
+                remove_unused_subroutines=remove_unused_subroutines,
+                min_area=min_area,
+            )
+        except Exception as e:
+            raise FontError(e) from e
 
     def _restore_hinting_data(self, cff_table: CFFTable, private_dict: t.Dict[str, t.Any]) -> None:
         if not self.is_ps:
@@ -910,8 +930,12 @@ class Font:  # pylint: disable=too-many-public-methods
             "StemSnapH",
             "StemSnapV",
         )
-        for attr in hinting_attributes:
-            setattr(cff_table.private_dict, attr, private_dict.get(attr))
+
+        try:
+            for attr in hinting_attributes:
+                setattr(cff_table.private_dict, attr, private_dict.get(attr))
+        except Exception as e:
+            raise FontError(e) from e
 
     def ps_autohint(self, **kwargs: t.Dict[str, t.Any]) -> None:
         """
@@ -922,18 +946,21 @@ class Font:  # pylint: disable=too-many-public-methods
                 "OTF autohinting is only supported for PostScript flavored fonts."
             )
 
-        options = ACOptions()
-        for key, value in kwargs.items():
-            setattr(options, key, value)
+        try:
+            options = ACOptions()
+            for key, value in kwargs.items():
+                setattr(options, key, value)
 
-        with restore_flavor(self.ttfont):
-            self.save_to_temp_file()
-            in_file = _validate_path(self._temp_file)
-            font = openFont(in_file, options=options)
-            font_instance = FontInstance(font=font, inpath=in_file, outpath=None)
-            fw = fontWrapper(options=options, fil=[font_instance])
-            fw.hint()
-            self.ttfont[T_CFF] = fw.fontInstances[0].font.ttFont[T_CFF]
+            with restore_flavor(self.ttfont):
+                self.save_to_temp_file()
+                in_file = _validate_path(self._temp_file)
+                font = openFont(in_file, options=options)
+                font_instance = FontInstance(font=font, inpath=in_file, outpath=None)
+                fw = fontWrapper(options=options, fil=[font_instance])
+                fw.hint()
+                self.ttfont[T_CFF] = fw.fontInstances[0].font.ttFont[T_CFF]
+        except Exception as e:
+            raise FontError(e) from e
 
     def ps_dehint(self, drop_hinting_data: bool = False) -> None:
         """
@@ -942,12 +969,15 @@ class Font:  # pylint: disable=too-many-public-methods
         if not self.is_ps:
             raise NotImplementedError("Dehinting is only supported for PostScript flavored fonts.")
 
-        cff_table = CFFTable(self.ttfont)
-        data = cff_table.private_dict.rawDict
-        cff_table.table.cff.remove_hints()
+        try:
+            cff_table = CFFTable(self.ttfont)
+            data = cff_table.private_dict.rawDict
+            cff_table.table.cff.remove_hints()
 
-        if not drop_hinting_data:
-            self._restore_hinting_data(cff_table, data)
+            if not drop_hinting_data:
+                self._restore_hinting_data(cff_table, data)
+        except Exception as e:
+            raise FontError(e) from e
 
     def ps_subroutinize(self) -> None:
         """
@@ -957,8 +987,11 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError(
                 "Subroutinization is only supported for PostScript flavored fonts."
             )
-        with restore_flavor(self.ttfont):
-            subroutinize(self.ttfont)
+        try:
+            with restore_flavor(self.ttfont):
+                subroutinize(self.ttfont)
+        except Exception as e:
+            raise FontError(e) from e
 
     def ps_desubroutinize(self) -> None:
         """
@@ -968,8 +1001,11 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError(
                 "Desubroutinization is only supported for PostScript flavored fonts."
             )
-        with restore_flavor(self.ttfont):
-            desubroutinize(self.ttfont)
+        try:
+            with restore_flavor(self.ttfont):
+                desubroutinize(self.ttfont)
+        except Exception as e:
+            raise FontError(e) from e
 
     def ps_check_outlines(self) -> None:
         """
@@ -981,11 +1017,14 @@ class Font:  # pylint: disable=too-many-public-methods
         if not self.is_ps:
             raise NotImplementedError("Checking outlines is only supported for PostScript fonts.")
 
-        with restore_flavor(self.ttfont):
-            self.save_to_temp_file()
-            check_outlines(args=[self._temp_file.as_posix(), "--error-correction-mode"])
-            with Font(self._temp_file) as temp_font:
-                self.ttfont[T_CFF] = temp_font.ttfont[T_CFF]
+        try:
+            with restore_flavor(self.ttfont):
+                self.save_to_temp_file()
+                check_outlines(args=[self._temp_file.as_posix(), "--error-correction-mode"])
+                with Font(self._temp_file) as temp_font:
+                    self.ttfont[T_CFF] = temp_font.ttfont[T_CFF]
+        except Exception as e:
+            raise FontError(e) from e
 
     def ps_add_extremes(self, drop_hinting_data: bool = False) -> None:
         """
@@ -994,20 +1033,23 @@ class Font:  # pylint: disable=too-many-public-methods
         if not self.is_ps:
             raise NotImplementedError("Adding extrema is only supported for PostScript fonts.")
 
-        cff_table = CFFTable(self.ttfont)
-        data = cff_table.private_dict.rawDict
-        charstrings = add_extremes(self.ttfont)
-        build_otf(font=self.ttfont, charstrings_dict=charstrings)
-
-        # Reload the font before correcting contours, otherwise the CFF top dict entries will be
-        # deleted.
-        self.reload()
-        self.correct_contours(remove_hinting=True, ignore_errors=True)
-
-        if not drop_hinting_data:
-            # The font has been reloaded, so we need to instantiate the CFFTable again.
+        try:
             cff_table = CFFTable(self.ttfont)
-            self._restore_hinting_data(cff_table, data)
+            data = cff_table.private_dict.rawDict
+            charstrings = add_extremes(self.ttfont)
+            build_otf(font=self.ttfont, charstrings_dict=charstrings)
+
+            # Reload the font before correcting contours, otherwise the CFF top dict entries will be
+            # deleted.
+            self.reload()
+            self.correct_contours(remove_hinting=True, ignore_errors=True)
+
+            if not drop_hinting_data:
+                # The font has been reloaded, so we need to instantiate the CFFTable again.
+                cff_table = CFFTable(self.ttfont)
+                self._restore_hinting_data(cff_table, data)
+        except Exception as e:
+            raise FontError(e) from e
 
     def ps_round_coordinates(self) -> t.Set[str]:
         """
@@ -1017,7 +1059,11 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError(
                 "Rounding coordinates is only supported for PostScript fonts."
             )
-        return round_coordinates(self.ttfont)
+
+        try:
+            return round_coordinates(self.ttfont)
+        except Exception as e:
+            raise FontError(e) from e
 
     def rebuild_cmap(self, remap_all: bool = False) -> t.List[t.Tuple[int, str]]:
         """
@@ -1026,23 +1072,24 @@ class Font:  # pylint: disable=too-many-public-methods
         Args:
             remap_all: Whether to remap all glyphs.
         """
-        # rebuild_character_map(font=self.ttfont, remap_all=remap_all)
 
-        glyph_order = self.ttfont.getGlyphOrder()
-        _, unmapped = get_mapped_and_unmapped_glyphs(ttfont=self.ttfont)
-        if not remap_all:
-            target_cmap = self.ttfont.getBestCmap()  # We can also use cmap_from_reversed_cmap
-            source_cmap = _cmap_from_glyph_names(glyphs_list=unmapped)
-        else:
-            target_cmap = {}
-            source_cmap = _cmap_from_glyph_names(glyphs_list=glyph_order)
+        try:
+            glyph_order = self.ttfont.getGlyphOrder()
+            _, unmapped = get_mapped_and_unmapped_glyphs(ttfont=self.ttfont)
+            if not remap_all:
+                target_cmap = self.ttfont.getBestCmap()  # We can also use cmap_from_reversed_cmap
+                source_cmap = _cmap_from_glyph_names(glyphs_list=unmapped)
+            else:
+                target_cmap = {}
+                source_cmap = _cmap_from_glyph_names(glyphs_list=glyph_order)
 
-        updated_cmap, remapped, _ = update_character_map(
-            source_cmap=source_cmap, target_cmap=target_cmap
-        )
-        setup_character_map(ttfont=self.ttfont, mapping=updated_cmap)
-
-        return remapped
+            updated_cmap, remapped, _ = update_character_map(
+                source_cmap=source_cmap, target_cmap=target_cmap
+            )
+            setup_character_map(ttfont=self.ttfont, mapping=updated_cmap)
+            return remapped
+        except Exception as e:
+            raise FontError(e) from e
 
     def set_production_names(self) -> t.List[t.Tuple[str, str]]:
         """
@@ -1059,40 +1106,44 @@ class Font:  # pylint: disable=too-many-public-methods
         Finally, the font is updated with the new glyph order, the cmap table is rebuilt, and the
         list of renamed glyphs is returned.
         """
-        old_glyph_order: t.List[str] = self.ttfont.getGlyphOrder()
-        reversed_cmap: _ReversedCmap = self.ttfont[T_CMAP].buildReversed()
-        new_glyph_order: t.List[str] = []
-        renamed_glyphs: t.List[t.Tuple[str, str]] = []
 
-        for glyph_name in old_glyph_order:
-            uni_str = get_uni_str(glyph_name, reversed_cmap)
-            # If still no uni_str, the glyph name is unmodified.
-            if not uni_str:
-                new_glyph_order.append(glyph_name)
-                continue
+        try:
+            old_glyph_order: t.List[str] = self.ttfont.getGlyphOrder()
+            reversed_cmap: _ReversedCmap = self.ttfont[T_CMAP].buildReversed()
+            new_glyph_order: t.List[str] = []
+            renamed_glyphs: t.List[t.Tuple[str, str]] = []
 
-            # In case the production name could not be found, the glyph is already named with the
-            # production name, or the production name is already assigned, we skip the renaming
-            # process.
-            production_name = _prod_name_from_uni_str(uni_str)
-            if (
-                not production_name
-                or production_name == glyph_name
-                or production_name in old_glyph_order
-            ):
-                new_glyph_order.append(glyph_name)
-                continue
+            for glyph_name in old_glyph_order:
+                uni_str = get_uni_str(glyph_name, reversed_cmap)
+                # If still no uni_str, the glyph name is unmodified.
+                if not uni_str:
+                    new_glyph_order.append(glyph_name)
+                    continue
 
-            new_glyph_order.append(production_name)
-            renamed_glyphs.append((glyph_name, production_name))
+                # In case the production name could not be found, the glyph is already named with
+                # the production name, or the production name is already assigned, we skip the
+                # renaming process.
+                production_name = _prod_name_from_uni_str(uni_str)
+                if (
+                    not production_name
+                    or production_name == glyph_name
+                    or production_name in old_glyph_order
+                ):
+                    new_glyph_order.append(glyph_name)
+                    continue
 
-        if not renamed_glyphs:
-            return []
+                new_glyph_order.append(production_name)
+                renamed_glyphs.append((glyph_name, production_name))
 
-        rename_map = dict(zip(old_glyph_order, new_glyph_order))
-        PostProcessor.rename_glyphs(otf=self.ttfont, rename_map=rename_map)
-        self.rebuild_cmap(remap_all=True)
-        return renamed_glyphs
+            if not renamed_glyphs:
+                return []
+
+            rename_map = dict(zip(old_glyph_order, new_glyph_order))
+            PostProcessor.rename_glyphs(otf=self.ttfont, rename_map=rename_map)
+            self.rebuild_cmap(remap_all=True)
+            return renamed_glyphs
+        except Exception as e:
+            raise FontError(e) from e
 
     def rename_glyph(self, old_name: str, new_name: str) -> bool:
         """
@@ -1102,26 +1153,29 @@ class Font:  # pylint: disable=too-many-public-methods
             old_name (str): The old name of the glyph.
             new_name (str): The new name of the glyph.
         """
-        old_glyph_order = self.ttfont.getGlyphOrder()
-        new_glyph_order = []
+        try:
+            old_glyph_order = self.ttfont.getGlyphOrder()
+            new_glyph_order = []
 
-        if old_name not in old_glyph_order:
-            raise ValueError(f"Glyph '{old_name}' not found in the font.")
+            if old_name not in old_glyph_order:
+                raise ValueError(f"Glyph '{old_name}' not found in the font.")
 
-        if new_name in old_glyph_order:
-            raise ValueError(f"Glyph '{new_name}' already exists in the font.")
+            if new_name in old_glyph_order:
+                raise ValueError(f"Glyph '{new_name}' already exists in the font.")
 
-        for glyph_name in old_glyph_order:
-            if glyph_name == old_name:
-                new_glyph_order.append(new_name)
-            else:
-                new_glyph_order.append(glyph_name)
+            for glyph_name in old_glyph_order:
+                if glyph_name == old_name:
+                    new_glyph_order.append(new_name)
+                else:
+                    new_glyph_order.append(glyph_name)
 
-        rename_map = dict(zip(old_glyph_order, new_glyph_order))
-        PostProcessor.rename_glyphs(otf=self.ttfont, rename_map=rename_map)
-        self.rebuild_cmap(remap_all=True)
+            rename_map = dict(zip(old_glyph_order, new_glyph_order))
+            PostProcessor.rename_glyphs(otf=self.ttfont, rename_map=rename_map)
+            self.rebuild_cmap(remap_all=True)
 
-        return new_glyph_order != old_glyph_order
+            return new_glyph_order != old_glyph_order
+        except Exception as e:
+            raise FontError(e) from e
 
     def rename_glyphs(self, new_glyph_order: t.List[str]) -> bool:
         """
@@ -1130,15 +1184,16 @@ class Font:  # pylint: disable=too-many-public-methods
         Args:
             new_glyph_order (list): The new glyph order.
         """
-        old_glyph_order = self.ttfont.getGlyphOrder()
-        if new_glyph_order == old_glyph_order:
-            return False
-
-        rename_map = dict(zip(old_glyph_order, new_glyph_order))
-        PostProcessor.rename_glyphs(otf=self.ttfont, rename_map=rename_map)
-        self.rebuild_cmap(remap_all=True)
-
-        return True
+        try:
+            old_glyph_order = self.ttfont.getGlyphOrder()
+            if new_glyph_order == old_glyph_order:
+                return False
+            rename_map = dict(zip(old_glyph_order, new_glyph_order))
+            PostProcessor.rename_glyphs(otf=self.ttfont, rename_map=rename_map)
+            self.rebuild_cmap(remap_all=True)
+            return True
+        except Exception as e:
+            raise FontError(e) from e
 
     def sort_glyphs(
         self,
@@ -1151,37 +1206,40 @@ class Font:  # pylint: disable=too-many-public-methods
             sort_by (str): The sorting method. Can be one of 'unicode', 'alphabetical', or
             'cannedDesign'.
         """
-        ufo = defcon.Font()
-        extractUFO(self.file, destination=ufo, doFeatures=False, doInfo=False, doKerning=False)
-        old_glyph_order = self.ttfont.getGlyphOrder()
-        new_glyph_order = ufo.unicodeData.sortGlyphNames(
-            glyphNames=old_glyph_order,
-            sortDescriptors=[{"type": sort_by}],
-        )
+        try:
+            ufo = defcon.Font()
+            extractUFO(self.file, destination=ufo, doFeatures=False, doInfo=False, doKerning=False)
+            old_glyph_order = self.ttfont.getGlyphOrder()
+            new_glyph_order = ufo.unicodeData.sortGlyphNames(
+                glyphNames=old_glyph_order,
+                sortDescriptors=[{"type": sort_by}],
+            )
 
-        # Ensure that the '.notdef' glyph is always the first glyph in the font as required by the
-        # OpenType specification. If the '.notdef' glyph is not the first glyph, compiling the CFF
-        # table will fail.
-        # https://learn.microsoft.com/en-us/typography/opentype/spec/recom#glyph-0-the-notdef-glyph
-        if ".notdef" in new_glyph_order:
-            new_glyph_order.remove(".notdef")
-            new_glyph_order.insert(0, ".notdef")
+            # Ensure that the '.notdef' glyph is always the first glyph in the font as required by
+            # the OpenType specification. If the '.notdef' glyph is not the first glyph, compiling
+            # the CFF table will fail.
+            # https://learn.microsoft.com/en-us/typography/opentype/spec/recom#glyph-0-the-notdef-glyph
+            if ".notdef" in new_glyph_order:
+                new_glyph_order.remove(".notdef")
+                new_glyph_order.insert(0, ".notdef")
 
-        if old_glyph_order == new_glyph_order:
-            return False
+            if old_glyph_order == new_glyph_order:
+                return False
 
-        self.ttfont.reorderGlyphs(new_glyph_order=new_glyph_order)
+            self.ttfont.reorderGlyphs(new_glyph_order=new_glyph_order)
 
-        # Remove this block when the new version of fontTools is released.
-        if self.is_ps:
-            cff_table = self.ttfont[T_CFF]
-            top_dict = cff_table.cff.topDictIndex[0]
-            charstrings = top_dict.CharStrings.charStrings
-            sorted_charstrings = {k: charstrings.get(k) for k in new_glyph_order}
-            top_dict.charset = new_glyph_order
-            top_dict.CharStrings.charStrings = sorted_charstrings
+            # Remove this block when the new version of fontTools is released.
+            if self.is_ps:
+                cff_table = self.ttfont[T_CFF]
+                top_dict = cff_table.cff.topDictIndex[0]
+                charstrings = top_dict.CharStrings.charStrings
+                sorted_charstrings = {k: charstrings.get(k) for k in new_glyph_order}
+                top_dict.charset = new_glyph_order
+                top_dict.CharStrings.charStrings = sorted_charstrings
 
-        return True
+            return True
+        except Exception as e:
+            raise FontError(e) from e
 
     def remove_unused_glyphs(self, recalc_timestamp: bool = False) -> t.Set[str]:
         """
@@ -1194,17 +1252,20 @@ class Font:  # pylint: disable=too-many-public-methods
         Returns:
             Set[str]: A set of strings representing the glyphs that were removed.
         """
-        options = Options(**SUBSETTER_DEFAULTS)
-        options.recalc_timestamp = recalc_timestamp
-        old_glyph_order = self.ttfont.getGlyphOrder()
-        cmap_table = CmapTable(self.ttfont)
-        unicodes = cmap_table.get_codepoints()
-        subsetter = Subsetter(options=options)
-        subsetter.populate(unicodes=unicodes)
-        subsetter.subset(self.ttfont)
-        new_glyph_order = self.ttfont.getGlyphOrder()
+        try:
+            options = Options(**SUBSETTER_DEFAULTS)
+            options.recalc_timestamp = recalc_timestamp
+            old_glyph_order = self.ttfont.getGlyphOrder()
+            cmap_table = CmapTable(self.ttfont)
+            unicodes = cmap_table.get_codepoints()
+            subsetter = Subsetter(options=options)
+            subsetter.populate(unicodes=unicodes)
+            subsetter.subset(self.ttfont)
+            new_glyph_order = self.ttfont.getGlyphOrder()
 
-        return set(old_glyph_order) - set(new_glyph_order)
+            return set(old_glyph_order) - set(new_glyph_order)
+        except Exception as e:
+            raise FontError(e) from e
 
     def remove_glyphs(
         self,
@@ -1220,30 +1281,32 @@ class Font:  # pylint: disable=too-many-public-methods
         Returns:
             Set[str]: A set of strings representing the glyphs that were removed.
         """
+        try:
+            old_glyph_order = self.ttfont.getGlyphOrder()
+            if not glyph_names_to_remove and not glyph_ids_to_remove:
+                raise ValueError("No glyph names or glyph IDs provided to remove.")
 
-        old_glyph_order = self.ttfont.getGlyphOrder()
-        if not glyph_names_to_remove and not glyph_ids_to_remove:
-            raise ValueError("No glyph names or glyph IDs provided to remove.")
+            glyph_names_to_remove = glyph_names_to_remove or set()
 
-        glyph_names_to_remove = glyph_names_to_remove or set()
+            # Convert glyph IDs to glyph names.
+            if glyph_ids_to_remove:
+                for glyph_id in glyph_ids_to_remove:
+                    if glyph_id < 0 or glyph_id >= len(old_glyph_order):
+                        continue
+                    glyph_names_to_remove.add(old_glyph_order[glyph_id])
 
-        # Convert glyph IDs to glyph names.
-        if glyph_ids_to_remove:
-            for glyph_id in glyph_ids_to_remove:
-                if glyph_id < 0 or glyph_id >= len(old_glyph_order):
-                    continue
-                glyph_names_to_remove.add(old_glyph_order[glyph_id])
+            if not glyph_names_to_remove:
+                return set()
 
-        if not glyph_names_to_remove:
-            return set()
+            remaining_glyphs = {gn for gn in old_glyph_order if gn not in glyph_names_to_remove}
+            options = Options(**SUBSETTER_DEFAULTS)
+            options.recalc_timestamp = self.ttfont.recalcTimestamp
 
-        remaining_glyphs = {gn for gn in old_glyph_order if gn not in glyph_names_to_remove}
-        options = Options(**SUBSETTER_DEFAULTS)
-        options.recalc_timestamp = self.ttfont.recalcTimestamp
+            subsetter = Subsetter(options=options)
+            subsetter.populate(glyphs=remaining_glyphs)
+            subsetter.subset(self.ttfont)
 
-        subsetter = Subsetter(options=options)
-        subsetter.populate(glyphs=remaining_glyphs)
-        subsetter.subset(self.ttfont)
-
-        new_glyph_order = self.ttfont.getGlyphOrder()
-        return set(old_glyph_order).difference(new_glyph_order)
+            new_glyph_order = self.ttfont.getGlyphOrder()
+            return set(old_glyph_order).difference(new_glyph_order)
+        except Exception as e:
+            raise FontError(e) from e
