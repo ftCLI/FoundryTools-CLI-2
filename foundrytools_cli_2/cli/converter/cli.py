@@ -18,7 +18,7 @@ from foundrytools_cli_2.cli.shared_options import (
     subroutinize_flag,
     target_upm_option,
 )
-from foundrytools_cli_2.lib.cli_tools.task_runner import TaskRunner
+from foundrytools_cli_2.cli.task_runner import TaskRunner
 from foundrytools_cli_2.lib.font import Font
 
 cli = click.Group("converter", help="Font conversion utilities.")

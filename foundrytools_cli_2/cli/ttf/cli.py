@@ -5,7 +5,7 @@ from pathlib import Path
 import click
 
 from foundrytools_cli_2.cli.shared_options import base_options, target_upm_option
-from foundrytools_cli_2.lib.cli_tools.task_runner import TaskRunner
+from foundrytools_cli_2.cli.task_runner import TaskRunner
 from foundrytools_cli_2.lib.font import Font
 
 cli = click.Group(help="Utilities for editing OpenType-TT fonts.")

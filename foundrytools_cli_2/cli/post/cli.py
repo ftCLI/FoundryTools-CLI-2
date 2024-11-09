@@ -7,7 +7,7 @@ import click
 
 from foundrytools_cli_2.cli.shared_callbacks import validate_params
 from foundrytools_cli_2.cli.shared_options import base_options
-from foundrytools_cli_2.lib.cli_tools.task_runner import TaskRunner
+from foundrytools_cli_2.cli.task_runner import TaskRunner
 
 
 @click.command(no_args_is_help=True)
