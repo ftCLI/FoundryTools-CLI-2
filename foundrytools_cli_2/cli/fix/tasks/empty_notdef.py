@@ -28,6 +28,7 @@ def draw_notdef_cff(font: Font, width: int, height: int, thickness: int) -> T2Ch
         T2CharString: The '.notdef' glyph charstring.
     """
     pen = T2CharStringPen(width=0, glyphSet=font.ttfont.getGlyphSet())
+    glyph_set = font.ttfont.getGlyphSet()
 
     # Draw the outer contour (counterclockwise)
     pen.moveTo((0, 0))
@@ -43,7 +44,7 @@ def draw_notdef_cff(font: Font, width: int, height: int, thickness: int) -> T2Ch
     pen.lineTo((width - thickness, thickness))
     pen.closePath()
 
-    font.glyph_set[NOTDEF].draw(pen)
+    glyph_set[NOTDEF].draw(pen)
     charstring = pen.getCharString()
     return charstring
 
@@ -65,6 +66,7 @@ def draw_notdef_glyf(font: Font, width: int, height: int, thickness: int) -> Gly
     # Do not use font.glyph_set property here, as TTGlyphPen expects a dict[str, Any] object, not a
     # _TTGlyphSet object
     pen = TTGlyphPen(glyphSet=font.ttfont.getGlyphSet())
+    glyph_set = font.ttfont.getGlyphSet()
 
     # Draw the outer contour (clockwise)
     pen.moveTo((0, 0))
@@ -80,7 +82,7 @@ def draw_notdef_glyf(font: Font, width: int, height: int, thickness: int) -> Gly
     pen.lineTo((thickness, height - thickness))
     pen.closePath()
 
-    font.glyph_set[NOTDEF].draw(pen)
+    glyph_set[NOTDEF].draw(pen)
     return pen.glyph()
 
 
