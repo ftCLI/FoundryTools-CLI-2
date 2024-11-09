@@ -1078,6 +1078,126 @@ class Font:  # pylint: disable=too-many-public-methods
         except Exception as e:
             raise FontError(e) from e
 
+    def remove_glyphs(
+        self,
+        glyph_names_to_remove: t.Optional[t.Set[str]],
+        glyph_ids_to_remove: t.Optional[t.Set[int]],
+    ) -> t.Set[str]:
+        """
+        Removes glyphs from the font object.
+
+        Args:
+            glyph_names_to_remove (Optional[Set[str]]): A set of glyph names to remove.
+            glyph_ids_to_remove (Optional[Set[int]]): A set of glyph IDs to remove.
+        Returns:
+            Set[str]: A set of strings representing the glyphs that were removed.
+        """
+        try:
+            old_glyph_order = self.ttfont.getGlyphOrder()
+            if not glyph_names_to_remove and not glyph_ids_to_remove:
+                raise ValueError("No glyph names or glyph IDs provided to remove.")
+
+            glyph_names_to_remove = glyph_names_to_remove or set()
+
+            # Convert glyph IDs to glyph names.
+            if glyph_ids_to_remove:
+                for glyph_id in glyph_ids_to_remove:
+                    if glyph_id < 0 or glyph_id >= len(old_glyph_order):
+                        continue
+                    glyph_names_to_remove.add(old_glyph_order[glyph_id])
+
+            if not glyph_names_to_remove:
+                return set()
+
+            remaining_glyphs = {gn for gn in old_glyph_order if gn not in glyph_names_to_remove}
+            options = Options(**SUBSETTER_DEFAULTS)
+            options.recalc_timestamp = self.ttfont.recalcTimestamp
+
+            subsetter = Subsetter(options=options)
+            subsetter.populate(glyphs=remaining_glyphs)
+            subsetter.subset(self.ttfont)
+
+            new_glyph_order = self.ttfont.getGlyphOrder()
+            return set(old_glyph_order).difference(new_glyph_order)
+        except Exception as e:
+            raise FontError(e) from e
+
+    def remove_unused_glyphs(self, recalc_timestamp: bool = False) -> t.Set[str]:
+        """
+        Remove glyphs that are not reachable by Unicode values or by substitution rules in the font.
+
+        Args:
+            recalc_timestamp (bool): Boolean flag indicating whether timestamps should be
+            recalculated. Defaults to False.
+
+        Returns:
+            Set[str]: A set of strings representing the glyphs that were removed.
+        """
+        try:
+            options = Options(**SUBSETTER_DEFAULTS)
+            options.recalc_timestamp = recalc_timestamp
+            old_glyph_order = self.ttfont.getGlyphOrder()
+            cmap_table = CmapTable(self.ttfont)
+            unicodes = cmap_table.get_codepoints()
+            subsetter = Subsetter(options=options)
+            subsetter.populate(unicodes=unicodes)
+            subsetter.subset(self.ttfont)
+            new_glyph_order = self.ttfont.getGlyphOrder()
+
+            return set(old_glyph_order) - set(new_glyph_order)
+        except Exception as e:
+            raise FontError(e) from e
+
+    def rename_glyph(self, old_name: str, new_name: str) -> bool:
+        """
+        Rename a single glyph in the font.
+
+        Args:
+            old_name (str): The old name of the glyph.
+            new_name (str): The new name of the glyph.
+        """
+        try:
+            old_glyph_order = self.ttfont.getGlyphOrder()
+            new_glyph_order = []
+
+            if old_name not in old_glyph_order:
+                raise ValueError(f"Glyph '{old_name}' not found in the font.")
+
+            if new_name in old_glyph_order:
+                raise ValueError(f"Glyph '{new_name}' already exists in the font.")
+
+            for glyph_name in old_glyph_order:
+                if glyph_name == old_name:
+                    new_glyph_order.append(new_name)
+                else:
+                    new_glyph_order.append(glyph_name)
+
+            rename_map = dict(zip(old_glyph_order, new_glyph_order))
+            PostProcessor.rename_glyphs(otf=self.ttfont, rename_map=rename_map)
+            self.rebuild_cmap(remap_all=True)
+
+            return new_glyph_order != old_glyph_order
+        except Exception as e:
+            raise FontError(e) from e
+
+    def rename_glyphs(self, new_glyph_order: t.List[str]) -> bool:
+        """
+        Rename the glyphs in the font based on the new glyph order.
+
+        Args:
+            new_glyph_order (list): The new glyph order.
+        """
+        try:
+            old_glyph_order = self.ttfont.getGlyphOrder()
+            if new_glyph_order == old_glyph_order:
+                return False
+            rename_map = dict(zip(old_glyph_order, new_glyph_order))
+            PostProcessor.rename_glyphs(otf=self.ttfont, rename_map=rename_map)
+            self.rebuild_cmap(remap_all=True)
+            return True
+        except Exception as e:
+            raise FontError(e) from e
+
     def set_production_names(self) -> t.List[t.Tuple[str, str]]:
         """
         Set the production names for the glyphs in the font.
@@ -1132,56 +1252,6 @@ class Font:  # pylint: disable=too-many-public-methods
         except Exception as e:
             raise FontError(e) from e
 
-    def rename_glyph(self, old_name: str, new_name: str) -> bool:
-        """
-        Rename a single glyph in the font.
-
-        Args:
-            old_name (str): The old name of the glyph.
-            new_name (str): The new name of the glyph.
-        """
-        try:
-            old_glyph_order = self.ttfont.getGlyphOrder()
-            new_glyph_order = []
-
-            if old_name not in old_glyph_order:
-                raise ValueError(f"Glyph '{old_name}' not found in the font.")
-
-            if new_name in old_glyph_order:
-                raise ValueError(f"Glyph '{new_name}' already exists in the font.")
-
-            for glyph_name in old_glyph_order:
-                if glyph_name == old_name:
-                    new_glyph_order.append(new_name)
-                else:
-                    new_glyph_order.append(glyph_name)
-
-            rename_map = dict(zip(old_glyph_order, new_glyph_order))
-            PostProcessor.rename_glyphs(otf=self.ttfont, rename_map=rename_map)
-            self.rebuild_cmap(remap_all=True)
-
-            return new_glyph_order != old_glyph_order
-        except Exception as e:
-            raise FontError(e) from e
-
-    def rename_glyphs(self, new_glyph_order: t.List[str]) -> bool:
-        """
-        Rename the glyphs in the font based on the new glyph order.
-
-        Args:
-            new_glyph_order (list): The new glyph order.
-        """
-        try:
-            old_glyph_order = self.ttfont.getGlyphOrder()
-            if new_glyph_order == old_glyph_order:
-                return False
-            rename_map = dict(zip(old_glyph_order, new_glyph_order))
-            PostProcessor.rename_glyphs(otf=self.ttfont, rename_map=rename_map)
-            self.rebuild_cmap(remap_all=True)
-            return True
-        except Exception as e:
-            raise FontError(e) from e
-
     def sort_glyphs(
         self,
         sort_by: t.Literal["unicode", "alphabetical", "cannedDesign"] = "unicode",
@@ -1225,75 +1295,5 @@ class Font:  # pylint: disable=too-many-public-methods
                 top_dict.CharStrings.charStrings = sorted_charstrings
 
             return True
-        except Exception as e:
-            raise FontError(e) from e
-
-    def remove_unused_glyphs(self, recalc_timestamp: bool = False) -> t.Set[str]:
-        """
-        Remove glyphs that are not reachable by Unicode values or by substitution rules in the font.
-
-        Args:
-            recalc_timestamp (bool): Boolean flag indicating whether timestamps should be
-            recalculated. Defaults to False.
-
-        Returns:
-            Set[str]: A set of strings representing the glyphs that were removed.
-        """
-        try:
-            options = Options(**SUBSETTER_DEFAULTS)
-            options.recalc_timestamp = recalc_timestamp
-            old_glyph_order = self.ttfont.getGlyphOrder()
-            cmap_table = CmapTable(self.ttfont)
-            unicodes = cmap_table.get_codepoints()
-            subsetter = Subsetter(options=options)
-            subsetter.populate(unicodes=unicodes)
-            subsetter.subset(self.ttfont)
-            new_glyph_order = self.ttfont.getGlyphOrder()
-
-            return set(old_glyph_order) - set(new_glyph_order)
-        except Exception as e:
-            raise FontError(e) from e
-
-    def remove_glyphs(
-        self,
-        glyph_names_to_remove: t.Optional[t.Set[str]],
-        glyph_ids_to_remove: t.Optional[t.Set[int]],
-    ) -> t.Set[str]:
-        """
-        Removes glyphs from the font object.
-
-        Args:
-            glyph_names_to_remove (Optional[Set[str]]): A set of glyph names to remove.
-            glyph_ids_to_remove (Optional[Set[int]]): A set of glyph IDs to remove.
-        Returns:
-            Set[str]: A set of strings representing the glyphs that were removed.
-        """
-        try:
-            old_glyph_order = self.ttfont.getGlyphOrder()
-            if not glyph_names_to_remove and not glyph_ids_to_remove:
-                raise ValueError("No glyph names or glyph IDs provided to remove.")
-
-            glyph_names_to_remove = glyph_names_to_remove or set()
-
-            # Convert glyph IDs to glyph names.
-            if glyph_ids_to_remove:
-                for glyph_id in glyph_ids_to_remove:
-                    if glyph_id < 0 or glyph_id >= len(old_glyph_order):
-                        continue
-                    glyph_names_to_remove.add(old_glyph_order[glyph_id])
-
-            if not glyph_names_to_remove:
-                return set()
-
-            remaining_glyphs = {gn for gn in old_glyph_order if gn not in glyph_names_to_remove}
-            options = Options(**SUBSETTER_DEFAULTS)
-            options.recalc_timestamp = self.ttfont.recalcTimestamp
-
-            subsetter = Subsetter(options=options)
-            subsetter.populate(glyphs=remaining_glyphs)
-            subsetter.subset(self.ttfont)
-
-            new_glyph_order = self.ttfont.getGlyphOrder()
-            return set(old_glyph_order).difference(new_glyph_order)
         except Exception as e:
             raise FontError(e) from e
