@@ -18,10 +18,9 @@ def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Auto-hints the given TrueType fonts using ttfautohint-py.
     """
 
-    from foundrytools_cli_2.cli.ttf.tasks.autohint import ttf_autohint as task
-
-    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=Font.tt_autohint, **options)
     runner.filter.filter_out_ps = True
+    runner.force_modified = True
     runner.run()
 
 
@@ -32,10 +31,9 @@ def dehint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Removes hinting from the given TrueType fonts.
     """
 
-    from foundrytools_cli_2.cli.ttf.tasks.dehint import ttf_dehint as task
-
-    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=Font.tt_dehint, **options)
     runner.filter.filter_out_ps = True
+    runner.force_modified = True
     runner.run()
 
 
