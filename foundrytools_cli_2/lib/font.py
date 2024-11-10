@@ -2,6 +2,7 @@ import math
 import typing as t
 from io import BytesIO
 from pathlib import Path
+from types import TracebackType
 
 import defcon
 from afdko.checkoutlinesufo import run as check_outlines
@@ -102,7 +103,22 @@ class Font:  # pylint: disable=too-many-public-methods
         self._ttfont: t.Optional[TTFont] = None
         self._temp_file: Path = get_temp_file_path()
         self._modified = False
+        self._init_font(source, lazy, recalc_bboxes, recalc_timestamp)
 
+    def _init_font(
+        self,
+        source: t.Union[str, Path, BytesIO, TTFont],
+        lazy: t.Optional[bool],
+        recalc_bboxes: bool,
+        recalc_timestamp: bool,
+    ) -> None:
+        """
+        Initialize the font object.
+
+        Args:
+            source: A path to a font file (``str`` or ``Path`` object), a ``BytesIO`` object or
+                a ``TTFont`` object.
+        """
         if isinstance(source, (str, Path)):
             self._init_from_file(source, lazy, recalc_bboxes, recalc_timestamp)
         elif isinstance(source, BytesIO):
@@ -148,7 +164,12 @@ class Font:  # pylint: disable=too-many-public-methods
     def __enter__(self) -> "Font":
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback) -> None:  # type: ignore
+    def __exit__(
+        self,
+        exc_type: t.Optional[type],
+        exc_value: t.Optional[BaseException],
+        traceback: t.Optional[TracebackType],
+    ) -> None:
         self.close()
 
     def __repr__(self) -> str:
