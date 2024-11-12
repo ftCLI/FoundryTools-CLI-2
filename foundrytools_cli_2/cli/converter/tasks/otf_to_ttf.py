@@ -2,6 +2,7 @@ import typing as t
 from pathlib import Path
 
 from foundrytools_cli_2.cli.logger import logger
+from foundrytools_cli_2.lib.constants import T_HEAD
 from foundrytools_cli_2.lib.font import Font
 
 
@@ -33,7 +34,7 @@ def main(
         output_dir=output_dir, overwrite=overwrite, extension=extension, suffix=suffix
     )
 
-    tolerance = tolerance / 1000 * font.units_per_em
+    tolerance = tolerance / 1000 * font.ttfont[T_HEAD].unitsPerEm
 
     logger.info("Converting to TTF...")
     font.to_ttf(max_err=tolerance, reverse_direction=True)

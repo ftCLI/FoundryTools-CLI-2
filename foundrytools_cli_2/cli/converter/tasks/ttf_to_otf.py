@@ -4,6 +4,7 @@ from pathlib import Path
 from afdko.fdkutils import run_shell_command
 
 from foundrytools_cli_2.cli.logger import logger
+from foundrytools_cli_2.lib.constants import T_HEAD
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.otf_builder import build_otf
 from foundrytools_cli_2.lib.t2_charstrings import quadratics_to_cubics_2
@@ -72,7 +73,7 @@ def ttf2otf(
         font.tt_scale_upem(target_upm=target_upm)
 
     # Adjust tolerance to font units per em after scaling, not before
-    tolerance = tolerance / 1000 * font.units_per_em
+    tolerance = tolerance / 1000 * font.ttfont[T_HEAD].unitsPerEm
 
     logger.info("Converting to OTF...")
     font.to_otf(tolerance=tolerance, correct_contours=correct_contours)
