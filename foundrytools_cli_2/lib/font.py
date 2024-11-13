@@ -1133,20 +1133,15 @@ class Font:  # pylint: disable=too-many-public-methods
         except Exception as e:
             raise FontError(e) from e
 
-    def remove_unused_glyphs(self, recalc_timestamp: bool = False) -> t.Set[str]:
+    def remove_unused_glyphs(self) -> t.Set[str]:
         """
         Remove glyphs that are not reachable by Unicode values or by substitution rules in the font.
 
-        Args:
-            recalc_timestamp (bool): Boolean flag indicating whether timestamps should be
-            recalculated. Defaults to False.
-
-        Returns:
-            Set[str]: A set of strings representing the glyphs that were removed.
+        :
         """
         try:
             options = Options(**SUBSETTER_DEFAULTS)
-            options.recalc_timestamp = recalc_timestamp
+            options.recalc_timestamp = self.ttfont.recalcTimestamp
             old_glyph_order = self.ttfont.getGlyphOrder()
             cmap_table = CmapTable(self.ttfont)
             unicodes = cmap_table.get_codepoints()
