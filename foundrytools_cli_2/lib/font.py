@@ -1137,7 +1137,8 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         Remove glyphs that are not reachable by Unicode values or by substitution rules in the font.
 
-        :
+        :return: A set of strings representing the glyphs that were removed.
+        :rtype: Set[str]
         """
         try:
             options = Options(**SUBSETTER_DEFAULTS)
