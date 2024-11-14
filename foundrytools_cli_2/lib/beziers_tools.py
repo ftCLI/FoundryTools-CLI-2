@@ -30,7 +30,7 @@ def handle_curve_nodes(pen: T2CharStringPen, nodes_list: Nodelist, i: int) -> in
     return i + 1  # Ensure "curve" node is not processed again
 
 
-def draw_bez(paths: t.List[BezierPath], pen: T2CharStringPen) -> None:
+def draw_bez(pen: T2CharStringPen, paths: t.List[BezierPath]) -> None:
     """
     Draws a list of Bezier paths using a T2CharStringPen.
 
@@ -70,7 +70,7 @@ def bez_to_charstring(paths: t.List[BezierPath], font: TTFont, glyph_name: str) 
     """
     glyph_set = font.getGlyphSet()
     pen = T2CharStringPen(width=glyph_set[glyph_name].width, glyphSet=glyph_set)
-    draw_bez(paths=paths, pen=pen)
+    draw_bez(pen=pen, paths=paths)
     charstring = pen.getCharString()
     return charstring
 
