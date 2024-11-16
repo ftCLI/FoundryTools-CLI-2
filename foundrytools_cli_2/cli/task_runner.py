@@ -182,9 +182,9 @@ class TaskRunner:  # pylint: disable=too-few-public-methods
             self._log_error(e)
 
     def _get_out_file_name(self, font: Font) -> Path:
-        return font.make_out_file_name(
+        return font.get_file_path(
             output_dir=self.config.save_options.output_dir,
-            extension=font.get_real_extension(),
+            extension=font.get_file_ext(),
             overwrite=self.config.save_options.overwrite,
             suffix=self.config.save_options.suffix,
         )

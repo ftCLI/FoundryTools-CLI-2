@@ -215,7 +215,7 @@ def get_output_file(
     """
 
     instance_file_name = get_instance_file_name(font=font, instance=instance)
-    extension = font.get_real_extension()
+    extension = font.get_file_ext()
     out_file = makeOutputFileName(instance_file_name, output_dir, extension, overwrite)
     return Path(out_file)
 
