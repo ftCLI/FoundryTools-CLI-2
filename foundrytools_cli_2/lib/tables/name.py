@@ -4,7 +4,7 @@ from fontTools.misc.timeTools import timestampToString
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables._n_a_m_e import _MAC_LANGUAGE_CODES, _WINDOWS_LANGUAGE_CODES, NameRecord
 
-from foundrytools_cli_2.lib.constants import T_NAME, NameIds
+from foundrytools_cli_2.lib.constants import T_NAME, NameIds, T_HEAD, T_OS_2
 from foundrytools_cli_2.lib.tables.default import DefaultTbl
 
 
@@ -305,12 +305,12 @@ class NameTable(DefaultTbl):
         """
 
         if not alternate:
-            font_revision = round(self.ttfont["head"].fontRevision, 3)
-            vendor_id = self.ttfont["OS/2"].achVendID
+            font_revision = round(self.ttfont[T_HEAD].fontRevision, 3)
+            vendor_id = self.ttfont[T_OS_2].achVendID
             postscript_name = self.get_debug_name(NameIds.POSTSCRIPT_NAME)
             unique_id = f"{font_revision};{vendor_id};{postscript_name}"
         else:
-            year_created = timestampToString(self.ttfont["head"].created).split(" ")[-1]
+            year_created = timestampToString(self.ttfont[T_HEAD].created).split(" ")[-1]
             family_name = self.get_best_family_name()
             subfamily_name = self.get_best_subfamily_name()
             manufacturer_name = self.get_debug_name(NameIds.MANUFACTURER_NAME)
