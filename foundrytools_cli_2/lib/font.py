@@ -474,17 +474,6 @@ class Font:  # pylint: disable=too-many-public-methods
         """
         self.ttfont.save(file, reorderTables=reorder_tables)
 
-    def save_to_temp_file(self, reorder_tables: t.Optional[bool] = True) -> None:
-        """
-        Save the font to a temporary file.
-
-        Args:
-            reorder_tables: If ``True`` (the default), reorder the tables, sorting them by tag
-                (recommended by the OpenType specification). If ``False``, retain the original
-                order. If ``None``, reorder by table dependency (fastest).
-        """
-        self.save(self._temp_file, reorder_tables=reorder_tables)
-
     def close(self) -> None:
         """
         Close the font and delete the temporary file.
@@ -862,7 +851,7 @@ class Font:  # pylint: disable=too-many-public-methods
                 setattr(options, key, value)
 
             with restore_flavor(self.ttfont):
-                self.save_to_temp_file()
+                self.save(self.temp_file)
                 in_file = _validate_path(self._temp_file)
                 font = openFont(in_file, options=options)
                 font_instance = FontInstance(font=font, inpath=in_file, outpath=None)
@@ -929,7 +918,7 @@ class Font:  # pylint: disable=too-many-public-methods
 
         try:
             with restore_flavor(self.ttfont):
-                self.save_to_temp_file()
+                self.save(self.temp_file)
                 check_outlines(args=[self._temp_file.as_posix(), "--error-correction-mode"])
                 with Font(self._temp_file) as temp_font:
                     self.ttfont[T_CFF] = temp_font.ttfont[T_CFF]
