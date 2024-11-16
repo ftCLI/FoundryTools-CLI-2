@@ -4,6 +4,7 @@ from pathlib import Path
 from afdko.fdkutils import run_shell_command
 
 from foundrytools_cli_2.cli.logger import logger
+from foundrytools_cli_2.lib.constants import T_HEAD
 from foundrytools_cli_2.lib.font import Font
 from foundrytools_cli_2.lib.otf_builder import build_otf
 from foundrytools_cli_2.lib.t2_charstrings import quadratics_to_cubics_2
@@ -30,8 +31,8 @@ def _build_out_file_name(font: Font, output_dir: t.Optional[Path], overwrite: bo
     """
     flavor = font.ttfont.flavor
     suffix = ".otf" if flavor is not None else ""
-    extension = font.get_real_extension() if flavor is not None else ".otf"
-    return font.make_out_file_name(
+    extension = font.get_file_ext() if flavor is not None else ".otf"
+    return font.get_file_path(
         output_dir=output_dir, overwrite=overwrite, extension=extension, suffix=suffix
     )
 
@@ -72,7 +73,7 @@ def ttf2otf(
         font.tt_scale_upem(target_upm=target_upm)
 
     # Adjust tolerance to font units per em after scaling, not before
-    tolerance = tolerance / 1000 * font.units_per_em
+    tolerance = tolerance / 1000 * font.ttfont[T_HEAD].unitsPerEm
 
     logger.info("Converting to OTF...")
     font.to_otf(tolerance=tolerance, correct_contours=correct_contours)
@@ -113,7 +114,7 @@ def ttf2otf_with_tx(
             Defaults to ``True``.
     """
     out_file = _build_out_file_name(font=font, output_dir=output_dir, overwrite=overwrite)
-    cff_file = font.make_out_file_name(extension=".cff", output_dir=output_dir, overwrite=overwrite)
+    cff_file = font.get_file_path(extension=".cff", output_dir=output_dir, overwrite=overwrite)
 
     flavor = font.ttfont.flavor
     if flavor is not None:

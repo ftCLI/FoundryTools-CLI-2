@@ -3,6 +3,7 @@ from pathlib import Path
 from pathvalidate import sanitize_filename, sanitize_filepath
 
 from foundrytools_cli_2.cli.logger import logger
+from foundrytools_cli_2.lib.constants import T_HEAD, T_NAME
 from foundrytools_cli_2.lib.font import Font
 
 __all__ = ["main"]
@@ -28,10 +29,10 @@ def _determine_output_directory(
     Returns:
         Path: The sanitized output directory path.
     """
-    family_name = sanitize_filename(font.get_best_family_name())
-    manufacturer_name = sanitize_filename(font.get_manufacturer())
-    font_revision = "v" + sanitize_filename(font.get_font_revision())
-    extension = font.get_real_extension().replace(".", "")
+    family_name = sanitize_filename(font.ttfont[T_NAME].getBestFamilyName())
+    manufacturer_name = sanitize_filename(font.ttfont[T_NAME].getManufacturerName())
+    font_revision = sanitize_filename(f"v{font.ttfont[T_HEAD].fontRevision:.3f}")
+    extension = font.get_file_ext().replace(".", "")
 
     out_dir = base_dir
 
@@ -98,7 +99,7 @@ def main(
         )
         out_dir.mkdir(parents=True, exist_ok=True)
 
-        new_file = font.make_out_file_name(file=out_dir.joinpath(font.file.name), overwrite=True)
+        new_file = font.get_file_path(file=out_dir.joinpath(font.file.name), overwrite=True)
 
         if font.file == new_file:
             logger.skip("No changes made")  # type: ignore

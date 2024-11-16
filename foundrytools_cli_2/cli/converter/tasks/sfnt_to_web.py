@@ -33,24 +33,20 @@ def main(
     # may occur. For example, if we convert a WOFF and a WOFF2 with the same stem and
     # the same sfntVersion, the file converted first will be overwritten by the second
     # one.
-    suffix = font.get_real_extension()
+    suffix = font.get_file_ext()
 
     out_formats = [WOFF_FLAVOR, WOFF2_FLAVOR] if out_format is None else [out_format]
 
     if WOFF_FLAVOR in out_formats:
         logger.info("Converting to WOFF")
         font.to_woff()
-        out_file = font.make_out_file_name(
-            output_dir=output_dir, overwrite=overwrite, suffix=suffix
-        )
+        out_file = font.get_file_path(output_dir=output_dir, overwrite=overwrite, suffix=suffix)
         font.save(out_file, reorder_tables=reorder_tables)
         logger.success(f"File saved to {out_file}")
 
     if WOFF2_FLAVOR in out_formats:
         logger.info("Converting to WOFF2")
         font.to_woff2()
-        out_file = font.make_out_file_name(
-            output_dir=output_dir, overwrite=overwrite, suffix=suffix
-        )
+        out_file = font.get_file_path(output_dir=output_dir, overwrite=overwrite, suffix=suffix)
         font.save(out_file, reorder_tables=reorder_tables)
         logger.success(f"File saved to {out_file}")

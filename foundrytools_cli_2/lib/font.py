@@ -2,6 +2,7 @@ import math
 import typing as t
 from io import BytesIO
 from pathlib import Path
+from types import TracebackType
 
 import defcon
 from afdko.checkoutlinesufo import run as check_outlines
@@ -18,7 +19,6 @@ from fontTools.subset import Options, Subsetter
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables._f_v_a_r import Axis, NamedInstance
-from pathvalidate import sanitize_filename
 from ttfautohint import ttfautohint
 from ufo2ft.postProcessor import PostProcessor
 
@@ -44,7 +44,7 @@ from foundrytools_cli_2.lib.constants import (
 from foundrytools_cli_2.lib.otf_builder import build_otf
 from foundrytools_cli_2.lib.skia_tools import correct_glyphs_contours
 from foundrytools_cli_2.lib.t2_charstrings import quadratics_to_cubics, round_coordinates
-from foundrytools_cli_2.lib.tables import CFFTable, CmapTable, HeadTable, NameTable, OS2Table
+from foundrytools_cli_2.lib.tables import CFFTable, CmapTable, HeadTable, OS2Table
 from foundrytools_cli_2.lib.ttf_builder import build_ttf
 from foundrytools_cli_2.lib.utils.misc import restore_flavor
 from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path
@@ -102,7 +102,22 @@ class Font:  # pylint: disable=too-many-public-methods
         self._ttfont: t.Optional[TTFont] = None
         self._temp_file: Path = get_temp_file_path()
         self._modified = False
+        self._init_font(source, lazy, recalc_bboxes, recalc_timestamp)
 
+    def _init_font(
+        self,
+        source: t.Union[str, Path, BytesIO, TTFont],
+        lazy: t.Optional[bool],
+        recalc_bboxes: bool,
+        recalc_timestamp: bool,
+    ) -> None:
+        """
+        Initialize the font object.
+
+        Args:
+            source: A path to a font file (``str`` or ``Path`` object), a ``BytesIO`` object or
+                a ``TTFont`` object.
+        """
         if isinstance(source, (str, Path)):
             self._init_from_file(source, lazy, recalc_bboxes, recalc_timestamp)
         elif isinstance(source, BytesIO):
@@ -148,7 +163,12 @@ class Font:  # pylint: disable=too-many-public-methods
     def __enter__(self) -> "Font":
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback) -> None:  # type: ignore
+    def __exit__(
+        self,
+        exc_type: t.Optional[type],
+        exc_value: t.Optional[BaseException],
+        traceback: t.Optional[TracebackType],
+    ) -> None:
         self.close()
 
     def __repr__(self) -> str:
@@ -243,16 +263,6 @@ class Font:  # pylint: disable=too-many-public-methods
             value: A boolean indicating whether the font has been modified.
         """
         self._modified = value
-
-    @property
-    def units_per_em(self) -> int:
-        """
-        Get the units per em of the font.
-
-        Returns:
-            The units per em of the font.
-        """
-        return self.ttfont[T_HEAD].unitsPerEm
 
     @property
     def is_ps(self) -> bool:
@@ -496,7 +506,29 @@ class Font:  # pylint: disable=too-many-public-methods
         self.ttfont = TTFont(buf, recalcBBoxes=recalc_bboxes, recalcTimestamp=recalc_timestamp)
         buf.close()
 
-    def make_out_file_name(
+    def get_file_ext(self) -> str:
+        """
+        Get the real extension of the font. If the font is a web font, the extension will be
+        determined by the font flavor. If the font is a SFNT font, the extension will be determined
+        by the sfntVersion attribute.
+
+        Returns:
+            The real extension of the font (e.g. '.woff', '.woff2', '.otf', '.ttf').
+        """
+
+        # Order of if statements is important.
+        # WOFF and WOFF2 must be checked before OTF and TTF.
+        if self.is_woff:
+            return WOFF_EXTENSION
+        if self.is_woff2:
+            return WOFF2_EXTENSION
+        if self.is_ps:
+            return OTF_EXTENSION
+        if self.is_tt:
+            return TTF_EXTENSION
+        raise ValueError("Unknown font type.")
+
+    def get_file_path(
         self,
         file: t.Optional[Path] = None,
         output_dir: t.Optional[Path] = None,
@@ -535,7 +567,7 @@ class Font:  # pylint: disable=too-many-public-methods
             raise ValueError("File must be a Path object.")
 
         out_dir = output_dir or file.parent
-        extension = extension or self.get_real_extension()
+        extension = extension or self.get_file_ext()
         file_name = file.stem + extension
 
         # Clean up the file name by removing the extensions used as file name suffix as added by
@@ -556,115 +588,6 @@ class Font:  # pylint: disable=too-many-public-methods
             )
         )
         return out_file
-
-    def get_real_extension(self) -> str:
-        """
-        Get the real extension of the font. If the font is a web font, the extension will be
-        determined by the font flavor. If the font is a SFNT font, the extension will be determined
-        by the sfntVersion attribute.
-
-        Returns:
-            The real extension of the font (e.g. '.woff', '.woff2', '.otf', '.ttf').
-        """
-
-        # Order of if statements is important.
-        # WOFF and WOFF2 must be checked before OTF and TTF.
-        if self.is_woff:
-            return WOFF_EXTENSION
-        if self.is_woff2:
-            return WOFF2_EXTENSION
-        if self.is_ps:
-            return OTF_EXTENSION
-        if self.is_tt:
-            return TTF_EXTENSION
-        raise ValueError("Unknown font type.")
-
-    def get_best_file_name(self, source: int = 1) -> str:
-        """
-        Get the best file name for a font.
-
-        Args:
-            source (int, optional): The source string(s) from which to extract the new file name.
-                Default is 1 (FamilyName-StyleName), used also as fallback name when 4 or 5 are
-                passed but the font is TrueType.
-
-                1: FamilyName-StyleName
-                2: PostScript Name
-                3: Full Font Name
-                4: CFF fontNames (CFF fonts only)
-                5: CFF TopDict FullName (CFF fonts only)
-
-        Returns:
-            A ``Path`` object pointing to the best file name for the font.
-        """
-        name_table = NameTable(self.ttfont)
-        cff_table = CFFTable(self.ttfont) if self.is_ps else None
-
-        if self.is_variable:
-            family_name = name_table.get_best_family_name().replace(" ", "").strip()
-            if self.is_italic:
-                family_name += "-Italic"
-            axes = self.get_axes()
-            file_name = f"{family_name}[{','.join([axis.axisTag for axis in axes])}]"
-            return sanitize_filename(file_name, platform="auto")
-
-        if self.is_tt and source in (4, 5):
-            source = 1
-        if source == 1:
-            family_name = name_table.get_best_family_name()
-            subfamily_name = name_table.get_best_subfamily_name()
-            file_name = f"{family_name}-{subfamily_name}".replace(" ", "").replace(".", "")
-        elif source == 2:
-            file_name = name_table.get_debug_name(name_id=6)
-        elif source == 3:
-            file_name = name_table.get_best_full_name()
-        elif source == 4 and cff_table is not None:
-            file_name = cff_table.table.cff.fontNames[0]
-        elif source == 5 and cff_table is not None:
-            file_name = cff_table.table.cff.topDictIndex[0].FullName
-        else:
-            raise ValueError("Invalid source value.")
-        return sanitize_filename(file_name, platform="auto")
-
-    def get_best_family_name(self) -> str:
-        """
-        Get the best family name for a font.
-
-        Returns:
-            The best family name for the font.
-        """
-        name_table = NameTable(self.ttfont)
-        return name_table.get_best_family_name()
-
-    def get_best_subfamily_name(self) -> str:
-        """
-        Get the best subfamily name for a font.
-
-        Returns:
-            The best subfamily name for the font.
-        """
-        name_table = NameTable(self.ttfont)
-        return name_table.get_best_subfamily_name()
-
-    def get_manufacturer(self) -> str:
-        """
-        Get the manufacturer of the font.
-
-        Returns:
-            The manufacturer of the font.
-        """
-        name_table = NameTable(self.ttfont)
-        return name_table.get_manufacturer_name()
-
-    def get_font_revision(self) -> str:
-        """
-        Get the font revision.
-
-        Returns:
-            The font revision.
-        """
-        head = HeadTable(self.ttfont)
-        return f"{head.font_revision:.3f}"
 
     def get_axes(self) -> t.List[Axis]:
         """
@@ -1122,20 +1045,16 @@ class Font:  # pylint: disable=too-many-public-methods
         except Exception as e:
             raise FontError(e) from e
 
-    def remove_unused_glyphs(self, recalc_timestamp: bool = False) -> t.Set[str]:
+    def remove_unused_glyphs(self) -> t.Set[str]:
         """
         Remove glyphs that are not reachable by Unicode values or by substitution rules in the font.
 
-        Args:
-            recalc_timestamp (bool): Boolean flag indicating whether timestamps should be
-            recalculated. Defaults to False.
-
-        Returns:
-            Set[str]: A set of strings representing the glyphs that were removed.
+        :return: A set of strings representing the glyphs that were removed.
+        :rtype: Set[str]
         """
         try:
             options = Options(**SUBSETTER_DEFAULTS)
-            options.recalc_timestamp = recalc_timestamp
+            options.recalc_timestamp = self.ttfont.recalcTimestamp
             old_glyph_order = self.ttfont.getGlyphOrder()
             cmap_table = CmapTable(self.ttfont)
             unicodes = cmap_table.get_codepoints()
