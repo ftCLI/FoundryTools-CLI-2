@@ -47,12 +47,14 @@ def dehint(font: Font, drop_hinting_data: bool = False, subroutinize: bool = Tru
         drop_hinting_data (bool): Whether to drop hinting data.
         subroutinize (bool): Whether to subroutinize the font.
     """
-    logger.info("Dehinting")
-    font.ps_dehint(drop_hinting_data=drop_hinting_data)
-    if subroutinize:
-        logger.info("Subroutinizing")
-        font.ps_subroutinize()
-    font.is_modified = True
+    logger.info("Dehinting font...")
+
+    if font.ps_dehint(drop_hinting_data=drop_hinting_data):
+        font.is_modified = True
+
+        if subroutinize:
+            logger.info("Subroutinizing...")
+            font.ps_subroutinize()
 
 
 def check_outlines(font: Font, subroutinize: bool = True) -> None:

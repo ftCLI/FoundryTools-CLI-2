@@ -861,7 +861,7 @@ class Font:  # pylint: disable=too-many-public-methods
         except Exception as e:
             raise FontError(e) from e
 
-    def ps_dehint(self, drop_hinting_data: bool = False) -> None:
+    def ps_dehint(self, drop_hinting_data: bool = False) -> bool:
         """
         Dehint a PostScript font.
         """
@@ -870,11 +870,9 @@ class Font:  # pylint: disable=too-many-public-methods
 
         try:
             cff_table = CFFTable(self.ttfont)
-            data = cff_table.private_dict.rawDict
-            cff_table.table.cff.remove_hints()
-
-            if not drop_hinting_data:
-                self._restore_hinting_data(cff_table, data)
+            cff_table.remove_hinting(drop_hinting_data=drop_hinting_data)
+            print(cff_table.is_modified)
+            return cff_table.is_modified
         except Exception as e:
             raise FontError(e) from e
 
@@ -886,6 +884,7 @@ class Font:  # pylint: disable=too-many-public-methods
             raise NotImplementedError(
                 "Subroutinization is only supported for PostScript flavored fonts."
             )
+
         try:
             with restore_flavor(self.ttfont):
                 subroutinize(self.ttfont)
