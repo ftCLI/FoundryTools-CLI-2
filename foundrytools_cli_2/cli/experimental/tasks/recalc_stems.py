@@ -6,10 +6,10 @@ from afdko.otfautohint.autohint import FontInstance, fontWrapper, openFont
 from afdko.otfautohint.hinter import glyphHinter
 from afdko.otfautohint.report import Report
 from fontTools.ttLib import TTFont
+from foundrytools import Font
+from foundrytools.utils.path_tools import get_temp_file_path
 
 from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.utils.path_tools import get_temp_file_path
 
 H_STEM_GLYPHS = ["A", "H", "T", "S", "C", "O"]
 V_STEM_GLYPHS = ["E", "H", "I", "K", "L", "M", "N", "T", "U"]
@@ -132,7 +132,7 @@ def recalc_stems(
     return int(h_stems[0][1]), int(v_stems[0][1])
 
 
-def main(font: Font) -> None:
+def main(font: Font) -> bool:
     """
     Recalculates the hinting stems of an OTF font.
 
@@ -141,11 +141,11 @@ def main(font: Font) -> None:
     """
     if not font.is_ps:
         logger.error("Font is not a PostScript font")
-        return
+        return False
 
     if font.file is None:
         logger.error("Font has no file path")
-        return
+        return False
 
     flavor = font.ttfont.flavor
     temp_file = get_temp_file_path()
@@ -165,7 +165,8 @@ def main(font: Font) -> None:
 
     if current_std_h_w == std_h_w and current_std_v_w == std_v_w:
         logger.info("Stems are already up-to-date")
-    else:
-        set_font_stems(font.ttfont, std_h_w, std_v_w)
-        font.ttfont.flavor = flavor
-        font.is_modified = True
+        return False
+
+    set_font_stems(font.ttfont, std_h_w, std_v_w)
+    font.ttfont.flavor = flavor
+    return True

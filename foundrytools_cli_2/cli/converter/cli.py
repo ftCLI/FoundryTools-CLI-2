@@ -4,13 +4,16 @@ import typing as t
 from pathlib import Path
 
 import click
+from foundrytools import Font
 
 from foundrytools_cli_2.cli.converter.options import (
+    check_outlines_flag,
     in_format_choice,
     out_format_choice,
     tolerance_option,
     ttf2otf_mode_choice,
 )
+from foundrytools_cli_2.cli.shared_callbacks import choice_to_int_callback
 from foundrytools_cli_2.cli.shared_options import (
     base_options,
     correct_contours_flag,
@@ -19,7 +22,6 @@ from foundrytools_cli_2.cli.shared_options import (
     target_upm_option,
 )
 from foundrytools_cli_2.cli.task_runner import TaskRunner
-from foundrytools_cli_2.lib.font import Font
 
 cli = click.Group("converter", help="Font conversion utilities.")
 
@@ -46,6 +48,7 @@ def otf_to_ttf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @tolerance_option()
 @target_upm_option(help_msg="Scale the converted fonts to the specified UPM.")
 @correct_contours_flag()
+@check_outlines_flag()
 @subroutinize_flag()
 @base_options()
 def ttf_to_otf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
@@ -107,12 +110,37 @@ def sfnt_to_web(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("var2static")
+@click.option(
+    "-ol",
+    "--overlap-mode",
+    "overlap",
+    type=click.Choice(["0", "1", "2", "3"]),
+    default="1",
+    show_default=True,
+    callback=choice_to_int_callback,
+    help="""
+    The overlap mode to use when converting variable fonts to static fonts.
+    
+    See https://fonttools.readthedocs.io/en/latest/varLib/instancer.html#fontTools.varLib.instancer.instantiateVariableFont
+    
+    \b
+    0: KEEP_AND_DONT_SET_FLAGS
+    1: KEEP_AND_SET_FLAGS
+    2: REMOVE
+    3: REMOVE_AND_IGNORE_ERRORS
+    """,
+)
+@click.option(
+    "-s",
+    "--select-instance",
+    is_flag=True,
+    help="Select a single instance with custom axis values.",
+)
 @base_options()
 def variable_to_static(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Convert variable fonts to static fonts.
     """
-
     from foundrytools_cli_2.cli.converter.tasks.variable_to_static import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)

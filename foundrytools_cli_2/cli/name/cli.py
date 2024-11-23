@@ -6,7 +6,6 @@ import click
 
 from foundrytools_cli_2.cli.name.options import (
     alternate_unique_id,
-    delete_all,
     language_string,
     name_id,
     name_ids,
@@ -49,7 +48,6 @@ def del_empty_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("del-mac-names")
-@delete_all()
 @base_options()
 def del_mac_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """

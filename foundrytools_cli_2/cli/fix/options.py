@@ -82,7 +82,10 @@ def min_area_option() -> t.Callable:
             "--min-area",
             type=click.IntRange(min=0),
             default=25,
-            help="Remove tiny paths with area less than the specified value.",
+            help="""
+            All subpaths with a bounding box less than this value will be removed. Default is 25
+            square units (same as afdko.checkoutlinesufo). Set to 0 to disable this feature.
+            """,
         )
     ]
     return add_options(_min_area_option)

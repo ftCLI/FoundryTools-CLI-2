@@ -1,10 +1,10 @@
 from pathlib import Path
 
+from foundrytools import Font
+from foundrytools.constants import T_HEAD, T_NAME
 from pathvalidate import sanitize_filename, sanitize_filepath
 
 from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.lib.constants import T_HEAD, T_NAME
-from foundrytools_cli_2.lib.font import Font
 
 __all__ = ["main"]
 

@@ -1,11 +1,12 @@
 import typing as t
 
+from foundrytools import Font
+from foundrytools.core.tables.os_2 import InvalidOS2VersionError
+
 from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.tables import HeadTable, OS2Table
 
 
-def recalc_avg_char_width(font: Font) -> None:
+def recalc_avg_char_width(font: Font) -> bool:
     """
     Recalculates the ``OS/2.xAvgCharWidth`` value.
 
@@ -13,12 +14,11 @@ def recalc_avg_char_width(font: Font) -> None:
         font (Font): The Font object representing the font file.
     """
 
-    os_2_table = OS2Table(font.ttfont)
-    os_2_table.recalc_avg_char_width()
-    font.is_modified = os_2_table.is_modified
+    font.t_os_2.table.recalcAvgCharWidth(font.ttfont)
+    return font.t_os_2.is_modified
 
 
-def recalc_cap_height(font: Font) -> None:
+def recalc_cap_height(font: Font) -> bool:
     """
     Recalculates the ``OS/2.sCapHeight`` value.
 
@@ -26,12 +26,11 @@ def recalc_cap_height(font: Font) -> None:
         font (Font): The Font object representing the font file.
     """
 
-    os_2_table = OS2Table(font.ttfont)
-    os_2_table.recalc_cap_height()
-    font.is_modified = os_2_table.is_modified
+    font.t_os_2.recalc_cap_height()
+    return font.t_os_2.is_modified
 
 
-def recalc_x_height(font: Font) -> None:
+def recalc_x_height(font: Font) -> bool:
     """
     Recalculates the ``OS/2.sXHeight`` value.
 
@@ -39,12 +38,11 @@ def recalc_x_height(font: Font) -> None:
         font (Font): The Font object representing the font file.
     """
 
-    os_2_table = OS2Table(font.ttfont)
-    os_2_table.recalc_x_height()
-    font.is_modified = os_2_table.is_modified
+    font.t_os_2.recalc_x_height()
+    return font.t_os_2.is_modified
 
 
-def recalc_max_context(font: Font) -> None:
+def recalc_max_context(font: Font) -> bool:
     """
     Recalculates the ``OS/2.usMaxContext`` value.
 
@@ -52,12 +50,11 @@ def recalc_max_context(font: Font) -> None:
         font (Font): The Font object representing the font file.
     """
 
-    os_2_table = OS2Table(font.ttfont)
-    os_2_table.recalc_max_context()
-    font.is_modified = os_2_table.is_modified
+    font.t_os_2.recalc_max_context()
+    return font.t_os_2.is_modified
 
 
-def recalc_unicode_ranges(font: Font, percentage: float = 33) -> None:
+def recalc_unicode_ranges(font: Font, percentage: float = 33) -> bool:
     """
     Recalculates the ``OS/2.ulUnicodeRange1`` through ``OS/2.ulUnicodeRange4`` values.
 
@@ -66,16 +63,17 @@ def recalc_unicode_ranges(font: Font, percentage: float = 33) -> None:
         font (Font): The Font object representing the font file.
     """
 
-    os_2_table = OS2Table(font.ttfont)
-    result = os_2_table.recalc_unicode_ranges(percentage=percentage)
+    result = font.t_os_2.recalc_unicode_ranges(percentage=percentage)
 
     if result:
         for block in result:
             logger.info(f"({block[0]}) {block[1]}: {block[2]}")
-        font.is_modified = True
+        return True
+
+    return False
 
 
-def recalc_codepage_ranges(font: Font) -> None:
+def recalc_codepage_ranges(font: Font) -> bool:
     """
     Recalculates the ``OS/2.ulCodePageRange1`` through ``OS/2.ulCodePageRange2`` values.
 
@@ -83,9 +81,8 @@ def recalc_codepage_ranges(font: Font) -> None:
         font (Font): The Font object representing the font file.
     """
 
-    os_2_table = OS2Table(font.ttfont)
-    os_2_table.recalc_code_page_ranges()
-    font.is_modified = os_2_table.is_modified
+    font.t_os_2.recalc_code_page_ranges()
+    return font.t_os_2.is_modified
 
 
 def set_attrs(
@@ -100,7 +97,7 @@ def set_attrs(
     win_descent: t.Optional[int] = None,
     x_height: t.Optional[int] = None,
     cap_height: t.Optional[int] = None,
-) -> None:
+) -> bool:
     """
     Sets the font's OS/2 table properties based on the provided parameters.
 
@@ -118,7 +115,6 @@ def set_attrs(
         win_descent (optional): The usWinDescent value to set.
     """
 
-    os_2_table = OS2Table(font.ttfont)
     attrs = {
         "weight_class": weight_class,
         "width_class": width_class,
@@ -135,10 +131,11 @@ def set_attrs(
     for attr, value in attrs.items():
         if value is not None:
             try:
-                setattr(os_2_table, attr, value)
-            except (ValueError, os_2_table.InvalidOS2VersionError) as e:
+                setattr(font.t_os_2, attr, value)
+            except (ValueError, InvalidOS2VersionError) as e:
                 logger.error(f"Error setting {attr} to {value}: {e}")
-    font.is_modified = os_2_table.is_modified
+
+    return font.t_os_2.is_modified
 
 
 def set_fs_selection(
@@ -149,7 +146,7 @@ def set_fs_selection(
     use_typo_metrics: t.Optional[bool] = None,
     wws_consistent: t.Optional[bool] = None,
     oblique: t.Optional[bool] = None,
-) -> None:
+) -> bool:
     """
     Modifies the font's ``OS/2.fsSelection`` attributes based on the provided parameters. Updates
     the font's italic, bold, regular, use_typo_metrics, wws_consistent, and oblique attributes based
@@ -167,23 +164,22 @@ def set_fs_selection(
         oblique (optional): A boolean value indicating whether to set the oblique bit in the OS/2
             table.
     """
-    os_2_table = OS2Table(font.ttfont)
-    head_table = HeadTable(font.ttfont)
+
     if italic is not None:
-        font.is_italic = italic
+        font.flags.is_italic = italic
     if bold is not None:
-        font.is_bold = bold
+        font.flags.is_bold = bold
     if regular is not None:
-        font.is_regular = regular
+        font.flags.is_regular = regular
     if use_typo_metrics is not None:
-        os_2_table.fs_selection.use_typo_metrics = use_typo_metrics
+        font.t_os_2.fs_selection.use_typo_metrics = use_typo_metrics
     if wws_consistent is not None:
-        os_2_table.fs_selection.wws_consistent = wws_consistent
+        font.t_os_2.fs_selection.wws_consistent = wws_consistent
     if oblique is not None:
-        os_2_table.fs_selection.oblique = oblique
+        font.t_os_2.fs_selection.oblique = oblique
     # IMPORTANT: head_table.modified must be evaluated before os_2_table.modified to suppress
     # fontTools warning about non-matching bits.
-    font.is_modified = head_table.is_modified or os_2_table.is_modified
+    return font.t_head.is_modified or font.t_os_2.is_modified
 
 
 def set_fs_type(
@@ -191,7 +187,7 @@ def set_fs_type(
     embed_level: t.Optional[int] = None,
     no_subsetting: t.Optional[bool] = None,
     bitmap_embed_only: t.Optional[bool] = None,
-) -> None:
+) -> bool:
     """
     Sets the font's OS/2 table properties related to font embedding and subsetting.
 
@@ -202,19 +198,20 @@ def set_fs_type(
         bitmap_embed_only (optional): A boolean value indicating whether only bitmaps should be
             embedded.
     """
-    os_2_table = OS2Table(font.ttfont)
     attrs = {
         "embed_level": embed_level,
         "no_subsetting": no_subsetting,
         "bitmap_embed_only": bitmap_embed_only,
     }
+
     for attr, value in attrs.items():
         if value is not None:
-            setattr(os_2_table, attr, value)
-    font.is_modified = os_2_table.is_modified
+            setattr(font.t_os_2, attr, value)
+
+    return font.t_os_2.is_modified
 
 
-def upgrade_version(font: Font, target_version: int) -> None:
+def upgrade_version(font: Font, target_version: int) -> bool:
     """
     Upgrades the OS/2 table version to the specified version.
 
@@ -223,12 +220,11 @@ def upgrade_version(font: Font, target_version: int) -> None:
         target_version: The version to upgrade to.
     """
 
-    os_2_table = OS2Table(font.ttfont)
-    os_2_table.upgrade(target_version)
-    font.is_modified = os_2_table.is_modified
+    font.t_os_2.upgrade(target_version)
+    return font.t_os_2.is_modified
 
 
-def set_panose(font: Font, **kwargs: t.Dict[str, int]) -> None:
+def set_panose(font: Font, **kwargs: t.Dict[str, int]) -> bool:
     """
     Sets the PANOSE classification in the OS/2 table.
 
@@ -236,8 +232,8 @@ def set_panose(font: Font, **kwargs: t.Dict[str, int]) -> None:
         font: The Font object representing the font to modify.
         kwargs: A dictionary containing the PANOSE classification values to set.
     """
-    os_2_table = OS2Table(font.ttfont)
     for key, value in kwargs.items():
         if value is not None:
-            setattr(os_2_table.table.panose, key, value)
-    font.is_modified = os_2_table.is_modified
+            setattr(font.t_os_2.table.panose, key, value)
+
+    return font.t_os_2.is_modified

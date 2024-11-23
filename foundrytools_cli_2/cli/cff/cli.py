@@ -11,7 +11,7 @@ from foundrytools_cli_2.cli.cff.options import (
     top_dict_names_options,
     unique_id_flag,
 )
-from foundrytools_cli_2.cli.shared_callbacks import validate_params
+from foundrytools_cli_2.cli.shared_callbacks import ensure_at_least_one_param
 from foundrytools_cli_2.cli.shared_options import base_options, new_string, old_string
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
@@ -26,7 +26,7 @@ def set_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Sets the ``cff.fontNames[0]`` and/or ``topDictIndex[0]`` values.
     """
-    validate_params(click.get_current_context())
+    ensure_at_least_one_param(click.get_current_context())
 
     from foundrytools_cli_2.cli.cff.tasks import set_names as task
 
@@ -43,7 +43,7 @@ def del_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Deletes attributes from ``topDictIndex[0]`` using the provided keyword arguments.
     """
-    validate_params(click.get_current_context())
+    ensure_at_least_one_param(click.get_current_context())
 
     from foundrytools_cli_2.cli.cff.tasks import del_names as task
 

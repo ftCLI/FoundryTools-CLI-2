@@ -1,10 +1,9 @@
 from pathlib import Path
 
+from foundrytools import Font
 from pathvalidate import sanitize_filename
 
 from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.tables import CFFTable, NameTable
 
 
 def _get_file_stem(font: Font, source: int = 1) -> str:
@@ -25,31 +24,31 @@ def _get_file_stem(font: Font, source: int = 1) -> str:
     Returns:
         A sanitized file name for the font.
     """
-    name_table = NameTable(font.ttfont)
-    cff_table = CFFTable(font.ttfont) if font.is_ps else None
 
     if font.is_variable:
-        family_name = name_table.get_best_family_name().replace(" ", "").strip()
-        if font.is_italic:
+        family_name = font.t_name.table.getBestFamilyName().replace(" ", "").strip()
+        if font.flags.is_italic:
             family_name += "-Italic"
-        axes = font.get_axes()
+        axes = font.t_fvar.table.axes
+        if not axes:
+            raise RuntimeError("No axes found in the variable font.")
         file_name = f"{family_name}[{','.join([axis.axisTag for axis in axes])}]"
         return sanitize_filename(file_name, platform="auto")
 
     if font.is_tt and source in (4, 5):
         source = 1
     if source == 1:
-        family_name = name_table.get_best_family_name()
-        subfamily_name = name_table.get_best_subfamily_name()
+        family_name = str(font.t_name.table.getBestFamilyName())
+        subfamily_name = str(font.t_name.table.getBestSubFamilyName())
         file_name = f"{family_name}-{subfamily_name}".replace(" ", "").replace(".", "")
     elif source == 2:
-        file_name = name_table.get_debug_name(name_id=6)
+        file_name = str(font.t_name.table.getDebugName(6))
     elif source == 3:
-        file_name = name_table.get_best_full_name()
-    elif source == 4 and cff_table is not None:
-        file_name = cff_table.table.cff.fontNames[0]
-    elif source == 5 and cff_table is not None:
-        file_name = cff_table.table.cff.topDictIndex[0].FullName
+        file_name = str(font.t_name.table.getBestFullName())
+    elif source == 4 and font.is_ps:
+        file_name = font.t_cff_.table.cff.fontNames[0]
+    elif source == 5 and font.is_ps:
+        file_name = font.t_cff_.top_dict.FullName
     else:
         raise ValueError("Invalid source value.")
     return sanitize_filename(file_name, platform="auto")

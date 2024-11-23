@@ -2,13 +2,13 @@ import typing as t
 from pathlib import Path
 
 from afdko.fdkutils import run_shell_command
+from foundrytools import Font
+from foundrytools.app.otf_check_outlines import run as otf_check_outlines
+from foundrytools.app.otf_subroutinize import run as otf_subroutinize
+from foundrytools.lib.otf_builder import build_otf
+from foundrytools.lib.qu2cu import quadratics_to_cubics_2
 
 from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.lib.constants import T_HEAD
-from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.otf_builder import build_otf
-from foundrytools_cli_2.lib.t2_charstrings import quadratics_to_cubics_2
-from foundrytools_cli_2.lib.tables import OS2Table
 
 
 def _build_out_file_name(font: Font, output_dir: t.Optional[Path], overwrite: bool = True) -> Path:
@@ -42,6 +42,7 @@ def ttf2otf(
     tolerance: float = 1.0,
     target_upm: t.Optional[int] = None,
     correct_contours: bool = True,
+    check_outlines: bool = False,
     subroutinize: bool = True,
     output_dir: t.Optional[Path] = None,
     overwrite: bool = True,
@@ -57,6 +58,7 @@ def ttf2otf(
             ``None``.
         correct_contours (bool, optional): Whether to correct the contours with pathops. Defaults to
             ``True``.
+        check_outlines (bool, optional): Whether to check the outlines with tx. Default is ``True``.
         subroutinize (bool, optional): Whether to subroutinize the font. Defaults to ``True``.
         output_dir (t.Optional[Path], optional): The output directory. If ``None``, the output file
             will be saved in the same directory as the input file. Defaults to ``None``.
@@ -70,17 +72,21 @@ def ttf2otf(
 
     if target_upm:
         logger.info(f"Scaling UPM to {target_upm}...")
-        font.tt_scale_upem(target_upm=target_upm)
+        font.scale_upm(target_upm=target_upm)
 
     # Adjust tolerance to font units per em after scaling, not before
-    tolerance = tolerance / 1000 * font.ttfont[T_HEAD].unitsPerEm
+    tolerance = tolerance / 1000 * font.t_head.units_per_em
 
     logger.info("Converting to OTF...")
     font.to_otf(tolerance=tolerance, correct_contours=correct_contours)
 
+    if check_outlines:
+        logger.info("Checking outlines...")
+        otf_check_outlines(font)
+
     if subroutinize:
         logger.info("Subroutinizing...")
-        font.ps_subroutinize()
+        otf_subroutinize(font)
 
     font.ttfont.flavor = flavor
     font.save(out_file, reorder_tables=True)
@@ -91,6 +97,7 @@ def ttf2otf_with_tx(
     font: Font,
     target_upm: t.Optional[int] = None,
     correct_contours: bool = True,
+    check_outlines: bool = False,
     subroutinize: bool = True,
     output_dir: t.Optional[Path] = None,
     recalc_timestamp: bool = False,
@@ -105,6 +112,7 @@ def ttf2otf_with_tx(
             ``None``, which means that the font will not be scaled.
         correct_contours (bool, optional): Whether to correct the contours with pathops. Defaults to
             ``True``.
+        check_outlines (bool, optional): Whether to check the outlines with tx. Default is ``True``.
         subroutinize (bool, optional): Whether to subroutinize the font. Defaults to ``True``.
         output_dir (t.Optional[Path], optional): The output directory. If ``None``, the output file
             will be saved in the same directory as the input file. Defaults to ``None``.
@@ -124,7 +132,7 @@ def ttf2otf_with_tx(
 
     if target_upm:
         logger.info(f"Scaling UPM to {target_upm}...")
-        font.tt_scale_upem(target_upm=target_upm)
+        font.scale_upm(target_upm=target_upm)
         font.ttfont.save(out_file, reorderTables=None)
         font = Font(out_file, recalc_timestamp=recalc_timestamp)
         tx_command = ["tx", "-cff", "-S", "+V", "+b", str(out_file), str(cff_file)]
@@ -146,12 +154,15 @@ def ttf2otf_with_tx(
         font = Font(out_file, recalc_timestamp=recalc_timestamp)
         font.correct_contours()
 
-    os_2_table = OS2Table(font.ttfont)
-    os_2_table.recalc_avg_char_width()
+    font.t_os_2.recalc_avg_char_width()
+
+    if check_outlines:
+        logger.info("Checking outlines...")
+        otf_check_outlines(font)
 
     if subroutinize:
         logger.info("Subroutinizing...")
-        font.ps_subroutinize()
+        otf_subroutinize(font)
 
     font.ttfont.flavor = flavor
 
