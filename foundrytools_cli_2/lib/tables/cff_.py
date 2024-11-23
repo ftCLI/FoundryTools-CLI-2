@@ -8,6 +8,10 @@ from foundrytools_cli_2.lib.constants import T_CFF
 from foundrytools_cli_2.lib.tables.default import DefaultTbl
 
 
+class CCFTableError(Exception):
+    """Exception raised when an error occurs in the CFF table."""
+
+
 class CFFTable(DefaultTbl):
     """
     This class extends the fontTools ``CFF `` table to add some useful methods.
@@ -32,6 +36,47 @@ class CFFTable(DefaultTbl):
         Returns the private field of the 'CFF ' table.
         """
         return self.top_dict.Private
+
+    def _restore_hinting_data(self, private_dict: t.Dict[str, t.Any]) -> None:
+        """
+        Restore hinting data to a PostScript font.
+
+        :param cff_table: The CFF table of the font.
+        :type cff_table: CFFTable
+        :param private_dict: The private dictionary of the font.
+        :type private_dict: Dict[str, Any]
+        """
+        hinting_attributes = (
+            "BlueValues",
+            "OtherBlues",
+            "FamilyBlues",
+            "FamilyOtherBlues",
+            "StdHW",
+            "StdVW",
+            "StemSnapH",
+            "StemSnapV",
+        )
+
+        try:
+            for attr in hinting_attributes:
+                setattr(self.private_dict, attr, private_dict.get(attr))
+        except Exception as e:
+            raise CCFTableError(f"Error restoring hinting data: {e}") from e
+
+    def remove_hinting(self, drop_hinting_data: bool = False) -> None:
+        """
+        Removes hinting data from a PostScript font.
+
+        :param drop_hinting_data: If True, the hinting data will be removed from the font.
+        :type drop_hinting_data: bool
+        """
+        try:
+            data = self.private_dict.rawDict
+            self.table.cff.remove_hints()
+            if not drop_hinting_data:
+                self._restore_hinting_data(private_dict=data)
+        except Exception as e:
+            raise CCFTableError(f"Error while removing hinting data: {e}") from e
 
     def set_names(self, **kwargs: t.Dict[str, str]) -> None:
         """

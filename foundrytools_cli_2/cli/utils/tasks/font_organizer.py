@@ -30,7 +30,7 @@ def _determine_output_directory(
         Path: The sanitized output directory path.
     """
     family_name = sanitize_filename(font.ttfont[T_NAME].getBestFamilyName())
-    manufacturer_name = sanitize_filename(font.ttfont[T_NAME].getManufacturerName())
+    manufacturer_name = sanitize_filename(font.ttfont[T_NAME].getDebugName(8))
     font_revision = sanitize_filename(f"v{font.ttfont[T_HEAD].fontRevision:.3f}")
     extension = font.get_file_ext().replace(".", "")
 

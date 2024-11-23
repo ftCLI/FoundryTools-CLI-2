@@ -151,7 +151,7 @@ def main(font: Font) -> None:
     temp_file = get_temp_file_path()
     if flavor is not None:
         font.ttfont.flavor = None
-        font.save_to_temp_file()
+        font.save(font.temp_file)
         input_file = font.temp_file
     else:
         input_file = font.file

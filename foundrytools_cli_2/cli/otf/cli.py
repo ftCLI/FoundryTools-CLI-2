@@ -40,7 +40,6 @@ def dehint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_tt = True
-    runner.force_modified = True
     runner.run()
 
 
