@@ -168,7 +168,7 @@ def main(font: Font, min_slant: float = 2.0, mode: int = 1) -> None:
             Defaults to 1.
     """
 
-    calculated_italic_angle = otRound(font.calculate_italic_angle(min_slant=min_slant))
+    calculated_italic_angle = otRound(font.calc_italic_angle(min_slant=min_slant))
     check_post_table(font=font, calculated_italic_angle=calculated_italic_angle)
     check_hhea_table(font=font, calculated_italic_angle=calculated_italic_angle)
     if font.is_ps:

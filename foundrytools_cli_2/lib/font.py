@@ -670,7 +670,7 @@ class Font:  # pylint: disable=too-many-public-methods
         except Exception as e:
             raise FontError(e) from e
 
-    def calculate_italic_angle(self, min_slant: float = 2.0) -> float:
+    def calc_italic_angle(self, min_slant: float = 2.0) -> float:
         """
         Calculates the italic angle of a font by measuring the slant of the glyph 'H' or 'uni0048'.
 
