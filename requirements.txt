@@ -11,4 +11,4 @@ rich==13.9.4
 ttfautohint-py==0.5.1
 ufo2ft==3.3.1
 ufo-extractor==0.8.1
-win32-setctime==1.1.0; sys_platform == 'win32'
+win32-setctime==1.2.0; sys_platform == 'win32'
