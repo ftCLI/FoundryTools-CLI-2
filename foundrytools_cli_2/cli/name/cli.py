@@ -14,7 +14,7 @@ from foundrytools_cli_2.cli.name.options import (
     skip_name_ids,
     win_or_mac_platform_id,
 )
-from foundrytools_cli_2.cli.shared_options import base_options, new_string, old_string
+from foundrytools_cli_2.cli.shared_options import base_options, new_string_option, old_string_option
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
 cli = click.Group(help="Utilities for editing the ``name`` table.")
@@ -73,8 +73,8 @@ def del_unused_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("find-replace")
-@old_string()
-@new_string()
+@old_string_option()
+@new_string_option()
 @name_ids(required=False)
 @skip_name_ids()
 @platform_id()
