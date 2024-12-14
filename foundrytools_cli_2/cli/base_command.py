@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import Optional
 
@@ -23,7 +24,7 @@ class BaseCommand(click.Command):
             ),
             click.Option(
                 ["-out", "--output-dir"],
-                type=click.Path(file_okay=False, writable=True),
+                type=click.Path(path_type=Path, file_okay=False, writable=True),
                 callback=output_dir_callback,
                 help="""
                 The directory where output files are to be saved.
