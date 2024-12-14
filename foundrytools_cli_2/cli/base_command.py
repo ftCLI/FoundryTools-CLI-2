@@ -35,9 +35,9 @@ class BaseCommand(click.Command):
                 """,
             ),
             click.Option(
-                ["--no-overwrite"],
+                ["--no-overwrite", "overwrite"],
                 is_flag=True,
-                default=False,
+                default=True,
                 show_default=True,
                 help="""
                 Do not overwrite existing files.
