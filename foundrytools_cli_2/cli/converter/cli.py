@@ -6,6 +6,7 @@ from pathlib import Path
 import click
 from foundrytools import Font
 
+from foundrytools_cli_2.cli.base_command import BaseCommand
 from foundrytools_cli_2.cli.converter.options import (
     check_outlines_flag,
     in_format_choice,
@@ -26,10 +27,9 @@ from foundrytools_cli_2.cli.task_runner import TaskRunner
 cli = click.Group("converter", help="Font conversion utilities.")
 
 
-@cli.command("otf2ttf")
+@cli.command("otf2ttf", cls=BaseCommand)
 @tolerance_option()
 @target_upm_option(help_msg="Scale the converted fonts to the specified UPM.")
-@base_options()
 def otf_to_ttf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Convert PostScript flavored fonts to TrueType flavored fonts.
@@ -43,14 +43,13 @@ def otf_to_ttf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("ttf2otf")
+@cli.command("ttf2otf", cls=BaseCommand)
 @ttf2otf_mode_choice()
 @tolerance_option()
 @target_upm_option(help_msg="Scale the converted fonts to the specified UPM.")
 @correct_contours_flag()
 @check_outlines_flag()
 @subroutinize_flag()
-@base_options()
 def ttf_to_otf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Convert TrueType flavored fonts to PostScript flavored fonts.
@@ -70,10 +69,9 @@ def ttf_to_otf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("wf2ft")
+@cli.command("wf2ft", cls=BaseCommand)
 @in_format_choice()
 @reorder_tables_flag()
-@base_options()
 def web_to_sfnt(
     input_path: Path,
     in_format: t.Optional[t.Literal["woff", "woff2"]],
@@ -92,10 +90,9 @@ def web_to_sfnt(
     runner.run()
 
 
-@cli.command("ft2wf")
+@cli.command("ft2wf", cls=BaseCommand)
 @out_format_choice()
 @reorder_tables_flag()
-@base_options()
 def sfnt_to_web(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Convert SFNT fonts to WOFF and/or WOFF2 fonts.
@@ -109,7 +106,7 @@ def sfnt_to_web(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("var2static")
+@cli.command("var2static", cls=BaseCommand)
 @click.option(
     "-ol",
     "--overlap-mode",
@@ -136,7 +133,6 @@ def sfnt_to_web(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     is_flag=True,
     help="Select a single instance with custom axis values.",
 )
-@base_options()
 def variable_to_static(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Convert variable fonts to static fonts.

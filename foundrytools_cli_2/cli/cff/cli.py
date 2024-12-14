@@ -1,4 +1,5 @@
 # pylint: disable=import-outside-toplevel
+from foundrytools_cli_2.cli.base_command import BaseCommand
 
 import typing as t
 from pathlib import Path
@@ -19,10 +20,9 @@ from foundrytools_cli_2.cli.task_runner import TaskRunner
 cli = click.Group("cff", help="Utilities for editing the ``CFF`` table.")
 
 
-@cli.command("set-names")
+@cli.command("set-names", cls=BaseCommand)
 @font_names_option()
 @top_dict_names_options()
-@base_options()
 def set_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Sets the ``cff.fontNames[0]`` and/or ``topDictIndex[0]`` values.
@@ -38,10 +38,9 @@ def set_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("del-names")
+@cli.command("del-names", cls=BaseCommand)
 @top_dict_names_flags()
 @unique_id_flag()
-@base_options()
 def del_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Deletes attributes from ``topDictIndex[0]`` using the provided keyword arguments.
@@ -57,10 +56,9 @@ def del_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("find-replace")
+@cli.command("find-replace", cls=BaseCommand)
 @old_string_option()
 @new_string_option()
-@base_options()
 def find_replace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Finds and replaces a string in the ``CFF`` table. It performs the replacement in
