@@ -9,19 +9,20 @@ from foundrytools.app.otf_check_outlines import run as otf_check_outlines
 from foundrytools.app.otf_dehint import run as otf_dehint
 from foundrytools.app.otf_desubroutinize import run as otf_desubroutinize
 from foundrytools.app.otf_subroutinize import run as otf_subroutinize
+from foundrytools.utils.path_tools import get_temp_file_path
 
+from foundrytools_cli_2.cli.base_command import BaseCommand
 from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.cli.otf.options import drop_hinting_data_flag, otf_autohint_options
-from foundrytools_cli_2.cli.shared_options import base_options, subroutinize_flag
+from foundrytools_cli_2.cli.shared_options import subroutinize_flag
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
 cli = click.Group(help="Utilities for editing OpenType-PS fonts.")
 
 
-@cli.command("autohint")
+@cli.command("autohint", cls=BaseCommand)
 @otf_autohint_options()
 @subroutinize_flag()
-@base_options()
 def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Autohint OpenType-PS fonts with ``afdko.otfautohint``.
@@ -44,10 +45,9 @@ def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("dehint")
+@cli.command("dehint", cls=BaseCommand)
 @drop_hinting_data_flag()
 @subroutinize_flag()
-@base_options()
 def dehint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Dehint OpenType-PS fonts.
@@ -67,8 +67,7 @@ def dehint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("subr")
-@base_options()
+@cli.command("subr", cls=BaseCommand)
 def subr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Subroutinize OpenType-PS fonts with ``cffsubr``.
@@ -83,8 +82,7 @@ def subr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("desubr")
-@base_options()
+@cli.command("desubr", cls=BaseCommand)
 def desubr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Desubroutinize OpenType-PS fonts with ``cffsubr``.
@@ -99,9 +97,8 @@ def desubr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("check-outlines")
+@cli.command("check-outlines", cls=BaseCommand)
 @subroutinize_flag()
-@base_options()
 def check_outlines(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Check the outlines of OpenType-PS fonts with ``afdko.checkoutlinesufo``.
@@ -122,8 +119,7 @@ def check_outlines(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("round-coordinates")
-@base_options()
+@cli.command("round-coordinates", cls=BaseCommand)
 @subroutinize_flag()
 def round_coordinates(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
@@ -145,6 +141,54 @@ def round_coordinates(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
         return True
 
     runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner.filter.filter_out_tt = True
+    runner.filter.filter_out_variable = True
+    runner.run()
+
+
+@cli.command("recalc-stems", cls=BaseCommand)
+def recalc_stems(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Recalculate the hinting stems of OpenType-PS fonts.
+    """
+    from foundrytools.app.otf_recalc_stems import run as get_stems
+    def task(font: Font) -> bool:
+        if not font.is_ps:
+            logger.error("Font is not a PostScript font")
+            return False
+
+        if font.file is None:
+            logger.error("Font has no file path")
+            return False
+
+        flavor = font.ttfont.flavor
+        temp_file = get_temp_file_path()
+        if flavor is not None:
+            font.ttfont.flavor = None
+            font.save(font.temp_file)
+            input_file = font.temp_file
+        else:
+            input_file = font.file
+
+        logger.info("Getting stems...")
+
+        current_std_h_w = font.t_cff_.get_hinting_data().get("StdHW", None)
+        current_std_v_w = font.t_cff_.get_hinting_data().get("StdVW", None)
+
+        std_h_w, std_v_w = get_stems(input_file)
+        logger.info(f"StdHW: {current_std_h_w} -> {std_h_w}")
+        logger.info(f"StdVW: {current_std_v_w} -> {std_v_w}")
+        temp_file.unlink(missing_ok=True)
+
+        if (current_std_h_w, current_std_v_w) == (std_h_w, std_v_w):
+            logger.info("No changes were made")
+            return False
+
+        font.t_cff_.set_hinting_data(**{"StdHW": std_h_w, "StdVW": std_v_w})
+        font.ttfont.flavor = flavor
+        return True
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_tt = True
     runner.filter.filter_out_variable = True
     runner.run()
