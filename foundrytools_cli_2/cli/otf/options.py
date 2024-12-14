@@ -73,6 +73,7 @@ def allow_no_blues_flag() -> t.Callable:
     _allow_no_blues_flag = [
         click.option(
             "--allow-no-blues",
+            "allowNoBlues",
             is_flag=True,
             default=False,
             help="""
