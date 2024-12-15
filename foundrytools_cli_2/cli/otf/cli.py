@@ -174,17 +174,21 @@ def recalc_stems(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
         current_std_h_w = font.t_cff_.get_hinting_data().get("StdHW", None)
         current_std_v_w = font.t_cff_.get_hinting_data().get("StdVW", None)
+        current_stem_snap_h = font.t_cff_.get_hinting_data().get("StemSnapH", None)
+        current_stem_snap_v = font.t_cff_.get_hinting_data().get("StemSnapV", None)
 
-        std_h_w, std_v_w = get_stems(input_file)
+        std_h_w, std_v_w, stem_snap_h, stem_snap_v = get_stems(input_file)
         logger.info(f"StdHW: {current_std_h_w} -> {std_h_w}")
         logger.info(f"StdVW: {current_std_v_w} -> {std_v_w}")
+        logger.info(f"StemSnapH: {current_stem_snap_h} -> {stem_snap_h}")
+        logger.info(f"StemSnapV: {current_stem_snap_v} -> {stem_snap_v}")
         temp_file.unlink(missing_ok=True)
 
-        if (current_std_h_w, current_std_v_w) == (std_h_w, std_v_w):
+        if (current_std_h_w, current_std_v_w, current_stem_snap_h, current_stem_snap_v) == (std_h_w, std_v_w, stem_snap_h, stem_snap_v):
             logger.info("No changes were made")
             return False
 
-        font.t_cff_.set_hinting_data(**{"StdHW": std_h_w, "StdVW": std_v_w})
+        font.t_cff_.set_hinting_data(**{"StdHW": std_h_w, "StdVW": std_v_w, "StemSnapH": stem_snap_h, "StemSnapV": stem_snap_v})
         font.ttfont.flavor = flavor
         return True
 
