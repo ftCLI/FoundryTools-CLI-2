@@ -158,7 +158,7 @@ def round_coordinates(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 )
 @click.option(
     "--max-distance",
-    type=click.IntRange(min=1),
+    type=click.IntRange(min=0),
     default=1,
     help="""
     The maximum distance between widths to consider as part of the same group.
