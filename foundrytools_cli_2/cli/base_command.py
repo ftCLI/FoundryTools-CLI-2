@@ -73,7 +73,7 @@ class BaseCommand(click.Command):
                 sorting them by tag (recommended by the OpenType specification). If ``False``,
                 retain the original font order. If ``None``, reorder by table dependency (fastest).
                 """,
-            )
+            ),
         ]
         kwargs.setdefault("params", []).extend(shared_options)
         kwargs.setdefault("no_args_is_help", True)

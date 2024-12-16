@@ -16,7 +16,6 @@ from foundrytools_cli_2.cli.converter.options import (
 )
 from foundrytools_cli_2.cli.shared_callbacks import choice_to_int_callback
 from foundrytools_cli_2.cli.shared_options import (
-    base_options,
     correct_contours_flag,
     reorder_tables_flag,
     subroutinize_flag,

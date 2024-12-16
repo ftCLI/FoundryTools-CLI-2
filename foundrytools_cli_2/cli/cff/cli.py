@@ -1,12 +1,11 @@
 # pylint: disable=import-outside-toplevel
-from foundrytools_cli_2.cli.base_command import BaseCommand
-
 import typing as t
 from pathlib import Path
 
 import click
 from foundrytools import Font
 
+from foundrytools_cli_2.cli.base_command import BaseCommand
 from foundrytools_cli_2.cli.cff.options import (
     font_names_option,
     top_dict_names_flags,
@@ -14,7 +13,7 @@ from foundrytools_cli_2.cli.cff.options import (
     unique_id_flag,
 )
 from foundrytools_cli_2.cli.shared_callbacks import ensure_at_least_one_param
-from foundrytools_cli_2.cli.shared_options import base_options, new_string_option, old_string_option
+from foundrytools_cli_2.cli.shared_options import new_string_option, old_string_option
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
 cli = click.Group("cff", help="Utilities for editing the ``CFF`` table.")
