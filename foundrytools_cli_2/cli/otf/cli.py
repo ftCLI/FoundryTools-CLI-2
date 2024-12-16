@@ -147,11 +147,45 @@ def round_coordinates(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("recalc-stems", cls=BaseCommand)
+@click.option(
+    "-all",
+    "--report-all-stems",
+    is_flag=True,
+    help="""
+    Include stems formed by curved line segments; by default, includes only stems formed by straight
+    line segments.
+    """,
+)
+@click.option(
+    "--max-distance",
+    type=click.IntRange(min=1),
+    default=1,
+    help="""
+    The maximum distance between widths to consider as part of the same group.
+    """,
+)
+@click.option(
+    "--max-h-stems",
+    type=click.IntRange(min=1, max=12),
+    default=2,
+    help="""
+    The number of horizontal stem values to extract.
+    """,
+)
+@click.option(
+    "--max-v-stems",
+    type=click.IntRange(min=1, max=12),
+    default=2,
+    help="""
+    The number of vertical stem values to extract.
+    """,
+)
 def recalc_stems(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Recalculate the hinting stems of OpenType-PS fonts.
     """
     from foundrytools.app.otf_recalc_stems import run as get_stems
+
     def task(font: Font) -> bool:
         if not font.is_ps:
             logger.error("Font is not a PostScript font")
@@ -177,18 +211,39 @@ def recalc_stems(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
         current_stem_snap_h = font.t_cff_.get_hinting_data().get("StemSnapH", None)
         current_stem_snap_v = font.t_cff_.get_hinting_data().get("StemSnapV", None)
 
-        std_h_w, std_v_w, stem_snap_h, stem_snap_v = get_stems(input_file)
+        report_all_stems = t.cast(bool, options["report_all_stems"])
+        max_distance = t.cast(int, options["max_distance"])
+        max_h_stems = t.cast(int, options["max_h_stems"])
+        max_v_stems = t.cast(int, options["max_v_stems"])
+        std_h_w, std_v_w, stem_snap_h, stem_snap_v = get_stems(
+            input_file,
+            report_all_stems=report_all_stems,
+            max_distance=max_distance,
+            max_h_stems=max_h_stems,
+            max_v_stems=max_v_stems,
+        )
         logger.info(f"StdHW: {current_std_h_w} -> {std_h_w}")
         logger.info(f"StdVW: {current_std_v_w} -> {std_v_w}")
         logger.info(f"StemSnapH: {current_stem_snap_h} -> {stem_snap_h}")
         logger.info(f"StemSnapV: {current_stem_snap_v} -> {stem_snap_v}")
         temp_file.unlink(missing_ok=True)
 
-        if (current_std_h_w, current_std_v_w, current_stem_snap_h, current_stem_snap_v) == (std_h_w, std_v_w, stem_snap_h, stem_snap_v):
-            logger.info("No changes were made")
+        if (current_std_h_w, current_std_v_w, current_stem_snap_h, current_stem_snap_v) == (
+            std_h_w,
+            std_v_w,
+            stem_snap_h,
+            stem_snap_v,
+        ):
             return False
 
-        font.t_cff_.set_hinting_data(**{"StdHW": std_h_w, "StdVW": std_v_w, "StemSnapH": stem_snap_h, "StemSnapV": stem_snap_v})
+        font.t_cff_.set_hinting_data(
+            **{
+                "StdHW": std_h_w,
+                "StdVW": std_v_w,
+                "StemSnapH": stem_snap_h,
+                "StemSnapV": stem_snap_v,
+            }
+        )
         font.ttfont.flavor = flavor
         return True
 
