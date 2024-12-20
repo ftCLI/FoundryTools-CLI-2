@@ -4,6 +4,7 @@ from foundrytools_cli_2.cli.cff import cli as cff
 from foundrytools_cli_2.cli.converter import cli as converter
 from foundrytools_cli_2.cli.experimental import cli as experimental
 from foundrytools_cli_2.cli.fix import cli as fix
+from foundrytools_cli_2.cli.font import cli as font
 from foundrytools_cli_2.cli.glyphs import cli as glyphs
 from foundrytools_cli_2.cli.gsub import cli as gsub
 from foundrytools_cli_2.cli.name import cli as name
@@ -22,6 +23,7 @@ from foundrytools_cli_2.cli.utils import cli as utils
         "converter": converter,
         "experimental": experimental,
         "fix": fix,
+        "font": font,
         "glyphs": glyphs,
         "gsub": gsub,
         "name": name,
