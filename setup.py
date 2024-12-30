@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import List
 
 import setuptools
 
@@ -7,7 +6,7 @@ this_directory = Path(__file__).parent
 long_description = this_directory.joinpath("README.md").read_text(encoding="utf-8")
 
 
-def _get_requirements() -> List[str]:
+def _get_requirements() -> list[str]:
     """
     Relax hard pinning in setup.py
     """
