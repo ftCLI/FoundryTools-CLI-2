@@ -1,4 +1,4 @@
-foundrytools==0.1.0
+foundrytools==0.1.1
 afdko==4.0.2
 click==8.1.7
 loguru==0.7.3
