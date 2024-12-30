@@ -5,21 +5,20 @@ from pathlib import Path
 import click
 from foundrytools import Font
 
+from foundrytools_cli_2.cli.base_command import BaseCommand
 from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.cli.shared_callbacks import tuple_to_set_callback
-from foundrytools_cli_2.cli.shared_options import base_options
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
 cli = click.Group(help="A collection of utilities to remap, rename and sort glyphs.")
 
 
-@cli.command("remap")
+@cli.command("remap", cls=BaseCommand)
 @click.option(
     "--remap-all",
     is_flag=True,
     help="Remap all glyphs, including the ones already in the cmap table.",
 )
-@base_options()
 def rebuild_cmap(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Rebuild the cmap table of a font. Optionally remap all characters, including those already in
@@ -42,7 +41,7 @@ def rebuild_cmap(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("remove-glyphs")
+@cli.command("remove-glyphs", cls=BaseCommand)
 @click.option(
     "-gn",
     "--glyph-name",
@@ -61,7 +60,6 @@ def rebuild_cmap(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     help="The glyph IDs to remove.",
     callback=tuple_to_set_callback,
 )
-@base_options()
 def remove_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Remove glyphs from a font file.
@@ -90,10 +88,9 @@ def remove_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("rename-glyph")
+@cli.command("rename-glyph", cls=BaseCommand)
 @click.option("-old", "--old-name", required=True, help="The old name of the glyph.")
 @click.option("-new", "--new-name", required=True, help="The new name of the glyph.")
-@base_options()
 def rename_glyph(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Rename a glyph in a font file.
@@ -114,7 +111,7 @@ def rename_glyph(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("rename-glyphs")
+@cli.command("rename-glyphs", cls=BaseCommand)
 @click.option(
     "-s",
     "--source-file",
@@ -122,7 +119,6 @@ def rename_glyph(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     required=True,
     help="The source font file to get the glyph order from.",
 )
-@base_options()
 def rename_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Rename glyphs in a font file based on the glyph order of another font file.
@@ -147,8 +143,7 @@ def rename_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("set-production-names")
-@base_options()
+@cli.command("set-production-names", cls=BaseCommand)
 def set_production_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Set the production names of glyphs in a font file.
@@ -169,7 +164,7 @@ def set_production_names(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     runner.run()
 
 
-@cli.command("sort")
+@cli.command("sort", cls=BaseCommand)
 @click.option(
     "-by",
     "--sort-by",
@@ -185,7 +180,6 @@ def set_production_names(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     * cannedDesign: Sort glyphs into a design process friendly order.
     """,
 )
-@base_options()
 def sort_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Sort the glyphs in a font file.
