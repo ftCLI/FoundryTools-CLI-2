@@ -12,12 +12,12 @@ def main(font: Font) -> bool:
 
     # If the font is not bold or italic, set it to regular
     if not (font.flags.is_bold or font.flags.is_italic or font.flags.is_regular):
-        font.flags.is_regular = True
+        font.flags.set_regular()
         return True
 
     # If the font is bold or italic, set it to not regular
     if (font.flags.is_bold or font.flags.is_italic) and font.flags.is_regular:
-        font.flags.is_regular = False
+        font.t_os_2.fs_selection.regular = False
         return True
 
     return False

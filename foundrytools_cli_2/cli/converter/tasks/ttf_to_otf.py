@@ -4,7 +4,6 @@ from pathlib import Path
 from afdko.fdkutils import run_shell_command
 from foundrytools import Font
 from foundrytools.app.otf_check_outlines import run as otf_check_outlines
-from foundrytools.app.otf_subroutinize import run as otf_subroutinize
 from foundrytools.lib.otf_builder import build_otf
 from foundrytools.lib.qu2cu import quadratics_to_cubics_2
 
@@ -86,7 +85,7 @@ def ttf2otf(
 
     if subroutinize:
         logger.info("Subroutinizing...")
-        otf_subroutinize(font)
+        font.subroutinize()
 
     font.ttfont.flavor = flavor
     font.save(out_file, reorder_tables=True)
@@ -162,7 +161,7 @@ def ttf2otf_with_tx(
 
     if subroutinize:
         logger.info("Subroutinizing...")
-        otf_subroutinize(font)
+        font.subroutinize()
 
     font.ttfont.flavor = flavor
 

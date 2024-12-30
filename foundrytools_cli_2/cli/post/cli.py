@@ -43,7 +43,7 @@ def cli(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     ensure_at_least_one_param(click.get_current_context())
 
-    def _task(
+    def task(
         font: Font,
         italic_angle: t.Optional[float] = None,
         underline_position: t.Optional[int] = None,
@@ -69,5 +69,5 @@ def cli(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
         return font.t_post.is_modified
 
-    runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()

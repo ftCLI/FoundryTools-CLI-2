@@ -7,8 +7,6 @@ from foundrytools import Font
 from foundrytools.app.otf_autohint import run as otf_autohint
 from foundrytools.app.otf_check_outlines import run as otf_check_outlines
 from foundrytools.app.otf_dehint import run as otf_dehint
-from foundrytools.app.otf_desubroutinize import run as otf_desubroutinize
-from foundrytools.app.otf_subroutinize import run as otf_subroutinize
 from foundrytools.utils.path_tools import get_temp_file_path
 
 from foundrytools_cli_2.cli.base_command import BaseCommand
@@ -29,18 +27,18 @@ def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     # from foundrytools_cli_2.cli.otf.tasks import autohint as task
 
-    def _task(font: Font, subroutinize: bool = True, **kwargs: t.Dict[str, t.Any]) -> bool:
+    def task(font: Font, subroutinize: bool = True, **kwargs: t.Dict[str, t.Any]) -> bool:
         logger.info("Autohinting...")
         otf_autohint(font, **kwargs)
 
         if subroutinize:
             font.reload()  # DO NOT REMOVE
             logger.info("Subroutinizing...")
-            otf_subroutinize(font)
+            font.subroutinize()
 
         return True
 
-    runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_tt = True
     runner.run()
 
@@ -53,16 +51,16 @@ def dehint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Dehint OpenType-PS fonts.
     """
 
-    def _task(font: Font, drop_hinting_data: bool = False, subroutinize: bool = True) -> bool:
+    def task(font: Font, drop_hinting_data: bool = False, subroutinize: bool = True) -> bool:
         logger.info("Dehinting font...")
         otf_dehint(font, drop_hinting_data=drop_hinting_data)
         if subroutinize:
             logger.info("Subroutinizing...")
-            otf_subroutinize(font)
+            font.subroutinize()
 
         return True
 
-    runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_tt = True
     runner.run()
 
@@ -73,11 +71,11 @@ def subr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Subroutinize OpenType-PS fonts with ``cffsubr``.
     """
 
-    def _task(font: Font) -> bool:
+    def task(font: Font) -> bool:
         logger.info("Subroutinizing...")
-        return otf_subroutinize(font)
+        return font.subroutinize()
 
-    runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_tt = True
     runner.run()
 
@@ -88,11 +86,11 @@ def desubr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Desubroutinize OpenType-PS fonts with ``cffsubr``.
     """
 
-    def _task(font: Font) -> bool:
+    def task(font: Font) -> bool:
         logger.info("Desubroutinizing...")
-        return otf_desubroutinize(font)
+        return font.desubroutinize()
 
-    runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_tt = True
     runner.run()
 
@@ -104,16 +102,16 @@ def check_outlines(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Check the outlines of OpenType-PS fonts with ``afdko.checkoutlinesufo``.
     """
 
-    def _task(font: Font, subroutinize: bool = True) -> bool:
+    def task(font: Font, subroutinize: bool = True) -> bool:
         logger.info("Checking outlines")
         otf_check_outlines(font)
         if subroutinize:
             logger.info("Subroutinizing")
-            otf_subroutinize(font)
+            font.subroutinize()
 
         return True
 
-    runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_tt = True
     runner.filter.filter_out_variable = True
     runner.run()
@@ -126,7 +124,7 @@ def round_coordinates(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Round the coordinates of OpenType-PS fonts.
     """
 
-    def _task(font: Font, subroutinize: bool = True, drop_hinting_data: bool = False) -> bool:
+    def task(font: Font, subroutinize: bool = True, drop_hinting_data: bool = False) -> bool:
         logger.info("Rounding coordinates")
         result = font.t_cff_.round_coordinates(drop_hinting_data=drop_hinting_data)
         if not result:
@@ -136,11 +134,11 @@ def round_coordinates(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
         if subroutinize:
             logger.info("Subroutinizing")
-            otf_subroutinize(font)
+            font.subroutinize()
 
         return True
 
-    runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_tt = True
     runner.filter.filter_out_variable = True
     runner.run()
@@ -245,6 +243,36 @@ def recalc_stems(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
             }
         )
         font.ttfont.flavor = flavor
+        return True
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.filter.filter_out_tt = True
+    runner.filter.filter_out_variable = True
+    runner.run()
+
+
+@cli.command("recalc-zones", cls=BaseCommand)
+def recalc_zones(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+    """
+    Recalculate the hinting zones of OpenType-PS fonts.
+    """
+    from foundrytools.app.otf_recalc_zones import run as get_zones
+
+    def task(font: Font) -> bool:
+        if not font.is_ps:
+            logger.error("Font is not a PostScript font")
+            return False
+        current_other_blues, current_blues = (
+            font.t_cff_.get_hinting_data().get("OtherBlues", None),
+            font.t_cff_.get_hinting_data().get("BlueValues", None),
+        )
+        other_blues, blue_values = get_zones(font)
+        logger.info(f"BlueValues: {current_blues} -> {blue_values}")
+        logger.info(f"OtherBlues: {current_other_blues} -> {other_blues}")
+        if (current_other_blues, current_blues) == (other_blues, blue_values):
+            return False
+
+        font.t_cff_.set_hinting_data(**{"BlueValues": blue_values, "OtherBlues": other_blues})
         return True
 
     runner = TaskRunner(input_path=input_path, task=task, **options)

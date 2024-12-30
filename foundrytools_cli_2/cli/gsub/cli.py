@@ -34,7 +34,7 @@ def rename_feature(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Remaps the feature tags in the GSUB table.
     """
 
-    def _task(font: Font, old_feature_name: str, new_feature_name: str) -> bool:
+    def task(font: Font, old_feature_name: str, new_feature_name: str) -> bool:
         if "GSUB" not in font.ttfont:
             logger.error("GSUB table not found")
             return False
@@ -49,5 +49,5 @@ def rename_feature(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
         return font.t_gsub.rename_feature(old_feature_name, new_feature_name)
 
-    runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()

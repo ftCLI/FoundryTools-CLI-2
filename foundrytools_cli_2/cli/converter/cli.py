@@ -116,9 +116,9 @@ def sfnt_to_web(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     callback=choice_to_int_callback,
     help="""
     The overlap mode to use when converting variable fonts to static fonts.
-    
+
     See https://fonttools.readthedocs.io/en/latest/varLib/instancer.html#fontTools.varLib.instancer.instantiateVariableFont
-    
+
     \b
     0: KEEP_AND_DONT_SET_FLAGS
     1: KEEP_AND_SET_FLAGS

@@ -45,14 +45,14 @@ def decompose(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Decomposes the composite glyphs of the given TrueType fonts.
     """
 
-    def _task(font: Font) -> bool:
+    def task(font: Font) -> bool:
         result = font.t_glyf.decompose_all()
         if result:
             logger.opt(colors=True).info(f"Decomposed glyphs: <lc>{', '.join(list(result))}</lc>")
             return True
         return False
 
-    runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_ps = True
     runner.run()
 

@@ -37,7 +37,7 @@ def fix_contours(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     * Remove tiny paths.
     """
 
-    def _task(
+    def task(
         font: Font,
         min_area: int = 25,
         remove_hinting: bool = True,
@@ -61,7 +61,7 @@ def fix_contours(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
         )
         return True
 
-    runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_variable = True
     runner.run()
 
@@ -88,7 +88,7 @@ def fix_duplicate_components(input_path: Path, **options: t.Dict[str, t.Any]) ->
     * Remove duplicate components which have the same x,y coordinates.
     """
 
-    def _task(font: Font) -> bool:
+    def task(font: Font) -> bool:
         decomposed_glyphs = font.t_glyf.remove_duplicate_components()
 
         if decomposed_glyphs:
@@ -99,7 +99,7 @@ def fix_duplicate_components(input_path: Path, **options: t.Dict[str, t.Any]) ->
 
         return False
 
-    runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_ps = True
     runner.run()
 
@@ -181,13 +181,13 @@ def fix_kern_table(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     * Remove glyphs that are not defined in the ``cmap`` table from the ``kern`` table.
     """
 
-    def _task(font: Font) -> bool:
+    def task(font: Font) -> bool:
         if "kern" not in font.ttfont:
             logger.warning("No kerning table found.")
             return False
         return font.t_kern.remove_unmapped_glyphs()
 
-    runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -225,7 +225,7 @@ def fix_italic_angle(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     from foundrytools.app.fix_italic_angle import run as run_fix_italic_angle
 
-    def _task(font: Font, min_slant: float = 2.0, mode: int = 1) -> bool:
+    def task(font: Font, min_slant: float = 2.0, mode: int = 1) -> bool:
         if mode not in {1, 2, 3}:
             raise ValueError("Invalid mode. Must be 1, 2, or 3.")
 
@@ -244,7 +244,7 @@ def fix_italic_angle(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
         return modified
 
-    runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -419,7 +419,7 @@ def fix_transformed_components(input_path: Path, **options: t.Dict[str, t.Any]) 
     * Decompose composite glyphs that have transformed components.
     """
 
-    def _task(font: Font) -> bool:
+    def task(font: Font) -> bool:
         decomposed_glyphs = font.t_glyf.decompose_transformed()
         if decomposed_glyphs:
             logger.info(
@@ -430,7 +430,7 @@ def fix_transformed_components(input_path: Path, **options: t.Dict[str, t.Any]) 
 
         return False
 
-    runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_ps = True
     runner.filter.filter_out_variable = True
     runner.run()
@@ -460,10 +460,9 @@ def fix_unreachable_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> N
 
     * Remove glyphs that are not reachable by subsetting the font.
     """
-    from foundrytools.app.remove_unused_glyphs import run as remove_unused_glyphs
 
-    def _task(font: Font) -> bool:
-        removed_glyphs = remove_unused_glyphs(font)
+    def task(font: Font) -> bool:
+        removed_glyphs = font.remove_unused_glyphs()
 
         if removed_glyphs:
             logger.opt(colors=True).info(
@@ -473,7 +472,7 @@ def fix_unreachable_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> N
 
         return False
 
-    runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 

@@ -6,6 +6,10 @@ import click
 
 
 class BaseCommand(click.Command):
+    """
+    Base command for all commands in the CLI.
+    """
+
     def __init__(self, *args, **kwargs) -> None:
         shared_options = [
             click.Argument(
@@ -79,36 +83,6 @@ class BaseCommand(click.Command):
         kwargs.setdefault("no_args_is_help", True)
         kwargs.setdefault("context_settings", {"help_option_names": ["-h", "--help"]})
         super().__init__(*args, **kwargs)
-
-    def format_help(self, ctx: click.Context, formatter: click.HelpFormatter) -> None:
-        """Writes the help into the formatter if it exists.
-
-        This is a low-level method called by :meth:`get_help`.
-
-        This calls the following methods:
-
-        -   :meth:`format_usage`
-        -   :meth:`format_help_text`
-        -   :meth:`format_input_path`
-        -   :meth:`format_options`
-        -   :meth:`format_epilog`
-        """
-        self.format_usage(ctx, formatter)
-        self.format_help_text(ctx, formatter)
-        self.format_input_path(formatter)
-        self.format_options(ctx, formatter)
-        self.format_epilog(ctx, formatter)
-
-    @staticmethod
-    def format_input_path(formatter: click.HelpFormatter) -> None:
-        formatter.write_text("\n")
-        formatter.indent()
-        formatter.write_text(
-            "INPUT_PATH can be a file or a directory. If it's a directory, the command will "
-            "process all files in the directory, and eventually in subdirectories if the "
-            "``--recursive`` option is used. If it's a file, only that file will be processed."
-        )
-        formatter.dedent()
 
 
 def output_dir_callback(

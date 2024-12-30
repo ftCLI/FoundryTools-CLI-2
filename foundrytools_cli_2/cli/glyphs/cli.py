@@ -26,7 +26,7 @@ def rebuild_cmap(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     the cmap table.
     """
 
-    def _task(font: Font, remap_all: bool = False) -> bool:
+    def task(font: Font, remap_all: bool = False) -> bool:
         remapped_glyphs, _ = font.t_cmap.rebuild_character_map(remap_all=remap_all)
         if remapped_glyphs:
             logger.info("Remapped glyphs:")
@@ -38,7 +38,7 @@ def rebuild_cmap(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
         return False
 
-    runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -69,15 +69,12 @@ def remove_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     if not options.get("glyph_names_to_remove") and not options.get("glyph_ids_to_remove"):
         raise click.UsageError("You must provide at least one glyph name or ID to remove.")
 
-    from foundrytools.app.remove_glyphs import run as run_remove_glyphs
-
-    def _task(
+    def task(
         font: Font,
         glyph_names_to_remove: t.Optional[t.Set[str]],
         glyph_ids_to_remove: t.Optional[t.Set[int]],
     ) -> bool:
-        removed_glyphs = run_remove_glyphs(
-            font,
+        removed_glyphs = font.remove_glyphs(
             glyph_names_to_remove=glyph_names_to_remove,
             glyph_ids_to_remove=glyph_ids_to_remove,
         )
@@ -89,7 +86,7 @@ def remove_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
         return False
 
-    runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -102,10 +99,8 @@ def rename_glyph(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Rename a glyph in a font file.
     """
 
-    from foundrytools.app.rename_glyph import run as run_rename_glyph
-
-    def _task(font: Font, old_name: str, new_name: str) -> bool:
-        result = run_rename_glyph(font, old_name=old_name, new_name=new_name)
+    def task(font: Font, old_name: str, new_name: str) -> bool:
+        result = font.rename_glyph(old_name=old_name, new_name=new_name)
         if result:
             logger.opt(colors=True).info(
                 f"Renamed glyph: <lc>{old_name}</lc> to <lc>{new_name}</lc>"
@@ -114,7 +109,7 @@ def rename_glyph(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
         return False
 
-    runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.force_modified = True
     runner.run()
 
@@ -133,9 +128,7 @@ def rename_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Rename glyphs in a font file based on the glyph order of another font file.
     """
 
-    from foundrytools.app.rename_glyphs import run as run_rename_glyphs
-
-    def _task(font: Font, source_file: Path) -> bool:
+    def task(font: Font, source_file: Path) -> bool:
         old_glyph_order = font.ttfont.getGlyphOrder()
 
         try:
@@ -148,9 +141,9 @@ def rename_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
             logger.warning("The glyph order of the source font is the same as the current font.")
             return False
 
-        return run_rename_glyphs(font, new_glyph_order=new_glyph_order)
+        return font.rename_glyphs(new_glyph_order=new_glyph_order)
 
-    runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -161,10 +154,8 @@ def set_production_names(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     Set the production names of glyphs in a font file.
     """
 
-    from foundrytools.app.set_production_names import run as run_set_production_names
-
-    def _task(font: Font) -> bool:
-        renamed_glyphs = run_set_production_names(font)
+    def task(font: Font) -> bool:
+        renamed_glyphs = font.set_production_names()
 
         if renamed_glyphs:
             logger.info("Renamed glyphs:")
@@ -174,7 +165,7 @@ def set_production_names(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
 
         return False
 
-    runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
 
 
@@ -199,13 +190,12 @@ def sort_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Sort the glyphs in a font file.
     """
-    from foundrytools.app.sort_glyphs import run as run_sort_glyphs
 
-    def _task(
+    def task(
         font: Font,
         sort_by: t.Literal["unicode", "alphabetical", "cannedDesign"] = "unicode",
     ) -> bool:
-        return run_sort_glyphs(font, sort_by=sort_by)
+        return font.sort_glyphs(sort_by=sort_by)
 
-    runner = TaskRunner(input_path=input_path, task=_task, **options)
+    runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
