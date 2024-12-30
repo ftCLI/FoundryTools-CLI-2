@@ -1,20 +1,19 @@
 # pylint: disable=import-outside-toplevel
-import typing as t
 from pathlib import Path
+from typing import Any
 
 import click
 from foundrytools import Font
 
+from foundrytools_cli_2.cli.base_command import BaseCommand
 from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.cli.shared_options import base_options, target_upm_option
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
 cli = click.Group(help="Utilities for editing OpenType-TT fonts.")
 
 
-@cli.command("autohint")
-@base_options()
-def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+@cli.command("autohint", cls=BaseCommand)
+def autohint(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Auto-hints the given TrueType fonts using ttfautohint-py.
     """
@@ -25,9 +24,8 @@ def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("dehint")
-@base_options()
-def dehint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+@cli.command("dehint", cls=BaseCommand)
+def dehint(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Removes hinting from the given TrueType fonts.
     """
@@ -38,9 +36,8 @@ def dehint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("decompose")
-@base_options()
-def decompose(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+@cli.command("decompose", cls=BaseCommand)
+def decompose(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Decomposes the composite glyphs of the given TrueType fonts.
     """
@@ -57,10 +54,15 @@ def decompose(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     runner.run()
 
 
-@cli.command("scale-upm")
-@target_upm_option(required=True)
-@base_options()
-def scale_upm(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+@cli.command("scale-upm", cls=BaseCommand)
+@click.option(
+    "-upm",
+    "--target-upm",
+    type=click.IntRange(min=16, max=16384),
+    required=True,
+    help="The target UPM value to scale the fonts to.",
+)
+def scale_upm(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Scales the given TrueType fonts to the specified UPM.
     """

@@ -4,23 +4,67 @@ from pathlib import Path
 
 import click
 from foundrytools import Font
+from foundrytools.constants import TOP_DICT_NAMES
 
 from foundrytools_cli_2.cli.base_command import BaseCommand
-from foundrytools_cli_2.cli.cff.options import (
-    font_names_option,
-    top_dict_names_flags,
-    top_dict_names_options,
-    unique_id_flag,
-)
 from foundrytools_cli_2.cli.shared_callbacks import ensure_at_least_one_param
-from foundrytools_cli_2.cli.shared_options import new_string_option, old_string_option
+from foundrytools_cli_2.cli.shared_options import add_options
 from foundrytools_cli_2.cli.task_runner import TaskRunner
+
+
+def top_dict_names_flags() -> t.Callable:
+    """
+    Add the ``full-name``, ``family-name``, ``weight``, and ``version`` flags to a click command.
+
+    Returns:
+        t.Callable: A decorator that adds the flags to a click command
+    """
+
+    flags = [
+        click.option(
+            f"--{option_param}",
+            var_name,
+            is_flag=True,
+            default=None,
+            help=f"Deletes the ``{var_name}`` value",
+        )
+        for option_param, var_name in sorted(TOP_DICT_NAMES.items())
+    ]
+
+    return add_options(flags)
+
+
+def top_dict_names_options() -> t.Callable:
+    """
+    Add the ``full-name``, ``family-name``, ``weight``, and ``version`` options to a click command.
+
+    Returns:
+        t.Callable: A decorator that adds the options to a click command
+    """
+
+    options = [
+        click.option(
+            f"--{option_param}",
+            var_name,
+            type=str,
+            help=f"Sets the ``cff.topDictIndex[0].{var_name}`` value",
+        )
+        for option_param, var_name in sorted(TOP_DICT_NAMES.items())
+    ]
+
+    return add_options(options)
+
 
 cli = click.Group("cff", help="Utilities for editing the ``CFF`` table.")
 
 
 @cli.command("set-names", cls=BaseCommand)
-@font_names_option()
+@click.option(
+    "--font-name",
+    "fontNames",
+    type=str,
+    help="Sets the ``cff.fontNames`` value",
+)
 @top_dict_names_options()
 def set_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
@@ -39,7 +83,13 @@ def set_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 @cli.command("del-names", cls=BaseCommand)
 @top_dict_names_flags()
-@unique_id_flag()
+@click.option(
+    "--unique-id",
+    "UniqueID",
+    is_flag=True,
+    default=None,
+    help="Deletes the ``UniqueID`` value",
+)
 def del_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Deletes attributes from ``topDictIndex[0]`` using the provided keyword arguments.
@@ -56,8 +106,18 @@ def del_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("find-replace", cls=BaseCommand)
-@old_string_option()
-@new_string_option()
+@click.option(
+    "-os",
+    "--old-string",
+    required=True,
+    help="The string to be replaced.",
+)
+@click.option(
+    "-ns",
+    "--new-string",
+    required=True,
+    help="The string to replace the old string with.",
+)
 def find_replace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Finds and replaces a string in the ``CFF`` table. It performs the replacement in

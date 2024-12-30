@@ -1,35 +1,41 @@
 # pylint: disable=import-outside-toplevel
 
-import typing as t
 from pathlib import Path
+from typing import Any, Literal, Optional
 
 import click
 from foundrytools import Font
 
 from foundrytools_cli_2.cli.base_command import BaseCommand
-from foundrytools_cli_2.cli.converter.options import (
-    check_outlines_flag,
-    in_format_choice,
-    out_format_choice,
-    tolerance_option,
-    ttf2otf_mode_choice,
-)
 from foundrytools_cli_2.cli.shared_callbacks import choice_to_int_callback
-from foundrytools_cli_2.cli.shared_options import (
-    correct_contours_flag,
-    reorder_tables_flag,
-    subroutinize_flag,
-    target_upm_option,
-)
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
 cli = click.Group("converter", help="Font conversion utilities.")
 
 
 @cli.command("otf2ttf", cls=BaseCommand)
-@tolerance_option()
-@target_upm_option(help_msg="Scale the converted fonts to the specified UPM.")
-def otf_to_ttf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+@click.option(
+    "-t",
+    "--tolerance",
+    type=click.FloatRange(min=0.0, max=3.0),
+    default=1.0,
+    help="""
+    Conversion tolerance (0.0-3.0, default 1.0). Low tolerance adds more points but keeps shapes.
+    High tolerance adds few points but may change shape.
+    """,
+)
+@click.option(
+    "-upm",
+    "--target-upm",
+    type=click.IntRange(min=16, max=16384),
+    help="""
+    Set the target UPM value for the converted font.
+
+    Scaling is applied to the font after conversion to TrueType, to avoid scaling a PostScript font
+    (which in some cases can lead to corrupted outlines).
+    """,
+)
+def otf_to_ttf(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Convert PostScript flavored fonts to TrueType flavored fonts.
     """
@@ -43,13 +49,70 @@ def otf_to_ttf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("ttf2otf", cls=BaseCommand)
-@ttf2otf_mode_choice()
-@tolerance_option()
-@target_upm_option(help_msg="Scale the converted fonts to the specified UPM.")
-@correct_contours_flag()
-@check_outlines_flag()
-@subroutinize_flag()
-def ttf_to_otf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+@click.option(
+    "-m",
+    "--mode",
+    type=click.Choice(["qu2cu", "tx"]),
+    default="qu2cu",
+    show_default=True,
+    help="""
+    Conversion mode. By default, the script uses the ``qu2cu`` mode. Quadratic curves are
+    converted to cubic curves using the Qu2CuPen. Use the ``tx`` mode to use the tx tool
+    from AFDKO to generate the CFF table instead of the Qu2CuPen.
+    """,
+)
+@click.option(
+    "-t",
+    "--tolerance",
+    type=click.FloatRange(min=0.0, max=3.0),
+    default=1.0,
+    help="""
+    Conversion tolerance (0.0-3.0, default 1.0). Low tolerance adds more points but keeps shapes.
+    High tolerance adds few points but may change shape.
+
+    This option is only used in the ``qu2cu`` mode.
+    """,
+)
+@click.option(
+    "-upm",
+    "--target-upm",
+    type=click.IntRange(min=16, max=16384),
+    default=None,
+    help="""
+    Set the target UPM value for the converted font.
+
+    Scaling is applied to the TrueType font before conversion, to avoid scaling a PostScript font
+    (which in some cases can lead to corrupted outlines).
+    """,
+)
+@click.option(
+    "-cc/--no-cc",
+    "--correct-contours/--no-correct-contours",
+    is_flag=True,
+    default=True,
+    show_default=True,
+    help="""
+    Correct contours with pathops during conversion (removes overlaps and tiny contours, corrects
+    direction).
+    """,
+)
+@click.option(
+    "-co/--no-co",
+    "--check-outlines/--no-check-outlines",
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help="Perform a further check with ``afdko.checkoutlinesufo`` after conversion.",
+)
+@click.option(
+    "-s/--no-s",
+    "--subroutinize/--no-subroutinize",
+    is_flag=True,
+    default=True,
+    show_default=True,
+    help="Subroutinize the font with ``cffsubr`` after conversion.",
+)
+def ttf_to_otf(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Convert TrueType flavored fonts to PostScript flavored fonts.
     """
@@ -69,12 +132,22 @@ def ttf_to_otf(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("wf2ft", cls=BaseCommand)
-@in_format_choice()
-@reorder_tables_flag()
+@click.option(
+    "-f",
+    "--format",
+    "in_format",
+    type=click.Choice(["woff", "woff2"]),
+    default=None,
+    help="""
+    By default, the script converts both woff and woff2 flavored web fonts to SFNT fonts
+    (TrueType or OpenType). Use this option to convert only woff or woff2 flavored web
+    fonts.
+    """,
+)
 def web_to_sfnt(
     input_path: Path,
-    in_format: t.Optional[t.Literal["woff", "woff2"]],
-    **options: t.Dict[str, t.Any],
+    in_format: Optional[Literal["woff", "woff2"]],
+    **options: dict[str, Any],
 ) -> None:
     """
     Convert WOFF and WOFF2 fonts to SFNT fonts.
@@ -90,9 +163,18 @@ def web_to_sfnt(
 
 
 @cli.command("ft2wf", cls=BaseCommand)
-@out_format_choice()
-@reorder_tables_flag()
-def sfnt_to_web(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+@click.option(
+    "-f",
+    "--format",
+    "out_format",
+    type=click.Choice(["woff", "woff2"]),
+    default=None,
+    help="""
+    By default, the script converts SFNT fonts to both woff and woff2 flavored web fonts.
+    Use this option to convert only to woff or woff2 flavored web fonts.
+    """,
+)
+def sfnt_to_web(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Convert SFNT fonts to WOFF and/or WOFF2 fonts.
     """
@@ -132,7 +214,7 @@ def sfnt_to_web(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     is_flag=True,
     help="Select a single instance with custom axis values.",
 )
-def variable_to_static(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def variable_to_static(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Convert variable fonts to static fonts.
     """
