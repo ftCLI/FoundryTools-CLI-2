@@ -10,7 +10,7 @@ class BaseCommand(click.Command):
     Base command for all commands in the CLI.
     """
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs) -> None:  # type: ignore
         shared_options = [
             click.Argument(
                 ["input_path"],

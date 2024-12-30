@@ -49,7 +49,7 @@ def recalc_x_height(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
 
     def task(font: Font, glyph_name: str = "x") -> bool:
-        font.t_os_2.x_height = otRound(font.get_glyph_bounds(glyph_name)["yMax"])
+        font.t_os_2.x_height = otRound(font.get_glyph_bounds(glyph_name)["y_max"])
         return font.t_os_2.is_modified
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
@@ -70,7 +70,7 @@ def recalc_cap_height(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
 
     def task(font: Font, glyph_name: str = "H") -> bool:
-        font.t_os_2.cap_height = otRound(font.get_glyph_bounds(glyph_name)["yMax"])
+        font.t_os_2.cap_height = otRound(font.get_glyph_bounds(glyph_name)["y_max"])
         return font.t_os_2.is_modified
 
     runner = TaskRunner(input_path=input_path, task=task, **options)

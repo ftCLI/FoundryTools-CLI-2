@@ -1,6 +1,6 @@
 # pylint: disable=import-outside-toplevel
-import typing as t
 from pathlib import Path
+from typing import Any, cast
 
 import click
 from foundrytools import Font
@@ -21,13 +21,13 @@ cli = click.Group(help="Utilities for editing OpenType-PS fonts.")
 @cli.command("autohint", cls=BaseCommand)
 @otf_autohint_options()
 @subroutinize_flag()
-def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def autohint(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Autohint OpenType-PS fonts with ``afdko.otfautohint``.
     """
     # from foundrytools_cli_2.cli.otf.tasks import autohint as task
 
-    def task(font: Font, subroutinize: bool = True, **kwargs: t.Dict[str, t.Any]) -> bool:
+    def task(font: Font, subroutinize: bool = True, **kwargs: dict[str, Any]) -> bool:
         logger.info("Autohinting...")
         otf_autohint(font, **kwargs)
 
@@ -46,7 +46,7 @@ def autohint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 @cli.command("dehint", cls=BaseCommand)
 @drop_hinting_data_flag()
 @subroutinize_flag()
-def dehint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def dehint(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Dehint OpenType-PS fonts.
     """
@@ -66,7 +66,7 @@ def dehint(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("subr", cls=BaseCommand)
-def subr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def subr(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Subroutinize OpenType-PS fonts with ``cffsubr``.
     """
@@ -81,7 +81,7 @@ def subr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("desubr", cls=BaseCommand)
-def desubr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def desubr(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Desubroutinize OpenType-PS fonts with ``cffsubr``.
     """
@@ -97,7 +97,7 @@ def desubr(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 @cli.command("check-outlines", cls=BaseCommand)
 @subroutinize_flag()
-def check_outlines(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def check_outlines(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Check the outlines of OpenType-PS fonts with ``afdko.checkoutlinesufo``.
     """
@@ -119,7 +119,7 @@ def check_outlines(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 @cli.command("round-coordinates", cls=BaseCommand)
 @subroutinize_flag()
-def round_coordinates(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def round_coordinates(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Round the coordinates of OpenType-PS fonts.
     """
@@ -178,7 +178,7 @@ def round_coordinates(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     The number of vertical stem values to extract.
     """,
 )
-def recalc_stems(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def recalc_stems(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Recalculate the hinting stems of OpenType-PS fonts.
     """
@@ -209,10 +209,10 @@ def recalc_stems(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
         current_stem_snap_h = font.t_cff_.get_hinting_data().get("StemSnapH", None)
         current_stem_snap_v = font.t_cff_.get_hinting_data().get("StemSnapV", None)
 
-        report_all_stems = t.cast(bool, options["report_all_stems"])
-        max_distance = t.cast(int, options["max_distance"])
-        max_h_stems = t.cast(int, options["max_h_stems"])
-        max_v_stems = t.cast(int, options["max_v_stems"])
+        report_all_stems = cast(bool, options["report_all_stems"])
+        max_distance = cast(int, options["max_distance"])
+        max_h_stems = cast(int, options["max_h_stems"])
+        max_v_stems = cast(int, options["max_v_stems"])
         std_h_w, std_v_w, stem_snap_h, stem_snap_v = get_stems(
             input_file,
             report_all_stems=report_all_stems,
@@ -234,14 +234,13 @@ def recalc_stems(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
         ):
             return False
 
-        font.t_cff_.set_hinting_data(
-            **{
-                "StdHW": std_h_w,
-                "StdVW": std_v_w,
-                "StemSnapH": stem_snap_h,
-                "StemSnapV": stem_snap_v,
-            }
-        )
+        hinting_data: dict[str, Any] = {
+            "StdHW": std_h_w,
+            "StdVW": std_v_w,
+            "StemSnapH": stem_snap_h,
+            "StemSnapV": stem_snap_v,
+        }
+        font.t_cff_.set_hinting_data(**hinting_data)
         font.ttfont.flavor = flavor
         return True
 
@@ -252,7 +251,7 @@ def recalc_stems(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("recalc-zones", cls=BaseCommand)
-def recalc_zones(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def recalc_zones(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Recalculate the hinting zones of OpenType-PS fonts.
     """
@@ -272,7 +271,9 @@ def recalc_zones(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
         if (current_other_blues, current_blues) == (other_blues, blue_values):
             return False
 
-        font.t_cff_.set_hinting_data(**{"BlueValues": blue_values, "OtherBlues": other_blues})
+        font.t_cff_.set_hinting_data(
+            **cast(dict[str, Any], {"BlueValues": blue_values, "OtherBlues": other_blues})
+        )
         return True
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
