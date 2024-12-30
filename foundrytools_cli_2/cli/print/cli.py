@@ -4,14 +4,14 @@ import typing as t
 from pathlib import Path
 
 import click
+from foundrytools import FontFinder
 
 from foundrytools_cli_2.cli.shared_options import input_path_argument
-from foundrytools_cli_2.lib.cli_tools.font_finder import FontFinder
 
 cli = click.Group(help="Prints various font's information.")
 
 
-@cli.command("names")
+@cli.command("font-names")
 @input_path_argument()
 @click.option(
     "-ml",

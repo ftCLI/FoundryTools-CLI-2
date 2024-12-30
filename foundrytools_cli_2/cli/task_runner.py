@@ -2,15 +2,16 @@ import typing as t
 from dataclasses import dataclass
 from pathlib import Path
 
-from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.cli.timer import Timer
-from foundrytools_cli_2.lib.cli_tools.font_finder import (
+from foundrytools import Font
+from foundrytools.lib.font_finder import (
     FinderError,
     FinderFilter,
     FinderOptions,
     FontFinder,
 )
-from foundrytools_cli_2.lib.font import Font
+
+from foundrytools_cli_2.cli.logger import logger
+from foundrytools_cli_2.cli.timer import Timer
 
 
 class FontSaveError(Exception):
@@ -152,26 +153,27 @@ class TaskRunner:  # pylint: disable=too-few-public-methods
         with font:
             timer.start()
             logger.info(f"Processing file {font.file}")
-            self._execute_task(font)
-            self._save_or_skip(font)
+            task_result = bool(self._execute_task(font))
+            self._save_or_skip(font, task_status=task_result)
             timer.stop()
             print()  # add a newline after each font
 
-    def _execute_task(self, font: Font) -> None:
+    def _execute_task(self, font: Font) -> bool:
         try:
-            self.task(font, **self.config.task_options)
+            return bool(self.task(font, **self.config.task_options))
         except Exception as e:  # pylint: disable=broad-except
             self._log_error(e)
+            return False
 
-    def _save_or_skip(self, font: Font) -> None:
-        if not self._font_should_be_saved(font):
+    def _save_or_skip(self, font: Font, task_status: bool) -> None:
+        if not self._font_should_be_saved(task_status=task_status):
             if self.save_if_modified:
                 logger.skip("No changes made")  # type: ignore
         else:
             self._save_font_to_file(font)
 
-    def _font_should_be_saved(self, font: Font) -> bool:
-        return (self.save_if_modified and font.is_modified) or self.force_modified
+    def _font_should_be_saved(self, task_status: bool) -> bool:
+        return (self.save_if_modified and task_status) or self.force_modified
 
     def _save_font_to_file(self, font: Font) -> None:
         try:
@@ -191,4 +193,7 @@ class TaskRunner:  # pylint: disable=too-few-public-methods
 
     @staticmethod
     def _log_error(e: Exception) -> None:
-        logger.error(f"{type(e).__name__}: {e}")
+        try:
+            logger.opt(colors=True).error(f"<lr>{e.__module__}.{type(e).__name__}</lr>: {e}")
+        except AttributeError:
+            logger.opt(colors=True).error(f"<lr>{type(e).__name__}</lr>: {e}")

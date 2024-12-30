@@ -52,7 +52,9 @@ def allow_changes_flag() -> t.Callable:
     """
     _allow_changes_flag = [
         click.option(
+            "-c",
             "--allow-changes",
+            "allowChanges",
             is_flag=True,
             default=False,
             help="""
@@ -72,7 +74,8 @@ def allow_no_blues_flag() -> t.Callable:
     """
     _allow_no_blues_flag = [
         click.option(
-            "--allow-no-blues",
+            "--no-zones-stems",
+            "allowNoBlues",
             is_flag=True,
             default=False,
             help="""
@@ -92,9 +95,11 @@ def decimal_flag() -> t.Callable:
     """
     _decimal_flag = [
         click.option(
+            "-d",
             "--decimal",
+            "roundCoords",
             is_flag=True,
-            default=False,
+            default=True,
             help="""
             Use decimal coordinates.
             """,
@@ -113,6 +118,7 @@ def no_flex_flag() -> t.Callable:
     _no_flex_flag = [
         click.option(
             "--no-flex",
+            "noFlex",
             is_flag=True,
             default=False,
             help="""
@@ -133,6 +139,7 @@ def no_hint_sub_flag() -> t.Callable:
     _no_hint_sub_flag = [
         click.option(
             "--no-hint-sub",
+            "noHintSub",
             is_flag=True,
             default=False,
             help="""

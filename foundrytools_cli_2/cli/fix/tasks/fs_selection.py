@@ -1,7 +1,7 @@
-from foundrytools_cli_2.lib.font import Font
+from foundrytools import Font
 
 
-def main(font: Font) -> None:
+def main(font: Font) -> bool:
     """
     Fix the regular flag of a font. If the font is not bold or italic, it will be set to regular. If
     the font is bold or italic, it will be set to not regular.
@@ -11,11 +11,13 @@ def main(font: Font) -> None:
     """
 
     # If the font is not bold or italic, set it to regular
-    if not (font.is_bold or font.is_italic or font.is_regular):
-        font.is_regular = True
-        font.is_modified = True
+    if not (font.flags.is_bold or font.flags.is_italic or font.flags.is_regular):
+        font.flags.set_regular()
+        return True
 
     # If the font is bold or italic, set it to not regular
-    elif (font.is_bold or font.is_italic) and font.is_regular:
-        font.is_regular = False
-        font.is_modified = True
+    if (font.flags.is_bold or font.flags.is_italic) and font.flags.is_regular:
+        font.t_os_2.fs_selection.regular = False
+        return True
+
+    return False

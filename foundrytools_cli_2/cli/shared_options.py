@@ -324,7 +324,7 @@ def min_area_option() -> t.Callable:
     return add_options(_min_area_option)
 
 
-def old_string() -> t.Callable:
+def old_string_option() -> t.Callable:
     """
     Add the ``old_string`` option to a click command.
 
@@ -345,7 +345,7 @@ def old_string() -> t.Callable:
     return add_options(_old_string_option)
 
 
-def new_string() -> t.Callable:
+def new_string_option() -> t.Callable:
     """
     Add the ``new_string`` option to a click command.
 

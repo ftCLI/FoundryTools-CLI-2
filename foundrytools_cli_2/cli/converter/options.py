@@ -27,6 +27,28 @@ def tolerance_option() -> t.Callable:
     return add_options(_tolerance_option)
 
 
+def check_outlines_flag() -> t.Callable:
+    """
+    Add the ``check_outlines`` flag to a click command.
+
+    Returns:
+        t.Callable: A decorator that adds the ``check_outlines`` flag to a click command
+    """
+    _check_outlines_flag = [
+        click.option(
+            "-co/--no-co",
+            "--check-outlines/--no-check-outlines",
+            is_flag=True,
+            default=False,
+            show_default=True,
+            help="""
+            Check outlines for correctness. If set to False, the outlines will not be checked.
+            """,
+        )
+    ]
+    return add_options(_check_outlines_flag)
+
+
 def in_format_choice() -> t.Callable:
     """
     Add the ``flavor`` option to a click command.

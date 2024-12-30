@@ -93,7 +93,7 @@ def tuple_to_set_callback(
     return set(value)
 
 
-def validate_params(ctx: click.Context) -> None:
+def ensure_at_least_one_param(ctx: click.Context) -> None:
     """
     Checks if any attributes are provided to set, except for the ignored ones.
     """

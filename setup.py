@@ -1,17 +1,18 @@
 from pathlib import Path
-from typing import List
 
 import setuptools
 
 this_directory = Path(__file__).parent
 long_description = this_directory.joinpath("README.md").read_text(encoding="utf-8")
 
+REQUIREMENTS_FILE = this_directory.joinpath("requirements.txt")
 
-def _get_requirements() -> List[str]:
+
+def _get_requirements() -> list[str]:
     """
     Relax hard pinning in setup.py
     """
-    with open("requirements.txt", encoding="utf-8") as requirements:
+    with open(REQUIREMENTS_FILE, encoding="utf-8") as requirements:
         return [line.replace("==", ">=") for line in requirements.readlines()]
 
 
@@ -25,7 +26,6 @@ setuptools.setup(
     author_email="ftcli@proton.me",
     url="https://github.com/ftCLI/FoundryTools-CLI-2",
     packages=setuptools.find_packages(),
-    package_data={"foundrytools_cli_2": ["data/*.json"]},
     include_package_data=True,
     entry_points={"console_scripts": ["ft-cli = foundrytools_cli_2.__main__:cli"]},
     install_requires=_get_requirements(),

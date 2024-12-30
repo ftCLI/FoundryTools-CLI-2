@@ -1,10 +1,11 @@
+from foundrytools import Font
+from foundrytools.constants import T_CMAP, T_GDEF, T_HMTX
+from foundrytools.core.tables import GdefTable
+
 from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.lib.constants import T_CMAP, T_GDEF, T_HMTX
-from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.tables import GdefTable
 
 
-def fix_legacy_accents(font: Font) -> None:
+def fix_legacy_accents(font: Font) -> bool:
     """Check that legacy accents aren't used in composite glyphs."""
 
     # code-points for all legacy chars
@@ -54,4 +55,6 @@ def fix_legacy_accents(font: Font) -> None:
             logger.info(
                 f"Deleted {len(deleted)} legacy accents from GDEF table: {', '.join(deleted)}"
             )
-        font.is_modified = gdef.is_modified
+            return True
+
+    return False

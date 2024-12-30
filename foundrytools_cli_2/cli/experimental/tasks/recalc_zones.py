@@ -3,9 +3,9 @@ from collections import Counter
 
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.ttLib.ttFont import TTFont
+from foundrytools import Font
 
 from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.lib.font import Font
 
 UPPERCASE_LETTERS = [chr(i) for i in range(65, 91)]  # A-Z
 UPPERCASE_DESCENDERS = ["J", "Q"]
@@ -294,7 +294,7 @@ def recalc_zones(
     return other_blues, blue_values
 
 
-def main(font: Font) -> None:
+def main(font: Font) -> bool:
     """
     Recalculates the hinting zones of an OTF font.
 
@@ -303,7 +303,7 @@ def main(font: Font) -> None:
     """
     if not font.is_ps:
         logger.error("Font is not a PostScript font")
-        return
+        return False
 
     logger.info("Getting zones...")
     current_other_blues, current_blue_values = get_current_zones(font.ttfont)
@@ -314,6 +314,7 @@ def main(font: Font) -> None:
 
     if current_other_blues == other_blues and current_blue_values == blue_values:
         logger.info("Zones are already up-to-date")
-    else:
-        set_font_zones(font.ttfont, other_blues, blue_values)
-        font.is_modified = True
+        return False
+
+    set_font_zones(font.ttfont, other_blues, blue_values)
+    return True

@@ -1,11 +1,8 @@
-from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.tables.hmtx import HmtxTable
+from foundrytools import Font
 
 
-def main(font: Font) -> None:
+def main(font: Font) -> bool:
     """
     Fixes the width of the non-breaking space glyph to be the same as the space glyph.
     """
-    hmtx_table = HmtxTable(ttfont=font.ttfont)
-    hmtx_table.fix_non_breaking_space_width()
-    font.is_modified = hmtx_table.is_modified
+    return font.t_hmtx.fix_non_breaking_space_width()

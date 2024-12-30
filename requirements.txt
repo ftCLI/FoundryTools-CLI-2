@@ -1,14 +1,7 @@
-fonttools[woff,pathops,unicode]==4.55.3
+foundrytools==0.1.1
 afdko==4.0.2
-beziers==0.6.0
-cffsubr==0.3.0
-defcon==0.10.3
-click==8.1.8
-dehinter==4.0.0
+click==8.1.7
 loguru==0.7.3
 pathvalidate==3.2.1
 rich==13.9.4
-ttfautohint-py==0.5.1
-ufo2ft==3.3.1
-ufo-extractor==0.8.1
 win32-setctime==1.2.0; sys_platform == 'win32'

@@ -1,11 +1,11 @@
-# pylint: disable=import-outside-toplevel
-
 import typing as t
 from pathlib import Path
 
 import click
+from foundrytools import Font
 
-from foundrytools_cli_2.cli.shared_callbacks import validate_params
+from foundrytools_cli_2.cli.logger import logger
+from foundrytools_cli_2.cli.shared_callbacks import ensure_at_least_one_param
 from foundrytools_cli_2.cli.shared_options import base_options
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
@@ -41,9 +41,33 @@ def cli(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Utilities for editing the ``post`` table.
     """
-    validate_params(click.get_current_context())
+    ensure_at_least_one_param(click.get_current_context())
 
-    from foundrytools_cli_2.cli.post.tasks import set_attrs as task
+    def task(
+        font: Font,
+        italic_angle: t.Optional[float] = None,
+        underline_position: t.Optional[int] = None,
+        underline_thickness: t.Optional[int] = None,
+        fixed_pitch: t.Optional[bool] = None,
+    ) -> bool:
+        attrs = {
+            "italic_angle": italic_angle,
+            "underline_position": underline_position,
+            "underline_thickness": underline_thickness,
+            "fixed_pitch": fixed_pitch,
+        }
+
+        if all(value is None for value in attrs.values()):
+            logger.error("No parameter provided")
+            return False
+
+        for attr, value in attrs.items():
+            if value is not None:
+                old_value = getattr(font.t_post, attr)
+                logger.info(f"{attr}: {old_value} -> {value}")
+                setattr(font.t_post, attr, value)
+
+        return font.t_post.is_modified
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()

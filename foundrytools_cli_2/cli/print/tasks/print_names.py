@@ -2,19 +2,19 @@ import typing as t
 from shutil import get_terminal_size
 
 from fontTools.ttLib.tables._n_a_m_e import _MAC_LANGUAGES, _WINDOWS_LANGUAGES, NameRecord
-from rich.console import Console
-from rich.table import Table
-
-from foundrytools_cli_2.lib.constants import (
+from foundrytools import Font
+from foundrytools.constants import (
     MAC_ENCODING_IDS,
     NAME_IDS_TO_DESCRIPTION,
     PLATFORMS,
     TERMINAL_WIDTH,
     WINDOWS_ENCODING_IDS,
 )
-from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.tables import CFFTable, NameTable
-from foundrytools_cli_2.lib.utils.string_tools import wrap_string
+from foundrytools.core.tables import CFFTable, NameTable
+from rich.console import Console
+from rich.table import Table
+
+from foundrytools_cli_2.cli.print.common import wrap_string
 
 __all__ = ["main"]
 
@@ -46,7 +46,7 @@ def _process_name_table(
     font: Font, table: Table, terminal_width: int, max_lines: t.Optional[int], minimal: bool
 ) -> None:
     name_table = NameTable(font.ttfont)
-    names = name_table.names
+    names = name_table.table.names
     table.add_row(FONT_STYLE.format(name=font.file.name if font.file else font.bytesio))
     table.add_section()
     table.add_row(TABLE_NAME)
@@ -106,9 +106,6 @@ def _process_cff_table(
 
 
 def _get_platform_row(platform: t.Tuple[int, int, int]) -> str:
-    """
-    Returns a string that describes the platform, encoding, and language.
-    """
     platform_id = platform[0]
     plat_enc_id = platform[1]
     language_id = platform[2]
@@ -130,9 +127,6 @@ def _get_platform_row(platform: t.Tuple[int, int, int]) -> str:
 
 
 def _get_name_row(name: NameRecord) -> str:
-    """
-    Returns a string that describes a NameRecord.
-    """
     name_description = NAME_IDS_TO_DESCRIPTION.get(name.nameID, f"{name.nameID}")
     return (
         f"[bold cyan]{str(name.nameID).rjust(5)}[reset] : "

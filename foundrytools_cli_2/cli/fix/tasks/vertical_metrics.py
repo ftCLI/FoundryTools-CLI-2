@@ -1,8 +1,7 @@
-from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.tables import HheaTable, OS2Table
+from foundrytools import Font
 
 
-def main(font: Font, safe_bottom: int, safe_top: int) -> None:
+def main(font: Font, safe_bottom: int, safe_top: int) -> bool:
     """
     Adjusts the vertical metrics of a font to ensure consistency across the family.
 
@@ -12,20 +11,17 @@ def main(font: Font, safe_bottom: int, safe_top: int) -> None:
         safe_top (int): The safe top value for the font's vertical metrics.
     """
 
-    os_table = OS2Table(font.ttfont)
-    hhea_table = HheaTable(font.ttfont)
-
-    os_table.win_ascent = safe_top
-    os_table.win_descent = abs(safe_bottom)
-    os_table.typo_ascender = safe_top
-    os_table.typo_descender = safe_bottom
-    os_table.typo_line_gap = 0
-    hhea_table.ascent = safe_top
-    hhea_table.descent = safe_bottom
-    hhea_table.line_gap = 0
+    font.t_os_2.win_ascent = safe_top
+    font.t_os_2.win_descent = abs(safe_bottom)
+    font.t_os_2.typo_ascender = safe_top
+    font.t_os_2.typo_descender = safe_bottom
+    font.t_os_2.typo_line_gap = 0
+    font.t_hhea.ascent = safe_top
+    font.t_hhea.descent = safe_bottom
+    font.t_hhea.line_gap = 0
 
     # Set the USE_TYPO_METRICS bit
-    if os_table.version >= 4:
-        os_table.fs_selection.use_typo_metrics = True
+    if font.t_os_2.version >= 4:
+        font.t_os_2.fs_selection.use_typo_metrics = True
 
-    font.is_modified = os_table.is_modified or hhea_table.is_modified
+    return font.t_os_2.is_modified or font.t_hhea.is_modified

@@ -4,6 +4,7 @@ from pathlib import Path
 
 import click
 from fontTools.misc.roundTools import otRound
+from foundrytools import Font
 
 from foundrytools_cli_2.cli.fix.options import (
     ignore_errors_flag,
@@ -11,9 +12,9 @@ from foundrytools_cli_2.cli.fix.options import (
     keep_unused_subroutines_flag,
     min_area_option,
 )
+from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.cli.shared_options import base_options
 from foundrytools_cli_2.cli.task_runner import TaskRunner
-from foundrytools_cli_2.lib.tables import HeadTable
 
 cli = click.Group(help="Fix font errors.")
 
@@ -35,7 +36,30 @@ def fix_contours(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     * Correct the direction of the contours.
     * Remove tiny paths.
     """
-    from foundrytools_cli_2.cli.fix.tasks.contours import main as task
+
+    def task(
+        font: Font,
+        min_area: int = 25,
+        remove_hinting: bool = True,
+        ignore_errors: bool = False,
+        remove_unused_subroutines: bool = True,
+    ) -> bool:
+        logger.info("Correcting contours...")
+        modified_glyphs = font.correct_contours(
+            min_area=min_area,
+            remove_hinting=remove_hinting,
+            ignore_errors=ignore_errors,
+            remove_unused_subroutines=remove_unused_subroutines,
+        )
+
+        if not modified_glyphs:
+            logger.info("No glyphs were modified")
+            return False
+
+        logger.opt(colors=True).info(
+            f"{len(modified_glyphs)} glyphs were modified: <lc>{', '.join(modified_glyphs)}</lc>"
+        )
+        return True
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_variable = True
@@ -63,7 +87,17 @@ def fix_duplicate_components(input_path: Path, **options: t.Dict[str, t.Any]) ->
 
     * Remove duplicate components which have the same x,y coordinates.
     """
-    from foundrytools_cli_2.cli.fix.tasks.duplicate_components import main as task
+
+    def task(font: Font) -> bool:
+        decomposed_glyphs = font.t_glyf.remove_duplicate_components()
+
+        if decomposed_glyphs:
+            logger.opt(colors=True).info(
+                f"Decomposed glyphs: <lc>{', '.join(decomposed_glyphs)}</lc>"
+            )
+            return True
+
+        return False
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_ps = True
@@ -81,7 +115,7 @@ def fix_empty_notdef(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     an outline as the user will only see what looks like a space if a glyph is missing and not be
     aware of the active font’s limitation.
     """
-    from foundrytools_cli_2.cli.fix.tasks.empty_notdef import fix_empty_notdef as task
+    from foundrytools.app.fix_empty_notdef import run as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -146,7 +180,12 @@ def fix_kern_table(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     * Remove glyphs that are not defined in the ``cmap`` table from the ``kern`` table.
     """
-    from foundrytools_cli_2.cli.fix.tasks.kern_table import main as task
+
+    def task(font: Font) -> bool:
+        if "kern" not in font.ttfont:
+            logger.warning("No kerning table found.")
+            return False
+        return font.t_kern.remove_unmapped_glyphs()
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -184,7 +223,26 @@ def fix_italic_angle(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     The italic and oblique bits are then set based on the calculated italic angle and the provided
     mode.
     """
-    from foundrytools_cli_2.cli.fix.tasks.italic_angle import main as task
+    from foundrytools.app.fix_italic_angle import run as run_fix_italic_angle
+
+    def task(font: Font, min_slant: float = 2.0, mode: int = 1) -> bool:
+        if mode not in {1, 2, 3}:
+            raise ValueError("Invalid mode. Must be 1, 2, or 3.")
+
+        italic, oblique = mode in {1, 3}, mode in {2, 3}
+
+        result = run_fix_italic_angle(font, min_slant=min_slant, italic=italic, oblique=oblique)
+        modified = False
+
+        for k, v in result.items():
+            if v["pass"]:
+                logger.opt(colors=True).info(f"{k}: {v['old']} -> <green>OK</>")
+            else:
+                # If any of the checks failed, set the font as modified.
+                modified = True
+                logger.opt(colors=True).info(f"{k}: <red>{v['old']}</> -> <green>{v['new']}</>")
+
+        return modified
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -321,7 +379,7 @@ def fix_monospace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     * Set ``CFF.cff.TopDictIndex[0].isFixedPitch`` to ``True`` for CFF fonts
     """
-    from foundrytools_cli_2.cli.fix.tasks.monospace import main as task
+    from foundrytools.app.fix_monospace import run as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -360,7 +418,17 @@ def fix_transformed_components(input_path: Path, **options: t.Dict[str, t.Any]) 
 
     * Decompose composite glyphs that have transformed components.
     """
-    from foundrytools_cli_2.cli.fix.tasks.decompose_transformed import main as task
+
+    def task(font: Font) -> bool:
+        decomposed_glyphs = font.t_glyf.decompose_transformed()
+        if decomposed_glyphs:
+            logger.info(
+                f"Decomposed transformed components in the following glyphs: "
+                f"{', '.join(decomposed_glyphs)}"
+            )
+            return True
+
+        return False
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_ps = True
@@ -392,7 +460,17 @@ def fix_unreachable_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> N
 
     * Remove glyphs that are not reachable by subsetting the font.
     """
-    from foundrytools_cli_2.cli.fix.tasks.unreachable_glyphs import main as task
+
+    def task(font: Font) -> bool:
+        removed_glyphs = font.remove_unused_glyphs()
+
+        if removed_glyphs:
+            logger.opt(colors=True).info(
+                f"Removed glyphs: <lc>{', '.join(list(removed_glyphs))}</lc>"
+            )
+            return True
+
+        return False
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -414,7 +492,7 @@ def fix_vertical_metrics(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     Raises:
         ClickException: If no fonts are found in the specified path.
     """
-    from foundrytools_cli_2.lib.cli_tools.font_finder import FontFinder
+    from foundrytools import FontFinder
 
     fonts = FontFinder(input_path).find_fonts()
     if not fonts:
@@ -422,8 +500,7 @@ def fix_vertical_metrics(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
 
     metrics = []
     for font in fonts:
-        table_head = HeadTable(font.ttfont)
-        metrics.append((table_head.y_min, table_head.y_max))
+        metrics.append((font.t_head.y_min, font.t_head.y_max))
 
     # Calculate the minimum y_min and maximum y_max values
     safe_bottom = otRound(min(m[0] for m in metrics))

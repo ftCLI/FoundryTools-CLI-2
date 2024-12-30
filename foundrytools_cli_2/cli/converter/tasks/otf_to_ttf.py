@@ -1,9 +1,9 @@
 import typing as t
 from pathlib import Path
 
+from foundrytools import Font
+
 from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.lib.constants import T_HEAD
-from foundrytools_cli_2.lib.font import Font
 
 
 def main(
@@ -34,14 +34,14 @@ def main(
         output_dir=output_dir, overwrite=overwrite, extension=extension, suffix=suffix
     )
 
-    tolerance = tolerance / 1000 * font.ttfont[T_HEAD].unitsPerEm
+    tolerance = tolerance / 1000 * font.t_head.units_per_em
 
     logger.info("Converting to TTF...")
     font.to_ttf(max_err=tolerance, reverse_direction=True)
 
     if target_upm:
         logger.info(f"Scaling UPM to {target_upm}...")
-        font.tt_scale_upem(target_upm=target_upm)
+        font.scale_upm(target_upm=target_upm)
 
     font.save(out_file)
     logger.success(f"File saved to {out_file}")

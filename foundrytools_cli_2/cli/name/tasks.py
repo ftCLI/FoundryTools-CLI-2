@@ -1,7 +1,6 @@
 import typing as t
 
-from foundrytools_cli_2.lib.font import Font
-from foundrytools_cli_2.lib.tables import NameTable
+from foundrytools import Font
 
 
 def del_names(
@@ -9,7 +8,7 @@ def del_names(
     name_ids_to_process: t.Tuple[int],
     platform_id: t.Optional[int] = None,
     language_string: t.Optional[str] = None,
-) -> None:
+) -> bool:
     """
     Updates the name table of a font file by deleting NameRecords.
 
@@ -22,14 +21,13 @@ def del_names(
             None.
     """
 
-    name_table = NameTable(ttfont=font.ttfont)
-    name_table.remove_names(
+    font.t_name.remove_names(
         name_ids=name_ids_to_process, platform_id=platform_id, language_string=language_string
     )
-    font.is_modified = name_table.is_modified
+    return font.t_name.is_modified
 
 
-def del_empty_names(font: Font) -> None:
+def del_empty_names(font: Font) -> bool:
     """
     Deletes empty names from the given font.
 
@@ -37,34 +35,22 @@ def del_empty_names(font: Font) -> None:
         font (Font): The font object to delete the empty names from.
     """
 
-    name_table = NameTable(ttfont=font.ttfont)
-    name_table.remove_empty_names()
-    font.is_modified = name_table.is_modified
+    font.t_name.remove_empty_names()
+    return font.t_name.is_modified
 
 
-def del_mac_names(
-    font: Font,
-    delete_all: bool = False,
-) -> None:
+def del_mac_names(font: Font) -> bool:
     """
-    Deletes Macintosh-specific font names from the given font. By default, the following names are
-    kept: 1 (Font Family Name), 2 (Font Subfamily Name), 4 (Full Font Name), 5 (Version String),
-    6 (PostScript Name).
+    Deletes Macintosh-specific font names from the given font.
 
     Args:
         font (Font): The font object to delete the Macintosh names from.
-        delete_all (bool, optional): Whether to delete all Macintosh names. Defaults to False.
     """
-
-    name_table = NameTable(ttfont=font.ttfont)
-    name_ids_to_delete = {name.nameID for name in name_table.table.names if name.platformID == 1}
-    if not delete_all:
-        name_ids_to_delete.difference_update({1, 2, 4, 5, 6})
-    name_table.remove_names(name_ids=name_ids_to_delete, platform_id=1)
-    font.is_modified = name_table.is_modified
+    font.t_name.remove_mac_names()
+    return font.t_name.is_modified
 
 
-def del_unused_names(font: Font) -> None:
+def del_unused_names(font: Font) -> bool:
     """
     Removes unused NameRecords from the name table.
 
@@ -72,9 +58,8 @@ def del_unused_names(font: Font) -> None:
         font (Font): The font object to remove the unused names from.
     """
 
-    name_table = NameTable(ttfont=font.ttfont)
-    name_table.table.removeUnusedNames(font.ttfont)
-    font.is_modified = name_table.is_modified
+    font.t_name.table.removeUnusedNames(font.ttfont)
+    return font.t_name.is_modified
 
 
 def find_replace(
@@ -83,7 +68,7 @@ def find_replace(
     new_string: str,
     name_ids_to_process: t.Optional[t.Tuple[int]] = None,
     name_ids_to_skip: t.Optional[t.Tuple[int]] = None,
-) -> None:
+) -> bool:
     """
     Updates the name table of a font file by replacing occurrences of one string with another.
 
@@ -97,14 +82,13 @@ def find_replace(
             tuple.
     """
 
-    name_table = NameTable(ttfont=font.ttfont)
-    name_table.find_replace(
+    font.t_name.find_replace(
         old_string=old_string,
         new_string=new_string,
         name_ids_to_process=name_ids_to_process,
         name_ids_to_skip=name_ids_to_skip,
     )
-    font.is_modified = name_table.is_modified
+    return font.t_name.is_modified
 
 
 def set_name(
@@ -113,7 +97,7 @@ def set_name(
     name_string: str,
     platform_id: t.Optional[int] = None,
     language_string: str = "en",
-) -> None:
+) -> bool:
     """
     Updates the name table of a font file by setting the string value of a NameRecord.
 
@@ -125,31 +109,29 @@ def set_name(
         language_string (str): The language code of the name record. Defaults to "en".
     """
 
-    name_table = NameTable(ttfont=font.ttfont)
-    name_table.set_name(
+    font.t_name.set_name(
         name_id=name_id,
         name_string=name_string,
         platform_id=platform_id,
         language_string=language_string,
     )
-    font.is_modified = name_table.is_modified
+    return font.t_name.is_modified
 
 
-def strip_names(font: Font) -> None:
+def strip_names(font: Font) -> bool:
     """
     Removes leading and trailing whitespace from NameRecords in the name table.
 
     Args:
         font (Font): The Font object.
     """
-    name_table = NameTable(ttfont=font.ttfont)
-    name_table.strip_names()
-    font.is_modified = name_table.is_modified
+    font.t_name.strip_names()
+    return font.t_name.is_modified
 
 
 def build_unique_id(
     font: Font, platform_id: t.Optional[int] = None, alternate: bool = False
-) -> None:
+) -> bool:
     """
     Builds a unique ID for the font file.
 
@@ -159,12 +141,11 @@ def build_unique_id(
         alternate (bool, optional): Whether to build an alternate unique ID. Defaults to False.
     """
 
-    name_table = NameTable(ttfont=font.ttfont)
-    name_table.build_unique_identifier(platform_id=platform_id, alternate=alternate)
-    font.is_modified = name_table.is_modified
+    font.t_name.build_unique_identifier(platform_id=platform_id, alternate=alternate)
+    return font.t_name.is_modified
 
 
-def build_full_font_name(font: Font, platform_id: t.Optional[int] = None) -> None:
+def build_full_font_name(font: Font, platform_id: t.Optional[int] = None) -> bool:
     """
     Builds a full font name for the font file.
 
@@ -173,12 +154,11 @@ def build_full_font_name(font: Font, platform_id: t.Optional[int] = None) -> Non
         platform_id (int, optional): The platform ID of the name record. Defaults to None.
     """
 
-    name_table = NameTable(ttfont=font.ttfont)
-    name_table.build_full_font_name(platform_id=platform_id)
-    font.is_modified = name_table.is_modified
+    font.t_name.build_full_font_name(platform_id=platform_id)
+    return font.t_name.is_modified
 
 
-def build_version_string(font: Font, platform_id: t.Optional[int] = None) -> None:
+def build_version_string(font: Font, platform_id: t.Optional[int] = None) -> bool:
     """
     Builds a version string for the font file.
 
@@ -187,12 +167,11 @@ def build_version_string(font: Font, platform_id: t.Optional[int] = None) -> Non
         platform_id (int, optional): The platform ID of the name record. Defaults to None.
     """
 
-    name_table = NameTable(ttfont=font.ttfont)
-    name_table.build_version_string(platform_id=platform_id)
-    font.is_modified = name_table.is_modified
+    font.t_name.build_version_string(platform_id=platform_id)
+    return font.t_name.is_modified
 
 
-def build_postscript_name(font: Font, platform_id: t.Optional[int] = None) -> None:
+def build_postscript_name(font: Font, platform_id: t.Optional[int] = None) -> bool:
     """
     Builds a postscript name for the font file.
 
@@ -202,12 +181,11 @@ def build_postscript_name(font: Font, platform_id: t.Optional[int] = None) -> No
             will build the postscript name both platform 1 and 3.
     """
 
-    name_table = NameTable(ttfont=font.ttfont)
-    name_table.build_postscript_name(platform_id=platform_id)
-    font.is_modified = name_table.is_modified
+    font.t_name.build_postscript_name(platform_id=platform_id)
+    return font.t_name.is_modified
 
 
-def build_mac_names(font: Font) -> None:
+def build_mac_names(font: Font) -> bool:
     """
     Builds Macintosh-specific font names for the given font.
 
@@ -215,6 +193,5 @@ def build_mac_names(font: Font) -> None:
         font (Font): The font object to build the Macintosh names for.
     """
 
-    name_table = NameTable(ttfont=font.ttfont)
-    name_table.build_mac_names()
-    font.is_modified = name_table.is_modified
+    font.t_name.build_mac_names()
+    return font.t_name.is_modified
