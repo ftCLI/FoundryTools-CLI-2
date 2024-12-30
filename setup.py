@@ -5,12 +5,14 @@ import setuptools
 this_directory = Path(__file__).parent
 long_description = this_directory.joinpath("README.md").read_text(encoding="utf-8")
 
+REQUIREMENTS_FILE = this_directory.joinpath("requirements.txt")
+
 
 def _get_requirements() -> list[str]:
     """
     Relax hard pinning in setup.py
     """
-    with open("requirements.txt", encoding="utf-8") as requirements:
+    with open(REQUIREMENTS_FILE) as requirements:
         return [line.replace("==", ">=") for line in requirements.readlines()]
 
 
