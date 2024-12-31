@@ -117,13 +117,13 @@ def del_unused_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     "-os",
     "--old-string",
     required=True,
-    help="The string to be replaced.",
+    help="The string to be replaced in the NameRecords.",
 )
 @click.option(
     "-ns",
     "--new-string",
     required=True,
-    help="The string to replace the old string with.",
+    help="The string to replace the old string with in the NameRecords.",
 )
 @click.option(
     "-n",

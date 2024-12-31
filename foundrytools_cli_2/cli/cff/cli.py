@@ -12,14 +12,7 @@ from foundrytools_cli_2.cli.shared_options import add_options
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
 
-def top_dict_names_flags() -> t.Callable:
-    """
-    Add the ``full-name``, ``family-name``, ``weight``, and ``version`` flags to a click command.
-
-    Returns:
-        t.Callable: A decorator that adds the flags to a click command
-    """
-
+def _top_dict_names_flags() -> t.Callable:
     flags = [
         click.option(
             f"--{option_param}",
@@ -34,14 +27,7 @@ def top_dict_names_flags() -> t.Callable:
     return add_options(flags)
 
 
-def top_dict_names_options() -> t.Callable:
-    """
-    Add the ``full-name``, ``family-name``, ``weight``, and ``version`` options to a click command.
-
-    Returns:
-        t.Callable: A decorator that adds the options to a click command
-    """
-
+def _top_dict_names_options() -> t.Callable:
     options = [
         click.option(
             f"--{option_param}",
@@ -65,7 +51,7 @@ cli = click.Group("cff", help="Utilities for editing the ``CFF`` table.")
     type=str,
     help="Sets the ``cff.fontNames`` value",
 )
-@top_dict_names_options()
+@_top_dict_names_options()
 def set_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Sets the ``cff.fontNames[0]`` and/or ``topDictIndex[0]`` values.
@@ -82,7 +68,7 @@ def set_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("del-names", cls=BaseCommand)
-@top_dict_names_flags()
+@_top_dict_names_flags()
 @click.option(
     "--unique-id",
     "UniqueID",
@@ -110,13 +96,13 @@ def del_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     "-os",
     "--old-string",
     required=True,
-    help="The string to be replaced.",
+    help="The string to be replaced in th CFF TopDictIndex[0] fields.",
 )
 @click.option(
     "-ns",
     "--new-string",
     required=True,
-    help="The string to replace the old string with.",
+    help="The string to replace the old string with in the CFF TopDictIndex[0] fields.",
 )
 def find_replace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
