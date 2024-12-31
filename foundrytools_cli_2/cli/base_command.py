@@ -1,8 +1,8 @@
-import os
 from pathlib import Path
-from typing import Optional
 
 import click
+
+from foundrytools_cli_2.cli.shared_callbacks import output_dir_callback
 
 
 class BaseCommand(click.Command):
@@ -90,35 +90,3 @@ class BaseCommand(click.Command):
         kwargs.setdefault("no_args_is_help", True)
         kwargs.setdefault("context_settings", {"help_option_names": ["-h", "--help"]})
         super().__init__(*args, **kwargs)
-
-
-def output_dir_callback(
-    ctx: click.Context, _: click.Parameter, value: Optional[Path]
-) -> Optional[Path]:
-    """
-    Callback for ``--output-dir option``.
-
-    Tries to create the output directory if it doesn't exist. Checks if the output directory is
-    writable. Returns a Path object. If the callback fails, raises a click.BadParameter exception.
-
-    Args:
-        ctx (click.Context): click Context
-        _: click Parameter
-        value (t.Optional[Path]): The value to convert
-
-    Returns:
-        t.Optional[Path]: The converted value
-    """
-
-    # if the value is None or the click context is resilient, return None
-    if not value or ctx.resilient_parsing:
-        return None
-    # try to create the output directory if it doesn't exist
-    try:
-        value.mkdir(parents=True, exist_ok=True)
-    except Exception as e:
-        raise click.BadParameter(f"Could not create output directory: {e}") from e
-    # check if the output directory is writable
-    if not os.access(value, os.W_OK):
-        raise click.BadParameter(f"Output directory is not writable: {value}")
-    return value
