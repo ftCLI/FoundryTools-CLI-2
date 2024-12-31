@@ -1,12 +1,12 @@
-import typing as t
 from pathlib import Path
+from typing import Callable
 
 import click
 
 from foundrytools_cli_2.cli.shared_callbacks import output_dir_callback
 
 
-def add_options(options: t.List[t.Callable]) -> t.Callable:
+def add_options(options: list[Callable]) -> Callable:
     """
     Add options to a click command.
 
@@ -17,7 +17,7 @@ def add_options(options: t.List[t.Callable]) -> t.Callable:
         t.Callable: A decorator that adds the options to a click command
     """
 
-    def _add_options(func: t.Callable) -> t.Callable:
+    def _add_options(func: Callable) -> Callable:
         for option in reversed(options):
             func = option(func)
         return func
@@ -25,7 +25,7 @@ def add_options(options: t.List[t.Callable]) -> t.Callable:
     return _add_options
 
 
-def base_options() -> t.Callable:
+def base_options() -> Callable:
     """
     Add the common options to a click command.
 
@@ -45,7 +45,7 @@ def base_options() -> t.Callable:
     )
 
 
-def input_path_argument(dir_okay: bool = True, file_okay: bool = True) -> t.Callable:
+def input_path_argument(dir_okay: bool = True, file_okay: bool = True) -> Callable:
     """
     Add the ``input_path`` argument to a click command.
 
@@ -76,7 +76,7 @@ def input_path_argument(dir_okay: bool = True, file_okay: bool = True) -> t.Call
     return add_options(_file_or_path_argument)
 
 
-def recursive_flag() -> t.Callable:
+def recursive_flag() -> Callable:
     """
     Add the ``recursive`` option to a click command.
 
@@ -98,7 +98,7 @@ def recursive_flag() -> t.Callable:
     return add_options(_recursive_flag)
 
 
-def lazy_flag() -> t.Callable:
+def lazy_flag() -> Callable:
     """
     Add the ``lazy`` option to a click command.
 
@@ -119,7 +119,7 @@ def lazy_flag() -> t.Callable:
     return add_options(_lazy_flag)
 
 
-def output_dir_option() -> t.Callable:
+def output_dir_option() -> Callable:
     """
     Add the ``output_dir`` option to a click command.
 
@@ -143,7 +143,7 @@ def output_dir_option() -> t.Callable:
     return add_options(_output_dir_option)
 
 
-def overwrite_flag() -> t.Callable:
+def overwrite_flag() -> Callable:
     """
     Add the ``overwrite`` option to a click command.
 
@@ -165,7 +165,7 @@ def overwrite_flag() -> t.Callable:
     return add_options(_overwrite_flag)
 
 
-def recalc_timestamp_flag() -> t.Callable:
+def recalc_timestamp_flag() -> Callable:
     """
     Add the ``recalc_timestamp`` option to a click command.
 
@@ -186,7 +186,7 @@ def recalc_timestamp_flag() -> t.Callable:
     return add_options(_recalc_timestamp_flag)
 
 
-def recalc_bboxes_flag() -> t.Callable:
+def recalc_bboxes_flag() -> Callable:
     """
     Add the ``recalc_bboxes`` option to a click command.
 
@@ -208,28 +208,7 @@ def recalc_bboxes_flag() -> t.Callable:
     return add_options(_recalc_bboxes_flag)
 
 
-def reorder_tables_flag() -> t.Callable:
-    """
-    Add the ``reorder_tables`` option to a click command.
-
-    Returns:
-        t.Callable: A decorator that adds the ``reorder_tables`` option to a click command
-    """
-    _reorder_tables_flag = [
-        click.option(
-            "--reorder-tables/--no-reorder-tables",
-            default=True,
-            help="""
-            Reorder the font's tables on save. If true (the default), reorder the tables, sorting
-            them by tag (recommended by the OpenType specification). If False, retain the original
-            font order. If None, reorder by table dependency (fastest).
-            """,
-        )
-    ]
-    return add_options(_reorder_tables_flag)
-
-
-def debug_flag() -> t.Callable:
+def debug_flag() -> Callable:
     """
     Add the ``debug`` option to a click command.
 
@@ -251,7 +230,7 @@ def debug_flag() -> t.Callable:
 def target_upm_option(
     required: bool = False,
     help_msg: str = "Scale the font to the specified UPM.",
-) -> t.Callable:
+) -> Callable:
     """
     Add the ``scale_upm`` option to a click command.
 
@@ -271,7 +250,7 @@ def target_upm_option(
     return add_options(_target_upm_option)
 
 
-def subroutinize_flag() -> t.Callable:
+def subroutinize_flag() -> Callable:
     """
     Add the ``subroutinize`` option to a click command.
 
@@ -288,7 +267,7 @@ def subroutinize_flag() -> t.Callable:
     return add_options(_subroutinize_flag)
 
 
-def correct_contours_flag() -> t.Callable:
+def correct_contours_flag() -> Callable:
     """
     Add the ``correct_contours`` option to a click command.
 
@@ -305,7 +284,7 @@ def correct_contours_flag() -> t.Callable:
     return add_options(_correct_contours_flag)
 
 
-def min_area_option() -> t.Callable:
+def min_area_option() -> Callable:
     """
     Add the ``min_area`` option to a click command.
 
@@ -324,7 +303,7 @@ def min_area_option() -> t.Callable:
     return add_options(_min_area_option)
 
 
-def old_string_option() -> t.Callable:
+def old_string_option() -> Callable:
     """
     Add the ``old_string`` option to a click command.
 
@@ -345,7 +324,7 @@ def old_string_option() -> t.Callable:
     return add_options(_old_string_option)
 
 
-def new_string_option() -> t.Callable:
+def new_string_option() -> Callable:
     """
     Add the ``new_string`` option to a click command.
 
