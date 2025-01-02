@@ -1,7 +1,7 @@
 afdko==4.0.2
-click==8.1.7
+click==8.1.8
 foundrytools==0.1.1
 loguru==0.7.3
-pathvalidate==3.2.1
+pathvalidate==3.2.2
 rich==13.9.4
 win32-setctime==1.2.0; sys_platform == 'win32'
