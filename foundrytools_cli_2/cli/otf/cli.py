@@ -11,7 +11,6 @@ from foundrytools.utils.path_tools import get_temp_file_path
 
 from foundrytools_cli_2.cli.base_command import BaseCommand
 from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.cli.otf.options import drop_hinting_data_flag, otf_autohint_options
 from foundrytools_cli_2.cli.shared_options import subroutinize_flag
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
@@ -19,7 +18,56 @@ cli = click.Group(help="Utilities for editing OpenType-PS fonts.")
 
 
 @cli.command("autohint", cls=BaseCommand)
-@otf_autohint_options()
+@click.option(
+    "-ac",
+    "--allow-changes",
+    "allowChanges",
+    is_flag=True,
+    default=False,
+    help="""
+    Allow changes to the glyphs outlines.
+    """,
+)
+@click.option(
+    "-nzs",
+    "--no-zones-stems",
+    "allowNoBlues",
+    is_flag=True,
+    default=False,
+    help="""
+    Allow the font to have no alignment zones nor stem widths.
+    """,
+)
+@click.option(
+    "-d",
+    "--decimal",
+    "roundCoords",
+    is_flag=True,
+    default=True,
+    help="""
+    Use decimal coordinates.
+    """,
+)
+@click.option(
+    "-nf",
+    "--no-flex",
+    "noFlex",
+    is_flag=True,
+    default=False,
+    help="""
+    Suppress generation of flex commands.
+    """,
+)
+@click.option(
+    "-nh",
+    "--no-hint-sub",
+    "noHintSub",
+    is_flag=True,
+    default=False,
+    help="""
+    Suppress hint substitution.
+    """,
+)
 @subroutinize_flag()
 def autohint(input_path: Path, **options: dict[str, Any]) -> None:
     """
@@ -44,7 +92,15 @@ def autohint(input_path: Path, **options: dict[str, Any]) -> None:
 
 
 @cli.command("dehint", cls=BaseCommand)
-@drop_hinting_data_flag()
+@click.option(
+    "-dh",
+    "--drop-hinting-data",
+    is_flag=True,
+    help="""
+    Drop BlueValues, OtherBlues, FamilyBlues, FamilyOtherBlues, StdHW, StdVW, StemSnapH, and
+    StemSnapV from the CFF Private dictionary.
+    """,
+)
 @subroutinize_flag()
 def dehint(input_path: Path, **options: dict[str, Any]) -> None:
     """
