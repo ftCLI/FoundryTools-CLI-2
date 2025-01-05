@@ -25,26 +25,6 @@ def add_options(options: list[Callable]) -> Callable:
     return _add_options
 
 
-def base_options() -> Callable:
-    """
-    Add the common options to a click command.
-
-    Returns:
-        t.Callable: A decorator that adds the common options (``input_path``, ``recursive``,
-        ``output_dir``, ``overwrite``, ``recalc_timestamp``) to a click command
-    """
-
-    return add_options(
-        [
-            input_path_argument(),
-            recursive_flag(),
-            output_dir_option(),
-            overwrite_flag(),
-            recalc_timestamp_flag(),
-        ]
-    )
-
-
 def input_path_argument(dir_okay: bool = True, file_okay: bool = True) -> Callable:
     """
     Add the ``input_path`` argument to a click command.

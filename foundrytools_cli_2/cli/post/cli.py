@@ -4,13 +4,13 @@ from pathlib import Path
 import click
 from foundrytools import Font
 
+from foundrytools_cli_2.cli.base_command import BaseCommand
 from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.cli.shared_callbacks import ensure_at_least_one_param
-from foundrytools_cli_2.cli.shared_options import base_options
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
 
-@click.command(no_args_is_help=True)
+@click.command(cls=BaseCommand)
 @click.option(
     "--italic-angle",
     "italic_angle",
@@ -36,7 +36,6 @@ from foundrytools_cli_2.cli.task_runner import TaskRunner
     default=None,
     help="""Sets or clears the `isFixedPitch` value.""",
 )
-@base_options()
 def cli(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Utilities for editing the ``post`` table.
