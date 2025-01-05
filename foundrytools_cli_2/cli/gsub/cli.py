@@ -6,14 +6,14 @@ from pathlib import Path
 import click
 from foundrytools import Font
 
+from foundrytools_cli_2.cli.base_command import BaseCommand
 from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.cli.shared_options import base_options
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
 cli = click.Group(help="Utilities for editing the ``GSUB`` table.")
 
 
-@cli.command("rename-feature")
+@cli.command("rename-feature", cls=BaseCommand)
 @click.option(
     "-old",
     "--old-feature-name",
@@ -28,7 +28,6 @@ cli = click.Group(help="Utilities for editing the ``GSUB`` table.")
     required=True,
     help="The new feature name.",
 )
-@base_options()
 def rename_feature(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     """
     Remaps the feature tags in the GSUB table.
