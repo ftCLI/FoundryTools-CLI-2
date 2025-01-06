@@ -27,9 +27,9 @@ def subroutinize_flag() -> Callable:
     _subroutinize_flag = [
         click.option(
             "-subr/-no-subr",
-            "--subroutinize/--no-subroutinize",
+            "subroutinize",
             default=True,
-            help="Subroutinize the font after processind",
+            help="Subroutinize the font after processing",
         )
     ]
     return add_options(_subroutinize_flag)
