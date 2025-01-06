@@ -3,9 +3,21 @@ from pathlib import Path
 from typing import Any, Literal, Optional
 
 import click
+from fontTools.misc.cliTools import makeOutputFileName
+from fontTools.ttLib.tables._f_v_a_r import Axis, NamedInstance
 from foundrytools import Font
+from foundrytools.app.var2static import (
+    BadInstanceError,
+    UpdateNameTableError,
+    Var2StaticError,
+    check_update_name_table,
+)
+from foundrytools.app.var2static import run as var2static
+from foundrytools.constants import WOFF2_FLAVOR, WOFF_FLAVOR
+from pathvalidate import sanitize_filename
 
 from foundrytools_cli_2.cli import BaseCommand, choice_to_int_callback
+from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
 cli = click.Group("converter", help="Font conversion utilities.")
@@ -37,7 +49,32 @@ def otf_to_ttf(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Convert PostScript flavored fonts to TrueType flavored fonts.
     """
-    from foundrytools_cli_2.cli.converter.tasks.otf_to_ttf import main as task
+
+    def task(
+        font: Font,
+        tolerance: float = 1.0,
+        target_upm: Optional[int] = None,
+        output_dir: Optional[Path] = None,
+        overwrite: bool = True,
+    ) -> None:
+        flavor = font.ttfont.flavor
+        suffix = ".ttf" if flavor is not None else ""
+        extension = font.get_file_ext() if flavor is not None else ".ttf"
+        out_file = font.get_file_path(
+            output_dir=output_dir, overwrite=overwrite, extension=extension, suffix=suffix
+        )
+
+        tolerance = tolerance / 1000 * font.t_head.units_per_em
+
+        logger.info("Converting to TTF...")
+        font.to_ttf(max_err=tolerance, reverse_direction=True)
+
+        if target_upm:
+            logger.info(f"Scaling UPM to {target_upm}...")
+            font.scale_upm(target_upm=target_upm)
+
+        font.save(out_file)
+        logger.success(f"File saved to {out_file}")
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.save_if_modified = False
@@ -176,7 +213,31 @@ def sfnt_to_web(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Convert SFNT fonts to WOFF and/or WOFF2 fonts.
     """
-    from foundrytools_cli_2.cli.converter.tasks.sfnt_to_web import main as task
+
+    def task(
+        font: Font,
+        output_dir: Optional[Path] = None,
+        out_format: Optional[Literal["woff", "woff2"]] = None,
+        overwrite: bool = True,
+        reorder_tables: bool = False,
+    ) -> None:
+        suffix = font.get_file_ext()
+
+        out_formats = [WOFF_FLAVOR, WOFF2_FLAVOR] if out_format is None else [out_format]
+
+        if WOFF_FLAVOR in out_formats:
+            logger.info("Converting to WOFF")
+            font.to_woff()
+            out_file = font.get_file_path(output_dir=output_dir, overwrite=overwrite, suffix=suffix)
+            font.save(out_file, reorder_tables=reorder_tables)
+            logger.success(f"File saved to {out_file}")
+
+        if WOFF2_FLAVOR in out_formats:
+            logger.info("Converting to WOFF2")
+            font.to_woff2()
+            out_file = font.get_file_path(output_dir=output_dir, overwrite=overwrite, suffix=suffix)
+            font.save(out_file, reorder_tables=reorder_tables)
+            logger.success(f"File saved to {out_file}")
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_woff = True
@@ -216,7 +277,68 @@ def variable_to_static(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Convert variable fonts to static fonts.
     """
-    from foundrytools_cli_2.cli.converter.tasks.variable_to_static import main as task
+
+    def _select_instance_coordinates(axes: list[Axis]) -> NamedInstance:
+        click.secho("\nSelect coordinates:")
+        selected_coordinates = {}
+        selected_instance = NamedInstance()
+        for a in axes:
+            axis_tag = a.axisTag
+            min_value = a.minValue
+            max_value = a.maxValue
+            coordinates = click.prompt(
+                f"{axis_tag} ({min_value} - {max_value})",
+                type=click.FloatRange(min_value, max_value),
+            )
+            selected_coordinates[axis_tag] = coordinates
+
+        selected_instance.coordinates = selected_coordinates
+
+        return selected_instance
+
+    def task(
+        var_font: Font,
+        select_instance: bool = False,
+        overlap: int = 1,
+        output_dir: Optional[Path] = None,
+        overwrite: bool = True,
+    ) -> None:
+        if select_instance:
+            axes = var_font.t_fvar.table.axes
+            selected_instance = _select_instance_coordinates(axes)
+            requested_instances = [selected_instance]
+        else:
+            requested_instances = var_font.t_fvar.table.instances
+
+        if not requested_instances:
+            raise ValueError("No instances found in the variable font.")
+
+        if output_dir is None:
+            if var_font.file is None:
+                raise ValueError("Cannot determine the output directory.")
+            output_dir = var_font.file.parent
+
+        try:
+            check_update_name_table(var_font)
+            update_font_names = True
+        except UpdateNameTableError as e:
+            logger.warning(f"The name table cannot be updated: {e}")
+            update_font_names = False
+
+        for i, instance in enumerate(requested_instances, start=1):
+            logger.info(f"Exporting instance {i} of {len(requested_instances)}")
+            try:
+                static_font, file_name = var2static(var_font, instance, update_font_names, overlap)
+            except (BadInstanceError, Var2StaticError) as e:
+                logger.opt(colors=True).error(f"<lr>{e.__module__}.{type(e).__name__}</lr>: {e}")
+                continue
+
+            out_file = makeOutputFileName(
+                sanitize_filename(file_name), output_dir, overWrite=overwrite
+            )
+            static_font.save(out_file)
+            static_font.close()
+            logger.success(f"Static instance saved to {out_file}\n")
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.filter.filter_out_static = True
