@@ -2,7 +2,7 @@ import typing as t
 
 import click
 
-from foundrytools_cli_2.cli.shared_options import add_options
+from foundrytools_cli_2.cli import make_options
 
 
 def keep_hinting_flag() -> t.Callable:
@@ -22,7 +22,7 @@ def keep_hinting_flag() -> t.Callable:
             help="Keep hinting for unmodified glyphs, default is to drop hinting",
         )
     ]
-    return add_options(_keep_hinting_flag)
+    return make_options(_keep_hinting_flag)
 
 
 def ignore_errors_flag() -> t.Callable:
@@ -42,7 +42,7 @@ def ignore_errors_flag() -> t.Callable:
             """,
         )
     ]
-    return add_options(_ignore_errors_flag)
+    return make_options(_ignore_errors_flag)
 
 
 def keep_unused_subroutines_flag() -> t.Callable:
@@ -65,7 +65,7 @@ def keep_unused_subroutines_flag() -> t.Callable:
             """,
         )
     ]
-    return add_options(_keep_unused_subroutines_flag)
+    return make_options(_keep_unused_subroutines_flag)
 
 
 def min_area_option() -> t.Callable:
@@ -88,4 +88,4 @@ def min_area_option() -> t.Callable:
             """,
         )
     ]
-    return add_options(_min_area_option)
+    return make_options(_min_area_option)

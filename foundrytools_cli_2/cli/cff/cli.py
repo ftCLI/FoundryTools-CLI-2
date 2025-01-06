@@ -6,9 +6,7 @@ import click
 from foundrytools import Font
 from foundrytools.constants import TOP_DICT_NAMES
 
-from foundrytools_cli_2.cli.base_command import BaseCommand
-from foundrytools_cli_2.cli.shared_callbacks import ensure_at_least_one_param
-from foundrytools_cli_2.cli.shared_options import add_options
+from foundrytools_cli_2.cli import BaseCommand, ensure_at_least_one_param, make_options
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
 
@@ -24,7 +22,7 @@ def _top_dict_names_flags() -> t.Callable:
         for option_param, var_name in sorted(TOP_DICT_NAMES.items())
     ]
 
-    return add_options(flags)
+    return make_options(flags)
 
 
 def _top_dict_names_options() -> t.Callable:
@@ -38,7 +36,7 @@ def _top_dict_names_options() -> t.Callable:
         for option_param, var_name in sorted(TOP_DICT_NAMES.items())
     ]
 
-    return add_options(options)
+    return make_options(options)
 
 
 cli = click.Group("cff", help="Utilities for editing the ``CFF`` table.")

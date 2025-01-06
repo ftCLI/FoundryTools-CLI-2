@@ -5,9 +5,8 @@ from pathlib import Path
 import click
 from foundrytools import Font
 
-from foundrytools_cli_2.cli.base_command import BaseCommand
+from foundrytools_cli_2.cli import BaseCommand, tuple_to_set_callback
 from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.cli.shared_callbacks import tuple_to_set_callback
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
 cli = click.Group(help="A collection of utilities to remap, rename and sort glyphs.")

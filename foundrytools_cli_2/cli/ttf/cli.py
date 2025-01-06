@@ -5,7 +5,7 @@ from typing import Any
 import click
 from foundrytools import Font
 
-from foundrytools_cli_2.cli.base_command import BaseCommand
+from foundrytools_cli_2.cli import BaseCommand
 from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 

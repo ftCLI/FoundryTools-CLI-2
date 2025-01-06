@@ -1,5 +1,5 @@
-import typing as t
 from pathlib import Path
+from typing import Optional
 
 import click
 from fontTools.misc.cliTools import makeOutputFileName
@@ -42,7 +42,7 @@ def main(
     var_font: Font,
     select_instance: bool = False,
     overlap: int = 1,
-    output_dir: t.Optional[Path] = None,
+    output_dir: Optional[Path] = None,
     overwrite: bool = True,
 ) -> None:
     """

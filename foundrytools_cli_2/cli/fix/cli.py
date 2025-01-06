@@ -6,7 +6,7 @@ import click
 from fontTools.misc.roundTools import otRound
 from foundrytools import Font
 
-from foundrytools_cli_2.cli.base_command import BaseCommand
+from foundrytools_cli_2.cli import BaseCommand
 from foundrytools_cli_2.cli.fix.options import (
     ignore_errors_flag,
     keep_hinting_flag,
