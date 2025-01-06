@@ -1,5 +1,5 @@
-import typing as t
 from pathlib import Path
+from typing import Any, Optional, Union
 
 import click
 from fontTools.misc.roundTools import otRound
@@ -14,7 +14,7 @@ cli = click.Group(help="Utilities for editing the ``OS/2`` table.")
 
 
 @cli.command("recalc-avg-width", cls=BaseCommand)
-def recalc_avg_char_width(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def recalc_avg_char_width(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Recalculates the xAvgCharWidth value of the OS/2 table.
     """
@@ -34,7 +34,7 @@ def recalc_avg_char_width(input_path: Path, **options: t.Dict[str, t.Any]) -> No
     default="x",
     help="The glyph name to use for calculating the x-height. Default is 'x'.",
 )
-def recalc_x_height(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def recalc_x_height(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Recalculates the sxHeight value of the OS/2 table.
     """
@@ -54,7 +54,7 @@ def recalc_x_height(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     default="H",
     help="The glyph name to use for calculating the cap height. Default is 'H'.",
 )
-def recalc_cap_height(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def recalc_cap_height(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Recalculates the sCapHeight value of the OS/2 table.
     """
@@ -68,7 +68,7 @@ def recalc_cap_height(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("recalc-max-context", cls=BaseCommand)
-def recalc_max_context(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def recalc_max_context(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Recalculates the usMaxContext value of the OS/2 table.
     """
@@ -82,7 +82,7 @@ def recalc_max_context(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("recalc-codepage-ranges", cls=BaseCommand)
-def recalc_codepage_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def recalc_codepage_ranges(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Recalculates the ulCodePageRange values of the OS/2 table.
     """
@@ -103,7 +103,7 @@ def recalc_codepage_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> N
     default=33.0,
     help="Minimum percentage of coverage required for a Unicode range to be enabled.",
 )
-def recalc_unicode_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def recalc_unicode_ranges(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Recalculates the ulUnicodeRange values of the OS/2 table based on a minimum percentage of
     coverage.
@@ -251,13 +251,13 @@ def recalc_unicode_ranges(input_path: Path, **options: t.Dict[str, t.Any]) -> No
     This field was defined in version 2 of the ``OS/2`` table.
     """,
 )
-def set_attrs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def set_attrs(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Sets miscellaneous attributes of the OS/2 table.
     """
     ensure_at_least_one_param(click.get_current_context())
 
-    def task(font: Font, **kwargs: t.Dict[str, t.Optional[t.Union[int, float, str, bool]]]) -> bool:
+    def task(font: Font, **kwargs: dict[str, Optional[Union[int, float, str, bool]]]) -> bool:
         for attr, value in kwargs.items():
             if value is not None:
                 try:
@@ -411,13 +411,13 @@ def set_attrs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Bit 9 was defined in version 4 of the ``OS/2`` table.
     """,
 )
-def set_fs_selection(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def set_fs_selection(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Sets flags in the fsSelection field of the OS/2 table.
     """
     ensure_at_least_one_param(click.get_current_context())
 
-    def task(font: Font, **kwargs: t.Dict[str, t.Optional[bool]]) -> bool:
+    def task(font: Font, **kwargs: dict[str, Optional[bool]]) -> bool:
         for attr, value in kwargs.items():
             if value is not None:
                 if hasattr(font.flags, attr):
@@ -491,13 +491,13 @@ def set_fs_selection(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     restrictions specified in bits 0-3 and 8 also apply.
     """,
 )
-def set_fs_type(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def set_fs_type(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Set font embedding licensing rights for the font, defined in the fsType field of the OS/2 table.
     """
     ensure_at_least_one_param(click.get_current_context())
 
-    def task(font: Font, **kwargs: t.Dict[str, t.Optional[bool]]) -> bool:
+    def task(font: Font, **kwargs: dict[str, Optional[bool]]) -> bool:
         for attr, value in kwargs.items():
             if hasattr(font.t_os_2, attr) and value is not None:
                 setattr(font.t_os_2, attr, value)
@@ -598,13 +598,13 @@ def set_fs_type(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Sets the 'bXHeight' value.
     """,
 )
-def set_panose(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def set_panose(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Sets the PANOSE classification in the OS/2 table.
     """
     ensure_at_least_one_param(click.get_current_context())
 
-    def task(font: Font, **kwargs: t.Dict[str, int]) -> bool:
+    def task(font: Font, **kwargs: dict[str, int]) -> bool:
         for attr, value in kwargs.items():
             if hasattr(font.t_os_2.table.panose, attr) and value is not None:
                 setattr(font.t_os_2.table.panose, attr, value)
@@ -623,7 +623,7 @@ def set_panose(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     The version of the OS/2 table to set.
     """,
 )
-def upgrade(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def upgrade(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Upgrades the OS/2 table version.
 

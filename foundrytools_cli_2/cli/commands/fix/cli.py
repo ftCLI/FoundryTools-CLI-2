@@ -1,6 +1,6 @@
 # pylint: disable=import-outside-toplevel
-import typing as t
 from pathlib import Path
+from typing import Any, cast
 
 import click
 from fontTools.misc.roundTools import otRound
@@ -14,7 +14,7 @@ cli = click.Group(help="Fix font errors.")
 
 
 @cli.command("duplicate-components", cls=BaseCommand)
-def fix_duplicate_components(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def fix_duplicate_components(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Remove duplicate components.
 
@@ -51,7 +51,7 @@ def fix_duplicate_components(input_path: Path, **options: t.Dict[str, t.Any]) ->
 
 
 @cli.command("empty-notdef", cls=BaseCommand)
-def fix_empty_notdef(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def fix_empty_notdef(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Fixes the empty .notdef glyph by drawing a simple rectangle.
 
@@ -67,7 +67,7 @@ def fix_empty_notdef(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("fs-selection", cls=BaseCommand)
-def fix_fs_selection(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def fix_fs_selection(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Fixes the style flags (Regular, Italic, Bold) in the ``OS/2.fsSelection`` field and in the
     ``head.macStyle`` field.
@@ -101,7 +101,7 @@ def fix_fs_selection(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("kern-table", cls=BaseCommand)
-def fix_kern_table(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def fix_kern_table(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Fix the ``kern`` table by removing pairs that contain unmapped glyphs.
 
@@ -168,7 +168,7 @@ def fix_kern_table(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 \n
 """,
 )
-def fix_italic_angle(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def fix_italic_angle(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Fixes the italic angle and related attributes in the font.
 
@@ -203,7 +203,7 @@ def fix_italic_angle(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("legacy-accents", cls=BaseCommand)
-def fix_legacy_accents(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def fix_legacy_accents(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Check that legacy accents aren't used in composite glyphs.
 
@@ -226,7 +226,7 @@ def fix_legacy_accents(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("nbsp-missing", cls=BaseCommand)
-def fix_missing_nbsp(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def fix_missing_nbsp(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Fixes the missing non-breaking space glyph by double mapping the space glyph.
 
@@ -250,7 +250,7 @@ def fix_missing_nbsp(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("nbsp-width", cls=BaseCommand)
-def fix_nbsp_width(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def fix_nbsp_width(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Fixes the width of the non-breaking space glyph to be the same as the space glyph.
 
@@ -283,7 +283,7 @@ def fix_nbsp_width(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("monospace", cls=BaseCommand)
-def fix_monospace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def fix_monospace(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Fix metadata in monospaced fonts
 
@@ -341,7 +341,7 @@ def fix_monospace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("transformed-components", cls=BaseCommand)
-def fix_transformed_components(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def fix_transformed_components(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Decompose glyphs with transformed components.
 
@@ -391,7 +391,7 @@ def fix_transformed_components(input_path: Path, **options: t.Dict[str, t.Any]) 
 
 
 @cli.command("unreachable-glyphs", cls=BaseCommand)
-def fix_unreachable_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def fix_unreachable_glyphs(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Remove unreachable glyphs from the font.
 
@@ -430,7 +430,7 @@ def fix_unreachable_glyphs(input_path: Path, **options: t.Dict[str, t.Any]) -> N
 
 
 @cli.command("vertical-metrics", cls=BaseCommand)
-def fix_vertical_metrics(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def fix_vertical_metrics(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Ensures that the vertical metrics are consistent across the font family.
 
@@ -451,8 +451,8 @@ def fix_vertical_metrics(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     safe_bottom = otRound(min(m[0] for m in metrics))
     safe_top = otRound(max(m[1] for m in metrics))
 
-    options["safe_bottom"] = t.cast(t.Any, safe_bottom)
-    options["safe_top"] = t.cast(t.Any, safe_top)
+    options["safe_bottom"] = cast(Any, safe_bottom)
+    options["safe_top"] = cast(Any, safe_top)
 
     from foundrytools_cli_2.cli.commands.fix.fix_vertical_metrics import main as task
 

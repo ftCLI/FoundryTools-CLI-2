@@ -1,7 +1,6 @@
 # pylint: disable=import-outside-toplevel
 import os
 import platform
-import typing as t
 from pathlib import Path
 
 from fontTools.misc.timeTools import epoch_diff, timestampToString
@@ -37,9 +36,7 @@ def _is_relative_to(path: Path, other: Path) -> bool:
         return False
 
 
-def _get_file_timestamps(
-    input_path: Path, recursive: bool = True
-) -> t.Dict[Path, t.Tuple[int, int]]:
+def _get_file_timestamps(input_path: Path, recursive: bool = True) -> dict[Path, tuple[int, int]]:
     finder = FontFinder(input_path)
     finder.options.recursive = recursive
     fonts = finder.find_fonts()
@@ -54,9 +51,9 @@ def _get_file_timestamps(
 
 
 def _get_folder_timestamps(
-    folders: t.Set[Path],
-    files_timestamps: t.Dict[Path, t.Tuple[int, int]],
-) -> t.Dict[Path, t.Tuple[int, int]]:
+    folders: set[Path],
+    files_timestamps: dict[Path, tuple[int, int]],
+) -> dict[Path, tuple[int, int]]:
     folder_timestamps = {
         folder: (
             min(
@@ -80,7 +77,7 @@ def _get_folder_timestamps(
     return folder_timestamps
 
 
-def _set_timestamps(path_timestamps: t.Dict[Path, t.Tuple[int, int]]) -> None:
+def _set_timestamps(path_timestamps: dict[Path, tuple[int, int]]) -> None:
     for path, timestamps in path_timestamps.items():
         logger.opt(colors=True).info(f"Current path: <light-cyan>{path}</>")
 

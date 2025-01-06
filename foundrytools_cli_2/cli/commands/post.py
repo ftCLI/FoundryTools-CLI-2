@@ -1,5 +1,5 @@
-import typing as t
 from pathlib import Path
+from typing import Any, Optional
 
 import click
 from foundrytools import Font
@@ -35,7 +35,7 @@ from foundrytools_cli_2.cli.task_runner import TaskRunner
     default=None,
     help="""Sets or clears the `isFixedPitch` value.""",
 )
-def cli(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def cli(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Utilities for editing the ``post`` table.
     """
@@ -43,10 +43,10 @@ def cli(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     def task(
         font: Font,
-        italic_angle: t.Optional[float] = None,
-        underline_position: t.Optional[int] = None,
-        underline_thickness: t.Optional[int] = None,
-        fixed_pitch: t.Optional[bool] = None,
+        italic_angle: Optional[float] = None,
+        underline_position: Optional[int] = None,
+        underline_thickness: Optional[int] = None,
+        fixed_pitch: Optional[bool] = None,
     ) -> bool:
         attrs = {
             "italic_angle": italic_angle,

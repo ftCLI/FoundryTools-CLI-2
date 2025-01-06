@@ -1,9 +1,10 @@
-# pylint: disable=import-outside-toplevel
 from pathlib import Path
 from typing import Any
 
 import click
 from foundrytools import Font
+from foundrytools.app.ttf_autohint import run as ttf_autohint
+from foundrytools.app.ttf_dehint import run as ttf_dehint
 
 from foundrytools_cli_2.cli import BaseCommand
 from foundrytools_cli_2.cli.logger import logger
@@ -17,9 +18,8 @@ def autohint(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Auto-hints the given TrueType fonts using ttfautohint-py.
     """
-    from foundrytools.app.ttf_autohint import run as task
 
-    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=ttf_autohint, **options)
     runner.filter.filter_out_ps = True
     runner.run()
 
@@ -29,9 +29,8 @@ def dehint(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Removes hinting from the given TrueType fonts.
     """
-    from foundrytools.app.ttf_dehint import run as task
 
-    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner = TaskRunner(input_path=input_path, task=ttf_dehint, **options)
     runner.filter.filter_out_ps = True
     runner.run()
 

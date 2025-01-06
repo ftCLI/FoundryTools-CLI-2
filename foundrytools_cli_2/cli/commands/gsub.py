@@ -1,7 +1,5 @@
-# pylint: disable=import-outside-toplevel
-
-import typing as t
 from pathlib import Path
+from typing import Any
 
 import click
 from foundrytools import Font
@@ -28,7 +26,7 @@ cli = click.Group(help="Utilities for editing the ``GSUB`` table.")
     required=True,
     help="The new feature name.",
 )
-def rename_feature(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def rename_feature(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Remaps the feature tags in the GSUB table.
     """

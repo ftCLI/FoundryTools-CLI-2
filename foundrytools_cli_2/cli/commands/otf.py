@@ -1,4 +1,3 @@
-# pylint: disable=import-outside-toplevel
 from pathlib import Path
 from typing import Any, Callable, cast
 
@@ -7,6 +6,8 @@ from foundrytools import Font
 from foundrytools.app.otf_autohint import run as otf_autohint
 from foundrytools.app.otf_check_outlines import run as otf_check_outlines
 from foundrytools.app.otf_dehint import run as otf_dehint
+from foundrytools.app.otf_recalc_stems import run as get_stems
+from foundrytools.app.otf_recalc_zones import run as get_zones
 from foundrytools.utils.path_tools import get_temp_file_path
 
 from foundrytools_cli_2.cli import BaseCommand, make_options
@@ -255,7 +256,6 @@ def recalc_stems(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Recalculate the hinting stems of OpenType-PS fonts.
     """
-    from foundrytools.app.otf_recalc_stems import run as get_stems
 
     def task(font: Font) -> bool:
         if not font.is_ps:
@@ -328,7 +328,6 @@ def recalc_zones(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Recalculate the hinting zones of OpenType-PS fonts.
     """
-    from foundrytools.app.otf_recalc_zones import run as get_zones
 
     def task(font: Font) -> bool:
         if not font.is_ps:
