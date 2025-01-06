@@ -7,7 +7,7 @@ from foundrytools.app.otf_check_outlines import run as otf_check_outlines
 from foundrytools.lib.otf_builder import build_otf
 from foundrytools.lib.qu2cu import quadratics_to_cubics_2
 
-from foundrytools_cli_2.cli.logger import logger
+from foundrytools_cli_2.utils.logger import logger
 
 
 def _build_out_file_name(font: Font, output_dir: Optional[Path], overwrite: bool = True) -> Path:

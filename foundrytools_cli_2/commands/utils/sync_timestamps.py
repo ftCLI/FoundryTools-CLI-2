@@ -7,7 +7,7 @@ from fontTools.misc.timeTools import epoch_diff, timestampToString
 from foundrytools import FontFinder
 from foundrytools.constants import T_HEAD
 
-from foundrytools_cli_2.cli.logger import logger
+from foundrytools_cli_2.utils.logger import logger
 
 # Placeholder for `setctime`, and `import_error`
 SETCTIME = None

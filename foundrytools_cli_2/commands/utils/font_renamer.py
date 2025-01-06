@@ -3,7 +3,7 @@ from pathlib import Path
 from foundrytools import Font
 from pathvalidate import sanitize_filename
 
-from foundrytools_cli_2.cli.logger import logger
+from foundrytools_cli_2.utils.logger import logger
 
 
 def _get_file_stem(font: Font, source: int = 1) -> str:

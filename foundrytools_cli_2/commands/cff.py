@@ -5,8 +5,8 @@ import click
 from foundrytools import Font
 from foundrytools.constants import TOP_DICT_NAMES
 
-from foundrytools_cli_2.cli import BaseCommand, ensure_at_least_one_param, make_options
-from foundrytools_cli_2.cli.task_runner import TaskRunner
+from foundrytools_cli_2.utils import BaseCommand, ensure_at_least_one_param, make_options
+from foundrytools_cli_2.utils.task_runner import TaskRunner
 
 
 def _top_dict_names_flags() -> Callable:

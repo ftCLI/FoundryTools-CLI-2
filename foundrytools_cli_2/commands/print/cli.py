@@ -1,9 +1,10 @@
-# pylint: disable=import-outside-toplevel
 from pathlib import Path
 from typing import Optional
 
 import click
 from foundrytools import FontFinder
+
+from foundrytools_cli_2.commands.print.print_names import main as print_names
 
 cli = click.Group(help="Prints various font's information.")
 
@@ -30,7 +31,6 @@ def print_font_names(
     """
     Prints the name table.
     """
-    from foundrytools_cli_2.cli.commands.print.print_names import main as print_names
 
     finder = FontFinder(input_path)
     for font in finder.generate_fonts():

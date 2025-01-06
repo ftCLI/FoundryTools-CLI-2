@@ -16,9 +16,9 @@ from foundrytools.app.var2static import run as var2static
 from foundrytools.constants import WOFF2_FLAVOR, WOFF_FLAVOR
 from pathvalidate import sanitize_filename
 
-from foundrytools_cli_2.cli import BaseCommand, choice_to_int_callback
-from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.cli.task_runner import TaskRunner
+from foundrytools_cli_2.utils import BaseCommand, choice_to_int_callback
+from foundrytools_cli_2.utils.logger import logger
+from foundrytools_cli_2.utils.task_runner import TaskRunner
 
 
 def _select_instance_coordinates(axes: list[Axis]) -> NamedInstance:
@@ -171,7 +171,7 @@ def ttf_to_otf(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Convert TrueType flavored fonts to PostScript flavored fonts.
     """
-    from foundrytools_cli_2.cli.commands.converter.ttf_to_otf import ttf2otf, ttf2otf_with_tx
+    from foundrytools_cli_2.commands.converter.ttf_to_otf import ttf2otf, ttf2otf_with_tx
 
     if options["mode"] == "tx":
         options.pop("tolerance")

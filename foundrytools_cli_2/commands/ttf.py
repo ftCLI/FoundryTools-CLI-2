@@ -6,9 +6,9 @@ from foundrytools import Font
 from foundrytools.app.ttf_autohint import run as ttf_autohint
 from foundrytools.app.ttf_dehint import run as ttf_dehint
 
-from foundrytools_cli_2.cli import BaseCommand
-from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.cli.task_runner import TaskRunner
+from foundrytools_cli_2.utils import BaseCommand
+from foundrytools_cli_2.utils.logger import logger
+from foundrytools_cli_2.utils.task_runner import TaskRunner
 
 cli = click.Group(help="Utilities for editing OpenType-TT fonts.")
 

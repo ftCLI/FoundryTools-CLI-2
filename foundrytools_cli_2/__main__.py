@@ -1,18 +1,18 @@
 import click
 
-from foundrytools_cli_2.cli.commands.cff import cli as cff
-from foundrytools_cli_2.cli.commands.cmap import cli as cmap
-from foundrytools_cli_2.cli.commands.converter import cli as converter
-from foundrytools_cli_2.cli.commands.fix import cli as fix
-from foundrytools_cli_2.cli.commands.font import cli as font
-from foundrytools_cli_2.cli.commands.gsub import cli as gsub
-from foundrytools_cli_2.cli.commands.name import cli as name
-from foundrytools_cli_2.cli.commands.os_2 import cli as os_2
-from foundrytools_cli_2.cli.commands.otf import cli as otf
-from foundrytools_cli_2.cli.commands.post import cli as post
-from foundrytools_cli_2.cli.commands.print import cli as print_
-from foundrytools_cli_2.cli.commands.ttf import cli as ttf
-from foundrytools_cli_2.cli.commands.utils import cli as utils
+from foundrytools_cli_2.commands.cff import cli as cff
+from foundrytools_cli_2.commands.cmap import cli as cmap
+from foundrytools_cli_2.commands.converter import cli as converter
+from foundrytools_cli_2.commands.fix import cli as fix
+from foundrytools_cli_2.commands.font import cli as font
+from foundrytools_cli_2.commands.gsub import cli as gsub
+from foundrytools_cli_2.commands.name import cli as name
+from foundrytools_cli_2.commands.os_2 import cli as os_2
+from foundrytools_cli_2.commands.otf import cli as otf
+from foundrytools_cli_2.commands.post import cli as post
+from foundrytools_cli_2.commands.print import cli as print_
+from foundrytools_cli_2.commands.ttf import cli as ttf
+from foundrytools_cli_2.commands.utils import cli as utils
 
 
 @click.group(
