@@ -20,6 +20,26 @@ from foundrytools_cli_2.cli import BaseCommand, choice_to_int_callback
 from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
+
+def _select_instance_coordinates(axes: list[Axis]) -> NamedInstance:
+    click.secho("\nSelect coordinates:")
+    selected_coordinates = {}
+    selected_instance = NamedInstance()
+    for a in axes:
+        axis_tag = a.axisTag
+        min_value = a.minValue
+        max_value = a.maxValue
+        coordinates = click.prompt(
+            f"{axis_tag} ({min_value} - {max_value})",
+            type=click.FloatRange(min_value, max_value),
+        )
+        selected_coordinates[axis_tag] = coordinates
+
+    selected_instance.coordinates = selected_coordinates
+
+    return selected_instance
+
+
 cli = click.Group("converter", help="Font conversion utilities.")
 
 
@@ -277,24 +297,6 @@ def variable_to_static(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Convert variable fonts to static fonts.
     """
-
-    def _select_instance_coordinates(axes: list[Axis]) -> NamedInstance:
-        click.secho("\nSelect coordinates:")
-        selected_coordinates = {}
-        selected_instance = NamedInstance()
-        for a in axes:
-            axis_tag = a.axisTag
-            min_value = a.minValue
-            max_value = a.maxValue
-            coordinates = click.prompt(
-                f"{axis_tag} ({min_value} - {max_value})",
-                type=click.FloatRange(min_value, max_value),
-            )
-            selected_coordinates[axis_tag] = coordinates
-
-        selected_instance.coordinates = selected_coordinates
-
-        return selected_instance
 
     def task(
         var_font: Font,
