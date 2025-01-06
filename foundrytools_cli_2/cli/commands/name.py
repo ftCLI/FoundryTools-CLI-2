@@ -1,6 +1,5 @@
-# pylint: disable=import-outside-toplevel
-import typing as t
 from pathlib import Path
+from typing import Any, Optional
 
 import click
 from foundrytools import Font
@@ -48,16 +47,16 @@ cli = click.Group(help="Utilities for editing the ``name`` table.")
     Example: ``-l en`` will modify only NameRecords with language code "en".
     """,
 )
-def del_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def del_names(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Delete the specified NameRecords from the ``name`` table.
     """
 
     def task(
         font: Font,
-        name_ids_to_process: t.Tuple[int],
-        platform_id: t.Optional[int] = None,
-        language_string: t.Optional[str] = None,
+        name_ids_to_process: tuple[int],
+        platform_id: Optional[int] = None,
+        language_string: Optional[str] = None,
     ) -> bool:
         font.t_name.remove_names(
             name_ids=name_ids_to_process, platform_id=platform_id, language_string=language_string
@@ -69,7 +68,7 @@ def del_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("del-empty-names", cls=BaseCommand)
-def del_empty_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def del_empty_names(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Deletes empty NameRecords from the ``name`` table.
     """
@@ -83,7 +82,7 @@ def del_empty_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("del-mac-names", cls=BaseCommand)
-def del_mac_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def del_mac_names(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Delete Macintosh-specific NameRecords from the ``name`` table, excluding those with nameID 1, 2,
     4, 5 and 6. If the ``--del-all`` flag is set, all Macintosh-specific NameRecords are deleted.
@@ -98,7 +97,7 @@ def del_mac_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("del-unused-names", cls=BaseCommand)
-def del_unused_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def del_unused_names(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Delete unused NameRecords from the ``name`` table.
     """
@@ -163,7 +162,7 @@ def del_unused_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Example: ``-p 1`` will modify only NameRecords with platform ID 1.
     """,
 )
-def find_replace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def find_replace(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Find and replace text in the specified NameRecords.
     """
@@ -172,8 +171,8 @@ def find_replace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
         font: Font,
         old_string: str,
         new_string: str,
-        name_ids_to_process: t.Optional[t.Tuple[int]] = None,
-        name_ids_to_skip: t.Optional[t.Tuple[int]] = None,
+        name_ids_to_process: Optional[tuple[int]] = None,
+        name_ids_to_skip: Optional[tuple[int]] = None,
     ) -> bool:
         font.t_name.find_replace(
             old_string=old_string,
@@ -219,7 +218,7 @@ def find_replace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Example: ``-p 1`` will only add NameRecords with platform ID 1.
     """,
 )
-def set_name(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def set_name(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Set the string of the specified NameRecord in the ``name`` table.
     """
@@ -228,7 +227,7 @@ def set_name(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
         font: Font,
         name_id: int,
         name_string: str,
-        platform_id: t.Optional[int] = None,
+        platform_id: Optional[int] = None,
         language_string: str = "en",
     ) -> bool:
         font.t_name.set_name(
@@ -244,7 +243,7 @@ def set_name(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
 
 @cli.command("strip-names", cls=BaseCommand)
-def strip_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def strip_names(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Remove leading and trailing whitespace from the NameRecords.
     """
@@ -277,7 +276,7 @@ def strip_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Specify the platform ID to build the unique ID for.
     """,
 )
-def build_unique_id(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def build_unique_id(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Builds the NameID 3 (Unique ID).
 
@@ -290,7 +289,7 @@ def build_unique_id(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     ``Font Revision;Vendor ID;PostScript Name``
     """
 
-    def task(font: Font, platform_id: t.Optional[int] = None, alternate: bool = False) -> bool:
+    def task(font: Font, platform_id: Optional[int] = None, alternate: bool = False) -> bool:
         font.t_name.build_unique_identifier(platform_id=platform_id, alternate=alternate)
         return font.t_name.is_modified
 
@@ -309,12 +308,12 @@ def build_unique_id(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Specify the platform ID to build the Full Name for.
     """,
 )
-def build_full_name(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def build_full_name(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Builds the NameID 4 (Full Font Name).
     """
 
-    def task(font: Font, platform_id: t.Optional[int] = None) -> bool:
+    def task(font: Font, platform_id: Optional[int] = None) -> bool:
         font.t_name.build_full_font_name(platform_id=platform_id)
         return font.t_name.is_modified
 
@@ -333,12 +332,12 @@ def build_full_name(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     Specify the platform ID to build the Version String for.
     """,
 )
-def build_version_string(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def build_version_string(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Builds the NameID 5 (Version String).
     """
 
-    def task(font: Font, platform_id: t.Optional[int] = None) -> bool:
+    def task(font: Font, platform_id: Optional[int] = None) -> bool:
         font.t_name.build_version_string(platform_id=platform_id)
         return font.t_name.is_modified
 
@@ -357,12 +356,12 @@ def build_version_string(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     Specify the platform ID to build the PostScript Name for.
     """,
 )
-def build_postscript_name(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def build_postscript_name(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Builds the NameID 6 (PostScript Name).
     """
 
-    def task(font: Font, platform_id: t.Optional[int] = None) -> bool:
+    def task(font: Font, platform_id: Optional[int] = None) -> bool:
         font.t_name.build_postscript_name(platform_id=platform_id)
         return font.t_name.is_modified
 
@@ -371,7 +370,7 @@ def build_postscript_name(input_path: Path, **options: t.Dict[str, t.Any]) -> No
 
 
 @cli.command("build-mac-names", cls=BaseCommand)
-def build_mac_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def build_mac_names(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Builds the Macintosh-specific names.
 

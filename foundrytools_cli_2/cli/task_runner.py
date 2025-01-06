@@ -1,6 +1,6 @@
-import typing as t
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any, Callable, Optional, Union, get_type_hints
 
 from foundrytools import Font
 from foundrytools.lib.font_finder import (
@@ -28,9 +28,9 @@ class SaveOptions:
     A class that specifies how to save the font.
     """
 
-    reorder_tables: t.Optional[bool] = True
+    reorder_tables: Optional[bool] = True
     suffix: str = ""
-    output_dir: t.Optional[Path] = None
+    output_dir: Optional[Path] = None
     overwrite: bool = False
 
 
@@ -39,42 +39,42 @@ class TaskRunnerConfig:  # pylint: disable=too-few-public-methods
     Handle options for TaskRunner.
     """
 
-    def __init__(self, task_callable: t.Callable, options: t.Dict[str, t.Any]):
+    def __init__(self, task_callable: Callable, options: dict[str, Any]):
         self.task = task_callable
         self.filter = FinderFilter()
         self.finder_options = FinderOptions()
         self.save_options = SaveOptions()
-        self.task_options: t.Dict[str, t.Any] = {}
+        self.task_options: dict[str, Any] = {}
         self._handle_options(options)
 
-    def _handle_options(self, options: t.Dict[str, t.Any]) -> None:
+    def _handle_options(self, options: dict[str, Any]) -> None:
         self._parse_finder_options(options)
         self._parse_save_options(options)
         self._parse_task_options(options)
 
-    def _parse_finder_options(self, options: t.Dict[str, t.Any]) -> None:
+    def _parse_finder_options(self, options: dict[str, Any]) -> None:
         self._set_options(self.finder_options, options)
 
-    def _parse_save_options(self, options: t.Dict[str, t.Any]) -> None:
+    def _parse_save_options(self, options: dict[str, Any]) -> None:
         self._set_options(self.save_options, options)
 
-    def _parse_task_options(self, options: t.Dict[str, t.Any]) -> None:
-        if "kwargs" in t.get_type_hints(self.task):
+    def _parse_task_options(self, options: dict[str, Any]) -> None:
+        if "kwargs" in get_type_hints(self.task):
             self.task_options.update(
                 {
                     k: v
                     for k, v in options.items()
-                    if k not in t.get_type_hints(FinderOptions)
-                    and k not in t.get_type_hints(SaveOptions)
+                    if k not in get_type_hints(FinderOptions)
+                    and k not in get_type_hints(SaveOptions)
                 }
             )
         for key, value in options.items():
-            if key in t.get_type_hints(self.task):
+            if key in get_type_hints(self.task):
                 self.task_options.update({key: value})
 
     @staticmethod
     def _set_options(
-        options_group: t.Union[dict, FinderOptions, SaveOptions], options: t.Dict[str, t.Any]
+        options_group: Union[dict, FinderOptions, SaveOptions], options: dict[str, Any]
     ) -> None:
         """
         Update attributes of an options_group with provided options if the attribute exists.
@@ -104,8 +104,8 @@ class TaskRunner:  # pylint: disable=too-few-public-methods
     def __init__(
         self,
         input_path: Path,
-        task: t.Callable,
-        **options: t.Dict[str, t.Any],
+        task: Callable,
+        **options: dict[str, Any],
     ) -> None:
         """
         Initialize a new instance of the class.
@@ -140,7 +140,7 @@ class TaskRunner:  # pylint: disable=too-few-public-methods
         for font in fonts:
             self._process_font(font, timer=timer)
 
-    def _find_fonts(self) -> t.List[Font]:
+    def _find_fonts(self) -> list[Font]:
         finder = FontFinder(
             input_path=self.input_path, options=self.config.finder_options, filter_=self.filter
         )
