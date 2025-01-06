@@ -1,5 +1,6 @@
-import typing as t
 from shutil import get_terminal_size
+from textwrap import TextWrapper
+from typing import Optional
 
 from fontTools.ttLib.tables._n_a_m_e import _MAC_LANGUAGES, _WINDOWS_LANGUAGES, NameRecord
 from foundrytools import Font
@@ -13,8 +14,6 @@ from foundrytools.constants import (
 from foundrytools.core.tables import CFFTable, NameTable
 from rich.console import Console
 from rich.table import Table
-
-from foundrytools_cli_2.cli.print.common import wrap_string
 
 __all__ = ["main"]
 
@@ -42,8 +41,22 @@ CFF_TABLE_NAME = "[bold magenta]'CFF ' table[reset]"
 JUSTIFY = 22
 
 
+def _wrap_string(
+    string: str, width: int, initial_indent: int, indent: int, max_lines: Optional[int] = None
+) -> str:
+    wrapped_string = TextWrapper(
+        width=width,
+        initial_indent=" " * initial_indent,
+        subsequent_indent=" " * indent,
+        max_lines=max_lines,
+        break_on_hyphens=False,
+        break_long_words=True,
+    ).fill(string)
+    return wrapped_string
+
+
 def _process_name_table(
-    font: Font, table: Table, terminal_width: int, max_lines: t.Optional[int], minimal: bool
+    font: Font, table: Table, terminal_width: int, max_lines: Optional[int], minimal: bool
 ) -> None:
     name_table = NameTable(font.ttfont)
     names = name_table.table.names
@@ -64,10 +77,10 @@ def _process_name_table(
 
 
 def _add_name_row_to_table(
-    table: Table, name: NameRecord, terminal_width: int, max_lines: t.Optional[int]
+    table: Table, name: NameRecord, terminal_width: int, max_lines: Optional[int]
 ) -> None:
     row_string = _get_name_row(name)
-    row_string = wrap_string(
+    row_string = _wrap_string(
         width=terminal_width,
         initial_indent=INITIAL_INDENT,
         indent=INDENT,
@@ -78,7 +91,7 @@ def _add_name_row_to_table(
 
 
 def _process_cff_table(
-    font: Font, table: Table, terminal_width: int, max_lines: t.Optional[int], minimal: bool
+    font: Font, table: Table, terminal_width: int, max_lines: Optional[int], minimal: bool
 ) -> None:
     if not font.is_ps:
         return
@@ -95,7 +108,7 @@ def _process_cff_table(
     for cff_name in cff_names:
         for key, value in cff_name.items():
             row_string = f"{key.ljust(JUSTIFY)} : {value}"
-            row_string = wrap_string(
+            row_string = _wrap_string(
                 width=terminal_width,
                 initial_indent=CFF_INITIAL_INDENT,
                 indent=INDENT,
@@ -105,7 +118,7 @@ def _process_cff_table(
             table.add_row(row_string)
 
 
-def _get_platform_row(platform: t.Tuple[int, int, int]) -> str:
+def _get_platform_row(platform: tuple[int, int, int]) -> str:
     platform_id = platform[0]
     plat_enc_id = platform[1]
     language_id = platform[2]
@@ -134,7 +147,7 @@ def _get_name_row(name: NameRecord) -> str:
     )
 
 
-def main(font: Font, max_lines: t.Optional[int] = None, minimal: bool = False) -> None:
+def main(font: Font, max_lines: Optional[int] = None, minimal: bool = False) -> None:
     """
     Prints the names of the font.
     """
