@@ -30,7 +30,7 @@ def print_font_names(
     """
     Prints the name table.
     """
-    from foundrytools_cli_2.cli.print.print_names import main as print_names
+    from foundrytools_cli_2.cli.commands.print.print_names import main as print_names
 
     finder = FontFinder(input_path)
     for font in finder.generate_fonts():
