@@ -2,8 +2,7 @@ import typing as t
 
 import click
 
-from foundrytools_cli_2.cli.shared_callbacks import choice_to_int_callback
-from foundrytools_cli_2.cli.shared_options import add_options
+from foundrytools_cli_2.cli import choice_to_int_callback, make_options
 
 __all__ = [
     "set_attrs_options",
@@ -33,7 +32,7 @@ def weight_class() -> t.Callable:
             """,
         )
     ]
-    return add_options(_weight_class)
+    return make_options(_weight_class)
 
 
 def width_class() -> t.Callable:
@@ -56,7 +55,7 @@ def width_class() -> t.Callable:
             """,
         )
     ]
-    return add_options(_width_class)
+    return make_options(_width_class)
 
 
 def vendor_id() -> t.Callable:
@@ -78,7 +77,7 @@ def vendor_id() -> t.Callable:
             """,
         )
     ]
-    return add_options(_vendor_id)
+    return make_options(_vendor_id)
 
 
 def typo_ascender() -> t.Callable:
@@ -101,7 +100,7 @@ def typo_ascender() -> t.Callable:
             """,
         )
     ]
-    return add_options(_typo_ascender)
+    return make_options(_typo_ascender)
 
 
 def typo_descender() -> t.Callable:
@@ -124,7 +123,7 @@ def typo_descender() -> t.Callable:
             """,
         )
     ]
-    return add_options(_typo_descender)
+    return make_options(_typo_descender)
 
 
 def typo_line_gap() -> t.Callable:
@@ -147,7 +146,7 @@ def typo_line_gap() -> t.Callable:
             """,
         )
     ]
-    return add_options(_typo_line_gap)
+    return make_options(_typo_line_gap)
 
 
 def win_ascent() -> t.Callable:
@@ -170,7 +169,7 @@ def win_ascent() -> t.Callable:
             """,
         )
     ]
-    return add_options(_win_ascent)
+    return make_options(_win_ascent)
 
 
 def win_descent() -> t.Callable:
@@ -193,7 +192,7 @@ def win_descent() -> t.Callable:
             """,
         )
     ]
-    return add_options(_win_descent)
+    return make_options(_win_descent)
 
 
 def x_height() -> t.Callable:
@@ -225,7 +224,7 @@ def x_height() -> t.Callable:
             """,
         )
     ]
-    return add_options(_x_height)
+    return make_options(_x_height)
 
 
 def cap_height() -> t.Callable:
@@ -259,7 +258,7 @@ def cap_height() -> t.Callable:
             """,
         )
     ]
-    return add_options(_cap_height)
+    return make_options(_cap_height)
 
 
 def italic() -> t.Callable:
@@ -284,7 +283,7 @@ def italic() -> t.Callable:
             """,
         )
     ]
-    return add_options(_italic)
+    return make_options(_italic)
 
 
 def underscore() -> t.Callable:
@@ -308,7 +307,7 @@ def underscore() -> t.Callable:
             """,
         )
     ]
-    return add_options(_underscore)
+    return make_options(_underscore)
 
 
 def negative() -> t.Callable:
@@ -332,7 +331,7 @@ def negative() -> t.Callable:
             """,
         )
     ]
-    return add_options(_negative)
+    return make_options(_negative)
 
 
 def outline() -> t.Callable:
@@ -356,7 +355,7 @@ def outline() -> t.Callable:
             """,
         )
     ]
-    return add_options(_outline)
+    return make_options(_outline)
 
 
 def strikeout() -> t.Callable:
@@ -380,7 +379,7 @@ def strikeout() -> t.Callable:
             """,
         )
     ]
-    return add_options(_strikeout)
+    return make_options(_strikeout)
 
 
 def bold() -> t.Callable:
@@ -405,7 +404,7 @@ def bold() -> t.Callable:
             """,
         )
     ]
-    return add_options(_bold)
+    return make_options(_bold)
 
 
 def regular() -> t.Callable:
@@ -430,7 +429,7 @@ def regular() -> t.Callable:
             """,
         )
     ]
-    return add_options(_regular)
+    return make_options(_regular)
 
 
 def use_typo_metrics() -> t.Callable:
@@ -457,7 +456,7 @@ def use_typo_metrics() -> t.Callable:
             """,
         )
     ]
-    return add_options(_use_typo_metrics)
+    return make_options(_use_typo_metrics)
 
 
 def wws_consistent() -> t.Callable:
@@ -485,7 +484,7 @@ def wws_consistent() -> t.Callable:
             """,
         )
     ]
-    return add_options(_wws_consistent)
+    return make_options(_wws_consistent)
 
 
 def oblique() -> t.Callable:
@@ -519,7 +518,7 @@ def oblique() -> t.Callable:
             """,
         )
     ]
-    return add_options(_oblique)
+    return make_options(_oblique)
 
 
 def embed_level() -> t.Callable:
@@ -561,7 +560,7 @@ def embed_level() -> t.Callable:
             """,
         )
     ]
-    return add_options(_embed_level)
+    return make_options(_embed_level)
 
 
 def no_subsetting() -> t.Callable:
@@ -586,7 +585,7 @@ def no_subsetting() -> t.Callable:
             """,
         )
     ]
-    return add_options(_no_subsetting)
+    return make_options(_no_subsetting)
 
 
 def bitmap_embed_only() -> t.Callable:
@@ -613,7 +612,7 @@ def bitmap_embed_only() -> t.Callable:
             """,
         )
     ]
-    return add_options(_bitmap_embed_only)
+    return make_options(_bitmap_embed_only)
 
 
 def set_attrs_options() -> t.Callable:
@@ -635,7 +634,7 @@ def set_attrs_options() -> t.Callable:
         panose_x_height(),
         cap_height(),
     ]
-    return add_options(_set_attrs_options)
+    return make_options(_set_attrs_options)
 
 
 def set_fs_selection_options() -> t.Callable:
@@ -657,7 +656,7 @@ def set_fs_selection_options() -> t.Callable:
         wws_consistent(),
         oblique(),
     ]
-    return add_options(_set_flags_options)
+    return make_options(_set_flags_options)
 
 
 def set_fs_type_options() -> t.Callable:
@@ -672,7 +671,7 @@ def set_fs_type_options() -> t.Callable:
         no_subsetting(),
         bitmap_embed_only(),
     ]
-    return add_options(_set_permissions_options)
+    return make_options(_set_permissions_options)
 
 
 def family_type() -> t.Callable:
@@ -693,7 +692,7 @@ def family_type() -> t.Callable:
             """,
         )
     ]
-    return add_options(_family_type)
+    return make_options(_family_type)
 
 
 def serif_style() -> t.Callable:
@@ -711,7 +710,7 @@ def serif_style() -> t.Callable:
             """,
         )
     ]
-    return add_options(_serif_style)
+    return make_options(_serif_style)
 
 
 def weight() -> t.Callable:
@@ -729,7 +728,7 @@ def weight() -> t.Callable:
             """,
         )
     ]
-    return add_options(_weight)
+    return make_options(_weight)
 
 
 def proportion() -> t.Callable:
@@ -747,7 +746,7 @@ def proportion() -> t.Callable:
             """,
         )
     ]
-    return add_options(_proportion)
+    return make_options(_proportion)
 
 
 def contrast() -> t.Callable:
@@ -765,7 +764,7 @@ def contrast() -> t.Callable:
             """,
         )
     ]
-    return add_options(_contrast)
+    return make_options(_contrast)
 
 
 def stroke_variation() -> t.Callable:
@@ -783,7 +782,7 @@ def stroke_variation() -> t.Callable:
             """,
         )
     ]
-    return add_options(_stroke_variation)
+    return make_options(_stroke_variation)
 
 
 def arm_style() -> t.Callable:
@@ -801,7 +800,7 @@ def arm_style() -> t.Callable:
             """,
         )
     ]
-    return add_options(_arm_style)
+    return make_options(_arm_style)
 
 
 def letter_form() -> t.Callable:
@@ -819,7 +818,7 @@ def letter_form() -> t.Callable:
             """,
         )
     ]
-    return add_options(_letter_form)
+    return make_options(_letter_form)
 
 
 def midline() -> t.Callable:
@@ -837,7 +836,7 @@ def midline() -> t.Callable:
             """,
         )
     ]
-    return add_options(_midline)
+    return make_options(_midline)
 
 
 def panose_x_height() -> t.Callable:
@@ -855,7 +854,7 @@ def panose_x_height() -> t.Callable:
             """,
         )
     ]
-    return add_options(_x_height)
+    return make_options(_x_height)
 
 
 def panose_options() -> t.Callable:
@@ -874,4 +873,4 @@ def panose_options() -> t.Callable:
         midline(),
         panose_x_height(),
     ]
-    return add_options(_panose_options)
+    return make_options(_panose_options)

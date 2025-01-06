@@ -2,8 +2,7 @@ import typing as t
 
 import click
 
-from foundrytools_cli_2.cli.shared_callbacks import choice_to_int_callback
-from foundrytools_cli_2.cli.shared_options import add_options
+from foundrytools_cli_2.cli import choice_to_int_callback, make_options
 
 
 def rename_source_option() -> t.Callable:
@@ -35,7 +34,7 @@ def rename_source_option() -> t.Callable:
         """,
         )
     ]
-    return add_options(_rename_source_option)
+    return make_options(_rename_source_option)
 
 
 def sort_by_manufacturer_flag() -> t.Callable:
@@ -54,7 +53,7 @@ def sort_by_manufacturer_flag() -> t.Callable:
             help="Sort the font files by manufacturer.",
         )
     ]
-    return add_options(_sort_by_manufacturer_option)
+    return make_options(_sort_by_manufacturer_option)
 
 
 def sort_by_font_revision_flag() -> t.Callable:
@@ -73,7 +72,7 @@ def sort_by_font_revision_flag() -> t.Callable:
             help="Sort the font files by font revision.",
         )
     ]
-    return add_options(_sort_by_font_revision_option)
+    return make_options(_sort_by_font_revision_option)
 
 
 def sort_by_extension_flag() -> t.Callable:
@@ -92,7 +91,7 @@ def sort_by_extension_flag() -> t.Callable:
             help="Sort the font files by extension.",
         )
     ]
-    return add_options(_sort_by_extension_option)
+    return make_options(_sort_by_extension_option)
 
 
 def delete_empty_directories_flag() -> t.Callable:
@@ -111,7 +110,7 @@ def delete_empty_directories_flag() -> t.Callable:
             help="Delete empty directories after moving the font files.",
         )
     ]
-    return add_options(_delete_empty_directories_option)
+    return make_options(_delete_empty_directories_option)
 
 
 def font_organizer_options() -> t.Callable:
@@ -121,7 +120,7 @@ def font_organizer_options() -> t.Callable:
     Returns:
         click.option: The decorator to add the options to a click command
     """
-    return add_options(
+    return make_options(
         [
             rename_source_option(),
             sort_by_manufacturer_flag(),

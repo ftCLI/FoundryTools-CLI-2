@@ -5,8 +5,7 @@ from pathlib import Path
 import click
 from foundrytools import Font
 
-from foundrytools_cli_2.cli.base_command import BaseCommand
-from foundrytools_cli_2.cli.shared_callbacks import choice_to_int_callback
+from foundrytools_cli_2.cli import BaseCommand, choice_to_int_callback
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
 cli = click.Group(help="Utilities for editing the ``name`` table.")

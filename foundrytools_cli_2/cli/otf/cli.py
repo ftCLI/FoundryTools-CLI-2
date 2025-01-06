@@ -9,9 +9,8 @@ from foundrytools.app.otf_check_outlines import run as otf_check_outlines
 from foundrytools.app.otf_dehint import run as otf_dehint
 from foundrytools.utils.path_tools import get_temp_file_path
 
-from foundrytools_cli_2.cli.base_command import BaseCommand
+from foundrytools_cli_2.cli import BaseCommand, make_options
 from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.cli.shared_options import add_options
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
 cli = click.Group(help="Utilities for editing OpenType-PS fonts.")
@@ -27,12 +26,12 @@ def subroutinize_flag() -> Callable:
     _subroutinize_flag = [
         click.option(
             "-subr/-no-subr",
-            "--subroutinize/--no-subroutinize",
+            "subroutinize",
             default=True,
-            help="Subroutinize the font after processind",
+            help="Subroutinize the font after processing",
         )
     ]
-    return add_options(_subroutinize_flag)
+    return make_options(_subroutinize_flag)
 
 
 @cli.command("autohint", cls=BaseCommand)

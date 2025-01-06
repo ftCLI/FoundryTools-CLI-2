@@ -6,7 +6,7 @@ from fontTools.misc.roundTools import otRound
 from foundrytools import Font
 from foundrytools.core.tables.os_2 import InvalidOS2VersionError
 
-from foundrytools_cli_2.cli.base_command import BaseCommand
+from foundrytools_cli_2.cli import BaseCommand, ensure_at_least_one_param
 from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.cli.os_2.options import (
     panose_options,
@@ -14,7 +14,6 @@ from foundrytools_cli_2.cli.os_2.options import (
     set_fs_selection_options,
     set_fs_type_options,
 )
-from foundrytools_cli_2.cli.shared_callbacks import ensure_at_least_one_param
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
 cli = click.Group(help="Utilities for editing the ``OS/2`` table.")

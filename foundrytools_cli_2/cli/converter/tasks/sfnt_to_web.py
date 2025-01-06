@@ -1,5 +1,5 @@
-import typing as t
 from pathlib import Path
+from typing import Literal, Optional
 
 from foundrytools import Font
 from foundrytools.constants import WOFF2_FLAVOR, WOFF_FLAVOR
@@ -9,8 +9,8 @@ from foundrytools_cli_2.cli.logger import logger
 
 def main(
     font: Font,
-    output_dir: t.Optional[Path] = None,
-    out_format: t.Optional[t.Literal["woff", "woff2"]] = None,
+    output_dir: Optional[Path] = None,
+    out_format: Optional[Literal["woff", "woff2"]] = None,
     overwrite: bool = True,
     reorder_tables: bool = False,
 ) -> None:
