@@ -59,7 +59,7 @@ def font_renamer(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Renames the given font files.
     """
-    from foundrytools_cli_2.cli.utils.tasks.font_renamer import main as task
+    from foundrytools_cli_2.cli.utils.font_renamer import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.save_if_modified = False
@@ -100,7 +100,7 @@ def font_organizer(input_path: Path, **options: dict[str, Any]) -> None:
     # This is a workaround to make the task work with the current TaskRunner
     options["in_path"] = cast(Any, input_path)
 
-    from foundrytools_cli_2.cli.utils.tasks.font_organizer import main as task
+    from foundrytools_cli_2.cli.utils.font_organizer import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.save_if_modified = False
@@ -116,6 +116,6 @@ def align_timestamps(input_path: Path, recursive: bool = False) -> None:
     created and modified timestamps stored in their head table.
     """
 
-    from foundrytools_cli_2.cli.utils.tasks.sync_timestamps import main as task
+    from foundrytools_cli_2.cli.utils.sync_timestamps import main as task
 
     task(input_path, recursive=recursive)
