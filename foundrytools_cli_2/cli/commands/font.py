@@ -11,6 +11,82 @@ from foundrytools_cli_2.cli.task_runner import TaskRunner
 cli = click.Group(help="Font level utilities.")
 
 
+@cli.command("correct-contours", cls=BaseCommand)
+@click.option(
+    "-ma",
+    "--min-area",
+    type=click.IntRange(min=0),
+    default=25,
+    help="""
+        All subpaths with a bounding box less than this value will be removed. Default is 25
+        square units (same as afdko.checkoutlinesufo). Set to 0 to disable this feature.
+        """,
+)
+@click.option(
+    "--keep-hinting",
+    "remove_hinting",
+    is_flag=True,
+    default=True,
+    help="Keep hinting for unmodified glyphs, default is to drop hinting",
+)
+@click.option(
+    "--ignore-errors",
+    is_flag=True,
+    help="""
+        Ignore errors while correcting contours, thus keeping the tricky glyphs unchanged.
+        """,
+)
+@click.option(
+    "--keep-unused-subroutines",
+    "remove_unused_subroutines",
+    is_flag=True,
+    default=True,
+    help="""
+        Keep unused subroutines in CFF table after removing overlaps, default is to remove them
+        if any glyphs are modified.
+        """,
+)
+def correct_contours(input_path: Path, **options: dict[str, Any]) -> None:
+    """
+    Correct contours of the given fonts by removing overlaps, correcting the direction of the
+    contours, and removing tiny paths.
+
+    Fixing procedure:
+
+    * Remove overlaps in the contours of the glyphs.
+    * Correct the direction of the contours.
+    * Remove tiny paths.
+    """
+
+    def task(
+        font: Font,
+        min_area: int = 25,
+        remove_hinting: bool = True,
+        ignore_errors: bool = False,
+        remove_unused_subroutines: bool = True,
+    ) -> bool:
+        logger.info("Correcting contours...")
+        modified_glyphs = font.correct_contours(
+            min_area=min_area,
+            remove_hinting=remove_hinting,
+            ignore_errors=ignore_errors,
+            remove_unused_subroutines=remove_unused_subroutines,
+        )
+
+        if not modified_glyphs:
+            logger.info("No glyphs were modified")
+            return False
+
+        logger.opt(colors=True).info(
+            f"{len(modified_glyphs)} glyphs were modified: <lc>{', '.join(modified_glyphs)}</lc>"
+        )
+        return True
+
+    runner = TaskRunner(input_path=input_path, task=task, **options)
+    runner.filter.filter_out_variable = True
+    runner.run()
+
+
 @cli.command("rebuild", cls=BaseCommand)
 def rebuild(input_path: Path, **options: dict[str, Any]) -> None:
     """Rebuild the font by saving it as XML to a temporary stream and then loading it back."""

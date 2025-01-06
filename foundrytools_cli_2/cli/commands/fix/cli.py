@@ -7,62 +7,10 @@ from fontTools.misc.roundTools import otRound
 from foundrytools import Font
 
 from foundrytools_cli_2.cli import BaseCommand
-from foundrytools_cli_2.cli.fix.options import (
-    ignore_errors_flag,
-    keep_hinting_flag,
-    keep_unused_subroutines_flag,
-    min_area_option,
-)
 from foundrytools_cli_2.cli.logger import logger
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
 cli = click.Group(help="Fix font errors.")
-
-
-@cli.command("contours", cls=BaseCommand)
-@min_area_option()
-@keep_hinting_flag()
-@ignore_errors_flag()
-@keep_unused_subroutines_flag()
-def fix_contours(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
-    """
-    Correct contours of the given fonts by removing overlaps, correcting the direction of the
-    contours, and removing tiny paths.
-
-    Fixing procedure:
-
-    * Remove overlaps in the contours of the glyphs.
-    * Correct the direction of the contours.
-    * Remove tiny paths.
-    """
-
-    def task(
-        font: Font,
-        min_area: int = 25,
-        remove_hinting: bool = True,
-        ignore_errors: bool = False,
-        remove_unused_subroutines: bool = True,
-    ) -> bool:
-        logger.info("Correcting contours...")
-        modified_glyphs = font.correct_contours(
-            min_area=min_area,
-            remove_hinting=remove_hinting,
-            ignore_errors=ignore_errors,
-            remove_unused_subroutines=remove_unused_subroutines,
-        )
-
-        if not modified_glyphs:
-            logger.info("No glyphs were modified")
-            return False
-
-        logger.opt(colors=True).info(
-            f"{len(modified_glyphs)} glyphs were modified: <lc>{', '.join(modified_glyphs)}</lc>"
-        )
-        return True
-
-    runner = TaskRunner(input_path=input_path, task=task, **options)
-    runner.filter.filter_out_variable = True
-    runner.run()
 
 
 @cli.command("duplicate-components", cls=BaseCommand)
@@ -134,7 +82,19 @@ def fix_fs_selection(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     font is not bold or italic, the regular bit is set. If the font is bold or italic, the regular
     bit is cleared.
     """
-    from foundrytools_cli_2.cli.fix.tasks.fs_selection import main as task
+
+    def task(font: Font) -> bool:
+        # If the font is not bold or italic, set it to regular
+        if not (font.flags.is_bold or font.flags.is_italic or font.flags.is_regular):
+            font.flags.set_regular()
+            return True
+
+        # If the font is bold or italic, set it to not regular
+        if (font.flags.is_bold or font.flags.is_italic) and font.flags.is_regular:
+            font.t_os_2.fs_selection.regular = False
+            return True
+
+        return False
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -259,7 +219,7 @@ def fix_legacy_accents(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     More info: https://github.com/googlefonts/fontbakery/issues/4310
     """
-    from foundrytools_cli_2.cli.fix.tasks.legacy_accents import fix_legacy_accents as task
+    from foundrytools_cli_2.cli.commands.fix.fix_legacy_accents import fix_legacy_accents as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -280,7 +240,10 @@ def fix_missing_nbsp(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
 
     * Add a glyph for the missing ``nbspace`` character by double mapping the ``space`` character
     """
-    from foundrytools_cli_2.cli.fix.tasks.nbsp_missing import main as task
+
+    def task(font: Font) -> bool:
+        font.t_cmap.add_missing_nbsp()
+        return font.t_cmap.is_modified
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -311,7 +274,9 @@ def fix_nbsp_width(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     * Check if ``nbspace`` and space glyphs have the same width. If not, correct ``nbspace``
     width to match the ``space`` width.
     """
-    from foundrytools_cli_2.cli.fix.tasks.nbsp_width import main as task
+
+    def task(font: Font) -> bool:
+        return font.t_hmtx.fix_non_breaking_space_width()
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -489,7 +454,7 @@ def fix_vertical_metrics(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
     options["safe_bottom"] = t.cast(t.Any, safe_bottom)
     options["safe_top"] = t.cast(t.Any, safe_top)
 
-    from foundrytools_cli_2.cli.fix.tasks.vertical_metrics import main as task
+    from foundrytools_cli_2.cli.commands.fix.fix_vertical_metrics import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()

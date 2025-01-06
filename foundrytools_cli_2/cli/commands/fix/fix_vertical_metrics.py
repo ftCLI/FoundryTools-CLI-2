@@ -4,11 +4,6 @@ from foundrytools import Font
 def main(font: Font, safe_bottom: int, safe_top: int) -> bool:
     """
     Adjusts the vertical metrics of a font to ensure consistency across the family.
-
-    Args:
-        font (Font): The font object to be modified.
-        safe_bottom (int): The safe bottom value for the font's vertical metrics.
-        safe_top (int): The safe top value for the font's vertical metrics.
     """
 
     font.t_os_2.win_ascent = safe_top
