@@ -4,9 +4,9 @@ from typing import Any, Literal, Optional
 import click
 from foundrytools.core.font import Font
 
-from foundrytools_cli_2.cli import BaseCommand, tuple_to_set_callback
-from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.cli.task_runner import TaskRunner
+from foundrytools_cli_2.utils import BaseCommand, tuple_to_set_callback
+from foundrytools_cli_2.utils.logger import logger
+from foundrytools_cli_2.utils.task_runner import TaskRunner
 
 cli = click.Group(help="Font level utilities.")
 

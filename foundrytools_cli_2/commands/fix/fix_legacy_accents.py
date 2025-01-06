@@ -2,7 +2,7 @@ from foundrytools import Font
 from foundrytools.constants import T_CMAP, T_GDEF, T_HMTX
 from foundrytools.core.tables import GdefTable
 
-from foundrytools_cli_2.cli.logger import logger
+from foundrytools_cli_2.utils.logger import logger
 
 
 def fix_legacy_accents(font: Font) -> bool:

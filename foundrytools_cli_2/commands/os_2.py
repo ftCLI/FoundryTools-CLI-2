@@ -6,9 +6,9 @@ from fontTools.misc.roundTools import otRound
 from foundrytools import Font
 from foundrytools.core.tables.os_2 import InvalidOS2VersionError
 
-from foundrytools_cli_2.cli import BaseCommand, choice_to_int_callback, ensure_at_least_one_param
-from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.cli.task_runner import TaskRunner
+from foundrytools_cli_2.utils import BaseCommand, choice_to_int_callback, ensure_at_least_one_param
+from foundrytools_cli_2.utils.logger import logger
+from foundrytools_cli_2.utils.task_runner import TaskRunner
 
 cli = click.Group(help="Utilities for editing the ``OS/2`` table.")
 

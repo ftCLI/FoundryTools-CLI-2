@@ -10,9 +10,9 @@ from foundrytools.app.otf_recalc_stems import run as get_stems
 from foundrytools.app.otf_recalc_zones import run as get_zones
 from foundrytools.utils.path_tools import get_temp_file_path
 
-from foundrytools_cli_2.cli import BaseCommand, make_options
-from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.cli.task_runner import TaskRunner
+from foundrytools_cli_2.utils import BaseCommand, make_options
+from foundrytools_cli_2.utils.logger import logger
+from foundrytools_cli_2.utils.task_runner import TaskRunner
 
 cli = click.Group(help="Utilities for editing OpenType-PS fonts.")
 

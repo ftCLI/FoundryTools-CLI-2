@@ -4,8 +4,8 @@ from typing import Any, Optional
 import click
 from foundrytools import Font
 
-from foundrytools_cli_2.cli import BaseCommand, choice_to_int_callback
-from foundrytools_cli_2.cli.task_runner import TaskRunner
+from foundrytools_cli_2.utils import BaseCommand, choice_to_int_callback
+from foundrytools_cli_2.utils.task_runner import TaskRunner
 
 cli = click.Group(help="Utilities for editing the ``name`` table.")
 

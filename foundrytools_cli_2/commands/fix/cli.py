@@ -6,9 +6,9 @@ import click
 from fontTools.misc.roundTools import otRound
 from foundrytools import Font
 
-from foundrytools_cli_2.cli import BaseCommand
-from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.cli.task_runner import TaskRunner
+from foundrytools_cli_2.utils import BaseCommand
+from foundrytools_cli_2.utils.logger import logger
+from foundrytools_cli_2.utils.task_runner import TaskRunner
 
 cli = click.Group(help="Fix font errors.")
 
@@ -219,7 +219,7 @@ def fix_legacy_accents(input_path: Path, **options: dict[str, Any]) -> None:
 
     More info: https://github.com/googlefonts/fontbakery/issues/4310
     """
-    from foundrytools_cli_2.cli.commands.fix.fix_legacy_accents import fix_legacy_accents as task
+    from foundrytools_cli_2.commands.fix.fix_legacy_accents import fix_legacy_accents as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()
@@ -454,7 +454,7 @@ def fix_vertical_metrics(input_path: Path, **options: dict[str, Any]) -> None:
     options["safe_bottom"] = cast(Any, safe_bottom)
     options["safe_top"] = cast(Any, safe_top)
 
-    from foundrytools_cli_2.cli.commands.fix.fix_vertical_metrics import main as task
+    from foundrytools_cli_2.commands.fix.fix_vertical_metrics import main as task
 
     runner = TaskRunner(input_path=input_path, task=task, **options)
     runner.run()

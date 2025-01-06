@@ -4,9 +4,9 @@ from typing import Any, Optional
 import click
 from foundrytools import Font
 
-from foundrytools_cli_2.cli import BaseCommand, ensure_at_least_one_param
-from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.cli.task_runner import TaskRunner
+from foundrytools_cli_2.utils import BaseCommand, ensure_at_least_one_param
+from foundrytools_cli_2.utils.logger import logger
+from foundrytools_cli_2.utils.task_runner import TaskRunner
 
 
 @click.command(cls=BaseCommand)

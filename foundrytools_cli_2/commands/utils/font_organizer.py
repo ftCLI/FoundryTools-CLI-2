@@ -4,7 +4,7 @@ from foundrytools import Font
 from foundrytools.constants import T_HEAD, T_NAME
 from pathvalidate import sanitize_filename, sanitize_filepath
 
-from foundrytools_cli_2.cli.logger import logger
+from foundrytools_cli_2.utils.logger import logger
 
 __all__ = ["main"]
 

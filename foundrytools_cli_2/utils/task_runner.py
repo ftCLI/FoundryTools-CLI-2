@@ -10,8 +10,8 @@ from foundrytools.lib.font_finder import (
     FontFinder,
 )
 
-from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.cli.timer import Timer
+from foundrytools_cli_2.utils.logger import logger
+from foundrytools_cli_2.utils.timer import Timer
 
 
 class FontSaveError(Exception):
