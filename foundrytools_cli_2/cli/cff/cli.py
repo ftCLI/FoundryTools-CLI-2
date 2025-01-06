@@ -1,6 +1,6 @@
 # pylint: disable=import-outside-toplevel
-import typing as t
 from pathlib import Path
+from typing import Any, Callable
 
 import click
 from foundrytools import Font
@@ -10,7 +10,7 @@ from foundrytools_cli_2.cli import BaseCommand, ensure_at_least_one_param, make_
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
 
-def _top_dict_names_flags() -> t.Callable:
+def _top_dict_names_flags() -> Callable:
     flags = [
         click.option(
             f"--{option_param}",
@@ -25,7 +25,7 @@ def _top_dict_names_flags() -> t.Callable:
     return make_options(flags)
 
 
-def _top_dict_names_options() -> t.Callable:
+def _top_dict_names_options() -> Callable:
     options = [
         click.option(
             f"--{option_param}",
@@ -50,13 +50,13 @@ cli = click.Group("cff", help="Utilities for editing the ``CFF`` table.")
     help="Sets the ``cff.fontNames`` value",
 )
 @_top_dict_names_options()
-def set_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def set_names(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Sets the ``cff.fontNames[0]`` and/or ``topDictIndex[0]`` values.
     """
     ensure_at_least_one_param(click.get_current_context())
 
-    def task(font: Font, **kwargs: t.Dict[str, str]) -> bool:
+    def task(font: Font, **kwargs: dict[str, str]) -> bool:
         font.t_cff_.set_names(**kwargs)
         return True
 
@@ -74,13 +74,13 @@ def set_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     default=None,
     help="Deletes the ``UniqueID`` value",
 )
-def del_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def del_names(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Deletes attributes from ``topDictIndex[0]`` using the provided keyword arguments.
     """
     ensure_at_least_one_param(click.get_current_context())
 
-    def task(font: Font, **kwargs: t.Dict[str, str]) -> bool:
+    def task(font: Font, **kwargs: dict[str, str]) -> bool:
         font.t_cff_.del_names(**kwargs)
         return True
 
@@ -102,7 +102,7 @@ def del_names(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
     required=True,
     help="The string to replace the old string with in the CFF TopDictIndex[0] fields.",
 )
-def find_replace(input_path: Path, **options: t.Dict[str, t.Any]) -> None:
+def find_replace(input_path: Path, **options: dict[str, Any]) -> None:
     """
     Finds and replaces a string in the ``CFF`` table. It performs the replacement in
     ``cff.fontNames[0]`` and in the following ``topDictIndex[0]`` fields:

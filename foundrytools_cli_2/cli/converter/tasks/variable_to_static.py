@@ -48,14 +48,13 @@ def main(
     """
     Generate static font instances based on given parameters.
 
-    Args:
-        var_font (Font): The variable ``Font`` object.
-        select_instance (bool, optional): Whether to select a single instance with custom axis
-            values.
-        overlap (int, optional): The overlap mode. Defaults to 1 (KEEP_AND_SET_FLAGS).
-        output_dir (Optional[Path], optional): The output directory. Defaults to ``None``.
-        overwrite (bool, optional): Whether to overwrite existing files in the output directory.
-            Defaults to ``True``.
+    :param var_font: The variable font to generate static instances from.
+    :param select_instance: If True, the user will be prompted to select the coordinates for the
+        instance.
+    :param overlap: Overlaps removal method. Default is 1 (KEEP_AND_SET_FLAGS)
+    :param output_dir: The directory where the static instances will be saved. If not provided, the
+        instances will be saved in the same directory as the variable font.
+    :param overwrite: If True, the existing files will be overwritten.
     """
     if select_instance:
         axes = var_font.t_fvar.table.axes

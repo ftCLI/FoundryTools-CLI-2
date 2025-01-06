@@ -1,5 +1,4 @@
 # pylint: disable=import-outside-toplevel
-
 from pathlib import Path
 from typing import Any, Literal, Optional
 

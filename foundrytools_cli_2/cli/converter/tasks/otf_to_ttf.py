@@ -1,5 +1,5 @@
-import typing as t
 from pathlib import Path
+from typing import Optional
 
 from foundrytools import Font
 
@@ -9,8 +9,8 @@ from foundrytools_cli_2.cli.logger import logger
 def main(
     font: Font,
     tolerance: float = 1.0,
-    target_upm: t.Optional[int] = None,
-    output_dir: t.Optional[Path] = None,
+    target_upm: Optional[int] = None,
+    output_dir: Optional[Path] = None,
     overwrite: bool = True,
 ) -> None:
     """
