@@ -1,6 +1,6 @@
 # pylint: disable=import-outside-toplevel
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Callable, cast
 
 import click
 from foundrytools import Font
@@ -11,10 +11,28 @@ from foundrytools.utils.path_tools import get_temp_file_path
 
 from foundrytools_cli_2.cli.base_command import BaseCommand
 from foundrytools_cli_2.cli.logger import logger
-from foundrytools_cli_2.cli.shared_options import subroutinize_flag
+from foundrytools_cli_2.cli.shared_options import add_options
 from foundrytools_cli_2.cli.task_runner import TaskRunner
 
 cli = click.Group(help="Utilities for editing OpenType-PS fonts.")
+
+
+def subroutinize_flag() -> Callable:
+    """
+    Add the ``subroutinize`` option to a click command.
+
+    Returns:
+        t.Callable: A decorator that adds the ``subroutinize`` option to a click command
+    """
+    _subroutinize_flag = [
+        click.option(
+            "-subr/-no-subr",
+            "--subroutinize/--no-subroutinize",
+            default=True,
+            help="Subroutinize the font after processind",
+        )
+    ]
+    return add_options(_subroutinize_flag)
 
 
 @cli.command("autohint", cls=BaseCommand)
