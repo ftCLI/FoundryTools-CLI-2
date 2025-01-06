@@ -1,18 +1,15 @@
 # pylint: disable=import-outside-toplevel
-
-import typing as t
 from pathlib import Path
+from typing import Optional
 
 import click
 from foundrytools import FontFinder
-
-from foundrytools_cli_2.cli.shared_options import input_path_argument
 
 cli = click.Group(help="Prints various font's information.")
 
 
 @cli.command("font-names")
-@input_path_argument()
+@click.argument("input_path", type=click.Path(exists=True, resolve_path=True, path_type=Path))
 @click.option(
     "-ml",
     "--max-lines",
@@ -28,7 +25,7 @@ cli = click.Group(help="Prints various font's information.")
     17, 18, 21, 22, 25""",
 )
 def print_font_names(
-    input_path: Path, max_lines: t.Optional[int] = None, minimal: bool = False
+    input_path: Path, max_lines: Optional[int] = None, minimal: bool = False
 ) -> None:
     """
     Prints the name table.
