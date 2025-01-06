@@ -471,13 +471,6 @@ def fix_vertical_metrics(input_path: Path, **options: t.Dict[str, t.Any]) -> Non
 
     This task calculates the minimum y_min and maximum y_max values from the head table of all
     fonts in the family and sets the vertical metrics accordingly.
-
-    Args:
-        input_path (Path): The path to the input font file.
-        options (Dict[str, Any]): Additional options for the task runner.
-
-    Raises:
-        ClickException: If no fonts are found in the specified path.
     """
     from foundrytools import FontFinder
 
