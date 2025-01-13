@@ -11,7 +11,7 @@ logger.add(
     sys.stderr,
     backtrace=False,
     colorize=True,
-    format="[ <level>{level: <8}</level> ] " "{message}",
+    format="[ <level>{level: <8}</level> ] {message}",
     level="INFO",
 )
 
