@@ -8,7 +8,6 @@ from foundrytools.constants import (
     MAC_ENCODING_IDS,
     NAME_IDS_TO_DESCRIPTION,
     PLATFORMS,
-    TERMINAL_WIDTH,
     WINDOWS_ENCODING_IDS,
 )
 from foundrytools.core.tables import CFFTable, NameTable
@@ -39,6 +38,7 @@ FONT_STYLE = "[bold cyan]Font file: {name}[reset]"
 TABLE_NAME = "[bold magenta]'name' table[reset]"
 CFF_TABLE_NAME = "[bold magenta]'CFF ' table[reset]"
 JUSTIFY = 22
+TERMINAL_WIDTH = 80
 
 
 def _wrap_string(

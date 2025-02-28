@@ -1,4 +1,4 @@
-bump2version==1.0.1
+bump-my-version==0.29.0
 mypy==1.15.0
 pylint==3.3.4
 ruff==0.9.8
