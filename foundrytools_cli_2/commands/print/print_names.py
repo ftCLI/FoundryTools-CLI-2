@@ -40,6 +40,7 @@ CFF_TABLE_NAME = "[bold magenta]'CFF ' table[reset]"
 JUSTIFY = 22
 TERMINAL_WIDTH = 80
 
+
 def _wrap_string(
     string: str, width: int, initial_indent: int, indent: int, max_lines: Optional[int] = None
 ) -> str:
