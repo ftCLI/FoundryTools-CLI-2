@@ -1,5 +1,5 @@
-bump-my-version==0.29.0
-mypy==1.14.1
-pylint==3.3.3
-ruff==0.8.6
-setuptools==75.7.0
+bump-my-version==1.0.2
+mypy==1.15.0
+pre-commit==4.2.0
+pylint==3.3.5
+setuptools==76.1.0

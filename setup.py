@@ -17,17 +17,18 @@ def _get_requirements() -> list[str]:
 
 
 setuptools.setup(
-    name="foundrytools-cli-2",
+    name="foundrytools-cli-ng",
     version="2.0.0",
     description="A set of command line tools to inspect, manipulate and convert font files",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    author="ftCLI",
+    author="Cesare Gilento",
     author_email="ftcli@proton.me",
     url="https://github.com/ftCLI/FoundryTools-CLI-2",
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(where="src"),
+    package_dir={"": "src"},
     include_package_data=True,
-    entry_points={"console_scripts": ["ft-cli = foundrytools_cli_2.__main__:cli"]},
+    entry_points={"console_scripts": ["ft-cli = foundrytools_cli_ng.__main__:cli"]},
     install_requires=_get_requirements(),
     classifiers=[
         "Programming Language :: Python :: 3",
